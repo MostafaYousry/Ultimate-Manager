@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_tasks"
+            android:title="@string/tasks"
+            android:checked="true"/>
+        <item
+            android:id="@+id/nav_employees"
+            android:title="@string/employees" />
+        <item
+            android:id="@+id/nav_departments"
+            android:title="@string/departments" />
+    </group>
+</menu>

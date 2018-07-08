@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">EmployeesManagementApp</string>
+
+    <!-- strings defining navigation menu items -->
+    <string name="tasks">Tasks</string>
+    <string name="employees">Employees</string>
+    <string name="departments">Departments</string>
+
+
+</resources>
