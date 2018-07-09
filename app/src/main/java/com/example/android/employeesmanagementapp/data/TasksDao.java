@@ -16,7 +16,7 @@ public interface TasksDao {
     List<TaskEntry> loadAllTasks();
 
 
-    List<TaskEntry> loadTasksByDepartment();
+//    List<TaskEntry> loadTasksByDepartment();
 
     //List<TaskEntry> loadTasksByEmployee();
 

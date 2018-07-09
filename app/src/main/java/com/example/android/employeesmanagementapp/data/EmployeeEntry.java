@@ -6,14 +6,15 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
-@Entity(tableName = "employees" ,foreignKeys = {@ForeignKey(
-        entity=DepartmentEntry.class,
-        parentColumns="department_id",
-        childColumns="employee_id"),
-        @ForeignKey(
-        entity=TaskEntry.class,
-        parentColumns={"task_id",},
-        childColumns="employee_id")} , primaryKeys = {"department_id","task_id","employee_id"})
+//@Entity(tableName = "employees" ,foreignKeys = {@ForeignKey(
+//        entity=DepartmentEntry.class,
+//        parentColumns="department_id",
+//        childColumns="employee_id"),
+//        @ForeignKey(
+//        entity=TaskEntry.class,
+//        parentColumns={"task_id",},
+//        childColumns="employee_id")} , primaryKeys = {"department_id","task_id","employee_id"})
+@Entity(tableName = "employees")
 public class EmployeeEntry {
 
     @PrimaryKey(autoGenerate = true)

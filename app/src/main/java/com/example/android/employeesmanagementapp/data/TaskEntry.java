@@ -9,10 +9,11 @@ import android.arch.persistence.room.PrimaryKey;
 import java.util.Date;
 
 
-@Entity(tableName = "tasks",foreignKeys = @ForeignKey(
-        entity=DepartmentEntry.class,
-        parentColumns="department_id",
-        childColumns="task_id") , primaryKeys = {"department_id","task_id"})
+//@Entity(tableName = "tasks",foreignKeys = @ForeignKey(
+//        entity=DepartmentEntry.class,
+//        parentColumns="department_id",
+//        childColumns="task_id") , primaryKeys = {"department_id","task_id"})
+@Entity(tableName = "tasks")
 public class TaskEntry {
 
     @PrimaryKey(autoGenerate = true)

@@ -3,9 +3,11 @@ package com.example.android.employeesmanagementapp.data;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
+import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 
 @Database(entities = {EmployeeEntry.class,TaskEntry.class,DepartmentEntry.class},version = 1,exportSchema = false)
+@TypeConverters(DateTypeConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
     private static final String TAG = AppDatabase.class.getSimpleName();
     private static final String DATABASE_NAME = "employee_management";
