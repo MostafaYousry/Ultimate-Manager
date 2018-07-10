@@ -14,7 +14,10 @@ import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    private final String TAG = MainActivity.class.getSimpleName();
+    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String DEPARTMENTS_FRAGMENT_TAG = "departments";
+    private static final String TASKS_FRAGMENT_TAG = "tasks";
+    private static final String EMPLOYEES_FRAGMENT_TAG = "employees";
 
     private Toolbar mToolbar;
     private DrawerLayout mDrawerLayout;
@@ -42,8 +45,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //when app starts we show the tasks fragment
         if (savedInstanceState == null){
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container , new TasksFragment()).commit();
+                    .add(R.id.fragment_container , new TasksFragment(),TASKS_FRAGMENT_TAG).commit();
         }
+
+        //temporarily enable fragment manager debug logging
+        FragmentManager.enableDebugLogging(true);
     }
 
     /**
@@ -60,21 +66,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Log.d(TAG , "New Item is selected");
 
+        //todo: add to back stack to be able to return to previous fragment when back is pressed
         FragmentManager fragmentManager = getSupportFragmentManager();
         switch (item.getItemId()){
             case R.id.nav_tasks:
                 fragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container , new TasksFragment()).commit();
+                        .replace(R.id.fragment_container , new TasksFragment() , TASKS_FRAGMENT_TAG)
+                        .commit();
                 mToolbar.setTitle(getString(R.string.tasks));
                 break;
             case R.id.nav_employees:
                 fragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container , new EmployeesFragment()).commit();
+                        .replace(R.id.fragment_container , new EmployeesFragment() , EMPLOYEES_FRAGMENT_TAG)
+                        .commit();
                 mToolbar.setTitle(getString(R.string.employees));
                 break;
             case R.id.nav_departments:
                 fragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container , new DepartmentsFragment()).commit();
+                        .replace(R.id.fragment_container , new DepartmentsFragment() , DEPARTMENTS_FRAGMENT_TAG)
+                        .commit();
                 mToolbar.setTitle(getString(R.string.departments));
                 break;
 
@@ -96,4 +106,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onBackPressed() {
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START))
+            mDrawerLayout.closeDrawers();
+        else
+            super.onBackPressed();
+    }
+
 }

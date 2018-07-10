@@ -6,6 +6,14 @@ import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 
+import com.example.android.employeesmanagementapp.data.daos.DepartmentsDao;
+import com.example.android.employeesmanagementapp.data.daos.EmployeesDao;
+import com.example.android.employeesmanagementapp.data.daos.EmployeesTasksDao;
+import com.example.android.employeesmanagementapp.data.daos.TasksDao;
+import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
+import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
+import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
+
 @Database(entities = {EmployeeEntry.class,TaskEntry.class,DepartmentEntry.class},version = 1,exportSchema = false)
 @TypeConverters(DateTypeConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
@@ -32,4 +40,6 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract TasksDao tasksDao();
 
     public abstract DepartmentsDao departmentsDao();
+
+    public abstract EmployeesTasksDao employeesTasksDao();
 }

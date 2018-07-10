@@ -1,7 +1,6 @@
 package com.example.android.employeesmanagementapp;
 
 
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -11,7 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.android.employeesmanagementapp.data.DepartmentEntry;
+import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -33,6 +32,7 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_departments, container, false);
 
@@ -61,15 +61,16 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
 
 
     /**
-     * Temporary method for inserting fake data to RecyclerView's adapter
+     * Temporary method for inserting fake data to RecyclerView's adapter.
      * tobe replaced with data from database
      */
     private List<DepartmentEntry> getFakeData(){
-        DepartmentEntry departmentEntry1 = new DepartmentEntry("Department 1");
-        DepartmentEntry departmentEntry2 = new DepartmentEntry("Department 2");
-        DepartmentEntry departmentEntry3 = new DepartmentEntry("Department 3");
-        DepartmentEntry departmentEntry4 = new DepartmentEntry("Department 4");
-        DepartmentEntry departmentEntry5 = new DepartmentEntry("Department 5");
+        DepartmentEntry departmentEntry1 = new DepartmentEntry("Production" );
+        DepartmentEntry departmentEntry2 = new DepartmentEntry("Research and Development");
+        DepartmentEntry departmentEntry3 = new DepartmentEntry("Purchasing");
+        DepartmentEntry departmentEntry4 = new DepartmentEntry("Marketing");
+        DepartmentEntry departmentEntry5 = new DepartmentEntry("Human Resource Management");
+        DepartmentEntry departmentEntry6 = new DepartmentEntry("Accounting and Finance");
 
         List<DepartmentEntry> list = new LinkedList<DepartmentEntry>();
         list.add(departmentEntry1);
@@ -77,6 +78,7 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
         list.add(departmentEntry3);
         list.add(departmentEntry4);
         list.add(departmentEntry5);
+        list.add(departmentEntry6);
 
         return list;
     }
