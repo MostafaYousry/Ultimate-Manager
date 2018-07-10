@@ -13,9 +13,16 @@ import java.util.ArrayList;
 
 public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.EmployeeViewHolder> {
     private ArrayList<EmployeeData>  mData;
+    final private EmployeeOnClickListener mEmployeeOnClickListener;
 
-    public EmployeeAdapter(ArrayList<EmployeeData> data) {
+    public EmployeeAdapter(ArrayList<EmployeeData> data, EmployeeOnClickListener listener) {
         mData = data;
+        mEmployeeOnClickListener =  listener;
+    }
+
+    //interface to be implemented by Employee Fragment
+    public interface EmployeeOnClickListener{
+        void onListItemCLicked(int clickedItemIndex);
     }
 
 
@@ -39,7 +46,7 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
     }
 
 
-    public class EmployeeViewHolder extends RecyclerView.ViewHolder {
+    public class EmployeeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         //create object for each view in the item view
         TextView employeeName;
@@ -51,6 +58,9 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
             //set the objects by the opposite view by id
             employeeName = itemView.findViewById(R.id.employee_name);
             employeeImage = itemView.findViewById(R.id.employee_image);
+
+            // set the item click listener
+            itemView.setOnClickListener(this);
         }
         void bind (int position){
 
@@ -58,6 +68,10 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
             employeeName.setText(mData.get(position).getEmployeeName());
             employeeImage.setImageResource(mData.get(position).getEmployeeImageSac());
         }
+
+        @Override
+        public void onClick(View v) {
+            mEmployeeOnClickListener.onListItemCLicked(getAdapterPosition());
+        }
     }
 }
-
