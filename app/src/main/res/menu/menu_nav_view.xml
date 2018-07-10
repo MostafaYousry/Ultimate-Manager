@@ -3,12 +3,15 @@
         <item
             android:id="@+id/nav_tasks"
             android:title="@string/tasks"
-            android:checked="true"/>
+            android:checked="true"
+            android:icon="@drawable/ic_content_paste"/>
         <item
             android:id="@+id/nav_employees"
-            android:title="@string/employees" />
+            android:title="@string/employees"
+            android:icon="@drawable/ic_person"/>
         <item
             android:id="@+id/nav_departments"
-            android:title="@string/departments" />
+            android:title="@string/departments"
+            android:icon="@drawable/ic_people"/>
     </group>
 </menu>

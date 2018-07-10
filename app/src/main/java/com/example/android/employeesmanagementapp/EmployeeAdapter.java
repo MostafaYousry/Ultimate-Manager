@@ -1,16 +1,20 @@
 package com.example.android.employeesmanagementapp;
 
+import android.content.ClipData;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.EmployeeViewHolder> {
-    private String [] mData;
+import java.util.ArrayList;
 
-    public EmployeeAdapter(String[] data) {
+public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.EmployeeViewHolder> {
+    private ArrayList<EmployeeData>  mData;
+
+    public EmployeeAdapter(ArrayList<EmployeeData> data) {
         mData = data;
     }
 
@@ -18,6 +22,7 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
     @NonNull
     @Override
     public EmployeeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        //inflate item layout for the view holder
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.employee_layout,parent,false);
         EmployeeViewHolder employeeViewHolder = new EmployeeViewHolder(v);
         return employeeViewHolder;
@@ -30,17 +35,28 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
 
     @Override
     public int getItemCount() {
-        return mData.length;
+        return mData.size();
     }
 
+
     public class EmployeeViewHolder extends RecyclerView.ViewHolder {
+
+        //create object for each view in the item view
         TextView employeeName;
+        ImageView employeeImage;
+
         public EmployeeViewHolder(View itemView) {
             super(itemView);
+
+            //set the objects by the opposite view by id
             employeeName = itemView.findViewById(R.id.employee_name);
+            employeeImage = itemView.findViewById(R.id.employee_image);
         }
         void bind (int position){
-            employeeName.setText(mData[position]);
+
+            //change the item data by the position
+            employeeName.setText(mData.get(position).getEmployeeName());
+            employeeImage.setImageResource(mData.get(position).getEmployeeImageSac());
         }
     }
 }
