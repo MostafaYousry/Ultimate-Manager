@@ -1,6 +1,8 @@
 package com.example.android.employeesmanagementapp;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
@@ -8,21 +10,47 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private final String TAG = MainActivity.class.getSimpleName();
-
+    private static int fragmentId = R.id.nav_tasks;
     private Toolbar mToolbar;
     private DrawerLayout mDrawerLayout;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent  intent = null;
+                switch (fragmentId){
+                    case  R.id.nav_tasks:
+                        intent = new Intent(MainActivity.this, AddTaskActivity.class);
+                        break;
+                    case R.id.nav_employees:
+                        intent = new Intent(MainActivity.this, AddEmployeeActivity.class);
+                        break;
+
+                    case R.id.nav_departments:
+                         intent = new Intent(MainActivity.this, AddDepartmentActivity.class);
+                        break;
+                  
+                }
+                startActivity(intent);
+            }
+        });
 
         //set toolbar as actionbar
         mToolbar = findViewById(R.id.toolbar);
@@ -57,12 +85,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return true;
         }
 
-
         Log.d(TAG , "New Item is selected");
 
         FragmentManager fragmentManager = getSupportFragmentManager();
-        switch (item.getItemId()){
-            case R.id.nav_tasks:
+        fragmentId = item.getItemId();
+        switch (fragmentId){
+            case  R.id.nav_tasks:
                 fragmentManager.beginTransaction()
                         .replace(R.id.fragment_container , new TasksFragment()).commit();
                 mToolbar.setTitle(getString(R.string.tasks));
