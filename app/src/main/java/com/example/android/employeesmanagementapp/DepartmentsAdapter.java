@@ -14,15 +14,11 @@ import java.util.List;
 public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.DepartmentsViewHolder> {
 
     private List<DepartmentEntry> mDepartments;
-    private GridItemClickListener mGridItemClickListener;
-
-    //interface to handle click events
-    public interface GridItemClickListener{
-        void onGridItemClick(int clickedItemIndex);
-    }
+    private RecyclerViewItemClickListener mGridItemClickListener;
 
 
-    public DepartmentsAdapter(List<DepartmentEntry> data , GridItemClickListener gridItemClickListener){
+
+    public DepartmentsAdapter(List<DepartmentEntry> data , RecyclerViewItemClickListener gridItemClickListener){
         mDepartments = data;
         mGridItemClickListener = gridItemClickListener;
     }
@@ -54,7 +50,7 @@ public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.
         public DepartmentsViewHolder(View itemView) {
             super(itemView);
             mItemView = itemView;
-            mDepartmentName = itemView.findViewById(R.id.tv_department_name);
+            mDepartmentName = itemView.findViewById(R.id.item_department_name);
             mItemView.setOnClickListener(this);
         }
 
@@ -65,7 +61,7 @@ public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.
         @Override
         public void onClick(View v) {
             int clickedItemIndex = getAdapterPosition();
-            mGridItemClickListener.onGridItemClick(clickedItemIndex);
+            mGridItemClickListener.onItemClick(clickedItemIndex);
         }
     }
 

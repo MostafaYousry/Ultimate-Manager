@@ -5,8 +5,18 @@
     <string name="tasks">Tasks</string>
     <string name="employees">Employees</string>
     <string name="departments">Departments</string>
-    <string name="undo_label">Undo</string>
-    <string name="archived_label">Archive</string>
+
+
+    <!--<string name="undo_label">Undo</string>-->
+    <!--<string name="archived_label">Archive</string>-->
+
+
+    <!--strings for task detail activity-->
+    <string name="label_task_detail_title">Title :</string>
+    <string name="label_task_detail_description">Description :</string>
+    <string name="label_task_detail_rating">Rating :</string>
+    <string name="label_task_detail_department">Department :</string>
+    <string name="label_task_detail_employees">Employees :</string>
 
 
 </resources>

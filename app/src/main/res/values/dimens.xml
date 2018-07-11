@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="department_cv_height">250dp</dimen>
-    <dimen name="department_cv_tv_padding">16dp</dimen>
+    <dimen name="item_department_height">250dp</dimen>
+    <dimen name="item_task_height">100dp</dimen>
+
 </resources>

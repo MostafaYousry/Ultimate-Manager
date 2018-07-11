@@ -38,17 +38,22 @@ public class TaskEntry {
     @ColumnInfo(name = "task_is_completed")
     private boolean taskIsCompleted;
 
+
+    //used when creating new tasks
     @Ignore
-    public TaskEntry(int departmentID, String taskTitle, String taskDescription, Date taskStartDate, Date taskDueDate, int taskRating, boolean taskIsCompleted) {
+    public TaskEntry(int departmentID, String taskTitle, String taskDescription, Date taskStartDate, Date taskDueDate) {
         this.departmentID = departmentID;
         this.taskTitle = taskTitle;
         this.taskDescription = taskDescription;
         this.taskStartDate = taskStartDate;
         this.taskDueDate = taskDueDate;
-        this.taskRating = taskRating;
-        this.taskIsCompleted = taskIsCompleted;
+
+        taskRating = 0;
+        taskIsCompleted = false;
     }
 
+
+    //used by room when reading from db
     public TaskEntry(int taskId, int departmentID, String taskTitle, String taskDescription, Date taskStartDate, Date taskDueDate, int taskRating, boolean taskIsCompleted) {
         this.taskId = taskId;
         this.departmentID = departmentID;

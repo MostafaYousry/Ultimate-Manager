@@ -18,7 +18,8 @@
         </activity>
         <activity android:name=".AddTaskActivity" />
         <activity android:name=".AddEmployeeActivity" />
-        <activity android:name=".AddDepartmentActivity"></activity>
+        <activity android:name=".AddDepartmentActivity" />
+        <activity android:name=".TaskDetailActivity"></activity>
     </application>
 
 </manifest>

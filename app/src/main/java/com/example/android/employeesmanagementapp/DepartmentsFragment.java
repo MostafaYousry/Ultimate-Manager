@@ -12,14 +12,14 @@ import android.view.ViewGroup;
 
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.GridItemClickListener {
+public class DepartmentsFragment extends Fragment implements RecyclerViewItemClickListener {
     private final String TAG = DepartmentsFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private DepartmentsAdapter mAdapter;
@@ -39,6 +39,10 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
         //get recycler view
         mRecyclerView = rootView.findViewById(R.id.rv_departments_fragment);
 
+        // this setting to improves performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        mRecyclerView.setHasFixedSize(true);
+
         //initialise recycler view adapter
         mAdapter = new DepartmentsAdapter(getFakeData() , this);
         mRecyclerView.setAdapter(mAdapter);
@@ -51,8 +55,12 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
 
     }
 
+
+    /**
+     * called when a grid item is clicked
+     */
     @Override
-    public void onGridItemClick(int clickedItemIndex) {
+    public void onItemClick(int clickedItemIndex) {
         //todo: open department detail activity
         Log.d(TAG,"Item at index " + clickedItemIndex + " is clicked");
     }
@@ -72,7 +80,7 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
         DepartmentEntry departmentEntry5 = new DepartmentEntry("Human Resource Management");
         DepartmentEntry departmentEntry6 = new DepartmentEntry("Accounting and Finance");
 
-        List<DepartmentEntry> list = new LinkedList<DepartmentEntry>();
+        List<DepartmentEntry> list = new ArrayList<>();
         list.add(departmentEntry1);
         list.add(departmentEntry2);
         list.add(departmentEntry3);

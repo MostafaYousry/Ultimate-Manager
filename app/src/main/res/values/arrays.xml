@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--temporary fake data for spinner-->
+    <string-array name="employees_array">
+        <item>Mostafa</item>
+        <item>Abdelrahman</item>
+        <item>Karim</item>
+        <item>Abdallah</item>
+        <item>Moamen</item>
+        <item>Ammar</item>
+    </string-array>
+
+</resources>

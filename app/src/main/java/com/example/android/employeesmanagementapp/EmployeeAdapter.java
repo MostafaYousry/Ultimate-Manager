@@ -1,6 +1,5 @@
 package com.example.android.employeesmanagementapp;
 
-import android.content.ClipData;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -30,8 +29,10 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
     @Override
     public EmployeeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         //inflate item layout for the view holder
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.employee_layout,parent,false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_employees_rv,parent,false);
+
         EmployeeViewHolder employeeViewHolder = new EmployeeViewHolder(v);
+
         return employeeViewHolder;
     }
 
@@ -52,7 +53,7 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
         TextView employeeName;
         ImageView employeeImage;
 
-        public EmployeeViewHolder(View itemView) {
+        EmployeeViewHolder(View itemView) {
             super(itemView);
 
             //set the objects by the opposite view by id
