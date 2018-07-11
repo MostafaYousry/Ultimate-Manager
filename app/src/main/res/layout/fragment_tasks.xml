@@ -9,6 +9,6 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="tasks fragment 7an7ot hena el view pager b etneen tabs" />
+        android:text="tasks fragment" />
 
 </FrameLayout>
