@@ -24,7 +24,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private static final String DEPARTMENTS_FRAGMENT_TAG = "departments";
     private static final String TASKS_FRAGMENT_TAG = "tasks";
     private static final String EMPLOYEES_FRAGMENT_TAG = "employees";
-    private final String TAG = MainActivity.class.getSimpleName();
     private static int fragmentId = R.id.nav_tasks;
     private Toolbar mToolbar;
 
