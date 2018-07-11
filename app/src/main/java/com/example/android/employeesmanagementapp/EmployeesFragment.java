@@ -37,6 +37,16 @@ public class EmployeesFragment extends Fragment implements EmployeeAdapter.Emplo
         mEmployeeData.add(new EmployeeData("Tom Holland",R.drawable.family_son));
         mEmployeeData.add(new EmployeeData("Elezabeth Olsen",R.drawable.family_daughter));
         mEmployeeData.add(new EmployeeData("Chris Evans",R.drawable.family_older_brother));
+        mEmployeeData.add(new EmployeeData("Robert Dawney", R.drawable.family_father));
+        mEmployeeData.add(new EmployeeData("Emma Watson", R.drawable.family_mother));
+        mEmployeeData.add(new EmployeeData("Tom Holland",R.drawable.family_son));
+        mEmployeeData.add(new EmployeeData("Elezabeth Olsen",R.drawable.family_daughter));
+        mEmployeeData.add(new EmployeeData("Chris Evans",R.drawable.family_older_brother));
+        mEmployeeData.add(new EmployeeData("Robert Dawney", R.drawable.family_father));
+        mEmployeeData.add(new EmployeeData("Emma Watson", R.drawable.family_mother));
+        mEmployeeData.add(new EmployeeData("Tom Holland",R.drawable.family_son));
+        mEmployeeData.add(new EmployeeData("Elezabeth Olsen",R.drawable.family_daughter));
+        mEmployeeData.add(new EmployeeData("Chris Evans",R.drawable.family_older_brother));
 
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_employees, container, false);
