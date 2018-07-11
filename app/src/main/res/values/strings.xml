@@ -5,6 +5,8 @@
     <string name="tasks">Tasks</string>
     <string name="employees">Employees</string>
     <string name="departments">Departments</string>
+    <string name="undo_label">Undo</string>
+    <string name="archived_label">Archive</string>
 
 
 </resources>
