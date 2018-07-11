@@ -8,36 +8,34 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
+import com.example.android.employeesmanagementapp.utils.AppUtils;
+
 import java.util.ArrayList;
+import java.util.List;
 
-public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.EmployeeViewHolder> {
-    private ArrayList<EmployeeData>  mData;
-    final private EmployeeOnClickListener mEmployeeOnClickListener;
+public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.EmployeesViewHolder> {
+    private List<EmployeeEntry> mData;
+    final private RecyclerViewItemClickListener mClickListener;
 
-    public EmployeeAdapter(ArrayList<EmployeeData> data, EmployeeOnClickListener listener) {
+    EmployeesAdapter(List<EmployeeEntry> data, RecyclerViewItemClickListener listener) {
         mData = data;
-        mEmployeeOnClickListener =  listener;
+        mClickListener =  listener;
     }
-
-    //interface to be implemented by Employee Fragment
-    public interface EmployeeOnClickListener{
-        void onListItemCLicked(int clickedItemIndex);
-    }
-
 
     @NonNull
     @Override
-    public EmployeeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public EmployeesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         //inflate item layout for the view holder
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_employees_rv,parent,false);
 
-        EmployeeViewHolder employeeViewHolder = new EmployeeViewHolder(v);
+        EmployeesViewHolder employeesViewHolder = new EmployeesViewHolder(v);
 
-        return employeeViewHolder;
+        return employeesViewHolder;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull EmployeeViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull EmployeesViewHolder holder, int position) {
         holder.bind(position);
     }
 
@@ -47,13 +45,13 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
     }
 
 
-    public class EmployeeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class EmployeesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         //create object for each view in the item view
         TextView employeeName;
         ImageView employeeImage;
 
-        EmployeeViewHolder(View itemView) {
+        EmployeesViewHolder(View itemView) {
             super(itemView);
 
             //set the objects by the opposite view by id
@@ -67,12 +65,12 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
 
             //change the item data by the position
             employeeName.setText(mData.get(position).getEmployeeName());
-            employeeImage.setImageResource(mData.get(position).getEmployeeImageSac());
+            employeeImage.setImageResource(AppUtils.getRandomEmployeeImage());
         }
 
         @Override
         public void onClick(View v) {
-            mEmployeeOnClickListener.onListItemCLicked(getAdapterPosition());
+            mClickListener.onItemClick(getAdapterPosition());
         }
     }
 }

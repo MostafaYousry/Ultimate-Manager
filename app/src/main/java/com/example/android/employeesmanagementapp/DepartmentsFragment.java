@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
+import com.example.android.employeesmanagementapp.utils.AppUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,17 +35,17 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
                              Bundle savedInstanceState) {
 
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_departments, container, false);
+        View rootView = inflater.inflate(R.layout.fragments_rv, container, false);
 
         //get recycler view
-        mRecyclerView = rootView.findViewById(R.id.rv_departments_fragment);
+        mRecyclerView = rootView.findViewById(R.id.rv_fragment);
 
         // this setting to improves performance if you know that changes
         // in content do not change the layout size of the RecyclerView
         mRecyclerView.setHasFixedSize(true);
 
         //initialise recycler view adapter
-        mAdapter = new DepartmentsAdapter(getFakeData() , this);
+        mAdapter = new DepartmentsAdapter(AppUtils.getDepartmentsFakeData(), this);
         mRecyclerView.setAdapter(mAdapter);
 
         //hooking recycler view with grid layout manager (2 columns)
@@ -65,29 +66,4 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
         Log.d(TAG,"Item at index " + clickedItemIndex + " is clicked");
     }
 
-
-
-
-    /**
-     * Temporary method for inserting fake data to RecyclerView's adapter.
-     * tobe replaced with data from database
-     */
-    private List<DepartmentEntry> getFakeData(){
-        DepartmentEntry departmentEntry1 = new DepartmentEntry("Production" );
-        DepartmentEntry departmentEntry2 = new DepartmentEntry("Research and Development");
-        DepartmentEntry departmentEntry3 = new DepartmentEntry("Purchasing");
-        DepartmentEntry departmentEntry4 = new DepartmentEntry("Marketing");
-        DepartmentEntry departmentEntry5 = new DepartmentEntry("Human Resource Management");
-        DepartmentEntry departmentEntry6 = new DepartmentEntry("Accounting and Finance");
-
-        List<DepartmentEntry> list = new ArrayList<>();
-        list.add(departmentEntry1);
-        list.add(departmentEntry2);
-        list.add(departmentEntry3);
-        list.add(departmentEntry4);
-        list.add(departmentEntry5);
-        list.add(departmentEntry6);
-
-        return list;
-    }
 }
