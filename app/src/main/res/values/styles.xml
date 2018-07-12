@@ -1,5 +1,8 @@
 <resources>
 
+
+
+
     <!-- Base application theme. -->
     <style name="AppTheme" parent="@style/Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
@@ -8,6 +11,7 @@
         <item name="colorAccent">@color/colorSecondary</item>
         <!--style for card view-->
         <item name="cardViewStyle">@style/CardView</item>
+        <item name="coordinatorLayoutStyle">@style/Widget.Design.CoordinatorLayout</item>
     </style>
 
 

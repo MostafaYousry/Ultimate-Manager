@@ -2,6 +2,7 @@ package com.example.android.employeesmanagementapp;
 
 
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -64,6 +65,9 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
     public void onItemClick(int clickedItemIndex) {
         //todo: open department detail activity
         Log.d(TAG,"Item at index " + clickedItemIndex + " is clicked");
+
+        Snackbar.make(getView(), "Item at index " + clickedItemIndex + " is clicked", Snackbar.LENGTH_SHORT)
+                .show();
     }
 
 }

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -24,8 +25,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private static final String DEPARTMENTS_FRAGMENT_TAG = "departments";
     private static final String TASKS_FRAGMENT_TAG = "tasks";
     private static final String EMPLOYEES_FRAGMENT_TAG = "employees";
-    private static int fragmentId = R.id.nav_tasks;
+    private int mSelectedFragmentId = R.id.nav_tasks;
     private Toolbar mToolbar;
+    private BottomNavigationView mBottomNavigationView;
 
 
 
@@ -33,27 +35,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent  intent = null;
-                switch (fragmentId){
-                    case  R.id.nav_tasks:
-                        intent = new Intent(MainActivity.this, AddTaskActivity.class);
-                        break;
-                    case R.id.nav_employees:
-                        intent = new Intent(MainActivity.this, AddEmployeeActivity.class);
-                        break;
 
-                    case R.id.nav_departments:
-                         intent = new Intent(MainActivity.this, AddDepartmentActivity.class);
-                        break;
-                  
-                }
-                startActivity(intent);
-            }
-        });
+        setUpFab();
 
         //set toolbar as actionbar
         mToolbar = findViewById(R.id.toolbar);
@@ -61,17 +44,46 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
 
         //setup navigation view
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation_view);
-        bottomNavigationView.setOnNavigationItemSelectedListener(this);
+        mBottomNavigationView = findViewById(R.id.bottom_navigation_view);
+        mBottomNavigationView.setOnNavigationItemSelectedListener(this);
 
 
         //when app starts we show the tasks fragment
         if (savedInstanceState == null){
-            bottomNavigationView.setSelectedItemId(R.id.nav_tasks);
+            mBottomNavigationView.setSelectedItemId(R.id.nav_tasks);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.fragment_container , new TasksFragment(),TASKS_FRAGMENT_TAG).commit();
         }
 
+
+    }
+
+
+
+    private void setUpFab(){
+
+//        FloatingActionButton fab = findViewById(R.id.fab);
+//
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent  intent = null;
+//                switch (mSelectedFragmentId){
+//                    case  R.id.nav_tasks:
+//                        intent = new Intent(MainActivity.this, AddTaskActivity.class);
+//                        break;
+//                    case R.id.nav_employees:
+//                        intent = new Intent(MainActivity.this, AddEmployeeActivity.class);
+//                        break;
+//
+//                    case R.id.nav_departments:
+//                        intent = new Intent(MainActivity.this, AddDepartmentActivity.class);
+//                        break;
+//
+//                }
+//                startActivity(intent);
+//            }
+//        });
     }
 
     /**
@@ -88,8 +100,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         //todo: add to back stack to be able to return to previous fragment when back is pressed
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentId = item.getItemId();
-        switch (fragmentId){
+        mSelectedFragmentId = item.getItemId();
+        switch (mSelectedFragmentId){
             case  R.id.nav_tasks:
                 fragmentManager.beginTransaction()
                         .replace(R.id.fragment_container , new TasksFragment() , TASKS_FRAGMENT_TAG)

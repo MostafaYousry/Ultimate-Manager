@@ -11,4 +11,13 @@
         <item>Ammar</item>
     </string-array>
 
+    <!--temporary fake data for spinner-->
+    <string-array name="departments_array">
+        <item>Management</item>
+        <item>Research and Development</item>
+        <item>Business</item>
+        <item>Human Resources</item>
+    </string-array>
+
+
 </resources>

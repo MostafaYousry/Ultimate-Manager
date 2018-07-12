@@ -11,12 +11,16 @@
     <!--<string name="archived_label">Archive</string>-->
 
 
-    <!--strings for task detail activity-->
-    <string name="label_task_detail_title">Title :</string>
-    <string name="label_task_detail_description">Description :</string>
-    <string name="label_task_detail_rating">Rating :</string>
-    <string name="label_task_detail_department">Department :</string>
-    <string name="label_task_detail_employees">Employees :</string>
+    <!--strings for task detail activity & add task activity-->
+    <string name="label_task_title">Title :</string>
+    <string name="label_task_description">Description :</string>
+    <string name="label_task_rating">Rating :</string>
+    <string name="label_task_department">Department :</string>
+    <string name="label_task_employees">Employees :</string>
+    <string name="label_task_start_date">Starts :</string>
+    <string name="label_task_due_date">Due :</string>
+    <string name="hint_task_start_date">Choose start date</string>
+    <string name="hint_task_due_date">Choose due date</string>
 
 
 </resources>

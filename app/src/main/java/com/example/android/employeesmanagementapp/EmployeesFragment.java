@@ -3,10 +3,12 @@ package com.example.android.employeesmanagementapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +27,7 @@ import java.util.List;
  */
 public class EmployeesFragment extends Fragment implements RecyclerViewItemClickListener{
 
+    private static final String TAG = EmployeesFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private EmployeesAdapter mEmployeesAdapter;
 
@@ -70,6 +73,10 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
     @Override
     public void onItemClick(int clickedItemIndex) {
         //todo:open employee details
+
+        Log.d(TAG,"Item at index " + clickedItemIndex + " is clicked");
+        Snackbar.make(getView(), "Item at index " + clickedItemIndex + " is clicked", Snackbar.LENGTH_SHORT)
+                .show();
     }
 
 

@@ -1,25 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/border"
-    android:orientation="horizontal">
+    android:layout_gravity="center"
+    android:layout_margin="@dimen/item_employee_margin"
+    card_view:cardElevation="@dimen/cardview_default_elevation">
 
-    <ImageView
-        android:id="@+id/employee_image"
-        android:layout_width="0dp"
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1" />
+        android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/employee_name"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="2"
-        android:gravity="top"
-        android:padding="10dp"
-        android:textSize="15dp"
-        tools:text="huhuhuhuhuhyyyui"/>
+        <ImageView
+            android:id="@+id/employee_image"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/employee_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:gravity="top"
+            android:padding="10dp"
+            android:textSize="15sp" />
+
+    </LinearLayout>
+</android.support.v7.widget.CardView>
