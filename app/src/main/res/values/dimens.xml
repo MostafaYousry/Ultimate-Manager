@@ -3,5 +3,6 @@
     <dimen name="item_department_height">250dp</dimen>
     <dimen name="item_task_height">100dp</dimen>
     <dimen name="item_employee_margin">4dp</dimen>
+    <dimen name="add_department_margin">15dp</dimen>
 
 </resources>

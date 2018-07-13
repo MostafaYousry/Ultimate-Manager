@@ -1,12 +1,133 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".AddDepartmentActivity">
+
+    <include
+        android:id="@+id/department_toolbar"
+        layout="@layout/toolbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:layout_editor_absoluteY="25dp">
+
     <TextView
+        android:id="@+id/department_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ADD DEPARTMENT"/>
-</android.support.constraint.ConstraintLayout>
+        android:textColor="@color/colorSecondaryText"
+        android:layout_below="@id/toolbar"
+        android:layout_margin="@dimen/add_department_margin"
+        android:text="Name : "
+        android:textSize="18sp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline2"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <EditText
+        android:id="@+id/department_name_edit_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/add_department_margin"
+        android:hint="Department name"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/department_name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/guideline2"
+        app:layout_constraintTop_toTopOf="@+id/department_name"/>
+
+    <TextView
+        android:id="@+id/department_employees_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorSecondaryText"
+        style="@style/DepartmentMargin"
+        android:text="Employees : "
+        android:textSize="18sp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline2"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/department_name"/>
+
+    <Spinner
+        android:id="@+id/department_employees_spinner"
+        android:layout_width="0dp"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:spinnerMode="dropdown"
+        android:textSize="18sp"
+        style="@style/DepartmentMargin3"
+        app:layout_constraintBottom_toBottomOf="@+id/department_employees_text_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/guideline2"
+        app:layout_constraintTop_toTopOf="@+id/department_employees_text_view"/>
+
+    <TextView
+        android:id="@+id/department_running_task"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Running task : "
+        android:textColor="@color/colorSecondaryText"
+        android:textSize="18sp"
+        style="@style/DepartmentMargin"
+        app:layout_constraintEnd_toStartOf="@+id/guideline2"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/department_employees_text_view" />
+
+    <EditText
+        android:id="@+id/department_running_task_edit_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/DepartmentMargin2"
+        android:hint="Running task"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/department_running_task"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/guideline2"
+        app:layout_constraintTop_toTopOf="@+id/department_running_task"/>
+
+    <TextView
+        android:id="@+id/department_complete_tasks_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/DepartmentMargin"
+        android:text="Completed tasks : "
+        android:textSize="18sp"
+        android:textColor="@color/colorSecondaryText"
+        app:layout_constraintEnd_toStartOf="@+id/guideline2"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/department_running_task" />
+
+    <Spinner
+        android:id="@+id/department_completed_tasks_spinner"
+        android:layout_width="0dp"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        style="@style/DepartmentMargin3"
+        android:spinnerMode="dropdown"
+        android:textSize="18sp"
+        android:layout_alignParentRight="true"
+        app:layout_constraintBottom_toBottomOf="@+id/department_complete_tasks_text_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/guideline2"
+        app:layout_constraintTop_toTopOf="@+id/department_complete_tasks_text_view"/>
+
+        <android.support.constraint.Guideline
+            android:id="@+id/guideline2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="128dp" />
+    </android.support.constraint.ConstraintLayout>
+</LinearLayout>

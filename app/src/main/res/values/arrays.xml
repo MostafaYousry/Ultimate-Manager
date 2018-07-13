@@ -19,5 +19,13 @@
         <item>Human Resources</item>
     </string-array>
 
+    <!--temporary fake data for spinner-->
+    <string-array name="task_array">
+        <item>task2</item>
+        <item>task2</item>
+        <item>task3</item>
+        <item>task3</item>
+    </string-array>
+
 
 </resources>

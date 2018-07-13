@@ -1,6 +1,7 @@
 package com.example.android.employeesmanagementapp;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -66,8 +67,10 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
         //todo: open department detail activity
         Log.d(TAG,"Item at index " + clickedItemIndex + " is clicked");
 
-        Snackbar.make(getView(), "Item at index " + clickedItemIndex + " is clicked", Snackbar.LENGTH_SHORT)
-                .show();
+        Intent intent = new Intent(getActivity() , AddDepartmentActivity.class);
+        //todo:pass rv.getTag ---> item id in db instead index in rv
+        intent.putExtra(AddDepartmentActivity.DEPARTMENT_ID_KEY , clickedItemIndex);
+        startActivity(intent);
     }
 
 }

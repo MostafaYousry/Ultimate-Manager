@@ -33,5 +33,8 @@
     <string name="add_new_task">Add new task</string>
     <string name="update_task">Update task</string>
 
+    <string name="add_new_department">Add new department</string>
+    <string name="update_department">Update department</string>
+
 
 </resources>
