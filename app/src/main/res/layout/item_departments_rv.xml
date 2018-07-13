@@ -8,8 +8,9 @@
     android:layout_marginTop="4dp"
     android:layout_gravity="center"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/department_cv_height"
-    card_view:cardElevation="@dimen/cardview_default_elevation">
+    android:layout_height="@dimen/item_department_height"
+    card_view:cardElevation="@dimen/cardview_default_elevation"
+    card_view:cardCornerRadius="@dimen/cardview_default_radius">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,11 +18,11 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/tv_department_name"
+            android:id="@+id/item_department_name"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:padding="@dimen/department_cv_tv_padding"
+            android:padding="16dp"
             android:textColor="@android:color/black"
             android:textSize="18sp"
             tools:text="Department1" />

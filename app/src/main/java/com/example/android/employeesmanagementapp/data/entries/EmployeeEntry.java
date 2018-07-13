@@ -31,25 +31,20 @@ public class EmployeeEntry {
     @ColumnInfo(name = "employee_hire_date")
     private Date employeeHireDate;
 
-    @ColumnInfo(name = "employee_num_tasks_completed")
-    private int numTasksCompleted;
-
     @Ignore
-    public EmployeeEntry(int departmentId, @NonNull String employeeName, @NonNull int employeeSalary, Date employeeHireDate, int numTasksCompleted) {
+    public EmployeeEntry(int departmentId, @NonNull String employeeName, @NonNull int employeeSalary, Date employeeHireDate) {
         this.departmentId = departmentId;
         this.employeeName = employeeName;
         this.employeeSalary = employeeSalary;
         this.employeeHireDate = employeeHireDate;
-        this.numTasksCompleted = numTasksCompleted;
     }
 
-    public EmployeeEntry(int employeeID, int departmentId, @NonNull String employeeName, @NonNull int employeeSalary, Date employeeHireDate, int numTasksCompleted) {
+    public EmployeeEntry(int employeeID, int departmentId, @NonNull String employeeName, @NonNull int employeeSalary, Date employeeHireDate) {
         this.employeeID = employeeID;
         this.departmentId = departmentId;
         this.employeeName = employeeName;
         this.employeeSalary = employeeSalary;
         this.employeeHireDate = employeeHireDate;
-        this.numTasksCompleted = numTasksCompleted;
     }
 
     public int getEmployeeID() {
@@ -94,11 +89,4 @@ public class EmployeeEntry {
         this.employeeHireDate = employeeHireDate;
     }
 
-    public int getNumTasksCompleted() {
-        return numTasksCompleted;
-    }
-
-    public void setNumTasksCompleted(int numTasksCompleted) {
-        this.numTasksCompleted = numTasksCompleted;
-    }
 }

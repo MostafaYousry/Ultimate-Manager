@@ -2,6 +2,7 @@ package com.example.android.employeesmanagementapp;
 
 
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,15 +12,16 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
+import com.example.android.employeesmanagementapp.utils.AppUtils;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.GridItemClickListener {
+public class DepartmentsFragment extends Fragment implements RecyclerViewItemClickListener {
     private final String TAG = DepartmentsFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private DepartmentsAdapter mAdapter;
@@ -34,13 +36,17 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
                              Bundle savedInstanceState) {
 
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_departments, container, false);
+        View rootView = inflater.inflate(R.layout.fragments_rv, container, false);
 
         //get recycler view
-        mRecyclerView = rootView.findViewById(R.id.rv_departments_fragment);
+        mRecyclerView = rootView.findViewById(R.id.rv_fragment);
+
+        // this setting to improves performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        mRecyclerView.setHasFixedSize(true);
 
         //initialise recycler view adapter
-        mAdapter = new DepartmentsAdapter(getFakeData() , this);
+        mAdapter = new DepartmentsAdapter(AppUtils.getDepartmentsFakeData(), this);
         mRecyclerView.setAdapter(mAdapter);
 
         //hooking recycler view with grid layout manager (2 columns)
@@ -51,35 +57,17 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
 
     }
 
-    @Override
-    public void onGridItemClick(int clickedItemIndex) {
-        //todo: open department detail activity
-        Log.d(TAG,"Item at index " + clickedItemIndex + " is clicked");
-    }
-
-
-
 
     /**
-     * Temporary method for inserting fake data to RecyclerView's adapter.
-     * tobe replaced with data from database
+     * called when a grid item is clicked
      */
-    private List<DepartmentEntry> getFakeData(){
-        DepartmentEntry departmentEntry1 = new DepartmentEntry("Production" );
-        DepartmentEntry departmentEntry2 = new DepartmentEntry("Research and Development");
-        DepartmentEntry departmentEntry3 = new DepartmentEntry("Purchasing");
-        DepartmentEntry departmentEntry4 = new DepartmentEntry("Marketing");
-        DepartmentEntry departmentEntry5 = new DepartmentEntry("Human Resource Management");
-        DepartmentEntry departmentEntry6 = new DepartmentEntry("Accounting and Finance");
+    @Override
+    public void onItemClick(int clickedItemIndex) {
+        //todo: open department detail activity
+        Log.d(TAG,"Item at index " + clickedItemIndex + " is clicked");
 
-        List<DepartmentEntry> list = new LinkedList<DepartmentEntry>();
-        list.add(departmentEntry1);
-        list.add(departmentEntry2);
-        list.add(departmentEntry3);
-        list.add(departmentEntry4);
-        list.add(departmentEntry5);
-        list.add(departmentEntry6);
-
-        return list;
+        Snackbar.make(getView(), "Item at index " + clickedItemIndex + " is clicked", Snackbar.LENGTH_SHORT)
+                .show();
     }
+
 }
