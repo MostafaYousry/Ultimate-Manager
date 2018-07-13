@@ -1,0 +1,25 @@
+//todo:merge employee detail and add employee activities into one
+//todo:merge department detail and add department activities into one
+//todo:fix task start and due date issue
+
+
+//App database
+//todo:finish entities and daos
+//todo:test on main thread
+//todo:add live data
+//todo:add view models
+
+
+
+//App Theme
+//todo:see how to use Theme.material
+//todo:use text input edit text material design component instead of normal edit text
+//todo:apply every widget guideline(elevation,measurements,...)
+//todo:apply transitions,animations,statelist animator, .....
+//todo:apply coordinator layout in activities
+//todo:add feature to load image from phone or take one with camera
+//todo:apply picasso image library for image processing
+//todo:use image color palette to pick background color for department name
+//todo:choose app fonts (Typogrophy)
+//todo:pick app theme colors(see color guidelines and material palette)
+//todo:pick app icons(Iconography) (see material design guide)

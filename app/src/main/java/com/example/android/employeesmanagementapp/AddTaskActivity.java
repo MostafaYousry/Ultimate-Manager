@@ -174,7 +174,7 @@ public class AddTaskActivity extends AppCompatActivity  {
         if (mTaskId == DEFAULT_TASK_ID){
             getSupportActionBar().setTitle(getString(R.string.add_new_task));
         }else {
-            getSupportActionBar().setTitle(getString(R.string.update_task));
+            getSupportActionBar().setTitle(getString(R.string.edit_task));
         }
     }
 
@@ -187,7 +187,6 @@ public class AddTaskActivity extends AppCompatActivity  {
             mTaskRatingBar.setRating(0);
             mTaskRatingBar.setIsIndicator(false);
         }else {
-            mToolbar.setTitle(getString(R.string.update_task));
 //            mTaskRatingBar.setIsIndicator(true);
             //todo:set task rating
         }

@@ -31,7 +31,7 @@
 
     <!--strings for toolbar title-->
     <string name="add_new_task">Add new task</string>
-    <string name="update_task">Update task</string>
+    <string name="edit_task">Edit task</string>
 
 
 </resources>
