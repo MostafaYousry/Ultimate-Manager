@@ -2,4 +2,5 @@
 <resources>
     <dimen name="department_cv_height">250dp</dimen>
     <dimen name="department_cv_tv_padding">16dp</dimen>
+    <dimen name="employee_cv_margine">4dp</dimen>
 </resources>

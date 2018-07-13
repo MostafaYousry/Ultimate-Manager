@@ -67,9 +67,6 @@ public class EmployeesFragment extends Fragment implements EmployeeAdapter.Emplo
         mLinearLayoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
 
-        //add divider between items
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-
         //create object of EmployeeAdapter and send data
         mEmployeeAdapter = new EmployeeAdapter(mEmployeeData, this);
 
