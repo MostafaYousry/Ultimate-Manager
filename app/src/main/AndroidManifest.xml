@@ -18,8 +18,12 @@
             </intent-filter>
 
         </activity>
-        <activity android:name=".AddTaskActivity" >
-
+        <activity
+            android:name=".AddTaskActivity"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
 
 
         </activity>
@@ -28,7 +32,6 @@
 
         <activity android:name=".AddDepartmentActivity" />
 
-        <activity android:name=".TaskDetailActivity"/>
     </application>
 
 </manifest>

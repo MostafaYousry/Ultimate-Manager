@@ -22,9 +22,11 @@ import android.view.View;
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+
     private static final String DEPARTMENTS_FRAGMENT_TAG = "departments";
     private static final String TASKS_FRAGMENT_TAG = "tasks";
     private static final String EMPLOYEES_FRAGMENT_TAG = "employees";
+
     private int mSelectedFragmentId = R.id.nav_tasks;
     private Toolbar mToolbar;
     private BottomNavigationView mBottomNavigationView;
@@ -53,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             mBottomNavigationView.setSelectedItemId(R.id.nav_tasks);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.fragment_container , new TasksFragment(),TASKS_FRAGMENT_TAG).commit();
+            getSupportActionBar().setTitle(getString(R.string.tasks));
         }
 
 
@@ -62,28 +65,28 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     private void setUpFab(){
 
-//        FloatingActionButton fab = findViewById(R.id.fab);
-//
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent  intent = null;
-//                switch (mSelectedFragmentId){
-//                    case  R.id.nav_tasks:
-//                        intent = new Intent(MainActivity.this, AddTaskActivity.class);
-//                        break;
-//                    case R.id.nav_employees:
-//                        intent = new Intent(MainActivity.this, AddEmployeeActivity.class);
-//                        break;
-//
-//                    case R.id.nav_departments:
-//                        intent = new Intent(MainActivity.this, AddDepartmentActivity.class);
-//                        break;
-//
-//                }
-//                startActivity(intent);
-//            }
-//        });
+        FloatingActionButton fab = findViewById(R.id.fab);
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent  intent = null;
+                switch (mSelectedFragmentId){
+                    case  R.id.nav_tasks:
+                        intent = new Intent(MainActivity.this, AddTaskActivity.class);
+                        break;
+                    case R.id.nav_employees:
+                        intent = new Intent(MainActivity.this, AddEmployeeActivity.class);
+                        break;
+
+                    case R.id.nav_departments:
+                        intent = new Intent(MainActivity.this, AddDepartmentActivity.class);
+                        break;
+
+                }
+                startActivity(intent);
+            }
+        });
     }
 
     /**

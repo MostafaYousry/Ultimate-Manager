@@ -1,6 +1,7 @@
 package com.example.android.employeesmanagementapp;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -63,10 +64,13 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
      */
     @Override
     public void onItemClick(int clickedItemIndex) {
-        //todo: open task detail activity
         Log.d(TAG,"Item at index " + clickedItemIndex + " is clicked");
-        Snackbar.make(getView(), "Item at index " + clickedItemIndex + " is clicked", Snackbar.LENGTH_SHORT)
-                .show();
+
+
+        Intent intent = new Intent(getActivity() , AddTaskActivity.class);
+        //todo:pass rv.getTag ---> item id in db instead index in rv
+        intent.putExtra(AddTaskActivity.TASK_ID_KEY , clickedItemIndex);
+        startActivity(intent);
     }
 }
 

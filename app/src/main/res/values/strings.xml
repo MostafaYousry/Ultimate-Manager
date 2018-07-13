@@ -11,7 +11,7 @@
     <!--<string name="archived_label">Archive</string>-->
 
 
-    <!--strings for task detail activity & add task activity-->
+    <!--strings for add task activity-->
     <string name="label_task_title">Title :</string>
     <string name="label_task_description">Description :</string>
     <string name="label_task_rating">Rating :</string>
@@ -19,8 +19,19 @@
     <string name="label_task_employees">Employees :</string>
     <string name="label_task_start_date">Starts :</string>
     <string name="label_task_due_date">Due :</string>
+    <string name="hint_task_title">Task title</string>
+    <string name="hint_task_description">Task description</string>
     <string name="hint_task_start_date">Choose start date</string>
     <string name="hint_task_due_date">Choose due date</string>
+
+
+    <!--strings for menu actions-->
+    <string name="action_save">Save</string>
+
+
+    <!--strings for toolbar title-->
+    <string name="add_new_task">Add new task</string>
+    <string name="update_task">Update task</string>
 
 
 </resources>
