@@ -2,13 +2,19 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_tasks"
-            android:title="@string/tasks"
-            android:checked="true"/>
+
+            android:icon="@drawable/ic_tasks"
+            android:title="@string/tasks" />
+
         <item
+            android:icon="@drawable/ic_employees"
             android:id="@+id/nav_employees"
-            android:title="@string/employees" />
+            android:title="@string/employees"/>
         <item
             android:id="@+id/nav_departments"
+
+            android:icon="@drawable/ic_departments"
             android:title="@string/departments" />
+
     </group>
 </menu>

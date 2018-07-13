@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--temporary fake data for spinner-->
+    <string-array name="employees_array">
+        <item>Mostafa</item>
+        <item>Abdelrahman</item>
+        <item>Karim</item>
+        <item>Abdallah</item>
+        <item>Moamen</item>
+        <item>Ammar</item>
+    </string-array>
+
+    <!--temporary fake data for spinner-->
+    <string-array name="departments_array">
+        <item>Management</item>
+        <item>Research and Development</item>
+        <item>Business</item>
+        <item>Human Resources</item>
+    </string-array>
+
+
+</resources>

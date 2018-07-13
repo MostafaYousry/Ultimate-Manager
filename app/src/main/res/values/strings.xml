@@ -5,22 +5,33 @@
     <string name="tasks">Tasks</string>
     <string name="employees">Employees</string>
     <string name="departments">Departments</string>
-    <string name="example_task">Arrange Papers</string>
-    <string name="title">Title :</string>
-    <string name="description">Description :</string>
-    <string name="example_description">You will first go to the desk then find the papers then arrange them and come back to me</string>
-    <string name="rating">Rating :</string>
-    <string name="department">Department :</string>
-    <string name="example_department">Office</string>
-    <string name="employees_title">Employees :</string>
-    <string name="short_example_description">Get the papers to me and don\'t be late</string>
-    <string-array name="employees_array">
-        <item>Mostafa</item>
-        <item>Abdelrahman</item>
-        <item>Karim</item>
-        <item>Abdallah</item>
-        <item>Moamen</item>
-        <item>Ammar</item>
-    </string-array>
+
+
+    <!--<string name="undo_label">Undo</string>-->
+    <!--<string name="archived_label">Archive</string>-->
+
+
+    <!--strings for add task activity-->
+    <string name="label_task_title">Title :</string>
+    <string name="label_task_description">Description :</string>
+    <string name="label_task_rating">Rating :</string>
+    <string name="label_task_department">Department :</string>
+    <string name="label_task_employees">Employees :</string>
+    <string name="label_task_start_date">Starts :</string>
+    <string name="label_task_due_date">Due :</string>
+    <string name="hint_task_title">Task title</string>
+    <string name="hint_task_description">Task description</string>
+    <string name="hint_task_start_date">Choose start date</string>
+    <string name="hint_task_due_date">Choose due date</string>
+
+
+    <!--strings for menu actions-->
+    <string name="action_save">Save</string>
+
+
+    <!--strings for toolbar title-->
+    <string name="add_new_task">Add new task</string>
+    <string name="update_task">Update task</string>
+
 
 </resources>
