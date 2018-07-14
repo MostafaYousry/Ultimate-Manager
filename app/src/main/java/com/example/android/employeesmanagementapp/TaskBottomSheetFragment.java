@@ -1,10 +1,8 @@
 package com.example.android.employeesmanagementapp;
 
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
+
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,30 +10,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
+import com.example.android.employeesmanagementapp.AddTaskActivity;
+import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
+import com.example.android.employeesmanagementapp.TasksAdapter;
+import com.example.android.employeesmanagementapp.TasksFragment;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import android.support.design.widget.BottomSheetDialogFragment;
 
-
-/**
- * A simple {@link Fragment} subclass.
- */
-public class TasksFragment extends Fragment implements RecyclerViewItemClickListener {
-
+public class TaskBottomSheetFragment extends BottomSheetDialogFragment  implements RecyclerViewItemClickListener {
     private final String TAG = TasksFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private TasksAdapter mAdapter;
 
-    public TasksFragment() {
-        // Required empty public constructor
-    }
-
 
     @Override
-    public View onCreateView( LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View view =inflater.inflate(R.layout.fragments_rv, container, false);
@@ -62,7 +53,6 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
     /**
      * called when a list item is clicked
      */
-    @Override
     public void onItemClick(int clickedItemIndex) {
         Log.d(TAG,"Item at index " + clickedItemIndex + " is clicked");
 
@@ -72,8 +62,4 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
         intent.putExtra(AddTaskActivity.TASK_ID_KEY , clickedItemIndex);
         startActivity(intent);
     }
-
 }
-
-
-

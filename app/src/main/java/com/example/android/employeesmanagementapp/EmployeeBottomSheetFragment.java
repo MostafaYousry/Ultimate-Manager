@@ -1,39 +1,23 @@
 package com.example.android.employeesmanagementapp;
 
-
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.Toast;
-import android.app.DialogFragment;
-import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
+import android.widget.CheckBox;
+
 import com.example.android.employeesmanagementapp.utils.AppUtils;
-import android.support.design.widget.BottomSheetDialogFragment;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
-
-/**
- * A simple {@link Fragment} subclass.
- */
-public class EmployeesFragment extends Fragment implements RecyclerViewItemClickListener{
+public class EmployeeBottomSheetFragment extends BottomSheetDialogFragment implements RecyclerViewItemClickListener{
 
     public static final String TAG = EmployeesFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
-    private EmployeesAdapter mEmployeesAdapter;
-
+    private EmployeesAdapter mEmployeesAdapter = new EmployeesAdapter(AppUtils.getEmployeesFakeData(), this);;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -61,13 +45,11 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
         mRecyclerView.setLayoutManager(layoutManager);
 
         //create object of EmployeesAdapter and send data
-        mEmployeesAdapter = new EmployeesAdapter(AppUtils.getEmployeesFakeData(), this);
+//        mEmployeesAdapter = new EmployeesAdapter(AppUtils.getEmployeesFakeData(), this);
 
         //set the employee recycler view adapter
         mRecyclerView.setAdapter(mEmployeesAdapter);
     }
-
-
 
     /**
      * called when a list item is clicked
@@ -81,4 +63,7 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
                 .show();
     }
 
+    public EmployeesAdapter getEmployeesAdapter() {
+        return mEmployeesAdapter;
+    }
 }

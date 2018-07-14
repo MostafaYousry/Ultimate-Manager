@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.Spinner;
@@ -33,6 +34,7 @@ public class AddTaskActivity extends AppCompatActivity  {
     private Spinner mTaskDepartmentSpinner;
     private Spinner mTaskEmployeesSpinner;
     private Toolbar mToolbar;
+    private Button showEmployeesBottomSheet, addEmployeesBottomSheet;
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -67,6 +69,25 @@ public class AddTaskActivity extends AppCompatActivity  {
         mTaskEmployeesSpinner = findViewById(R.id.task_employees);
 
 
+        showEmployeesBottomSheet = findViewById(R.id.show_employees_bottom_sheet);
+        showEmployeesBottomSheet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EmployeeBottomSheetFragment employeesFragment = new EmployeeBottomSheetFragment();
+                employeesFragment.show(getSupportFragmentManager(), employeesFragment.getTag());
+            }
+        });
+
+
+        addEmployeesBottomSheet = findViewById(R.id.add_employee_bottom_sheet);
+        addEmployeesBottomSheet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EmployeeBottomSheetFragment employeesFragment = new EmployeeBottomSheetFragment();
+                employeesFragment.show(getSupportFragmentManager(), employeesFragment.getTag());
+                employeesFragment.getEmployeesAdapter().setCheckBoxVisibility(1);
+            }
+        });
 
         setUpToolBar();
         setUpDepartmentSpinner();

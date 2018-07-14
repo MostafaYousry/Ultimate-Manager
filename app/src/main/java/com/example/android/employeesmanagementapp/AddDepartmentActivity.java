@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
@@ -19,9 +21,10 @@ public class AddDepartmentActivity extends AppCompatActivity {
     public static final String DEPARTMENT_ID_KEY = "task_id";
 
     private int mDepartmentId;
-    private EditText mDepartmentName , mRunningtask;
+    private EditText mDepartmentName, mRunningtask;
     private Spinner mDepartmentEmployees, mDepartmentCompletedTasks;
     private Toolbar mToolbar;
+    private Button showEmployeesBottomSheet, addEmployeesBottomSheet, showCompletedTasksBottomSheet;
 
     @SuppressLint("WrongViewCast")
     @Override
@@ -32,7 +35,7 @@ public class AddDepartmentActivity extends AppCompatActivity {
         //check if activity was opened from a click on rv item or from the fab
         Intent intent = getIntent();
         if (intent != null) {
-            mDepartmentId= intent.getIntExtra(DEPARTMENT_ID_KEY, DEFAULT_DEPARTMENT_ID);
+            mDepartmentId = intent.getIntExtra(DEPARTMENT_ID_KEY, DEFAULT_DEPARTMENT_ID);
         }
 
         //set toolbar as actionbar
@@ -43,18 +46,48 @@ public class AddDepartmentActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
 
-        mDepartmentName =  findViewById(R.id.department_name_edit_text);
+        mDepartmentName = findViewById(R.id.department_name_edit_text);
         mDepartmentEmployees = findViewById(R.id.department_employees_spinner);
         mRunningtask = findViewById(R.id.department_running_task_edit_text);
         mDepartmentCompletedTasks = findViewById(R.id.department_completed_tasks_spinner);
+
+        showEmployeesBottomSheet = findViewById(R.id.show_employees_bottom_sheet);
+        showEmployeesBottomSheet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EmployeeBottomSheetFragment employeesFragment = new EmployeeBottomSheetFragment();
+                employeesFragment.show(getSupportFragmentManager(), employeesFragment.getTag());
+            }
+        });
+
+
+        addEmployeesBottomSheet = findViewById(R.id.add_employee_bottom_sheet);
+        addEmployeesBottomSheet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EmployeeBottomSheetFragment employeesFragment = new EmployeeBottomSheetFragment();
+                employeesFragment.show(getSupportFragmentManager(), employeesFragment.getTag());
+                employeesFragment.getEmployeesAdapter().setCheckBoxVisibility(1);
+            }
+        });
+
+
+        showCompletedTasksBottomSheet = findViewById(R.id.completed_tasks_bottom_sheet);
+        showCompletedTasksBottomSheet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TaskBottomSheetFragment taskFragment = new TaskBottomSheetFragment();
+                taskFragment.show(getSupportFragmentManager(), taskFragment.getTag());
+            }
+        });
 
         setUpToolBar();
         setUpCompletedTasksSpinner();
         setUpEmployeesSpinner();
 
-        if (mDepartmentId == DEFAULT_DEPARTMENT_ID){
+        if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
             clearViews();
-        }else {
+        } else {
             loadTaskData();
         }
 
@@ -81,9 +114,9 @@ public class AddDepartmentActivity extends AppCompatActivity {
         // Apply the adapter to the spinner
         mDepartmentEmployees.setAdapter(adapter);
 
-        if (mDepartmentId == DEFAULT_DEPARTMENT_ID){
+        if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
             mDepartmentEmployees.setSelection(0);
-        }else {
+        } else {
             //todo:select this tasks employees
             //mTaskDepartmentSpinner.setSelection();
         }
@@ -101,9 +134,9 @@ public class AddDepartmentActivity extends AppCompatActivity {
         // Apply the adapter to the spinner
         mDepartmentCompletedTasks.setAdapter(adapter);
 
-        if (mDepartmentId == DEFAULT_DEPARTMENT_ID){
+        if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
             mDepartmentCompletedTasks.setSelection(0);
-        }else {
+        } else {
             //todo:select this tasks employees
             //mTaskDepartmentSpinner.setSelection();
         }
@@ -111,20 +144,21 @@ public class AddDepartmentActivity extends AppCompatActivity {
     }
 
     private void setUpToolBar() {
-        if (mDepartmentId == DEFAULT_DEPARTMENT_ID){
+        if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
             getSupportActionBar().setTitle(getString(R.string.add_new_department));
-        }else {
+        } else {
             getSupportActionBar().setTitle(getString(R.string.update_department));
         }
     }
+
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_menu , menu);
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_save:
                 saveTask();
                 break;
@@ -136,7 +170,7 @@ public class AddDepartmentActivity extends AppCompatActivity {
     }
 
 
-    private void saveTask(){
+    private void saveTask() {
         //todo:insert/update new data into db
         finish();
     }
