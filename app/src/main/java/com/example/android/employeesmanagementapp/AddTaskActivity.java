@@ -102,9 +102,6 @@ public class AddTaskActivity extends AppCompatActivity  {
         }
 
 
-
-
-
         //allow scrolling of edit text content when it is inside a scroll view
         mTaskDescription.setOnTouchListener(new View.OnTouchListener() {
             @Override
