@@ -35,10 +35,10 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
 
 
     @Override
-    public View onCreateView( LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view =inflater.inflate(R.layout.fragments_rv, container, false);
+        View view = inflater.inflate(R.layout.fragments_rv, container, false);
 
         // Inflate the layout for this fragment
         mRecyclerView = view.findViewById(R.id.rv_fragment);
@@ -52,7 +52,7 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
         mRecyclerView.setLayoutManager(layoutManager);
 
         // specify an adapter
-        mAdapter = new TasksAdapter(AppUtils.getTasksFakeData(),this);
+        mAdapter = new TasksAdapter(AppUtils.getTasksFakeData(), this);
         mRecyclerView.setAdapter(mAdapter);
 
         return view;
@@ -64,12 +64,12 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
      */
     @Override
     public void onItemClick(int clickedItemIndex) {
-        Log.d(TAG,"Item at index " + clickedItemIndex + " is clicked");
+        Log.d(TAG, "Item at index " + clickedItemIndex + " is clicked");
 
 
-        Intent intent = new Intent(getActivity() , AddTaskActivity.class);
+        Intent intent = new Intent(getActivity(), AddTaskActivity.class);
         //todo:pass rv.getTag ---> item id in db instead index in rv
-        intent.putExtra(AddTaskActivity.TASK_ID_KEY , clickedItemIndex);
+        intent.putExtra(AddTaskActivity.TASK_ID_KEY, clickedItemIndex + 0.0);
         startActivity(intent);
     }
 

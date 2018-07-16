@@ -22,7 +22,6 @@ public class AddDepartmentActivity extends AppCompatActivity {
 
     private int mDepartmentId;
     private EditText mDepartmentName, mRunningtask;
-    private Spinner mDepartmentEmployees, mDepartmentCompletedTasks;
     private Toolbar mToolbar;
     private Button showEmployeesBottomSheet, addEmployeesBottomSheet, showCompletedTasksBottomSheet;
 
@@ -46,10 +45,22 @@ public class AddDepartmentActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
 
+        setUpToolBar();
+        setBottomSheetButtons();
+
+        if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
+            clearViews();
+        } else {
+            loadTaskData();
+        }
+
+    }
+
+    //make the bottom sheet shows its content for employees and completed tasks
+    private void setBottomSheetButtons() {
+
         mDepartmentName = findViewById(R.id.department_name_edit_text);
-        mDepartmentEmployees = findViewById(R.id.department_employees_spinner);
         mRunningtask = findViewById(R.id.department_running_task_edit_text);
-        mDepartmentCompletedTasks = findViewById(R.id.department_completed_tasks_spinner);
 
         showEmployeesBottomSheet = findViewById(R.id.show_employees_bottom_sheet);
         showEmployeesBottomSheet.setOnClickListener(new View.OnClickListener() {
@@ -80,17 +91,6 @@ public class AddDepartmentActivity extends AppCompatActivity {
                 taskFragment.show(getSupportFragmentManager(), taskFragment.getTag());
             }
         });
-
-        setUpToolBar();
-        setUpCompletedTasksSpinner();
-        setUpEmployeesSpinner();
-
-        if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
-            clearViews();
-        } else {
-            loadTaskData();
-        }
-
     }
 
     private void loadTaskData() {
@@ -100,47 +100,6 @@ public class AddDepartmentActivity extends AppCompatActivity {
     private void clearViews() {
         mDepartmentName.setText("");
         mRunningtask.setText("");
-    }
-
-    private void setUpEmployeesSpinner() {
-        //todo:replace with data from db
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.employees_array, android.R.layout.simple_spinner_item);
-
-        // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        // Apply the adapter to the spinner
-        mDepartmentEmployees.setAdapter(adapter);
-
-        if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
-            mDepartmentEmployees.setSelection(0);
-        } else {
-            //todo:select this tasks employees
-            //mTaskDepartmentSpinner.setSelection();
-        }
-    }
-
-    private void setUpCompletedTasksSpinner() {
-        //todo:replace with data from db
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.task_array, android.R.layout.simple_spinner_item);
-
-        // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        // Apply the adapter to the spinner
-        mDepartmentCompletedTasks.setAdapter(adapter);
-
-        if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
-            mDepartmentCompletedTasks.setSelection(0);
-        } else {
-            //todo:select this tasks employees
-            //mTaskDepartmentSpinner.setSelection();
-        }
-
     }
 
     private void setUpToolBar() {

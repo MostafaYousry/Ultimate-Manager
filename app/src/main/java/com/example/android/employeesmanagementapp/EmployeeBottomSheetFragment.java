@@ -1,5 +1,6 @@
 package com.example.android.employeesmanagementapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.Snackbar;
@@ -61,6 +62,7 @@ public class EmployeeBottomSheetFragment extends BottomSheetDialogFragment imple
         Log.d(TAG,"Item at index " + clickedItemIndex + " is clicked");
         Snackbar.make(getView(), "Item at index " + clickedItemIndex + " is clicked", Snackbar.LENGTH_SHORT)
                 .show();
+
     }
 
     public EmployeesAdapter getEmployeesAdapter() {

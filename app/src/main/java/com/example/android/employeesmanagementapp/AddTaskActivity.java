@@ -6,6 +6,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -16,6 +17,7 @@ import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class AddTaskActivity extends AppCompatActivity  {
 
@@ -25,6 +27,7 @@ public class AddTaskActivity extends AppCompatActivity  {
     public static final String TASK_ID_KEY = "task_id";
 
     private int mTaskId;
+    private double mTaskIdDoubleMode;
 
     private EditText mTaskTitle;
     private EditText mTaskDescription;
@@ -46,7 +49,8 @@ public class AddTaskActivity extends AppCompatActivity  {
         //check if activity was opened from a click on rv item or from the fab
         Intent intent = getIntent();
         if (intent != null) {
-            mTaskId = intent.getIntExtra(TASK_ID_KEY, DEFAULT_TASK_ID);
+            mTaskIdDoubleMode = intent.getDoubleExtra(TASK_ID_KEY, DEFAULT_TASK_ID);
+            mTaskId = (int) mTaskIdDoubleMode;
         }
 
 
@@ -99,6 +103,14 @@ public class AddTaskActivity extends AppCompatActivity  {
             clearViews();
         }else {
             loadTaskData();
+            Log.v(TAG,mTaskId + "        " + mTaskIdDoubleMode);
+            if(mTaskId !=  mTaskIdDoubleMode){
+                mTaskTitle.setEnabled(false);
+                mTaskDescription.setEnabled(false);
+                mTaskStartDate.setClickable(false);
+                mTaskDueDate.setClickable(false);
+                mTaskRatingBar.setEnabled(false);
+            }
         }
 
 

@@ -59,7 +59,7 @@ public class TaskBottomSheetFragment extends BottomSheetDialogFragment  implemen
 
         Intent intent = new Intent(getActivity() , AddTaskActivity.class);
         //todo:pass rv.getTag ---> item id in db instead index in rv
-        intent.putExtra(AddTaskActivity.TASK_ID_KEY , clickedItemIndex);
+        intent.putExtra(AddTaskActivity.TASK_ID_KEY , clickedItemIndex + 0.5);
         startActivity(intent);
     }
 }
