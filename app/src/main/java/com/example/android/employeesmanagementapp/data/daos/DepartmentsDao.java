@@ -14,5 +14,17 @@ import java.util.List;
 @Dao
 public interface DepartmentsDao {
 
+    @Query("Select * From departments")
+    List<DepartmentEntry> loadAllDepartments();
+
+    @Insert
+    void addDepartment(DepartmentEntry departmentEntry);
+
+    @Delete
+    void deleteDepartment(DepartmentEntry departmentEntry);
+
+    @Update
+    void  updateDepartment(DepartmentEntry departmentEntry);
+
 
 }

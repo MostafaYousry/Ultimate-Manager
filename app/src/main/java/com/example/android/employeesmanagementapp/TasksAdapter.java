@@ -66,6 +66,12 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
         }
     }
 
+
+    public void setData(List<TaskEntry> newData){
+        mData = newData;
+        notifyDataSetChanged();
+    }
+
 }
 
 

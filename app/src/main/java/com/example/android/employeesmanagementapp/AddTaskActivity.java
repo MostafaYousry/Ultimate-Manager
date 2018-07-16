@@ -16,6 +16,10 @@ import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.example.android.employeesmanagementapp.data.AppDatabase;
+import com.example.android.employeesmanagementapp.data.AppExecutor;
+import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
+
 public class AddTaskActivity extends AppCompatActivity  {
 
     private static final String TAG = AddTaskActivity.class.getSimpleName();
@@ -34,12 +38,16 @@ public class AddTaskActivity extends AppCompatActivity  {
     private Spinner mTaskEmployeesSpinner;
     private Toolbar mToolbar;
 
+    private AppDatabase mDb;
+
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
+
+        mDb = AppDatabase.getInstance(this);
 
         //check if activity was opened from a click on rv item or from the fab
         Intent intent = getIntent();
@@ -215,6 +223,14 @@ public class AddTaskActivity extends AppCompatActivity  {
 
     private void saveTask(){
         //todo:insert/update new data into db
+        AppExecutor.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+//                TaskEntry taskEntry = new TaskEntry();
+//                mDb.tasksDao().addTask(taskEntry);
+
+            }
+        });
         finish();
     }
 }

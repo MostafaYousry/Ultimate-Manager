@@ -1,6 +1,7 @@
 package com.example.android.employeesmanagementapp;
 
 
+import android.arch.persistence.room.RoomDatabase;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -12,6 +13,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.android.employeesmanagementapp.data.AppDatabase;
+import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 
@@ -28,6 +31,7 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
     private final String TAG = TasksFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private TasksAdapter mAdapter;
+    private AppDatabase mDb;
 
     public TasksFragment() {
         // Required empty public constructor
@@ -37,6 +41,10 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+
+
+        mDb = AppDatabase.getInstance(getContext());
 
         View view =inflater.inflate(R.layout.fragments_rv, container, false);
 
@@ -50,6 +58,9 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
         // use a linear layout manager
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(layoutManager);
+
+
+
 
         // specify an adapter
         mAdapter = new TasksAdapter(AppUtils.getTasksFakeData(),this);
@@ -71,6 +82,26 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
         //todo:pass rv.getTag ---> item id in db instead index in rv
         intent.putExtra(AddTaskActivity.TASK_ID_KEY , clickedItemIndex);
         startActivity(intent);
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        AppExecutor.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                final List<TaskEntry> list = mDb.tasksDao().loadAllRunningTasks();
+
+                getActivity().runOnUiThread(new Runnable(){
+                    @Override
+                    public void run(){
+                        mAdapter.setData(list);
+                    }
+                });
+            }
+        });
+
     }
 }
 
