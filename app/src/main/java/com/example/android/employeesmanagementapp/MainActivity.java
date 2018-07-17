@@ -1,19 +1,13 @@
 package com.example.android.employeesmanagementapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
@@ -23,11 +17,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private static final String DEPARTMENTS_FRAGMENT_TAG = "departments";
-    private static final String TASKS_FRAGMENT_TAG = "tasks";
-    private static final String EMPLOYEES_FRAGMENT_TAG = "employees";
 
-    private int mSelectedFragmentId = R.id.nav_tasks;
+    private int mSelectedFragmentId;
     private Toolbar mToolbar;
     private BottomNavigationView mBottomNavigationView;
 
@@ -53,14 +44,20 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         //when app starts we show the tasks fragment
         if (savedInstanceState == null){
             mBottomNavigationView.setSelectedItemId(R.id.nav_tasks);
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container , new TasksFragment(),TASKS_FRAGMENT_TAG).commit();
+            loadFragment(new TasksFragment());
             getSupportActionBar().setTitle(getString(R.string.tasks));
         }
 
 
     }
 
+    private void loadFragment(Fragment fragment) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, fragment);
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
 
 
     private void setUpFab(){
@@ -101,29 +98,18 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         Log.d(TAG , "New Item is selected");
 
-        //todo: add to back stack to be able to return to previous fragment when back is pressed
-        FragmentManager fragmentManager = getSupportFragmentManager();
         mSelectedFragmentId = item.getItemId();
         switch (mSelectedFragmentId){
             case  R.id.nav_tasks:
-                fragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container , new TasksFragment() , TASKS_FRAGMENT_TAG)
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                        .commit();
+                loadFragment(new TasksFragment());
                 mToolbar.setTitle(getString(R.string.tasks));
                 break;
             case R.id.nav_employees:
-                fragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container , new EmployeesFragment() , EMPLOYEES_FRAGMENT_TAG)
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                        .commit();
+                loadFragment(new EmployeesFragment());
                 mToolbar.setTitle(getString(R.string.employees));
                 break;
             case R.id.nav_departments:
-                fragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container , new DepartmentsFragment() , DEPARTMENTS_FRAGMENT_TAG)
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                        .commit();
+                loadFragment(new DepartmentsFragment());
                 mToolbar.setTitle(getString(R.string.departments));
                 break;
 
@@ -133,4 +119,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         return true;
     }
+
+
 }

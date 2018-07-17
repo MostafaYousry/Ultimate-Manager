@@ -1,10 +1,7 @@
 package com.example.android.employeesmanagementapp;
 
 
-import android.arch.persistence.room.RoomDatabase;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,13 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.android.employeesmanagementapp.data.AppDatabase;
-import com.example.android.employeesmanagementapp.data.AppExecutor;
-import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 
 /**
@@ -55,6 +46,7 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
         // in content do not change the layout size of the RecyclerView
         mRecyclerView.setHasFixedSize(true);
 
+
         // use a linear layout manager
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(layoutManager);
@@ -78,29 +70,29 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
         Log.d(TAG,"Item at index " + clickedItemIndex + " is clicked");
 
 
-        Intent intent = new Intent(getActivity() , AddTaskActivity.class);
-        //todo:pass rv.getTag ---> item id in db instead index in rv
-        intent.putExtra(AddTaskActivity.TASK_ID_KEY , clickedItemIndex);
-        startActivity(intent);
+//        Intent intent = new Intent(getActivity() , AddTaskActivity.class);
+//        //todo:pass rv.getTag ---> item id in db instead index in rv
+//        intent.putExtra(AddTaskActivity.TASK_ID_KEY , clickedItemIndex);
+//        startActivity(intent);
     }
 
 
     @Override
     public void onResume() {
         super.onResume();
-        AppExecutor.getInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                final List<TaskEntry> list = mDb.tasksDao().loadAllRunningTasks();
-
-                getActivity().runOnUiThread(new Runnable(){
-                    @Override
-                    public void run(){
-                        mAdapter.setData(list);
-                    }
-                });
-            }
-        });
+//        AppExecutor.getInstance().diskIO().execute(new Runnable() {
+//            @Override
+//            public void run() {
+//                final List<TaskEntry> list = mDb.tasksDao().loadAllRunningTasks();
+//
+//                getActivity().runOnUiThread(new Runnable(){
+//                    @Override
+//                    public void run(){
+//                        mAdapter.setData(list);
+//                    }
+//                });
+//            }
+//        });
 
     }
 }
