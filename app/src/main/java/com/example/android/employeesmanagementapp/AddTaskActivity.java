@@ -72,31 +72,11 @@ public class AddTaskActivity extends AppCompatActivity  {
         mTaskDepartmentSpinner = findViewById(R.id.task_department);
         mTaskEmployeesSpinner = findViewById(R.id.task_employees);
 
-
-        showEmployeesBottomSheet = findViewById(R.id.show_employees_bottom_sheet);
-        showEmployeesBottomSheet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EmployeeBottomSheetFragment employeesFragment = new EmployeeBottomSheetFragment();
-                employeesFragment.show(getSupportFragmentManager(), employeesFragment.getTag());
-            }
-        });
-
-
-        addEmployeesBottomSheet = findViewById(R.id.add_employee_bottom_sheet);
-        addEmployeesBottomSheet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EmployeeBottomSheetFragment employeesFragment = new EmployeeBottomSheetFragment();
-                employeesFragment.show(getSupportFragmentManager(), employeesFragment.getTag());
-                employeesFragment.getEmployeesAdapter().setCheckBoxVisibility(1);
-            }
-        });
-
         setUpToolBar();
         setUpDepartmentSpinner();
         setUpEmployeesSpinner();
         setUpRatingBar();
+        setUpBottomSheet();
 
 
         if (mTaskId == DEFAULT_TASK_ID){
@@ -128,6 +108,28 @@ public class AddTaskActivity extends AppCompatActivity  {
             }
         });
 
+    }
+
+    private void setUpBottomSheet() {
+        showEmployeesBottomSheet = findViewById(R.id.show_employees_bottom_sheet);
+        showEmployeesBottomSheet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EmployeeBottomSheetFragment employeesFragment = new EmployeeBottomSheetFragment(false);
+                employeesFragment.show(getSupportFragmentManager(), employeesFragment.getTag());
+            }
+        });
+
+
+        addEmployeesBottomSheet = findViewById(R.id.add_employee_bottom_sheet);
+        addEmployeesBottomSheet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EmployeeBottomSheetFragment employeesFragment = new EmployeeBottomSheetFragment(true);
+                employeesFragment.show(getSupportFragmentManager(), employeesFragment.getTag());
+                employeesFragment.getEmployeesAdapter().setCheckBoxVisibility(true);
+            }
+        });
     }
 
 

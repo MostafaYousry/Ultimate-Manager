@@ -66,7 +66,7 @@ public class AddDepartmentActivity extends AppCompatActivity {
         showEmployeesBottomSheet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EmployeeBottomSheetFragment employeesFragment = new EmployeeBottomSheetFragment();
+                EmployeeBottomSheetFragment employeesFragment = new EmployeeBottomSheetFragment(false);
                 employeesFragment.show(getSupportFragmentManager(), employeesFragment.getTag());
             }
         });
@@ -76,9 +76,9 @@ public class AddDepartmentActivity extends AppCompatActivity {
         addEmployeesBottomSheet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EmployeeBottomSheetFragment employeesFragment = new EmployeeBottomSheetFragment();
+                EmployeeBottomSheetFragment employeesFragment = new EmployeeBottomSheetFragment(true);
                 employeesFragment.show(getSupportFragmentManager(), employeesFragment.getTag());
-                employeesFragment.getEmployeesAdapter().setCheckBoxVisibility(1);
+                employeesFragment.getEmployeesAdapter().setCheckBoxVisibility(true);
             }
         });
 
@@ -127,7 +127,6 @@ public class AddDepartmentActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
 
     private void saveTask() {
         //todo:insert/update new data into db

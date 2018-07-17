@@ -1,9 +1,11 @@
 package com.example.android.employeesmanagementapp;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -11,25 +13,45 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.support.v7.widget.Toolbar;
 
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 
-public class EmployeeBottomSheetFragment extends BottomSheetDialogFragment implements RecyclerViewItemClickListener{
+public class EmployeeBottomSheetFragment extends BottomSheetDialogFragment implements RecyclerViewItemClickListener {
 
     public static final String TAG = EmployeesFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
-    private EmployeesAdapter mEmployeesAdapter = new EmployeesAdapter(AppUtils.getEmployeesFakeData(), this);;
+    private View mRootView;
+    private Toolbar mToolbar;
+    private EmployeesAdapter mEmployeesAdapter = new EmployeesAdapter(AppUtils.getEmployeesFakeData(), this);
+    private boolean toolBarVisibility;
+
+    @SuppressLint("ValidFragment")
+    public EmployeeBottomSheetFragment(boolean toolBarVisibility) {
+        this.toolBarVisibility = toolBarVisibility;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragments_rv, container, false);
-
+        mRootView = rootView;
         // method to setup employees recycler view
         setupRecyclerView(rootView);
-
+        if (toolBarVisibility)
+            setUpToolBar();
         return rootView;
+    }
+
+    private void setUpToolBar() {
+        mToolbar = mRootView.findViewById(R.id.fragment_toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(mToolbar);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Available Employees");
+        mToolbar.setVisibility(View.VISIBLE);
     }
 
     private void setupRecyclerView(View rootView) {
@@ -59,13 +81,13 @@ public class EmployeeBottomSheetFragment extends BottomSheetDialogFragment imple
     public void onItemClick(int clickedItemIndex) {
         //todo:open employee details
 
-        Log.d(TAG,"Item at index " + clickedItemIndex + " is clicked");
+        Log.d(TAG, "Item at index " + clickedItemIndex + " is clicked");
         Snackbar.make(getView(), "Item at index " + clickedItemIndex + " is clicked", Snackbar.LENGTH_SHORT)
                 .show();
-
     }
 
     public EmployeesAdapter getEmployeesAdapter() {
         return mEmployeesAdapter;
     }
+
 }

@@ -18,7 +18,7 @@ import java.util.List;
 public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.EmployeesViewHolder> {
     private List<EmployeeEntry> mData;
     final private RecyclerViewItemClickListener mClickListener;
-    private int visible = 0;
+    private boolean visible = false;
 
     EmployeesAdapter(List<EmployeeEntry> data, RecyclerViewItemClickListener listener) {
         mData = data;
@@ -71,7 +71,7 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
             //change the item data by the position
             employeeName.setText(mData.get(position).getEmployeeName());
             employeeImage.setImageResource(AppUtils.getRandomEmployeeImage());
-            if(visible == 1)
+            if(visible)
                 employeeCheckBox.setVisibility(View.VISIBLE);
             else employeeCheckBox.setVisibility(View.GONE);
         }
@@ -82,7 +82,7 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
         }
     }
 
-    public void setCheckBoxVisibility(int visible) {
+    public void setCheckBoxVisibility(boolean visible) {
        this.visible = visible;
     }
 }
