@@ -24,6 +24,16 @@
     <string name="hint_task_start_date">Choose start date</string>
     <string name="hint_task_due_date">Choose due date</string>
 
+    <!--strings for add employee activity-->
+    <string name="label_employee_name">Name :</string>
+    <string name="label_employee_salary">Salary :</string>
+    <string name="label_employee_hire_date">Hire date :</string>
+    <string name="label_employee_department">Department :</string>
+    <string name="hint_employee_name">Employee Name</string>
+    <string name="hint_employee_salary">Employee Salary</string>
+    <string name="hint_employee_hire_date">Choose Date Hired</string>
+    <string name="hint_employee_department">Choose a Department</string>
+
 
     <!--strings for menu actions-->
     <string name="action_save">Save</string>
@@ -32,6 +42,7 @@
     <!--strings for toolbar title-->
     <string name="add_new_task">Add new task</string>
     <string name="edit_task">Edit task</string>
+    <string name="add_new_employee">New Employee</string>
 
 
 </resources>
