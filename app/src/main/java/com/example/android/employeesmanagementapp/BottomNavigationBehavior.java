@@ -1,14 +1,16 @@
 package com.example.android.employeesmanagementapp;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.snackbar.Snackbar;
+
+import androidx.annotation.NonNull;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.view.ViewCompat;
 
 public class BottomNavigationBehavior extends CoordinatorLayout.Behavior<BottomNavigationView> {
     private static final String TAG = BottomNavigationBehavior.class.getSimpleName();

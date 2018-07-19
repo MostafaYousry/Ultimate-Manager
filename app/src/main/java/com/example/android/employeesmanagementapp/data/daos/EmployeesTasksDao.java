@@ -1,10 +1,10 @@
 package com.example.android.employeesmanagementapp.data.daos;
 
-import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Delete;
-import android.arch.persistence.room.Insert;
-
 import com.example.android.employeesmanagementapp.data.entries.EmployeesTasksEntry;
+
+import androidx.room.Dao;
+import androidx.room.Delete;
+import androidx.room.Insert;
 
 @Dao
 public interface EmployeesTasksDao {

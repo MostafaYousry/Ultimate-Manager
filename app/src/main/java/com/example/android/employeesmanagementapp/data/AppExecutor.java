@@ -3,10 +3,11 @@ package com.example.android.employeesmanagementapp.data;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+
+import androidx.annotation.NonNull;
 
 /**
  * Executors used to make database operation

@@ -1,8 +1,8 @@
 package com.example.android.employeesmanagementapp.data.entries;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.ForeignKey;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
 
 @Entity(tableName = "employees_tasks",
 primaryKeys = {"employee_id","task_id"},

@@ -2,16 +2,18 @@ package com.example.android.employeesmanagementapp;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
@@ -46,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             mBottomNavigationView.setSelectedItemId(R.id.nav_tasks);
             loadFragment(new TasksFragment());
             getSupportActionBar().setTitle(getString(R.string.tasks));
+            mSelectedFragmentId = R.id.nav_tasks;
         }
 
 

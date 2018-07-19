@@ -1,9 +1,5 @@
 package com.example.android.employeesmanagementapp.data;
 
-import android.arch.persistence.room.Database;
-import android.arch.persistence.room.Room;
-import android.arch.persistence.room.RoomDatabase;
-import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 
 import com.example.android.employeesmanagementapp.data.daos.DepartmentsDao;
@@ -14,6 +10,11 @@ import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.entries.EmployeesTasksEntry;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
+
+import androidx.room.Database;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
+import androidx.room.TypeConverters;
 
 @Database(entities = {EmployeeEntry.class,TaskEntry.class,DepartmentEntry.class,EmployeesTasksEntry.class},version = 1,exportSchema = false)
 @TypeConverters(DateTypeConverter.class)

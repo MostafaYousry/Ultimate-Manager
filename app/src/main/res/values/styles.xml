@@ -9,9 +9,7 @@
         <item name="colorPrimary">@color/primaryColor</item>
         <item name="colorPrimaryDark">@color/primaryDarkColor</item>
         <item name="colorAccent">@color/secondaryColor</item>
-        <!--style for card view-->
-        <item name="cardViewStyle">@style/CardView</item>
-        <item name="coordinatorLayoutStyle">@style/Widget.Design.CoordinatorLayout</item>
+
     </style>
 
 

@@ -3,10 +3,6 @@ package com.example.android.employeesmanagementapp;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -18,6 +14,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.data.AppDatabase;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.DialogFragment;
 
 public class AddEmployeeActivity extends AppCompatActivity {
 
