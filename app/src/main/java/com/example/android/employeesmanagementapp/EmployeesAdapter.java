@@ -2,6 +2,7 @@ package com.example.android.employeesmanagementapp;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.EmployeesViewHolder> {
+    private static final String TAG = EmployeesAdapter.class.getSimpleName();
     private List<EmployeeEntry> mData;
     final private RecyclerViewItemClickListener mClickListener;
     private boolean visible = false;
@@ -66,14 +68,22 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
             itemView.setOnClickListener(this);
         }
 
-        void bind(int position) {
+        void bind(final int position) {
 
             //change the item data by the position
             employeeName.setText(mData.get(position).getEmployeeName());
             employeeImage.setImageResource(AppUtils.getRandomEmployeeImage());
-            if(visible)
+            if (visible)
                 employeeCheckBox.setVisibility(View.VISIBLE);
             else employeeCheckBox.setVisibility(View.GONE);
+
+            employeeCheckBox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.v(TAG,"employee's checkbox at position " + position + " is checked");
+                }
+            });
+
         }
 
         @Override
@@ -83,6 +93,6 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
     }
 
     public void setCheckBoxVisibility(boolean visible) {
-       this.visible = visible;
+        this.visible = visible;
     }
 }

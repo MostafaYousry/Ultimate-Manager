@@ -17,6 +17,8 @@ import android.support.v7.widget.Toolbar;
 
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 
+
+@SuppressLint("ValidFragment")
 public class EmployeeBottomSheetFragment extends BottomSheetDialogFragment implements RecyclerViewItemClickListener {
 
     public static final String TAG = EmployeesFragment.class.getSimpleName();
@@ -81,7 +83,7 @@ public class EmployeeBottomSheetFragment extends BottomSheetDialogFragment imple
     public void onItemClick(int clickedItemIndex) {
         //todo:open employee details
 
-        Log.d(TAG, "Item at index " + clickedItemIndex + " is clicked");
+        Log.d(TAG, "Item at index " + clickedItemIndex + " is clicked in bottom sheet");
         Snackbar.make(getView(), "Item at index " + clickedItemIndex + " is clicked", Snackbar.LENGTH_SHORT)
                 .show();
     }
