@@ -3,8 +3,8 @@ package com.example.android.employeesmanagementapp;
 import android.content.Intent;
 import android.os.Bundle;
 
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +17,7 @@ import com.example.android.employeesmanagementapp.TasksAdapter;
 import com.example.android.employeesmanagementapp.TasksFragment;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 
-import android.support.design.widget.BottomSheetDialogFragment;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 public class TaskBottomSheetFragment extends BottomSheetDialogFragment  implements RecyclerViewItemClickListener {
     private final String TAG = TasksFragment.class.getSimpleName();

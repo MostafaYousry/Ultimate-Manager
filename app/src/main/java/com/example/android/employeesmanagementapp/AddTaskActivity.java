@@ -2,10 +2,10 @@ package com.example.android.employeesmanagementapp;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -230,6 +230,3 @@ public class AddTaskActivity extends AppCompatActivity  {
         finish();
     }
 }
-
-
-

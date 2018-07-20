@@ -1,7 +1,5 @@
 package com.example.android.employeesmanagementapp;
 
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,8 +11,10 @@ import android.widget.TextView;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.EmployeesViewHolder> {
     private static final String TAG = EmployeesAdapter.class.getSimpleName();

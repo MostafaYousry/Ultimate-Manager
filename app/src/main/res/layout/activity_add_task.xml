@@ -26,7 +26,7 @@
         android:scrollbars="vertical">
 
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:layout_editor_absoluteY="25dp">
@@ -169,7 +169,7 @@
                 app:layout_constraintStart_toEndOf="@+id/guideline2"
                 app:layout_constraintTop_toTopOf="@+id/textView8" />
 
-            <android.support.constraint.Guideline
+            <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guideline2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -262,7 +262,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/show_employees_bottom_sheet"
                 />
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </LinearLayout>
 
