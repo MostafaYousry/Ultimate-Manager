@@ -17,7 +17,6 @@ import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class AddTaskActivity extends AppCompatActivity  {
 
@@ -70,12 +69,10 @@ public class AddTaskActivity extends AppCompatActivity  {
         mTaskDueDate = findViewById(R.id.task_due_date);
         mTaskRatingBar = findViewById(R.id.task_rating);
         mTaskDepartmentSpinner = findViewById(R.id.task_department);
-        mTaskEmployeesSpinner = findViewById(R.id.task_employees);
 
+        setUpRatingBar();
         setUpToolBar();
         setUpDepartmentSpinner();
-        setUpEmployeesSpinner();
-        setUpRatingBar();
         setUpBottomSheet();
 
 
@@ -181,32 +178,15 @@ public class AddTaskActivity extends AppCompatActivity  {
         }
     }
 
-    private void setUpEmployeesSpinner(){
-        //todo:replace with data from db
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.employees_array, android.R.layout.simple_spinner_item);
-
-        // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        // Apply the adapter to the spinner
-        mTaskEmployeesSpinner.setAdapter(adapter);
-
-        if (mTaskId == DEFAULT_TASK_ID){
-            mTaskEmployeesSpinner.setSelection(0);
-        }else {
-            //todo:select this tasks employees
-            //mTaskDepartmentSpinner.setSelection();
-        }
-    }
 
     private void setUpToolBar(){
         if (mTaskId == DEFAULT_TASK_ID){
             getSupportActionBar().setTitle(getString(R.string.add_new_task));
-        }else {
+        }else if (mTaskId == mTaskIdDoubleMode) {
             getSupportActionBar().setTitle(getString(R.string.update_task));
         }
+        else
+            getSupportActionBar().setTitle(R.string.task_details);
     }
 
     private void setUpRatingBar(){
