@@ -77,6 +77,19 @@ public class AddTaskActivity extends AppCompatActivity  {
         setUpDepartmentDropDown();
         setUpRatingBar();
 
+        mTaskDueDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pickDate(view);
+            }
+        });
+
+        mTaskStartDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pickDate(view);
+            }
+        });
 
         if (mTaskId == DEFAULT_TASK_ID){
             clearViews();
