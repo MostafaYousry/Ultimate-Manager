@@ -20,18 +20,19 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
     private static final String TAG = EmployeesAdapter.class.getSimpleName();
     private List<EmployeeEntry> mData;
     final private RecyclerViewItemClickListener mClickListener;
+    private List<EmployeeEntry> mData;
     private boolean visible = false;
 
     EmployeesAdapter(List<EmployeeEntry> data, RecyclerViewItemClickListener listener) {
         mData = data;
-        mClickListener = listener;
+        mClickListener =  listener;
     }
 
     @NonNull
     @Override
     public EmployeesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         //inflate item layout for the view holder
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_employees_rv, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_employees_rv,parent,false);
 
         EmployeesViewHolder employeesViewHolder = new EmployeesViewHolder(v);
 
@@ -49,7 +50,7 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
     }
 
 
-    public class EmployeesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class EmployeesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         //create object for each view in the item view
         TextView employeeName;
@@ -69,6 +70,7 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
         }
 
         void bind(final int position) {
+
 
             //change the item data by the position
             employeeName.setText(mData.get(position).getEmployeeName());

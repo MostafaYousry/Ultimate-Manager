@@ -1,11 +1,10 @@
 package com.example.android.employeesmanagementapp.data.entries;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
-import androidx.room.Index;
 import androidx.room.PrimaryKey;
-import androidx.annotation.NonNull;
 
 @Entity(tableName = "departments")
 public class DepartmentEntry {

@@ -1,9 +1,5 @@
 package com.example.android.employeesmanagementapp.data;
 
-import androidx.room.Database;
-import androidx.room.Room;
-import androidx.room.RoomDatabase;
-import androidx.room.TypeConverters;
 import android.content.Context;
 
 import com.example.android.employeesmanagementapp.data.daos.DepartmentsDao;
@@ -12,9 +8,15 @@ import com.example.android.employeesmanagementapp.data.daos.EmployeesTasksDao;
 import com.example.android.employeesmanagementapp.data.daos.TasksDao;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
+import com.example.android.employeesmanagementapp.data.entries.EmployeesTasksEntry;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 
-@Database(entities = {EmployeeEntry.class,TaskEntry.class,DepartmentEntry.class},version = 1,exportSchema = false)
+import androidx.room.Database;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
+import androidx.room.TypeConverters;
+
+@Database(entities = {EmployeeEntry.class,TaskEntry.class,DepartmentEntry.class,EmployeesTasksEntry.class},version = 1,exportSchema = false)
 @TypeConverters(DateTypeConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
     private static final String TAG = AppDatabase.class.getSimpleName();

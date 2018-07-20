@@ -1,8 +1,8 @@
 package com.example.android.employeesmanagementapp;
 
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +12,8 @@ import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHolder> {
 
@@ -19,7 +21,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
     private RecyclerViewItemClickListener mListClickListener;
 
 
-    public TasksAdapter(List<TaskEntry> data , RecyclerViewItemClickListener clickListener) {
+    public TasksAdapter(List<TaskEntry> data, RecyclerViewItemClickListener clickListener) {
         mData = data;
         mListClickListener = clickListener;
     }
@@ -45,6 +47,10 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
         return mData.size();
     }
 
+    public void setData(List<TaskEntry> newData) {
+        mData = newData;
+        notifyDataSetChanged();
+    }
 
     class TasksViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView mTextView;
@@ -55,7 +61,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
             itemView.setOnClickListener(this);
         }
 
-        void bind (int position){
+        void bind(int position) {
             mTextView.setText(mData.get(position).getTaskTitle());
         }
 

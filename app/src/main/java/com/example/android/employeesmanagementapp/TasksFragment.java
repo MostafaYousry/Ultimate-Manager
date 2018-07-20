@@ -12,12 +12,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
+import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 
 /**
@@ -28,6 +28,7 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
     private final String TAG = TasksFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private TasksAdapter mAdapter;
+    private AppDatabase mDb;
 
     public TasksFragment() {
         // Required empty public constructor
@@ -38,7 +39,11 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragments_rv, container, false);
+
+
+        mDb = AppDatabase.getInstance(getContext());
+
+        View view =inflater.inflate(R.layout.fragments_rv, container, false);
 
         // Inflate the layout for this fragment
         mRecyclerView = view.findViewById(R.id.rv_fragment);
@@ -72,6 +77,27 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
         intent.putExtra(AddTaskActivity.TASK_ID_KEY, clickedItemIndex + 0.0);
         startActivity(intent);
     }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+//        AppExecutor.getInstance().diskIO().execute(new Runnable() {
+//            @Override
+//            public void run() {
+//                final List<TaskEntry> list = mDb.tasksDao().loadAllRunningTasks();
+//
+//                getActivity().runOnUiThread(new Runnable(){
+//                    @Override
+//                    public void run(){
+//                        mAdapter.setData(list);
+//                    }
+//                });
+//            }
+//        });
+
+    }
+
 
 }
 
