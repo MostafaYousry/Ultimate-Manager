@@ -7,22 +7,17 @@
     <string name="departments">Departments</string>
 
 
-    <!--<string name="undo_label">Undo</string>-->
-    <!--<string name="archived_label">Archive</string>-->
-
+    <string name="required_field">*Required</string>
 
     <!--strings for add task activity-->
-    <string name="label_task_title">Title :</string>
-    <string name="label_task_description">Description :</string>
     <string name="label_task_rating">Rating :</string>
     <string name="label_task_department">Department :</string>
     <string name="label_task_employees">Employees :</string>
-    <string name="label_task_start_date">Starts :</string>
-    <string name="label_task_due_date">Due :</string>
     <string name="hint_task_title">Task title</string>
     <string name="hint_task_description">Task description</string>
-    <string name="hint_task_start_date">Choose start date</string>
-    <string name="hint_task_due_date">Choose due date</string>
+    <string name="hint_task_start_date">Start date</string>
+    <string name="hint_task_due_date">Due date</string>
+    <string name="hint_task_department">Department</string>
 
     <!--strings for add employee activity-->
     <string name="label_employee_name">Name :</string>

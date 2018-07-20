@@ -8,13 +8,12 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.RatingBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.data.AppDatabase;
-import com.example.android.employeesmanagementapp.data.AppExecutor;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -34,8 +33,7 @@ public class AddTaskActivity extends AppCompatActivity  {
     private TextView mTaskStartDate;
     private TextView mTaskDueDate;
     private RatingBar mTaskRatingBar;
-    private Spinner mTaskDepartmentSpinner;
-    private Spinner mTaskEmployeesSpinner;
+    private AutoCompleteTextView mTaskDepartment;
     private Toolbar mToolbar;
 
     private AppDatabase mDb;
@@ -71,14 +69,12 @@ public class AddTaskActivity extends AppCompatActivity  {
         mTaskStartDate = findViewById(R.id.task_start_date);
         mTaskDueDate = findViewById(R.id.task_due_date);
         mTaskRatingBar = findViewById(R.id.task_rating);
-        mTaskDepartmentSpinner = findViewById(R.id.task_department);
-        mTaskEmployeesSpinner = findViewById(R.id.task_employees);
+        mTaskDepartment = findViewById(R.id.task_department);
 
 
 
         setUpToolBar();
-        setUpDepartmentSpinner();
-        setUpEmployeesSpinner();
+        setUpDepartmentDropDown();
         setUpRatingBar();
 
 
@@ -137,46 +133,33 @@ public class AddTaskActivity extends AppCompatActivity  {
     }
 
 
-    private void setUpDepartmentSpinner(){
+    private void setUpDepartmentDropDown() {
         //todo:replace with data from db
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.departments_array, android.R.layout.simple_spinner_item);
-
+                R.array.departments_array, android.R.layout.simple_dropdown_item_1line);
 
         // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         // Apply the adapter to the spinner
-        mTaskDepartmentSpinner.setAdapter(adapter);
+        mTaskDepartment.setAdapter(adapter);
+
+        mTaskDepartment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mTaskDepartment.showDropDown();
+            }
+        });
 
         if (mTaskId == DEFAULT_TASK_ID){
-            mTaskDepartmentSpinner.setSelection(0);
+            mTaskDepartment.setSelection(0);
         }else {
             //todo:select this tasks department
             //mTaskDepartmentSpinner.setSelection();
         }
     }
 
-    private void setUpEmployeesSpinner(){
-        //todo:replace with data from db
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.employees_array, android.R.layout.simple_spinner_item);
-
-        // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        // Apply the adapter to the spinner
-        mTaskEmployeesSpinner.setAdapter(adapter);
-
-        if (mTaskId == DEFAULT_TASK_ID){
-            mTaskEmployeesSpinner.setSelection(0);
-        }else {
-            //todo:select this tasks employees
-            //mTaskDepartmentSpinner.setSelection();
-        }
-    }
 
     private void setUpToolBar(){
         if (mTaskId == DEFAULT_TASK_ID){
@@ -185,6 +168,7 @@ public class AddTaskActivity extends AppCompatActivity  {
             getSupportActionBar().setTitle(getString(R.string.edit_task));
         }
     }
+
 
     private void setUpRatingBar(){
         mTaskRatingBar.setNumStars(5);
@@ -207,6 +191,7 @@ public class AddTaskActivity extends AppCompatActivity  {
         return true;
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
@@ -223,14 +208,14 @@ public class AddTaskActivity extends AppCompatActivity  {
 
     private void saveTask(){
         //todo:insert/update new data into db
-        AppExecutor.getInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
+//        AppExecutor.getInstance().diskIO().execute(new Runnable() {
+//            @Override
+//            public void run() {
 //                TaskEntry taskEntry = new TaskEntry();
 //                mDb.tasksDao().addTask(taskEntry);
-
-            }
-        });
+//
+//            }
+//        });
         finish();
     }
 }

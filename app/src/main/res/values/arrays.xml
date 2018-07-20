@@ -13,10 +13,12 @@
 
     <!--temporary fake data for spinner-->
     <string-array name="departments_array">
-        <item>Management</item>
+        <item>Production</item>
         <item>Research and Development</item>
-        <item>Business</item>
-        <item>Human Resources</item>
+        <item>Purchasing</item>
+        <item>Marketing</item>
+        <item>Human Resource Management</item>
+        <item>Accounting and Finance</item>
     </string-array>
 
 
