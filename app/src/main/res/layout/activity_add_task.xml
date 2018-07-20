@@ -157,68 +157,34 @@
             </com.google.android.material.textfield.TextInputLayout>
 
 
-            <Spinner
-                android:id="@+id/task_department"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginEnd="8dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginStart="8dp"
-                android:gravity="center"
-                app:layout_constraintBottom_toBottomOf="@+id/textView3"
+                app:helperText="@string/required_field"
+                app:helperTextEnabled="true"
+                app:hintAnimationEnabled="true"
+                app:hintEnabled="true"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/guideline2"
-                app:layout_constraintTop_toTopOf="@+id/textView3"
-                tools:text="Office" />
-
-
-            <TextView
-                android:id="@+id/textView4"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="40dp"
-                android:text="@string/label_task_employees"
-                android:textColor="@color/colorSecondaryText"
-                android:textSize="18sp"
-                app:layout_constraintEnd_toStartOf="@+id/guideline2"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView3" />
+                app:layout_constraintTop_toBottomOf="@+id/textInputLayout4">
 
+                <AutoCompleteTextView
+                    android:id="@+id/task_department"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:completionThreshold="1"
+                    android:drawableEnd="@drawable/ic_arrow_drop_down"
+                    android:hint="@string/hint_task_department"
+                    android:paddingLeft="14dp"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp" />
 
-            <Spinner
-                android:id="@+id/task_employees"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                app:layout_constraintBottom_toBottomOf="@+id/textView4"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/guideline2"
-                app:layout_constraintTop_toTopOf="@+id/textView4" />
-
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="40dp"
-                android:text="@string/label_task_rating"
-                android:textColor="@color/colorSecondaryText"
-                android:textSize="18sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/guideline2"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView4" />
+            </com.google.android.material.textfield.TextInputLayout>
 
 
             <RatingBar
@@ -234,6 +200,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
 
+
             <Button
                 android:id="@+id/show_employees_bottom_sheet"
                 android:layout_width="wrap_content"
@@ -243,7 +210,7 @@
                 android:text="Show task employees"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView2"
+                app:layout_constraintTop_toBottomOf="@+id/task_rating"
                 />
             <Button
                 android:id="@+id/add_employee_bottom_sheet"

@@ -104,9 +104,9 @@ public class AddDepartmentActivity extends AppCompatActivity {
 
     private void setUpToolBar() {
         if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
-            getSupportActionBar().setTitle(getString(R.string.add_new_department));
+            getSupportActionBar().setTitle("Add new department");
         } else {
-            getSupportActionBar().setTitle(getString(R.string.update_department));
+            getSupportActionBar().setTitle("Update department");
         }
     }
 

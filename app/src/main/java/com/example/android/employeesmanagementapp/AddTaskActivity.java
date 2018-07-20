@@ -2,18 +2,13 @@ package com.example.android.employeesmanagementapp;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import androidx.fragment.app.DialogFragment;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import androidx.appcompat.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -32,17 +27,14 @@ public class AddTaskActivity extends AppCompatActivity  {
     public static final String TASK_ID_KEY = "task_id";
 
     private int mTaskId;
-    private double mTaskIdDoubleMode;
 
     private EditText mTaskTitle;
     private EditText mTaskDescription;
     private TextView mTaskStartDate;
     private TextView mTaskDueDate;
     private RatingBar mTaskRatingBar;
-    private Spinner mTaskDepartmentSpinner;
-    private Spinner mTaskEmployeesSpinner;
+    private AutoCompleteTextView mTaskDepartment;
     private Toolbar mToolbar;
-    private Button showEmployeesBottomSheet, addEmployeesBottomSheet;
 
     private AppDatabase mDb;
 
@@ -58,8 +50,7 @@ public class AddTaskActivity extends AppCompatActivity  {
         //check if activity was opened from a click on rv item or from the fab
         Intent intent = getIntent();
         if (intent != null) {
-            mTaskIdDoubleMode = intent.getDoubleExtra(TASK_ID_KEY, DEFAULT_TASK_ID);
-            mTaskId = (int) mTaskIdDoubleMode;
+            mTaskId = intent.getIntExtra(TASK_ID_KEY, DEFAULT_TASK_ID);
         }
 
 
@@ -78,26 +69,19 @@ public class AddTaskActivity extends AppCompatActivity  {
         mTaskStartDate = findViewById(R.id.task_start_date);
         mTaskDueDate = findViewById(R.id.task_due_date);
         mTaskRatingBar = findViewById(R.id.task_rating);
-        mTaskDepartmentSpinner = findViewById(R.id.task_department);
+        mTaskDepartment = findViewById(R.id.task_department);
 
-        setUpRatingBar();
+
+
         setUpToolBar();
-        setUpDepartmentSpinner();
-        setUpBottomSheet();
+        setUpDepartmentDropDown();
+        setUpRatingBar();
 
 
         if (mTaskId == DEFAULT_TASK_ID){
             clearViews();
         }else {
             loadTaskData();
-            Log.v(TAG,mTaskId + "        " + mTaskIdDoubleMode);
-            if(mTaskId !=  mTaskIdDoubleMode){
-                mTaskTitle.setEnabled(false);
-                mTaskDescription.setEnabled(false);
-                mTaskStartDate.setClickable(false);
-                mTaskDueDate.setClickable(false);
-                mTaskRatingBar.setEnabled(false);
-            }
         }
 
 
@@ -118,28 +102,6 @@ public class AddTaskActivity extends AppCompatActivity  {
             }
         });
 
-    }
-
-    private void setUpBottomSheet() {
-        showEmployeesBottomSheet = findViewById(R.id.show_employees_bottom_sheet);
-        showEmployeesBottomSheet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EmployeeBottomSheetFragment employeesFragment = new EmployeeBottomSheetFragment(false);
-                employeesFragment.show(getSupportFragmentManager(), employeesFragment.getTag());
-            }
-        });
-
-
-        addEmployeesBottomSheet = findViewById(R.id.add_employee_bottom_sheet);
-        addEmployeesBottomSheet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EmployeeBottomSheetFragment employeesFragment = new EmployeeBottomSheetFragment(true);
-                employeesFragment.show(getSupportFragmentManager(), employeesFragment.getTag());
-                employeesFragment.getEmployeesAdapter().setCheckBoxVisibility(true);
-            }
-        });
     }
 
 
@@ -198,25 +160,6 @@ public class AddTaskActivity extends AppCompatActivity  {
         }
     }
 
-    private void setUpEmployeesSpinner(){
-        //todo:replace with data from db
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.employees_array, android.R.layout.simple_spinner_item);
-
-        // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        // Apply the adapter to the spinner
-        mTaskEmployeesSpinner.setAdapter(adapter);
-
-        if (mTaskId == DEFAULT_TASK_ID){
-            mTaskEmployeesSpinner.setSelection(0);
-        }else {
-            //todo:select this tasks employees
-            //mTaskDepartmentSpinner.setSelection();
-        }
-    }
 
     private void setUpToolBar(){
         if (mTaskId == DEFAULT_TASK_ID){
@@ -236,7 +179,6 @@ public class AddTaskActivity extends AppCompatActivity  {
             mTaskRatingBar.setRating(0);
             mTaskRatingBar.setIsIndicator(false);
         }else {
-            mToolbar.setTitle(getString(R.string.update_task));
 //            mTaskRatingBar.setIsIndicator(true);
             //todo:set task rating
         }
@@ -277,6 +219,3 @@ public class AddTaskActivity extends AppCompatActivity  {
         finish();
     }
 }
-
-
-

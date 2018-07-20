@@ -20,7 +20,6 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
     private static final String TAG = EmployeesAdapter.class.getSimpleName();
     private List<EmployeeEntry> mData;
     final private RecyclerViewItemClickListener mClickListener;
-    private List<EmployeeEntry> mData;
     private boolean visible = false;
 
     EmployeesAdapter(List<EmployeeEntry> data, RecyclerViewItemClickListener listener) {
