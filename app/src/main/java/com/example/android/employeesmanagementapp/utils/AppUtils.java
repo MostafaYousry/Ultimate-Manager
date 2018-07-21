@@ -37,20 +37,20 @@ public final class AppUtils {
     public static List<EmployeeEntry> getEmployeesFakeData(){
         List<EmployeeEntry> list = new ArrayList<>();
 
-        EmployeeEntry employeeEntry1 = new EmployeeEntry(2,"Robert Dawney",200,new Date());
+        EmployeeEntry employeeEntry1 = new EmployeeEntry(2,"Robert Downey",200,new Date());
         EmployeeEntry employeeEntry2 = new EmployeeEntry(1,"Emma Watson",200,new Date());
         EmployeeEntry employeeEntry3 = new EmployeeEntry(2,"Tom Holland",200,new Date());
-        EmployeeEntry employeeEntry4 = new EmployeeEntry(3,"Elezabeth Olsen",200,new Date());
+        EmployeeEntry employeeEntry4 = new EmployeeEntry(3,"Elizabeth Olsen",200,new Date());
         EmployeeEntry employeeEntry5 = new EmployeeEntry(0,"Chris Evans",200,new Date());
-        EmployeeEntry employeeEntry6 = new EmployeeEntry(2,"Robert Dawney",200,new Date());
+        EmployeeEntry employeeEntry6 = new EmployeeEntry(2,"Robert Downey",200,new Date());
         EmployeeEntry employeeEntry7 = new EmployeeEntry(1,"Emma Watson",200,new Date());
         EmployeeEntry employeeEntry8 = new EmployeeEntry(1,"Tom Holland",200,new Date());
-        EmployeeEntry employeeEntry9 = new EmployeeEntry(2,"Elezabeth Olsen",200,new Date());
+        EmployeeEntry employeeEntry9 = new EmployeeEntry(2,"Elizabeth Olsen",200,new Date());
         EmployeeEntry employeeEntry10 = new EmployeeEntry(0,"Chris Evans",200,new Date());
-        EmployeeEntry employeeEntry11 = new EmployeeEntry(1,"Robert Dawney",200,new Date());
+        EmployeeEntry employeeEntry11 = new EmployeeEntry(1,"Robert Downey",200,new Date());
         EmployeeEntry employeeEntry12 = new EmployeeEntry(3,"Emma Watson",200,new Date());
         EmployeeEntry employeeEntry13 = new EmployeeEntry(2,"Tom Holland",200,new Date());
-        EmployeeEntry employeeEntry14 = new EmployeeEntry(1,"Elezabeth Olsen",200,new Date());
+        EmployeeEntry employeeEntry14 = new EmployeeEntry(1,"Elizabeth Olsen",200,new Date());
         EmployeeEntry employeeEntry15 = new EmployeeEntry(0,"Chris Evans",200,new Date());
 
         list.add(employeeEntry1);
