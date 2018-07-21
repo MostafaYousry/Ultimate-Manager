@@ -109,7 +109,7 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
      * @param employees new employees list
      */
     public void setData(List<EmployeeEntry> employees) {
-        mData = mData;
+        mData = employees;
         notifyDataSetChanged();
     }
 }

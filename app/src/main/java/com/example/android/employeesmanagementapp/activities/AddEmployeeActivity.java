@@ -158,7 +158,7 @@ public class AddEmployeeActivity extends AppCompatActivity {
 
     private void setupDepartmentsSpinner() {
 
-        LiveData<List<DepartmentEntry>> departments = mDb.departmentsDao().loadAllDepartments();
+        LiveData<List<DepartmentEntry>> departments = mDb.departmentsDao().loadDepartments();
         departments.observe(this, new Observer<List<DepartmentEntry>>() {
             @Override
             public void onChanged(List<DepartmentEntry> departmentEntries) {

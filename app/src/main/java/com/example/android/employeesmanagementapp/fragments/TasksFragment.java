@@ -75,7 +75,6 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
             }
         });
 
-
         mRecyclerView.setAdapter(mAdapter);
 
         return view;
