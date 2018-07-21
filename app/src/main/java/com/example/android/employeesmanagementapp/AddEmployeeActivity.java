@@ -22,8 +22,8 @@ import androidx.fragment.app.DialogFragment;
 
 public class AddEmployeeActivity extends AppCompatActivity {
 
-    public static final String EMPLOYEE_ID_KEY = "employee_id";
     private static final String TAG = AddEmployeeActivity.class.getSimpleName();
+    public static final String EMPLOYEE_ID_KEY = "employee_id";
     private static final int DEFAULT_EMPLOYEE_ID = -1;
     private int mEmployeeId;
 

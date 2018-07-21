@@ -22,7 +22,7 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
     final private RecyclerViewItemClickListener mClickListener;
     private boolean visible = false;
 
-    EmployeesAdapter(List<EmployeeEntry> data, RecyclerViewItemClickListener listener) {
+    public EmployeesAdapter(List<EmployeeEntry> data, RecyclerViewItemClickListener listener) {
         mData = data;
         mClickListener =  listener;
     }
@@ -74,9 +74,11 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
             //change the item data by the position
             employeeName.setText(mData.get(position).getEmployeeName());
             employeeImage.setImageResource(AppUtils.getRandomEmployeeImage());
+
             if (visible)
                 employeeCheckBox.setVisibility(View.VISIBLE);
-            else employeeCheckBox.setVisibility(View.GONE);
+            else
+                employeeCheckBox.setVisibility(View.GONE);
 
             employeeCheckBox.setOnClickListener(new View.OnClickListener() {
                 @Override
