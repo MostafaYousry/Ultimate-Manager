@@ -8,7 +8,11 @@ import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-
+/**
+ * Task Entry POJO
+ * defines columns and keys in tasks table
+ * and constructors for RoomDatabase
+ */
 @Entity(tableName = "tasks",
 foreignKeys = @ForeignKey(entity = DepartmentEntry.class,parentColumns = "department_id",childColumns = "department_id"))
 public class TaskEntry {
@@ -33,13 +37,13 @@ public class TaskEntry {
     private Date taskDueDate;
 
     @ColumnInfo(name = "task_rating")
-    private int taskRating;              //from 0 to 5
+    private float taskRating;              //from 0 to 5
 
     @ColumnInfo(name = "task_is_completed")
     private boolean taskIsCompleted;
 
 
-    //used when creating new tasks
+    //used when creating new TaskEntry object
     @Ignore
     public TaskEntry(int departmentID, String taskTitle, String taskDescription, Date taskStartDate, Date taskDueDate) {
         this.departmentID = departmentID;
@@ -48,13 +52,13 @@ public class TaskEntry {
         this.taskStartDate = taskStartDate;
         this.taskDueDate = taskDueDate;
 
-        taskRating = 0;
-        taskIsCompleted = false;
+        taskRating = 0; //rating defaults to false
+        taskIsCompleted = false; //new tasks are not yet completed
     }
 
 
-    //used by room when reading from db
-    public TaskEntry(int taskId, int departmentID, String taskTitle, String taskDescription, Date taskStartDate, Date taskDueDate, int taskRating, boolean taskIsCompleted) {
+    //used by room when reading from database
+    public TaskEntry(int taskId, int departmentID, String taskTitle, String taskDescription, Date taskStartDate, Date taskDueDate, float taskRating, boolean taskIsCompleted) {
         this.taskId = taskId;
         this.departmentID = departmentID;
         this.taskTitle = taskTitle;
@@ -113,7 +117,7 @@ public class TaskEntry {
         this.taskDueDate = taskDueDate;
     }
 
-    public int getTaskRating() {
+    public float getTaskRating() {
         return taskRating;
     }
 

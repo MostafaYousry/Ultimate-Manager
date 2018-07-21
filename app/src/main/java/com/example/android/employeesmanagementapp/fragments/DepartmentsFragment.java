@@ -1,24 +1,31 @@
-package com.example.android.employeesmanagementapp;
+package com.example.android.employeesmanagementapp.fragments;
 
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Rect;
-import android.content.Intent;
 import android.os.Bundle;
-import com.google.android.material.snackbar.Snackbar;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.android.employeesmanagementapp.utils.AppUtils;
-import com.google.android.material.snackbar.Snackbar;
+import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
+import com.example.android.employeesmanagementapp.activities.AddDepartmentActivity;
+import com.example.android.employeesmanagementapp.adapters.DepartmentsAdapter;
+import com.example.android.employeesmanagementapp.data.AppDatabase;
+import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
+import com.example.android.employeesmanagementapp.data.factories.TaskIsCompletedFact;
+import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
+
+import java.util.List;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -31,11 +38,17 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
     private final String TAG = DepartmentsFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private DepartmentsAdapter mAdapter;
+    private AppDatabase mDb;
 
     public DepartmentsFragment() {
         // Required empty public constructor
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mDb = AppDatabase.getInstance(getContext());
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -52,7 +65,17 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
         mRecyclerView.setHasFixedSize(true);
 
         //initialise recycler view adapter
-        mAdapter = new DepartmentsAdapter(AppUtils.getDepartmentsFakeData(), this);
+        mAdapter = new DepartmentsAdapter(this);
+
+        LiveData<List<DepartmentEntry>> departmentsList = ViewModelProviders.of(this, new TaskIsCompletedFact(mDb, false)).get(MainViewModel.class).getAllDepartmentsList();
+        departmentsList.observe(this, new Observer<List<DepartmentEntry>>() {
+            @Override
+            public void onChanged(List<DepartmentEntry> departmentEntries) {
+                mAdapter.setData(departmentEntries);
+            }
+        });
+
+
         mRecyclerView.setAdapter(mAdapter);
 
         //hooking recycler view with grid layout manager (2 columns)

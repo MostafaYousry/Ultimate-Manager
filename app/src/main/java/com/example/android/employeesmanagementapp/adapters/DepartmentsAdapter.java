@@ -1,10 +1,12 @@
-package com.example.android.employeesmanagementapp;
+package com.example.android.employeesmanagementapp.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 
 import java.util.List;
@@ -18,8 +20,7 @@ public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.
     private RecyclerViewItemClickListener mGridItemClickListener;
 
 
-    public DepartmentsAdapter(List<DepartmentEntry> data, RecyclerViewItemClickListener gridItemClickListener) {
-        mDepartments = data;
+    public DepartmentsAdapter(RecyclerViewItemClickListener gridItemClickListener) {
         mGridItemClickListener = gridItemClickListener;
     }
 
@@ -39,6 +40,8 @@ public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.
 
     @Override
     public int getItemCount() {
+        if (mDepartments == null)
+            return 0;
         return mDepartments.size();
     }
 

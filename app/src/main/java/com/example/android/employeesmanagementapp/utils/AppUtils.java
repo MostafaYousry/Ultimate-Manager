@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+
+/**
+ * class for app utilities
+ */
 public final class AppUtils {
 
     public static List<Integer> employeeImages = new ArrayList<>();

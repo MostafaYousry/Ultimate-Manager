@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--menu items shown in toolbar in AddTaskActivity , AddEmployeeActivity , AddDepartmentActivity-->
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_save"
         android:icon="@drawable/ic_check"
-        android:title=""
+        android:title="@string/action_save"
         app:showAsAction="always" />
 </menu>

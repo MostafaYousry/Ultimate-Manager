@@ -4,6 +4,11 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 
+/**
+ * EmployeesTasks Entry POJO
+ * defines columns and keys in employees_tasks table
+ * and constructors for RoomDatabase
+ */
 @Entity(tableName = "employees_tasks",
 primaryKeys = {"employee_id","task_id"},
 foreignKeys = {@ForeignKey(entity = EmployeeEntry.class,parentColumns = "employee_id",childColumns = "employee_id"),
@@ -16,6 +21,7 @@ public class EmployeesTasksEntry {
     @ColumnInfo(name = "task_id")
     private int taskId;
 
+    //used for reading and creating an EmployeesTasksEntry object
     public EmployeesTasksEntry(int employeeId, int taskId) {
         this.employeeId = employeeId;
         this.taskId = taskId;

@@ -1,4 +1,4 @@
-package com.example.android.employeesmanagementapp;
+package com.example.android.employeesmanagementapp.fragments;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -7,7 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.android.employeesmanagementapp.utils.AppUtils;
+import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
+import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -24,7 +26,7 @@ public class EmployeeBottomSheetFragment extends BottomSheetDialogFragment imple
     private RecyclerView mRecyclerView;
     private View mRootView;
     private Toolbar mToolbar;
-    private EmployeesAdapter mEmployeesAdapter = new EmployeesAdapter(AppUtils.getEmployeesFakeData(), this);
+    private EmployeesAdapter mEmployeesAdapter = new EmployeesAdapter(this);
     private boolean toolBarVisibility;
 
     @SuppressLint("ValidFragment")

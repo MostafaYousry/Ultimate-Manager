@@ -16,6 +16,11 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
+/**
+ * class for main app database
+ * follows singleton design pattern
+ * defines all entities in the database , database name , database version , type converters used
+ */
 @Database(entities = {EmployeeEntry.class,TaskEntry.class,DepartmentEntry.class,EmployeesTasksEntry.class},version = 1,exportSchema = false)
 @TypeConverters(DateTypeConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
