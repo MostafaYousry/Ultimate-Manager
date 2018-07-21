@@ -1,7 +1,5 @@
 package com.example.android.employeesmanagementapp;
 
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,14 +9,16 @@ import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.DepartmentsViewHolder> {
 
     private List<DepartmentEntry> mDepartments;
     private RecyclerViewItemClickListener mGridItemClickListener;
 
 
-
-    public DepartmentsAdapter(List<DepartmentEntry> data , RecyclerViewItemClickListener gridItemClickListener){
+    public DepartmentsAdapter(List<DepartmentEntry> data, RecyclerViewItemClickListener gridItemClickListener) {
         mDepartments = data;
         mGridItemClickListener = gridItemClickListener;
     }
@@ -26,7 +26,7 @@ public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.
     @NonNull
     @Override
     public DepartmentsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_departments_rv,parent,false);
+        View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_departments_rv, parent, false);
         DepartmentsViewHolder departmentsViewHolder = new DepartmentsViewHolder(rootView);
 
         return departmentsViewHolder;
@@ -42,8 +42,17 @@ public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.
         return mDepartments.size();
     }
 
+    /**
+     * used to update adapters data if any change occurs
+     *
+     * @param departments new departments list
+     */
+    public void setData(List<DepartmentEntry> departments) {
+        mDepartments = departments;
+        notifyDataSetChanged();
+    }
 
-    public class DepartmentsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class DepartmentsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public View mItemView;
         public TextView mDepartmentName;
 
@@ -54,7 +63,7 @@ public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.
             mItemView.setOnClickListener(this);
         }
 
-        public void bind(int position){
+        public void bind(int position) {
             mDepartmentName.setText(mDepartments.get(position).getDepartmentName());
         }
 
@@ -63,15 +72,5 @@ public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.
             int clickedItemIndex = getAdapterPosition();
             mGridItemClickListener.onItemClick(clickedItemIndex);
         }
-    }
-
-    /**
-     * used to update adapters data if any change occurs
-     *
-     * @param  departments new departments list
-     */
-    public void setData(List<DepartmentEntry> departments){
-        mDepartments = departments;
-        notifyDataSetChanged();
     }
 }

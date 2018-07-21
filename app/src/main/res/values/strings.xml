@@ -7,22 +7,32 @@
     <string name="departments">Departments</string>
 
 
-    <!--<string name="undo_label">Undo</string>-->
-    <!--<string name="archived_label">Archive</string>-->
-
+    <string name="required_field">*Required</string>
 
     <!--strings for add task activity-->
-    <string name="label_task_title">Title :</string>
-    <string name="label_task_description">Description :</string>
     <string name="label_task_rating">Rating :</string>
     <string name="label_task_department">Department :</string>
     <string name="label_task_employees">Employees :</string>
-    <string name="label_task_start_date">Starts :</string>
-    <string name="label_task_due_date">Due :</string>
     <string name="hint_task_title">Task title</string>
     <string name="hint_task_description">Task description</string>
-    <string name="hint_task_start_date">Choose start date</string>
-    <string name="hint_task_due_date">Choose due date</string>
+    <string name="hint_task_start_date">Start date</string>
+    <string name="hint_task_due_date">Due date</string>
+    <string name="hint_task_department">Department</string>
+
+    <!--strings for add employee activity-->
+    <string name="label_employee_name">Name :</string>
+    <string name="label_employee_salary">Salary :</string>
+    <string name="label_employee_hire_date">Hire date :</string>
+    <string name="label_employee_department">Department :</string>
+    <string name="hint_employee_name">Employee Name</string>
+    <string name="hint_employee_salary">Employee Salary</string>
+    <string name="hint_employee_hire_date">Choose Date Hired</string>
+    <string name="hint_employee_department">Choose a Department</string>
+
+
+    <!--strings for add department activity-->
+    <string name="label_department_name">Name :</string>
+    <string name="hint_department_name">Department name</string>
 
 
     <!--strings for menu actions-->
@@ -31,7 +41,10 @@
 
     <!--strings for toolbar title-->
     <string name="add_new_task">Add new task</string>
-    <string name="update_task">Update task</string>
-
+    <string name="edit_task">Edit task</string>
+    <string name="add_new_employee">Add new employee</string>
+    <string name="edit_employee">Edit employee</string>
+    <string name="add_new_department">Add new department</string>
+    <string name="edit_department">Edit_department</string>
 
 </resources>

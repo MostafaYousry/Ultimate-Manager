@@ -14,19 +14,19 @@ public final class AppUtils {
     public static List<Integer> employeeImages = new ArrayList<>();
 
     static {
-        employeeImages.add(R.drawable.family_daughter);
-        employeeImages.add(R.drawable.family_father);
-        employeeImages.add(R.drawable.family_grandfather);
-        employeeImages.add(R.drawable.family_grandmother);
-        employeeImages.add(R.drawable.family_mother);
-        employeeImages.add(R.drawable.family_older_brother);
-        employeeImages.add(R.drawable.family_older_sister);
-        employeeImages.add(R.drawable.family_son);
-        employeeImages.add(R.drawable.family_younger_brother);
-        employeeImages.add(R.drawable.family_younger_sister);
+        employeeImages.add(R.drawable.griezmann);
+        employeeImages.add(R.drawable.salah);
+        employeeImages.add(R.drawable.pogba);
+        employeeImages.add(R.drawable.hazard);
+        employeeImages.add(R.drawable.ronaldo);
+        employeeImages.add(R.drawable.messi);
+        employeeImages.add(R.drawable.dybala);
+        employeeImages.add(R.drawable.kroos);
+        employeeImages.add(R.drawable.mbappe);
     }
 
-    public static int getRandomEmployeeImage(){
+    public static int getRandomEmployeeImage() {
+
         return employeeImages.get((int)(Math.random()*employeeImages.size()));
     }
 
@@ -34,24 +34,19 @@ public final class AppUtils {
      * Temporary method for inserting fake data to RecyclerView's adapter.
      * tobe replaced with data from database
      */
-    public static List<EmployeeEntry> getEmployeesFakeData(){
+    public static List<EmployeeEntry> getEmployeesFakeData() {
         List<EmployeeEntry> list = new ArrayList<>();
 
-        EmployeeEntry employeeEntry1 = new EmployeeEntry(2,"Robert Downey",200,new Date());
-        EmployeeEntry employeeEntry2 = new EmployeeEntry(1,"Emma Watson",200,new Date());
-        EmployeeEntry employeeEntry3 = new EmployeeEntry(2,"Tom Holland",200,new Date());
-        EmployeeEntry employeeEntry4 = new EmployeeEntry(3,"Elizabeth Olsen",200,new Date());
-        EmployeeEntry employeeEntry5 = new EmployeeEntry(0,"Chris Evans",200,new Date());
-        EmployeeEntry employeeEntry6 = new EmployeeEntry(2,"Robert Downey",200,new Date());
-        EmployeeEntry employeeEntry7 = new EmployeeEntry(1,"Emma Watson",200,new Date());
-        EmployeeEntry employeeEntry8 = new EmployeeEntry(1,"Tom Holland",200,new Date());
-        EmployeeEntry employeeEntry9 = new EmployeeEntry(2,"Elizabeth Olsen",200,new Date());
-        EmployeeEntry employeeEntry10 = new EmployeeEntry(0,"Chris Evans",200,new Date());
-        EmployeeEntry employeeEntry11 = new EmployeeEntry(1,"Robert Downey",200,new Date());
-        EmployeeEntry employeeEntry12 = new EmployeeEntry(3,"Emma Watson",200,new Date());
-        EmployeeEntry employeeEntry13 = new EmployeeEntry(2,"Tom Holland",200,new Date());
-        EmployeeEntry employeeEntry14 = new EmployeeEntry(1,"Elizabeth Olsen",200,new Date());
-        EmployeeEntry employeeEntry15 = new EmployeeEntry(0,"Chris Evans",200,new Date());
+        EmployeeEntry employeeEntry1 = new EmployeeEntry(2, "Antoine Griezmann", 200, new Date());
+        EmployeeEntry employeeEntry2 = new EmployeeEntry(1, "Mohamed Salah", 200, new Date());
+        EmployeeEntry employeeEntry3 = new EmployeeEntry(2, "Paul Pogba", 200, new Date());
+        EmployeeEntry employeeEntry4 = new EmployeeEntry(3, "Eden Hazard", 200, new Date());
+        EmployeeEntry employeeEntry5 = new EmployeeEntry(0, "Cristiano Ronaldo", 200, new Date());
+        EmployeeEntry employeeEntry6 = new EmployeeEntry(2, "Lionel Messi", 200, new Date());
+        EmployeeEntry employeeEntry9 = new EmployeeEntry(2, "Paulo Dybala", 200, new Date());
+        EmployeeEntry employeeEntry7 = new EmployeeEntry(1, "Tony Kroos", 200, new Date());
+        EmployeeEntry employeeEntry8 = new EmployeeEntry(1, "Kylian Mbappe", 200, new Date());
+
 
         list.add(employeeEntry1);
         list.add(employeeEntry2);
@@ -62,12 +57,6 @@ public final class AppUtils {
         list.add(employeeEntry7);
         list.add(employeeEntry8);
         list.add(employeeEntry9);
-        list.add(employeeEntry10);
-        list.add(employeeEntry11);
-        list.add(employeeEntry12);
-        list.add(employeeEntry13);
-        list.add(employeeEntry14);
-        list.add(employeeEntry15);
 
         return list;
     }
@@ -76,21 +65,21 @@ public final class AppUtils {
      * Temporary method for inserting fake data to RecyclerView's adapter.
      * tobe replaced with data from database
      */
-    public static List<TaskEntry> getTasksFakeData(){
-        TaskEntry taskEntry1 = new TaskEntry(2,"App code refactor","wfjjwnfiwnfiwenf",new Date(),new Date());
-        TaskEntry taskEntry2 = new TaskEntry(0,"Add new Feature","wfjjwnfiwnfiwenfasdasd",new Date(),new Date());
-        TaskEntry taskEntry3 = new TaskEntry(3,"rererererererererererer","wfjjwnfiwnfiwenfsdasdasdadsad",new Date(),new Date());
-        TaskEntry taskEntry4 = new TaskEntry(3,"el3ab baleee","wfjjwnfiwnfiwenfasdasd",new Date(),new Date());
-        TaskEntry taskEntry5 = new TaskEntry(1,"skalob baneee","asdasdsdasdadsad",new Date(),new Date());
-        TaskEntry taskEntry6 = new TaskEntry(4,"eboo msh baskoota","wfjjwnfiwnfiwenfasdasdasdsadasdasdsadasdsads",new Date(),new Date());
+    public static List<TaskEntry> getTasksFakeData() {
+        TaskEntry taskEntry1 = new TaskEntry(2, "App code refactor", "wfjjwnfiwnfiwenf", new Date(), new Date());
+        TaskEntry taskEntry2 = new TaskEntry(0, "Add new Feature", "wfjjwnfiwnfiwenfasdasd", new Date(), new Date());
+//        TaskEntry taskEntry3 = new TaskEntry(3,"rererererererererererer","wfjjwnfiwnfiwenfsdasdasdadsad",new Date(),new Date());
+//        TaskEntry taskEntry4 = new TaskEntry(3,"el3ab baleee","wfjjwnfiwnfiwenfasdasd",new Date(),new Date());
+//        TaskEntry taskEntry5 = new TaskEntry(1,"skalob baneee","asdasdsdasdadsad",new Date(),new Date());
+//        TaskEntry taskEntry6 = new TaskEntry(4,"eboo msh baskoota","wfjjwnfiwnfiwenfasdasdasdsadasdasdsadasdsads",new Date(),new Date());
 
         List<TaskEntry> list = new ArrayList<>();
         list.add(taskEntry1);
         list.add(taskEntry2);
-        list.add(taskEntry3);
-        list.add(taskEntry4);
-        list.add(taskEntry5);
-        list.add(taskEntry6);
+//        list.add(taskEntry3);
+//        list.add(taskEntry4);
+//        list.add(taskEntry5);
+//        list.add(taskEntry6);
 
         return list;
     }
@@ -99,8 +88,8 @@ public final class AppUtils {
      * Temporary method for inserting fake data to RecyclerView's adapter.
      * tobe replaced with data from database
      */
-    public static List<DepartmentEntry> getDepartmentsFakeData(){
-        DepartmentEntry departmentEntry1 = new DepartmentEntry("Production" );
+    public static List<DepartmentEntry> getDepartmentsFakeData() {
+        DepartmentEntry departmentEntry1 = new DepartmentEntry("Production");
         DepartmentEntry departmentEntry2 = new DepartmentEntry("Research and Development");
         DepartmentEntry departmentEntry3 = new DepartmentEntry("Purchasing");
         DepartmentEntry departmentEntry4 = new DepartmentEntry("Marketing");

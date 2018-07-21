@@ -1,21 +1,27 @@
 package com.example.android.employeesmanagementapp;
 
 
+import android.content.res.Resources;
+import android.graphics.Rect;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
+import com.google.android.material.snackbar.Snackbar;
 
-import java.util.ArrayList;
-import java.util.List;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 
 /**
@@ -50,8 +56,14 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
         mRecyclerView.setAdapter(mAdapter);
 
         //hooking recycler view with grid layout manager (2 columns)
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),2);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
         mRecyclerView.setLayoutManager(gridLayoutManager);
+
+        //adding spacing between grid items
+        mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(dpToPx(8)));
+
+        //applying default rv animations
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         return rootView;
 
@@ -64,10 +76,55 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
     @Override
     public void onItemClick(int clickedItemIndex) {
         //todo: open department detail activity
-        Log.d(TAG,"Item at index " + clickedItemIndex + " is clicked");
+        Log.d(TAG, "Item at index " + clickedItemIndex + " is clicked");
 
-        Snackbar.make(getView(), "Item at index " + clickedItemIndex + " is clicked", Snackbar.LENGTH_SHORT)
-                .show();
+        Intent intent = new Intent(getActivity() , AddDepartmentActivity.class);
+        //todo:pass rv.getTag ---> item id in db instead index in rv
+        intent.putExtra(AddDepartmentActivity.DEPARTMENT_ID_KEY , clickedItemIndex);
+        startActivity(intent);
     }
+
+    /**
+     * Converts dp to pixel
+     */
+    private int dpToPx(int dp) {
+        Resources r = getResources();
+        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
+    }
+
+    public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
+
+        private int spacing;
+
+        public GridSpacingItemDecoration(int spacing) {
+            this.spacing = spacing;
+        }
+
+        @Override
+        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+            int position = parent.getChildAdapterPosition(view); // item position
+
+
+            if (position % 2 == 0) {
+                //if left row
+                outRect.left = spacing;
+                outRect.right = spacing / 2;
+            } else {
+                //if right row
+                outRect.right = spacing;
+                outRect.left = spacing / 2;
+            }
+
+            //if top row
+            if (position == 0 || position == 1) {
+                outRect.top = spacing;
+            }
+
+
+            outRect.bottom = spacing;
+
+        }
+    }
+
 
 }
