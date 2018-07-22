@@ -1,23 +1,20 @@
-package com.example.android.employeesmanagementapp;
+package com.example.android.employeesmanagementapp.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.android.employeesmanagementapp.AddTaskActivity;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
-import com.example.android.employeesmanagementapp.TasksAdapter;
-import com.example.android.employeesmanagementapp.TasksFragment;
-import com.example.android.employeesmanagementapp.utils.AppUtils;
-
+import com.example.android.employeesmanagementapp.activities.AddTaskActivity;
+import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class TaskBottomSheetFragment extends BottomSheetDialogFragment  implements RecyclerViewItemClickListener {
     private final String TAG = TasksFragment.class.getSimpleName();
@@ -43,7 +40,7 @@ public class TaskBottomSheetFragment extends BottomSheetDialogFragment  implemen
         mRecyclerView.setLayoutManager(layoutManager);
 
         // specify an adapter
-        mAdapter = new TasksAdapter(AppUtils.getTasksFakeData(),this);
+        mAdapter = new TasksAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
 
         return view;

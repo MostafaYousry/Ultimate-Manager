@@ -1,4 +1,4 @@
-package com.example.android.employeesmanagementapp;
+package com.example.android.employeesmanagementapp.fragments;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -14,6 +14,10 @@ import java.util.Date;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 
+/**
+ * a dialog fragment that pops to allow user to choose a date
+ * and displays that date in a given view id (TextView).
+ */
 public class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
     private View viewToShowDateIn;

@@ -54,7 +54,7 @@
 
     <Button
         android:id="@+id/show_employees_bottom_sheet"
-        style="@style/DepartmentMargin"
+        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"

@@ -6,6 +6,11 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+/**
+ * Department Entry POJO
+ * defines columns and keys in departments table
+ * and constructors for RoomDatabase
+ */
 @Entity(tableName = "departments")
 public class DepartmentEntry {
 
@@ -17,11 +22,13 @@ public class DepartmentEntry {
     @ColumnInfo(name = "department_name")
     private String departmentName;
 
+    //used when creating new DepartmentEntry object
     @Ignore
     public DepartmentEntry(@NonNull String departmentName) {
         this.departmentName = departmentName;
     }
 
+    //used by room when reading from database
     public DepartmentEntry(int departmentId, @NonNull String departmentName) {
         this.departmentId = departmentId;
         this.departmentName = departmentName;

@@ -1,4 +1,6 @@
 //todo:fix task start and due date issue
+//todo:AutocompletTextView shows wrong selected department name
+
 
 //App database
 //todo:test on main thread

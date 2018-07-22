@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".activities.MainActivity">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -19,18 +19,18 @@
 
         </activity>
         <activity
-            android:name=".AddTaskActivity"
-            android:parentActivityName=".MainActivity">
+            android:name=".activities.AddTaskActivity"
+            android:parentActivityName=".activities.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".activities.MainActivity" />
 
 
         </activity>
 
-        <activity android:name=".AddEmployeeActivity" />
+        <activity android:name=".activities.AddEmployeeActivity" />
 
-        <activity android:name=".AddDepartmentActivity" />
+        <activity android:name=".activities.AddDepartmentActivity" />
 
     </application>
 

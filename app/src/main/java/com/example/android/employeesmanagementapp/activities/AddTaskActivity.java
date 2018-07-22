@@ -1,4 +1,4 @@
-package com.example.android.employeesmanagementapp;
+package com.example.android.employeesmanagementapp.activities;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -7,19 +7,33 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
+import com.example.android.employeesmanagementapp.data.AppExecutor;
+import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
+import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
+import com.example.android.employeesmanagementapp.data.factories.TaskIsCompletedFact;
+import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
+import com.example.android.employeesmanagementapp.fragments.DatePickerFragment;
+
+import java.util.Date;
+import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
-public class AddTaskActivity extends AppCompatActivity  {
+public class AddTaskActivity extends AppCompatActivity {
 
     private static final String TAG = AddTaskActivity.class.getSimpleName();
 
@@ -36,7 +50,13 @@ public class AddTaskActivity extends AppCompatActivity  {
     private AutoCompleteTextView mTaskDepartment;
     private Toolbar mToolbar;
 
+    private TaskEntry mTaskEntry;
+
+    private int mSelectedDepartmentId;
     private AppDatabase mDb;
+
+    private DepartmentsArrayAdapter mdepartmentsArrayAdapter;
+
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -78,14 +98,11 @@ public class AddTaskActivity extends AppCompatActivity  {
         setUpRatingBar();
 
 
-        if (mTaskId == DEFAULT_TASK_ID){
+        if (mTaskId == DEFAULT_TASK_ID) {
             clearViews();
-        }else {
+        } else {
             loadTaskData();
         }
-
-
-
 
 
         //allow scrolling of edit text content when it is inside a scroll view
@@ -93,7 +110,7 @@ public class AddTaskActivity extends AppCompatActivity  {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 v.getParent().requestDisallowInterceptTouchEvent(true);
-                switch (event.getAction() & MotionEvent.ACTION_MASK){
+                switch (event.getAction() & MotionEvent.ACTION_MASK) {
                     case MotionEvent.ACTION_UP:
                         v.getParent().requestDisallowInterceptTouchEvent(false);
                         break;
@@ -119,7 +136,7 @@ public class AddTaskActivity extends AppCompatActivity  {
     }
 
 
-    private void clearViews(){
+    private void clearViews() {
         mTaskTitle.setText("");
         mTaskDescription.setText("");
         mTaskStartDate.setText("");
@@ -128,73 +145,101 @@ public class AddTaskActivity extends AppCompatActivity  {
 
     }
 
-    private void loadTaskData(){
+    private void loadTaskData() {
+        final LiveData<TaskEntry> task = AppDatabase.getInstance(this).tasksDao().loadTaskById(mTaskId);
+        task.observe(this, new Observer<TaskEntry>() {
+            @Override
+            public void onChanged(TaskEntry taskEntry) {
+                mTaskEntry = taskEntry;
+                task.removeObservers(AddTaskActivity.this);
+            }
+        });
+
+
         //todo:fill with task data
+        mTaskTitle.setText(mTaskEntry.getTaskTitle());
+        mTaskDescription.setText(mTaskEntry.getTaskDescription());
+        mTaskStartDate.setText(mTaskEntry.getTaskDueDate().toString());
+        mTaskDueDate.setText(mTaskEntry.getTaskDueDate().toString());
+
+
+
     }
 
 
     private void setUpDepartmentDropDown() {
-        //todo:replace with data from db
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.departments_array, android.R.layout.simple_dropdown_item_1line);
 
-        // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mdepartmentsArrayAdapter = new DepartmentsArrayAdapter(AddTaskActivity.this);
+
+        //
+        LiveData<List<DepartmentEntry>> departments = ViewModelProviders.of(this, new TaskIsCompletedFact(mDb, false)).get(MainViewModel.class).getAllDepartmentsList();
+        departments.observe(this, new Observer<List<DepartmentEntry>>() {
+            @Override
+            public void onChanged(List<DepartmentEntry> departmentEntries) {
+                mdepartmentsArrayAdapter.setDepartmentEntryList(departmentEntries);
+            }
+        });
+
+
 
         // Apply the adapter to the spinner
-        mTaskDepartment.setAdapter(adapter);
+        mTaskDepartment.setAdapter(mdepartmentsArrayAdapter);
 
         mTaskDepartment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 mTaskDepartment.showDropDown();
             }
         });
 
-        if (mTaskId == DEFAULT_TASK_ID){
+        mTaskDepartment.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                mSelectedDepartmentId = (int) view.getTag();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
+
+        if (mTaskId == DEFAULT_TASK_ID) {
             mTaskDepartment.setSelection(0);
-        }else {
+        } else {
             //todo:select this tasks department
-            //mTaskDepartmentSpinner.setSelection();
+            mTaskDepartment.setSelection(mdepartmentsArrayAdapter.getPositionForItemId(mSelectedDepartmentId));
         }
     }
 
 
-    private void setUpToolBar(){
-        if (mTaskId == DEFAULT_TASK_ID){
+    private void setUpToolBar() {
+        if (mTaskId == DEFAULT_TASK_ID) {
             getSupportActionBar().setTitle(getString(R.string.add_new_task));
-        }else {
+        } else {
             getSupportActionBar().setTitle(getString(R.string.edit_task));
         }
     }
 
 
-    private void setUpRatingBar(){
+    private void setUpRatingBar() {
         mTaskRatingBar.setNumStars(5);
         mTaskRatingBar.setMax(5);
         mTaskRatingBar.setStepSize(0.5f);
-
-        if (mTaskId == DEFAULT_TASK_ID){
-            mTaskRatingBar.setRating(0);
-            mTaskRatingBar.setIsIndicator(false);
-        }else {
-//            mTaskRatingBar.setIsIndicator(true);
-            //todo:set task rating
-        }
+        mTaskRatingBar.setRating(0);
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_menu , menu);
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
         return true;
     }
 
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_save:
                 saveTask();
                 break;
@@ -206,16 +251,29 @@ public class AddTaskActivity extends AppCompatActivity  {
     }
 
 
-    private void saveTask(){
+    private void saveTask() {
         //todo:insert/update new data into db
-//        AppExecutor.getInstance().diskIO().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                TaskEntry taskEntry = new TaskEntry();
-//                mDb.tasksDao().addTask(taskEntry);
-//
-//            }
-//        });
+        if (valideData()) {
+            int departmentId = 1;
+            String taskTitle = mTaskTitle.getText().toString();
+            String taskDescription = mTaskDescription.getText().toString();
+            Date taskStartDate = new Date();
+            Date taskDueDate = new Date();
+
+
+            final TaskEntry newTask = new TaskEntry(departmentId, taskTitle, taskDescription, taskStartDate, taskDueDate);
+
+            AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    mDb.tasksDao().addTask(newTask);
+                }
+            });
+        }
         finish();
+    }
+
+    private boolean valideData() {
+        return true;
     }
 }

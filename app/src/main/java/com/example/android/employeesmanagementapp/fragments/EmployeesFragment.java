@@ -1,4 +1,4 @@
-package com.example.android.employeesmanagementapp;
+package com.example.android.employeesmanagementapp.fragments;
 
 
 import android.os.Bundle;
@@ -7,14 +7,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.android.employeesmanagementapp.utils.AppUtils;
-import com.google.android.material.snackbar.Snackbar;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
+import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
+import com.example.android.employeesmanagementapp.data.AppDatabase;
+import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
+import com.example.android.employeesmanagementapp.data.factories.TaskIsCompletedFact;
+import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.List;
+
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,11 +29,20 @@ import androidx.recyclerview.widget.RecyclerView;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class EmployeesFragment extends Fragment implements RecyclerViewItemClickListener{
+public class EmployeesFragment extends Fragment implements RecyclerViewItemClickListener {
 
     public static final String TAG = EmployeesFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private EmployeesAdapter mEmployeesAdapter;
+    private AppDatabase mDb;
+
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mDb = AppDatabase.getInstance(getContext());
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -55,7 +71,16 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
         mRecyclerView.setLayoutManager(layoutManager);
 
         //create object of EmployeesAdapter and send data
-        mEmployeesAdapter = new EmployeesAdapter(AppUtils.getEmployeesFakeData(), this);
+        mEmployeesAdapter = new EmployeesAdapter(this);
+
+        LiveData<List<EmployeeEntry>> employeesList = ViewModelProviders.of(this, new TaskIsCompletedFact(mDb, false)).get(MainViewModel.class).getAllEmployeesList();
+        employeesList.observe(this, new Observer<List<EmployeeEntry>>() {
+            @Override
+            public void onChanged(List<EmployeeEntry> employeeEntries) {
+                mEmployeesAdapter.setData(employeeEntries);
+            }
+        });
+
 
         //set the employee recycler view adapter
         mRecyclerView.setAdapter(mEmployeesAdapter);

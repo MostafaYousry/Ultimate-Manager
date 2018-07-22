@@ -1,4 +1,4 @@
-package com.example.android.employeesmanagementapp;
+package com.example.android.employeesmanagementapp.adapters;
 
 
 import android.view.LayoutInflater;
@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 
 import java.util.List;
@@ -19,8 +21,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
     private RecyclerViewItemClickListener mListClickListener;
 
 
-    public TasksAdapter(List<TaskEntry> data, RecyclerViewItemClickListener clickListener) {
-        mData = data;
+    public TasksAdapter(RecyclerViewItemClickListener clickListener) {
         mListClickListener = clickListener;
     }
 
@@ -42,11 +43,18 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
 
     @Override
     public int getItemCount() {
+        if (mData == null)
+            return 0;
         return mData.size();
     }
 
-    public void setData(List<TaskEntry> newData) {
-        mData = newData;
+    /**
+     * used to update adapters data if any change occurs
+     *
+     * @param tasks : new tasks list
+     */
+    public void setData(List<TaskEntry> tasks) {
+        mData = tasks;
         notifyDataSetChanged();
     }
 
@@ -65,8 +73,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
 
         @Override
         public void onClick(View v) {
-            int clickedItemIndex = getAdapterPosition();
-            mListClickListener.onItemClick(clickedItemIndex);
+            mListClickListener.onItemClick((int) v.getTag());
         }
     }
 

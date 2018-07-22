@@ -1,4 +1,4 @@
-package com.example.android.employeesmanagementapp;
+package com.example.android.employeesmanagementapp.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,6 +6,10 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.fragments.DepartmentsFragment;
+import com.example.android.employeesmanagementapp.fragments.EmployeesFragment;
+import com.example.android.employeesmanagementapp.fragments.TasksFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 

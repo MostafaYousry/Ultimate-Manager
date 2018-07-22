@@ -1,4 +1,4 @@
-package com.example.android.employeesmanagementapp;
+package com.example.android.employeesmanagementapp.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,6 +7,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.data.AppDatabase;
+import com.example.android.employeesmanagementapp.data.AppExecutor;
+import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
+import com.example.android.employeesmanagementapp.fragments.EmployeeBottomSheetFragment;
+import com.example.android.employeesmanagementapp.fragments.TaskBottomSheetFragment;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -23,10 +30,14 @@ public class AddDepartmentActivity extends AppCompatActivity {
     private Toolbar mToolbar;
     private Button mShowEmployeesBottomSheet, mAddEmployeesBottomSheet, mShowCompletedTasksBottomSheet;
 
+    private AppDatabase mDb;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_department);
+
+        mDb = AppDatabase.getInstance(this);
 
         //check if activity was opened from a click on rv item or from the fab
         Intent intent = getIntent();
@@ -62,16 +73,6 @@ public class AddDepartmentActivity extends AppCompatActivity {
 
     //bottom sheets to show department's employees and completed tasks
     private void setUpBottomSheetButtons() {
-
-
-        mShowEmployeesBottomSheet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EmployeeBottomSheetFragment employeesFragment = new EmployeeBottomSheetFragment(false);
-                employeesFragment.show(getSupportFragmentManager(), employeesFragment.getTag());
-            }
-        });
-
 
         mAddEmployeesBottomSheet.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -130,6 +131,22 @@ public class AddDepartmentActivity extends AppCompatActivity {
 
     private void saveDepartment() {
         //todo:insert/update new data into db
+        if (valideData()) {
+            final String departmentName = mDepartmentName.getText().toString();
+
+            final DepartmentEntry newDepartment = new DepartmentEntry(departmentName);
+
+            AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    mDb.departmentsDao().addDepartment(newDepartment);
+                }
+            });
+        }
         finish();
+    }
+
+    private boolean valideData() {
+        return true;
     }
 }

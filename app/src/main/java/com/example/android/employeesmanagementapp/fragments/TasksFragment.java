@@ -1,21 +1,28 @@
-package com.example.android.employeesmanagementapp;
+package com.example.android.employeesmanagementapp.fragments;
 
 
 import android.content.Intent;
 import android.os.Bundle;
-import com.google.android.material.snackbar.Snackbar;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
+import com.example.android.employeesmanagementapp.activities.AddTaskActivity;
+import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
-import com.example.android.employeesmanagementapp.utils.AppUtils;
+import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
+import com.example.android.employeesmanagementapp.data.factories.TaskIsCompletedFact;
+import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
+
+import java.util.List;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -33,6 +40,7 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
     public TasksFragment() {
         // Required empty public constructor
     }
+
 
 
     @Override
@@ -57,7 +65,16 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
         mRecyclerView.setLayoutManager(layoutManager);
 
         // specify an adapter
-        mAdapter = new TasksAdapter(AppUtils.getTasksFakeData(), this);
+        mAdapter = new TasksAdapter(this);
+
+        LiveData<List<TaskEntry>> tasksList = ViewModelProviders.of(this, new TaskIsCompletedFact(mDb, false)).get(MainViewModel.class).getTasksList();
+        tasksList.observe(this, new Observer<List<TaskEntry>>() {
+            @Override
+            public void onChanged(List<TaskEntry> taskEntries) {
+                mAdapter.setData(taskEntries);
+            }
+        });
+
         mRecyclerView.setAdapter(mAdapter);
 
         return view;
@@ -79,24 +96,6 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
     }
 
 
-    @Override
-    public void onResume() {
-        super.onResume();
-//        AppExecutor.getInstance().diskIO().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                final List<TaskEntry> list = mDb.tasksDao().loadAllRunningTasks();
-//
-//                getActivity().runOnUiThread(new Runnable(){
-//                    @Override
-//                    public void run(){
-//                        mAdapter.setData(list);
-//                    }
-//                });
-//            }
-//        });
-
-    }
 
 
 }

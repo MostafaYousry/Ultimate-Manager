@@ -1,3 +1,4 @@
+<!-- menu items shown in the bottom navigation view-->
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     <group android:checkableBehavior="single">
         <item

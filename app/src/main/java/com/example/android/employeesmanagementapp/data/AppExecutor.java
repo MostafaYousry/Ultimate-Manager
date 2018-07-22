@@ -10,8 +10,12 @@ import java.util.concurrent.Executors;
 import androidx.annotation.NonNull;
 
 /**
- * Executors used to make database operation
- * specifically (insert , update , delete)
+ * Executors class used to run database operations
+ * on background thread.
+ * if there is multiple calls they are queued.
+ * used specifically for (insert , update , delete)
+ *
+ * follows singleton design pattern
  */
 public class AppExecutor {
 
@@ -36,15 +40,6 @@ public class AppExecutor {
         return sInstance;
     }
 
-    public Executor diskIO() {
-        return diskIO;
-    }
-
-    public Executor mainThread() {
-        return mainThread;
-    }
-
-
     private static class MainThreadExecutor implements Executor {
         private Handler mainThreadHandler = new Handler(Looper.getMainLooper());
 
@@ -53,5 +48,16 @@ public class AppExecutor {
             mainThreadHandler.post(command);
         }
     }
+
+    //single thread executor runs on background thread
+    public Executor diskIO() {
+        return diskIO;
+    }
+
+    //main thread executor runs on ui thread
+    public Executor mainThread() {
+        return mainThread;
+    }
+
 
 }
