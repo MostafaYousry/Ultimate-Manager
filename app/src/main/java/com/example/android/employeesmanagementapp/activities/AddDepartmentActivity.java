@@ -12,11 +12,16 @@ import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
+import com.example.android.employeesmanagementapp.data.factories.DepIdFact;
+import com.example.android.employeesmanagementapp.data.viewmodels.AddNewDepViewModel;
 import com.example.android.employeesmanagementapp.fragments.EmployeeBottomSheetFragment;
 import com.example.android.employeesmanagementapp.fragments.TaskBottomSheetFragment;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
 
 public class AddDepartmentActivity extends AppCompatActivity {
@@ -61,15 +66,34 @@ public class AddDepartmentActivity extends AppCompatActivity {
 
 
         setUpToolBar();
-        setUpBottomSheetButtons();
-
         if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
             clearViews();
         } else {
-            loadDepartmentData();
+            final LiveData<DepartmentEntry> department = ViewModelProviders.of(this, new DepIdFact(mDb, mDepartmentId)).get(AddNewDepViewModel.class).getDepartment();
+            department.observe(this, new Observer<DepartmentEntry>() {
+                @Override
+                public void onChanged(DepartmentEntry departmentEntry) {
+                    department.removeObservers(AddDepartmentActivity.this);
+                    populateUi(departmentEntry);
+                }
+            });
         }
 
+
+        setUpBottomSheetButtons();
+
+
     }
+
+
+    private void populateUi(DepartmentEntry departmentEntry) {
+        if (departmentEntry == null)
+            return;
+        mDepartmentName.setText(departmentEntry.getDepartmentName());
+
+
+    }
+
 
     //bottom sheets to show department's employees and completed tasks
     private void setUpBottomSheetButtons() {
@@ -77,9 +101,8 @@ public class AddDepartmentActivity extends AppCompatActivity {
         mAddEmployeesBottomSheet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EmployeeBottomSheetFragment employeesFragment = new EmployeeBottomSheetFragment(true);
+                EmployeeBottomSheetFragment employeesFragment = new EmployeeBottomSheetFragment();
                 employeesFragment.show(getSupportFragmentManager(), employeesFragment.getTag());
-                employeesFragment.getEmployeesAdapter().setCheckBoxVisibility(true);
             }
         });
 
@@ -91,10 +114,6 @@ public class AddDepartmentActivity extends AppCompatActivity {
                 taskFragment.show(getSupportFragmentManager(), taskFragment.getTag());
             }
         });
-    }
-
-    private void loadDepartmentData() {
-        //todo:fill with task data
     }
 
     private void clearViews() {

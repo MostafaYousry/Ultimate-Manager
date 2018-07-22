@@ -15,19 +15,17 @@ import java.util.List;
 /**
  * array adapter for spinners and autocomplete text views
  */
-public class DepartmentsArrayAdapter extends ArrayAdapter<DepartmentEntry> {
+public class DepartmentsArrayAdapter extends ArrayAdapter<String> {
+
     private List<DepartmentEntry> mDepartmentEntryList;
     private HashMap<Integer, Integer> idToPositionHashMap;
 
     public DepartmentsArrayAdapter(Context context) {
         super(context, 0);
         idToPositionHashMap = new HashMap<>();
+
     }
 
-    @Override
-    public int getCount() {
-        return mDepartmentEntryList.size();
-    }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -35,7 +33,7 @@ public class DepartmentsArrayAdapter extends ArrayAdapter<DepartmentEntry> {
             convertView = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
 
         TextView departmentName = (TextView) convertView;
-        departmentName.setTag(mDepartmentEntryList.get(position).getDepartmentId());
+        convertView.setTag(mDepartmentEntryList.get(position).getDepartmentId());
         departmentName.setText(mDepartmentEntryList.get(position).getDepartmentName());
 
         idToPositionHashMap.put(mDepartmentEntryList.get(position).getDepartmentId(), position);
@@ -43,20 +41,40 @@ public class DepartmentsArrayAdapter extends ArrayAdapter<DepartmentEntry> {
         return convertView;
     }
 
+    @Override
+    public int getCount() {
+        return mDepartmentEntryList.size();
+    }
+
+
+    @Override
+    public String getItem(int position) {
+        if (mDepartmentEntryList == null)
+            return "";
+        return mDepartmentEntryList.get(position).getDepartmentName();
+    }
+
+
+
+
+
     public void setDepartmentEntryList(List<DepartmentEntry> departmentEntryList) {
         mDepartmentEntryList = departmentEntryList;
         notifyDataSetChanged();
     }
 
 
-    @Override
-    public DepartmentEntry getItem(int position) {
-        return mDepartmentEntryList.get(position);
-    }
-
-    public int getPositionForItemId(int selectedDepartmentId) {
-
-        return idToPositionHashMap.get(selectedDepartmentId);
+    /**
+     * used when a department is already assigned to an existing task
+     * its used to select the previously chosen department for that task
+     *
+     * @param oldTaskDepartmentId :
+     * @return its position in the drop down list
+     */
+    public int getPositionForItemId(int oldTaskDepartmentId) {
+        if (mDepartmentEntryList == null)
+            return 0;
+        return idToPositionHashMap.get(oldTaskDepartmentId);
 
     }
 

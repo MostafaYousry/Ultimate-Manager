@@ -1,6 +1,5 @@
 package com.example.android.employeesmanagementapp.adapters;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,14 +22,17 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
     private List<EmployeeEntry> mData;
     final private RecyclerViewItemClickListener mClickListener;
     private boolean visible = false;
+    private boolean mUseCheckBoxLayout;
 
-    public EmployeesAdapter(RecyclerViewItemClickListener listener) {
+    public EmployeesAdapter(RecyclerViewItemClickListener listener, boolean useCheckBoxLayout) {
         mClickListener =  listener;
+        mUseCheckBoxLayout = useCheckBoxLayout;
     }
 
     @NonNull
     @Override
     public EmployeesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        //todo:check which item layout
         //inflate item layout for the view holder
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_employees_rv,parent,false);
 
@@ -67,6 +69,7 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
             employeeName = itemView.findViewById(R.id.employee_name);
             employeeImage = itemView.findViewById(R.id.employee_image);
             employeeCheckBox = itemView.findViewById(R.id.employee_check_box);
+            //todo:check which layout's viewholder
 
             // set the item click listener
             itemView.setOnClickListener(this);
@@ -74,22 +77,10 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
 
         void bind(final int position) {
 
-
             //change the item data by the position
             employeeName.setText(mData.get(position).getEmployeeName());
             employeeImage.setImageResource(AppUtils.getRandomEmployeeImage());
 
-            if (visible)
-                employeeCheckBox.setVisibility(View.VISIBLE);
-            else
-                employeeCheckBox.setVisibility(View.GONE);
-
-            employeeCheckBox.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.v(TAG,"employee's checkbox at position " + position + " is checked");
-                }
-            });
 
         }
 
@@ -97,10 +88,6 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
         public void onClick(View v) {
             mClickListener.onItemClick(getAdapterPosition());
         }
-    }
-
-    public void setCheckBoxVisibility(boolean visible) {
-        this.visible = visible;
     }
 
     /**

@@ -121,7 +121,7 @@ public class TaskEntry {
         return taskRating;
     }
 
-    public void setTaskRating(int taskRating) {
+    public void setTaskRating(float taskRating) {
         this.taskRating = taskRating;
     }
 

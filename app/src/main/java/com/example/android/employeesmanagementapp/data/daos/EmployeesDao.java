@@ -47,6 +47,15 @@ public interface EmployeesDao {
     LiveData<EmployeeEntry> loadEmployeeById(int employeeId);
 
     /**
+     * load all employees not in this department
+     *
+     * @param departmentId : the department's record id
+     * @return list of EmployeeEntry objects wrapped with LiveData
+     */
+    @Query("Select * from employees where department_id != :departmentId")
+    LiveData<List<EmployeeEntry>> loadEmployeesOutside(int departmentId);
+
+    /**
      * insert a new employee record
      *
      * @param employeeEntry

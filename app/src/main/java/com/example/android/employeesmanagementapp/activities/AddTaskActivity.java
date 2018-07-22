@@ -19,13 +19,13 @@ import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
-import com.example.android.employeesmanagementapp.data.factories.TaskIsCompletedFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
 import com.example.android.employeesmanagementapp.fragments.DatePickerFragment;
 
 import java.util.Date;
 import java.util.List;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
@@ -50,13 +50,10 @@ public class AddTaskActivity extends AppCompatActivity {
     private AutoCompleteTextView mTaskDepartment;
     private Toolbar mToolbar;
 
-    private TaskEntry mTaskEntry;
-
-    private int mSelectedDepartmentId;
     private AppDatabase mDb;
 
-    private DepartmentsArrayAdapter mdepartmentsArrayAdapter;
-
+    private DepartmentsArrayAdapter mDepartmentsArrayAdapter;
+    private int mSelectedDepartmentID;
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -92,29 +89,20 @@ public class AddTaskActivity extends AppCompatActivity {
         mTaskDepartment = findViewById(R.id.task_department);
 
 
-
         setUpToolBar();
         setUpDepartmentDropDown();
-        setUpRatingBar();
-
-        mTaskDueDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                pickDate(view);
-            }
-        });
-
-        mTaskStartDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                pickDate(view);
-            }
-        });
 
         if (mTaskId == DEFAULT_TASK_ID) {
             clearViews();
         } else {
-            loadTaskData();
+            final LiveData<TaskEntry> task = mDb.tasksDao().loadTaskById(mTaskId);
+            task.observe(this, new Observer<TaskEntry>() {
+                @Override
+                public void onChanged(@Nullable TaskEntry taskEntry) {
+                    task.removeObserver(this);
+                    populateUI(taskEntry);
+                }
+            });
         }
 
 
@@ -135,46 +123,26 @@ public class AddTaskActivity extends AppCompatActivity {
     }
 
 
-    public void pickDate(View view) {
-        //create a bundle containing id of clicked text view (startDateTextView or dueDateTextView)
-        Bundle bundle = new Bundle();
-        bundle.putInt("date_view_id", view.getId());
-
-        //instantiate a DatePickerFragment to show date picker dialog
-        DialogFragment datePickerFragment = new DatePickerFragment();
-        datePickerFragment.setArguments(bundle);
-
-        //show th dialog
-        datePickerFragment.show(getSupportFragmentManager(), "datePicker");
-    }
-
-
     private void clearViews() {
         mTaskTitle.setText("");
         mTaskDescription.setText("");
         mTaskStartDate.setText("");
         mTaskDueDate.setText("");
+        mTaskDepartment.setText(mDepartmentsArrayAdapter.getItem(0));
         mTaskRatingBar.setRating(0);
-
     }
 
-    private void loadTaskData() {
-        final LiveData<TaskEntry> task = AppDatabase.getInstance(this).tasksDao().loadTaskById(mTaskId);
-        task.observe(this, new Observer<TaskEntry>() {
-            @Override
-            public void onChanged(TaskEntry taskEntry) {
-                mTaskEntry = taskEntry;
-                task.removeObservers(AddTaskActivity.this);
-            }
-        });
+    private void populateUI(TaskEntry taskEntry) {
+        if (taskEntry == null)
+            return;
 
-
-        //todo:fill with task data
-        mTaskTitle.setText(mTaskEntry.getTaskTitle());
-        mTaskDescription.setText(mTaskEntry.getTaskDescription());
-        mTaskStartDate.setText(mTaskEntry.getTaskDueDate().toString());
-        mTaskDueDate.setText(mTaskEntry.getTaskDueDate().toString());
-
+        mTaskTitle.setText(taskEntry.getTaskTitle());
+        mTaskDescription.setText(taskEntry.getTaskDescription());
+        mTaskStartDate.setText(taskEntry.getTaskDueDate().toString());
+        mTaskDueDate.setText(taskEntry.getTaskDueDate().toString());
+        mTaskDepartment.setText(mDepartmentsArrayAdapter.getItem(mDepartmentsArrayAdapter.getPositionForItemId(taskEntry.getDepartmentID())));
+        mSelectedDepartmentID = taskEntry.getDepartmentID();
+        mTaskRatingBar.setRating(taskEntry.getTaskRating());
 
 
     }
@@ -182,47 +150,35 @@ public class AddTaskActivity extends AppCompatActivity {
 
     private void setUpDepartmentDropDown() {
 
-        mdepartmentsArrayAdapter = new DepartmentsArrayAdapter(AddTaskActivity.this);
+        mDepartmentsArrayAdapter = new DepartmentsArrayAdapter(AddTaskActivity.this);
 
-        //
-        LiveData<List<DepartmentEntry>> departments = ViewModelProviders.of(this, new TaskIsCompletedFact(mDb, false)).get(MainViewModel.class).getAllDepartmentsList();
+
+        LiveData<List<DepartmentEntry>> departments = ViewModelProviders.of(this).get(MainViewModel.class).getAllDepartmentsList();
         departments.observe(this, new Observer<List<DepartmentEntry>>() {
             @Override
             public void onChanged(List<DepartmentEntry> departmentEntries) {
-                mdepartmentsArrayAdapter.setDepartmentEntryList(departmentEntries);
+                mDepartmentsArrayAdapter.setDepartmentEntryList(departmentEntries);
             }
         });
 
 
+        mTaskDepartment.setAdapter(mDepartmentsArrayAdapter);
 
-        // Apply the adapter to the spinner
-        mTaskDepartment.setAdapter(mdepartmentsArrayAdapter);
+        mTaskDepartment.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                mSelectedDepartmentID = (int) view.getTag();
+            }
+        });
+
 
         mTaskDepartment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 mTaskDepartment.showDropDown();
             }
         });
 
-        mTaskDepartment.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                mSelectedDepartmentId = (int) view.getTag();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-            }
-        });
-
-        if (mTaskId == DEFAULT_TASK_ID) {
-            mTaskDepartment.setSelection(0);
-        } else {
-            //todo:select this tasks department
-            mTaskDepartment.setSelection(mdepartmentsArrayAdapter.getPositionForItemId(mSelectedDepartmentId));
-        }
     }
 
 
@@ -232,14 +188,6 @@ public class AddTaskActivity extends AppCompatActivity {
         } else {
             getSupportActionBar().setTitle(getString(R.string.edit_task));
         }
-    }
-
-
-    private void setUpRatingBar() {
-        mTaskRatingBar.setNumStars(5);
-        mTaskRatingBar.setMax(5);
-        mTaskRatingBar.setStepSize(0.5f);
-        mTaskRatingBar.setRating(0);
     }
 
 
@@ -267,9 +215,10 @@ public class AddTaskActivity extends AppCompatActivity {
     private void saveTask() {
         //todo:insert/update new data into db
         if (valideData()) {
-            int departmentId = 1;
+            int departmentId = mSelectedDepartmentID;
             String taskTitle = mTaskTitle.getText().toString();
             String taskDescription = mTaskDescription.getText().toString();
+            //todo:change string date to java object date
             Date taskStartDate = new Date();
             Date taskDueDate = new Date();
 
@@ -286,7 +235,23 @@ public class AddTaskActivity extends AppCompatActivity {
         finish();
     }
 
+
     private boolean valideData() {
         return true;
     }
+
+
+    public void pickDate(View view) {
+        //create a bundle containing id of clicked text view (startDateTextView or dueDateTextView)
+        Bundle bundle = new Bundle();
+        bundle.putInt("date_view_id", view.getId());
+
+        //instantiate a DatePickerFragment to show date picker dialog
+        DialogFragment datePickerFragment = new DatePickerFragment();
+        datePickerFragment.setArguments(bundle);
+
+        //show th dialog
+        datePickerFragment.show(getSupportFragmentManager(), "datePicker");
+    }
+
 }
