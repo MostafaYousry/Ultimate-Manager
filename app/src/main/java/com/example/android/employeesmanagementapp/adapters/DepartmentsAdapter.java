@@ -68,12 +68,12 @@ public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.
 
         public void bind(int position) {
             mDepartmentName.setText(mDepartments.get(position).getDepartmentName());
+            mItemView.setTag(mDepartments.get(position).getDepartmentId());
         }
 
         @Override
         public void onClick(View v) {
-            int clickedItemIndex = getAdapterPosition();
-            mGridItemClickListener.onItemClick(clickedItemIndex);
+            mGridItemClickListener.onItemClick((int) mItemView.getTag());
         }
     }
 }

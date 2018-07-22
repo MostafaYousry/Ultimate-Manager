@@ -25,10 +25,10 @@ public class MainViewModel extends ViewModel {
     private LiveData<List<EmployeeEntry>> allEmployeesList;
 
 
-    public MainViewModel(AppDatabase database, boolean taskIsCompleted) {
+    public MainViewModel(AppDatabase database) {
 
         allDepartmentsList = database.departmentsDao().loadDepartments();
-        tasksList = database.tasksDao().loadTasks(taskIsCompleted);
+        tasksList = database.tasksDao().loadRunningTasks();
         allEmployeesList = database.employeesDao().loadEmployees();
 
 
