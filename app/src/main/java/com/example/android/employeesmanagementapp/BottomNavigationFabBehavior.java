@@ -9,6 +9,13 @@ import com.google.android.material.snackbar.Snackbar;
 
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
+/**
+ * class for defining the behaviour of a fab in a layout containing
+ * a coordinator layout and a bottom navigation view
+ * <p>
+ * handles anchoring the fab on top of the bottom navigation view
+ * handles fab animation up and and down when a snack bar is displayed under it.
+ */
 public class BottomNavigationFabBehavior extends CoordinatorLayout.Behavior<FloatingActionButton> {
 
 

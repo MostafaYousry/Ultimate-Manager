@@ -12,6 +12,13 @@ import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.view.ViewCompat;
 
+/**
+ * defines behaviour of the bottom navigation view in
+ * coordinator layout
+ * <p>
+ * handles translating off and to the screen when scrolling.
+ * handles displaying the snack bar above the navigation view rather than on top of it.
+ */
 public class BottomNavigationBehavior extends CoordinatorLayout.Behavior<BottomNavigationView> {
     private static final String TAG = BottomNavigationBehavior.class.getSimpleName();
 

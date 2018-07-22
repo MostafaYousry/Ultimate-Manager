@@ -30,6 +30,11 @@
     <string name="hint_employee_department">Choose a Department</string>
 
 
+    <!--strings for add department activity-->
+    <string name="label_department_name">Name :</string>
+    <string name="hint_department_name">Department name</string>
+
+
     <!--strings for menu actions-->
     <string name="action_save">Save</string>
 
@@ -37,7 +42,9 @@
     <!--strings for toolbar title-->
     <string name="add_new_task">Add new task</string>
     <string name="edit_task">Edit task</string>
-    <string name="add_new_employee">New Employee</string>
-
+    <string name="add_new_employee">Add new employee</string>
+    <string name="edit_employee">Edit employee</string>
+    <string name="add_new_department">Add new department</string>
+    <string name="edit_department">Edit_department</string>
 
 </resources>

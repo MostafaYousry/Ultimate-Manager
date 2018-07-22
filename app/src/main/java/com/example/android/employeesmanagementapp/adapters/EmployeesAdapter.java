@@ -1,4 +1,4 @@
-package com.example.android.employeesmanagementapp;
+package com.example.android.employeesmanagementapp.adapters;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,6 +8,8 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 
@@ -22,8 +24,7 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
     final private RecyclerViewItemClickListener mClickListener;
     private boolean visible = false;
 
-    EmployeesAdapter(List<EmployeeEntry> data, RecyclerViewItemClickListener listener) {
-        mData = data;
+    public EmployeesAdapter(RecyclerViewItemClickListener listener) {
         mClickListener =  listener;
     }
 
@@ -45,6 +46,9 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
 
     @Override
     public int getItemCount() {
+
+        if (mData == null)
+            return 0;
         return mData.size();
     }
 
@@ -74,9 +78,11 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
             //change the item data by the position
             employeeName.setText(mData.get(position).getEmployeeName());
             employeeImage.setImageResource(AppUtils.getRandomEmployeeImage());
+
             if (visible)
                 employeeCheckBox.setVisibility(View.VISIBLE);
-            else employeeCheckBox.setVisibility(View.GONE);
+            else
+                employeeCheckBox.setVisibility(View.GONE);
 
             employeeCheckBox.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -95,5 +101,15 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
 
     public void setCheckBoxVisibility(boolean visible) {
         this.visible = visible;
+    }
+
+    /**
+     * used to update adapters data if any change occurs
+     *
+     * @param employees new employees list
+     */
+    public void setData(List<EmployeeEntry> employees) {
+        mData = employees;
+        notifyDataSetChanged();
     }
 }

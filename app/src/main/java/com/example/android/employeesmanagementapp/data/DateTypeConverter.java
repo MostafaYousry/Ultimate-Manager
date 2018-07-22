@@ -5,6 +5,12 @@ import java.util.Date;
 
 import androidx.room.TypeConverter;
 
+/**
+ * Type Converter class
+ * <p>
+ * helps room to know how to convert a java Date object to a timestamp for SQLite
+ * and vice versa.
+ */
 public class DateTypeConverter {
 
     @TypeConverter
