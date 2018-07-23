@@ -226,6 +226,9 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.569"
+                android:max="5"
+                android:numStars="5"
+                android:stepSize="0.5"
                 app:layout_constraintStart_toStartOf="parent" />
 
 

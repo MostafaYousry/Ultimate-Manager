@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +16,6 @@ import com.example.android.employeesmanagementapp.activities.AddDepartmentActivi
 import com.example.android.employeesmanagementapp.adapters.DepartmentsAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
-import com.example.android.employeesmanagementapp.data.factories.TaskIsCompletedFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
 
 import java.util.List;
@@ -67,7 +65,7 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
         //initialise recycler view adapter
         mAdapter = new DepartmentsAdapter(this);
 
-        LiveData<List<DepartmentEntry>> departmentsList = ViewModelProviders.of(this, new TaskIsCompletedFact(mDb, false)).get(MainViewModel.class).getAllDepartmentsList();
+        LiveData<List<DepartmentEntry>> departmentsList = ViewModelProviders.of(this).get(MainViewModel.class).getAllDepartmentsList();
         departmentsList.observe(this, new Observer<List<DepartmentEntry>>() {
             @Override
             public void onChanged(List<DepartmentEntry> departmentEntries) {
@@ -97,13 +95,11 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
      * called when a grid item is clicked
      */
     @Override
-    public void onItemClick(int clickedItemIndex) {
-        //todo: open department detail activity
-        Log.d(TAG, "Item at index " + clickedItemIndex + " is clicked");
+    public void onItemClick(int clickedItemId) {
+
 
         Intent intent = new Intent(getActivity() , AddDepartmentActivity.class);
-        //todo:pass rv.getTag ---> item id in db instead index in rv
-        intent.putExtra(AddDepartmentActivity.DEPARTMENT_ID_KEY , clickedItemIndex);
+        intent.putExtra(AddDepartmentActivity.DEPARTMENT_ID_KEY, clickedItemId);
         startActivity(intent);
     }
 

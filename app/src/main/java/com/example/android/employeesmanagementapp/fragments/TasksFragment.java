@@ -3,7 +3,6 @@ package com.example.android.employeesmanagementapp.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +13,6 @@ import com.example.android.employeesmanagementapp.activities.AddTaskActivity;
 import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
-import com.example.android.employeesmanagementapp.data.factories.TaskIsCompletedFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
 
 import java.util.List;
@@ -67,7 +65,7 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
         // specify an adapter
         mAdapter = new TasksAdapter(this);
 
-        LiveData<List<TaskEntry>> tasksList = ViewModelProviders.of(this, new TaskIsCompletedFact(mDb, false)).get(MainViewModel.class).getTasksList();
+        LiveData<List<TaskEntry>> tasksList = ViewModelProviders.of(this).get(MainViewModel.class).getTasksList();
         tasksList.observe(this, new Observer<List<TaskEntry>>() {
             @Override
             public void onChanged(List<TaskEntry> taskEntries) {
@@ -85,17 +83,12 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
      * called when a list item is clicked
      */
     @Override
-    public void onItemClick(int clickedItemIndex) {
-        Log.d(TAG, "Item at index " + clickedItemIndex + " is clicked");
-
+    public void onItemClick(int clickedItemRowID) {
 
         Intent intent = new Intent(getActivity(), AddTaskActivity.class);
-        //todo:pass rv.getTag ---> item id in db instead index in rv
-        intent.putExtra(AddTaskActivity.TASK_ID_KEY, clickedItemIndex + 0.0);
+        intent.putExtra(AddTaskActivity.TASK_ID_KEY, clickedItemRowID);
         startActivity(intent);
     }
-
-
 
 
 }

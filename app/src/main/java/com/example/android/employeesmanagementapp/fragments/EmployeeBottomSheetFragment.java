@@ -1,6 +1,5 @@
 package com.example.android.employeesmanagementapp.fragments;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,25 +12,33 @@ import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.snackbar.Snackbar;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
-@SuppressLint("ValidFragment")
+
 public class EmployeeBottomSheetFragment extends BottomSheetDialogFragment implements RecyclerViewItemClickListener {
 
-    public static final String TAG = EmployeesFragment.class.getSimpleName();
+    public static final String TAG = EmployeeBottomSheetFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private View mRootView;
     private Toolbar mToolbar;
-    private EmployeesAdapter mEmployeesAdapter = new EmployeesAdapter(this);
-    private boolean toolBarVisibility;
+    private static final String EMPLOYEES_IN_OUT_DEPARTMENT_KEY = "dep_emp_key";
+    private EmployeesAdapter mEmployeesAdapter;
+    private boolean mInDepartmentEmployees;
 
-    @SuppressLint("ValidFragment")
-    public EmployeeBottomSheetFragment(boolean toolBarVisibility) {
-        this.toolBarVisibility = toolBarVisibility;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Bundle bundle = getArguments();
+
+        if (bundle != null) {
+            if (bundle.containsKey(EMPLOYEES_IN_OUT_DEPARTMENT_KEY))
+                mInDepartmentEmployees = bundle.getBoolean(EMPLOYEES_IN_OUT_DEPARTMENT_KEY);
+        }
     }
 
     @Override
@@ -43,19 +50,11 @@ public class EmployeeBottomSheetFragment extends BottomSheetDialogFragment imple
         mRootView = rootView;
         // method to setup employees recycler view
         setupRecyclerView(rootView);
-        if (toolBarVisibility)
-            setUpToolBar();
+
+
         return rootView;
     }
 
-    private void setUpToolBar() {
-        mToolbar = mRootView.findViewById(R.id.toolbar);
-        ((AppCompatActivity) getActivity()).setSupportActionBar(mToolbar);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Available Employees");
-        mToolbar.setVisibility(View.VISIBLE);
-    }
 
     private void setupRecyclerView(View rootView) {
 
@@ -71,7 +70,9 @@ public class EmployeeBottomSheetFragment extends BottomSheetDialogFragment imple
         mRecyclerView.setLayoutManager(layoutManager);
 
         //create object of EmployeesAdapter and send data
-//        mEmployeesAdapter = new EmployeesAdapter(AppUtils.getEmployeesFakeData(), this);
+        mEmployeesAdapter = new EmployeesAdapter(this);
+
+        ViewModelProviders.of(this, )
 
         //set the employee recycler view adapter
         mRecyclerView.setAdapter(mEmployeesAdapter);

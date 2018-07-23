@@ -59,21 +59,23 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
     }
 
     class TasksViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        View mItemView;
         TextView mTextView;
-
         TasksViewHolder(View itemView) {
             super(itemView);
+            mItemView = itemView;
             mTextView = itemView.findViewById(R.id.item_task_title);
             itemView.setOnClickListener(this);
         }
 
         void bind(int position) {
             mTextView.setText(mData.get(position).getTaskTitle());
+            mItemView.setTag(mData.get(position).getTaskId());
         }
 
         @Override
         public void onClick(View v) {
-            mListClickListener.onItemClick((int) v.getTag());
+            mListClickListener.onItemClick((int) mItemView.getTag());
         }
     }
 

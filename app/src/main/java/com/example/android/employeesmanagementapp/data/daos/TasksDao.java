@@ -20,13 +20,12 @@ import androidx.room.Update;
 public interface TasksDao {
 
     /**
-     * load all tasks that are running or completed
+     * load all tasks that are running
      *
-     * @param taskIsCompleted: true for completed tasks / false for running tasks
      * @return list of TaskEntry objects wrapped with LiveData
      */
-    @Query("SELECT * FROM tasks WHERE task_is_completed = :taskIsCompleted")
-    LiveData<List<TaskEntry>> loadTasks(boolean taskIsCompleted);
+    @Query("SELECT * FROM tasks WHERE task_is_completed = 0")
+    LiveData<List<TaskEntry>> loadRunningTasks();
 
     /**
      * load all tasks that are running or completed for an existing employee
