@@ -1,8 +1,10 @@
 package com.example.android.employeesmanagementapp.activities;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -29,7 +31,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private BottomNavigationView mBottomNavigationView;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
 
         //when app starts we show the tasks fragment
-        if (savedInstanceState == null){
+        if (savedInstanceState == null) {
             mBottomNavigationView.setSelectedItemId(R.id.nav_tasks);
             loadFragment(new TasksFragment());
             getSupportActionBar().setTitle(getString(R.string.tasks));
@@ -58,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     }
 
-    private void loadFragment(Fragment fragment) {
+    void loadFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, fragment);
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
@@ -66,17 +67,24 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         transaction.commit();
     }
 
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu options from the res/menu/menu_catalog.xml file.
+        // This adds menu items to the app bar.
+        getMenuInflater().inflate(R.menu.menu_manger_options, menu);
+        return true;
+    }
 
-    private void setUpFab(){
+
+    private void setUpFab() {
 
         FloatingActionButton fab = findViewById(R.id.fab);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent  intent = null;
-                switch (mSelectedFragmentId){
-                    case  R.id.nav_tasks:
+                Intent intent = null;
+                switch (mSelectedFragmentId) {
+                    case R.id.nav_tasks:
                         intent = new Intent(MainActivity.this, AddTaskActivity.class);
                         break;
                     case R.id.nav_employees:
@@ -99,15 +107,15 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         //in case item is already selected do nothing
-        if (item.isChecked()){
+        if (item.isChecked()) {
             return true;
         }
 
-        Log.d(TAG , "New Item is selected");
+        Log.d(TAG, "New Item is selected");
 
         mSelectedFragmentId = item.getItemId();
-        switch (mSelectedFragmentId){
-            case  R.id.nav_tasks:
+        switch (mSelectedFragmentId) {
+            case R.id.nav_tasks:
                 loadFragment(new TasksFragment());
                 mToolbar.setTitle(getString(R.string.tasks));
                 break;

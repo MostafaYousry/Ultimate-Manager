@@ -70,7 +70,7 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
         mRecyclerView.setLayoutManager(layoutManager);
 
         //create object of EmployeesAdapter and send data
-        mEmployeesAdapter = new EmployeesAdapter(this);
+        mEmployeesAdapter = new EmployeesAdapter(this,true);
 
         LiveData<List<EmployeeEntry>> employeesList = ViewModelProviders.of(this).get(MainViewModel.class).getAllEmployeesList();
         employeesList.observe(this, new Observer<List<EmployeeEntry>>() {

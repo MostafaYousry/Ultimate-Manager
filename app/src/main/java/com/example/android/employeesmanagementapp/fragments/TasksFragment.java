@@ -6,10 +6,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
+import com.example.android.employeesmanagementapp.RecyclerViewItemLongClickListener;
+import com.example.android.employeesmanagementapp.activities.AddEmployeeActivity;
 import com.example.android.employeesmanagementapp.activities.AddTaskActivity;
+import com.example.android.employeesmanagementapp.activities.MainActivity;
 import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
@@ -28,7 +32,7 @@ import androidx.recyclerview.widget.RecyclerView;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class TasksFragment extends Fragment implements RecyclerViewItemClickListener {
+public class TasksFragment extends Fragment implements RecyclerViewItemClickListener ,RecyclerViewItemLongClickListener {
 
     private final String TAG = TasksFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
@@ -63,7 +67,7 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
         mRecyclerView.setLayoutManager(layoutManager);
 
         // specify an adapter
-        mAdapter = new TasksAdapter(this);
+        mAdapter = new TasksAdapter(this, this);
 
         LiveData<List<TaskEntry>> tasksList = ViewModelProviders.of(this).get(MainViewModel.class).getTasksList();
         tasksList.observe(this, new Observer<List<TaskEntry>>() {
@@ -84,14 +88,15 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
      */
     @Override
     public void onItemClick(int clickedItemRowID) {
-
         Intent intent = new Intent(getActivity(), AddTaskActivity.class);
         intent.putExtra(AddTaskActivity.TASK_ID_KEY, clickedItemRowID);
         startActivity(intent);
     }
 
-
+    @Override
+    public boolean onItemLongCLick(int longClickedItemRowId) {
+//        Intent intent = new Intent(getActivity(), AddEmployeeActivity.class);
+//        startActivity(intent);
+        return true;
+    }
 }
-
-
-

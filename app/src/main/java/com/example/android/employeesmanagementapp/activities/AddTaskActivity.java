@@ -135,7 +135,7 @@ public class AddTaskActivity extends AppCompatActivity {
     private void populateUI(TaskEntry taskEntry) {
         if (taskEntry == null)
             return;
-
+        System.out.println(mTaskId + "  " + taskEntry.getTaskTitle() + " " + taskEntry.getTaskDescription());
         mTaskTitle.setText(taskEntry.getTaskTitle());
         mTaskDescription.setText(taskEntry.getTaskDescription());
         mTaskStartDate.setText(taskEntry.getTaskDueDate().toString());
@@ -225,16 +225,23 @@ public class AddTaskActivity extends AppCompatActivity {
 
             final TaskEntry newTask = new TaskEntry(departmentId, taskTitle, taskDescription, taskStartDate, taskDueDate);
 
-            AppExecutor.getInstance().diskIO().execute(new Runnable() {
-                @Override
-                public void run() {
-                    mDb.tasksDao().addTask(newTask);
-                }
-            });
+                AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mTaskId == DEFAULT_TASK_ID) {
+                            mDb.tasksDao().addTask(newTask);
+                            System.out.println("new task");
+                        }
+                        else {
+                            newTask.setTaskId(mTaskId);
+                            mDb.tasksDao().updateTask(newTask);
+                            System.out.println("update task");
+                        }
+                    }
+                });
         }
         finish();
     }
-
 
     private boolean valideData() {
         return true;

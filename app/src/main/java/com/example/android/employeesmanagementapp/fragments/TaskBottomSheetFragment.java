@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
+import com.example.android.employeesmanagementapp.RecyclerViewItemLongClickListener;
 import com.example.android.employeesmanagementapp.activities.AddTaskActivity;
 import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -16,7 +17,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class TaskBottomSheetFragment extends BottomSheetDialogFragment  implements RecyclerViewItemClickListener {
+public class TaskBottomSheetFragment extends BottomSheetDialogFragment  implements RecyclerViewItemClickListener,RecyclerViewItemLongClickListener {
     private final String TAG = TasksFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private TasksAdapter mAdapter;
@@ -40,7 +41,7 @@ public class TaskBottomSheetFragment extends BottomSheetDialogFragment  implemen
         mRecyclerView.setLayoutManager(layoutManager);
 
         // specify an adapter
-        mAdapter = new TasksAdapter(this);
+        mAdapter = new TasksAdapter(this,this);
         mRecyclerView.setAdapter(mAdapter);
 
         return view;
@@ -58,5 +59,10 @@ public class TaskBottomSheetFragment extends BottomSheetDialogFragment  implemen
         //todo:pass rv.getTag ---> item id in db instead index in rv
         intent.putExtra(AddTaskActivity.TASK_ID_KEY , clickedItemIndex + 0.5);
         startActivity(intent);
+    }
+
+    @Override
+    public boolean onItemLongCLick(int longClickedItemRowId) {
+        return false;
     }
 }

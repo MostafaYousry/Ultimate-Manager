@@ -70,9 +70,7 @@ public class EmployeeBottomSheetFragment extends BottomSheetDialogFragment imple
         mRecyclerView.setLayoutManager(layoutManager);
 
         //create object of EmployeesAdapter and send data
-        mEmployeesAdapter = new EmployeesAdapter(this);
-
-        ViewModelProviders.of(this, )
+        mEmployeesAdapter = new EmployeesAdapter(this, true);
 
         //set the employee recycler view adapter
         mRecyclerView.setAdapter(mEmployeesAdapter);
