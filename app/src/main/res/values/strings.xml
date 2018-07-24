@@ -49,6 +49,9 @@
     <string name="edit_employee">Edit employee</string>
     <string name="add_new_department">Add new department</string>
     <string name="edit_department">Edit_department</string>
+    <string name="employee_empty_view_message">No employees to show, please add employees</string>
+    <string name="task_empty_view_message">No tasks to show</string>
+    <string name="department_empty_view_message">No departments to show</string>
 
 
 </resources>

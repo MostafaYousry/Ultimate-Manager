@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.employeesmanagementapp.R;
@@ -14,8 +16,10 @@ import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
 import com.example.android.employeesmanagementapp.activities.AddEmployeeActivity;
 import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
+import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,9 +44,12 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
     private ArrayList<EmployeeEntry> selectedEmployees = new ArrayList<EmployeeEntry>();
     private List<EmployeeEntry> employeeList = new ArrayList<EmployeeEntry>();
     EmployeeSelection mEmployeeSelection;
+    private LinearLayout emptyView;
+    private TextView emptyViewTextView;
+    private Snackbar mSnackbar;
 
     public interface EmployeeSelection {
-         void getSelectedEmployees(ArrayList<EmployeeEntry> selectedEmployeesId );
+        void getSelectedEmployees(ArrayList<EmployeeEntry> selectedEmployeesId);
     }
 
     @Override
@@ -75,7 +82,39 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
         // method to setup employees recycler view
         setupRecyclerView(rootView);
 
+        emptyView = rootView.findViewById(R.id.empty_view);
+        emptyViewTextView = rootView.findViewById(R.id.empty_view_message_text_view);
+
+        setFabEnabled();
+
         return rootView;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mSnackbar != null)
+            mSnackbar.dismiss();
+    }
+
+    private void setFabEnabled() {
+        LiveData<List<DepartmentEntry>> departmentList = ViewModelProviders.of(getActivity()).get(MainViewModel.class).getAllDepartmentsList();
+        departmentList.observe(this, new Observer<List<DepartmentEntry>>() {
+            @Override
+            public void onChanged(List<DepartmentEntry> departmentEntries) {
+                if (departmentEntries != null) {
+                    if (departmentEntries.size() == 0) {
+                        getActivity().findViewById(R.id.fab).setEnabled(false);
+                        mSnackbar = Snackbar.make(getView(), "please add department first", Snackbar.LENGTH_INDEFINITE);
+                        mSnackbar.show();
+                    } else {
+                        getActivity().findViewById(R.id.fab).setEnabled(true);
+                        if (mSnackbar != null)
+                            mSnackbar.dismiss();
+                    }
+                }
+            }
+        });
     }
 
     private void setupRecyclerView(View rootView) {
@@ -98,14 +137,32 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
         employeesList.observe(this, new Observer<List<EmployeeEntry>>() {
             @Override
             public void onChanged(List<EmployeeEntry> employeeEntries) {
-                mEmployeesAdapter.setData(employeeEntries);
-                employeeList = employeeEntries;
+                if (employeeEntries != null) {
+                    mEmployeesAdapter.setData(employeeEntries);
+                    employeeList = employeeEntries;
+                    if (mEmployeesAdapter.getItemCount() == 0)
+                        showEmptyView();
+                    else
+                        showRecyclerView();
+
+                }
             }
         });
 
 
         //set the employee recycler view adapter
         mRecyclerView.setAdapter(mEmployeesAdapter);
+    }
+
+    private void showEmptyView() {
+        mRecyclerView.setVisibility(View.GONE);
+        emptyViewTextView.setText(R.string.employee_empty_view_message);
+        emptyView.setVisibility(View.VISIBLE);
+    }
+
+    private void showRecyclerView() {
+        mRecyclerView.setVisibility(View.VISIBLE);
+        emptyView.setVisibility(View.GONE);
     }
 
 
@@ -129,7 +186,7 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
             Toast.makeText(getContext(), "employee long click listener with id " + longClickedItemRowId, Toast.LENGTH_LONG).show();
         }
         //if employeeId exists in  the array list --> remove it
-        else{
+        else {
             selectedEmployees.remove(employeeList.get(clickedPosition));
             Toast.makeText(getContext(), "Remove employee with id " + longClickedItemRowId, Toast.LENGTH_LONG).show();
         }
