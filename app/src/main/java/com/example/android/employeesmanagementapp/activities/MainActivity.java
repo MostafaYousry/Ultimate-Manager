@@ -93,23 +93,39 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         // User clicked on a menu option in the app bar overflow menu
         if (numOfSelectedEmployees == 0) {
             Toast.makeText(this, "No employees selected", Toast.LENGTH_LONG).show();
-        } else {
-            switch (item.getItemId()) {
-                case R.id.delete_employees:
-                    Toast.makeText(this, "Delete " + numOfSelectedEmployees + " employees", Toast.LENGTH_LONG).show();
-                    //ToDo delete these employees
-                    mToolbar.setTitle("Employees");
-                    numOfSelectedEmployees = 0;
-                    loadFragment(new EmployeesFragment());
-                    return true;
+        } else switch (item.getItemId()) {
+            case R.id.delete_employees:
+                Toast.makeText(this, "Delete " + numOfSelectedEmployees + " employees", Toast.LENGTH_LONG).show();
+                //ToDo delete these employees
+                for (int i = 0; i < selectedEmployeesId.size(); i++) {
+                    System.out.println("employee id = " + selectedEmployeesId.get(i));
+                    final LiveData<EmployeeEntry> employee = ViewModelProviders.of(this, new EmpIdFact(mDb, selectedEmployeesId.get(i))).get(AddNewEmployeeViewModel.class).getEmployee();
+                    final int idIndex = i;
+                    employee.observe(this, new Observer<EmployeeEntry>() {
+                        @Override
+                        public void onChanged(final EmployeeEntry employeeEntry) {
+                            AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    //get the employee entry to be deleted
+                                    mDb.employeesDao().deleteEmployee(employeeEntry);
+                                }
+                            });
+                        }
+                    });
 
-                case R.id.move_employees:
-                    Toast.makeText(this, "Move " + numOfSelectedEmployees + " employees", Toast.LENGTH_LONG).show();
-                    //ToDo move these employees
-                    DepartmentBottomSheetFragment departmentBottomSheetFragment = new DepartmentBottomSheetFragment();
-                    departmentBottomSheetFragment.show(getSupportFragmentManager(), departmentBottomSheetFragment.getTag());
-                    return true;
-            }
+                }
+                mToolbar.setTitle("Employees");
+                numOfSelectedEmployees = 0;
+                loadFragment(new EmployeesFragment());
+                return true;
+
+            case R.id.move_employees:
+                Toast.makeText(this, "Move " + numOfSelectedEmployees + " employees", Toast.LENGTH_LONG).show();
+                //ToDo move these employees
+                DepartmentBottomSheetFragment departmentBottomSheetFragment = new DepartmentBottomSheetFragment();
+                departmentBottomSheetFragment.show(getSupportFragmentManager(), departmentBottomSheetFragment.getTag());
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -177,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
 
     @Override
-    public void changeMode(ArrayList<Integer> selectedEmployeesId) {
+    public void getSelectedEmployees(ArrayList<Integer> selectedEmployeesId) {
         this.numOfSelectedEmployees = selectedEmployeesId.size();
         this.selectedEmployeesId = selectedEmployeesId;
         if (numOfSelectedEmployees == 0)

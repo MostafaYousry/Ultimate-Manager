@@ -86,36 +86,33 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
         }
 
         void bind(final int position) {
-
             //change the item data by the position
             employeeName.setText(mData.get(position).getEmployeeName());
             employeeImage.setImageResource(AppUtils.getRandomEmployeeImage());
             mItemView.setTag(mData.get(position).getEmployeeID());
 
-
         }
+
+        //if at least one of the items has a long click on it, its color will be grey
+        //and for that, onClick will behave like onLongClick "select items"
+        //if the item is selected and click on it again "long or normal click", its background will return white and will not be selected
 
         @SuppressLint("ResourceAsColor")
         @Override
         public void onClick(View v) {
             if (numOfSelected > 0) {
-                if (!isSelected) {
-                    numOfSelected++;
-                    mItemView.setBackgroundColor(Color.parseColor("#888888"));
-                    isSelected = true;
-                } else {
-                    numOfSelected--;
-                    mItemView.setBackgroundColor(Color.parseColor("#ffffff"));
-                    isSelected = false;
-                }
-                mLongClickListener.onItemLongCLick((int) mItemView.getTag());
+               changeItemMode();
             } else
                 mClickListener.onItemClick((int) mItemView.getTag());
         }
 
         @Override
         public boolean onLongClick(View view) {
-            System.out.println(isSelected + "   " + (int) mItemView.getTag());
+            changeItemMode();
+            return true;
+        }
+
+        private void changeItemMode(){
             if (!isSelected) {
                 numOfSelected++;
                 mItemView.setBackgroundColor(Color.parseColor("#888888"));
@@ -126,12 +123,9 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
                 isSelected = false;
             }
             mLongClickListener.onItemLongCLick((int) mItemView.getTag());
-            return true;
         }
 
-        private void setItemViewBackGround(int color) {
-            mItemView.setBackgroundColor(color);
-        }
+
     }
 
     /**

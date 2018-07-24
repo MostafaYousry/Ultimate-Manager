@@ -47,7 +47,7 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
     EmployeeSelection mEmployeeSelection;
 
     public interface EmployeeSelection {
-        public void changeMode(ArrayList<Integer> selectedEmployeesId );
+         void getSelectedEmployees(ArrayList<Integer> selectedEmployeesId );
     }
 
     @Override
@@ -127,15 +127,17 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
 
     @Override
     public boolean onItemLongCLick(int longClickedItemRowId) {
+        //if employeeId doesn't exist in  the array list --> add it
         if (!selectedEmployeesId.contains(longClickedItemRowId)) {
             selectedEmployeesId.add(longClickedItemRowId);
             Toast.makeText(getContext(), "employee long click listener with id " + longClickedItemRowId, Toast.LENGTH_LONG).show();
         }
+        //if employeeId exists in  the array list --> remove it
         else{
             selectedEmployeesId.remove(selectedEmployeesId.indexOf(longClickedItemRowId));
             Toast.makeText(getContext(), "Remove employee with id " + longClickedItemRowId, Toast.LENGTH_LONG).show();
         }
-        mEmployeeSelection.changeMode(selectedEmployeesId);
+        mEmployeeSelection.getSelectedEmployees(selectedEmployeesId);
         return true;
     }
 }
