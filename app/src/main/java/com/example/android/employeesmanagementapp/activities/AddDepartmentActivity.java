@@ -177,12 +177,19 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
         if (valideData()) {
             String departmentName = mDepartmentName.getText().toString();
 
+
             final DepartmentEntry newDepartment = new DepartmentEntry(departmentName);
 
             AppExecutor.getInstance().diskIO().execute(new Runnable() {
                 @Override
                 public void run() {
-                    mDb.departmentsDao().addDepartment(newDepartment);
+                    if (mDepartmentId == DEFAULT_DEPARTMENT_ID)
+                        mDb.departmentsDao().addDepartment(newDepartment);
+                    else {
+                        newDepartment.setDepartmentId(mDepartmentId);
+                        mDb.departmentsDao().updateDepartment(newDepartment);
+                    }
+
                 }
             });
 

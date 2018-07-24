@@ -1,14 +1,15 @@
 package com.example.android.employeesmanagementapp.fragments;
 
-
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import androidx.appcompat.widget.Toolbar;
 
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
@@ -17,10 +18,12 @@ import com.example.android.employeesmanagementapp.adapters.DepartmentsAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
+import java.net.InterfaceAddress;
 import java.util.List;
 
-import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -28,19 +31,12 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-
-/**
- * A simple {@link Fragment} subclass.
- */
-public class DepartmentsFragment extends Fragment implements RecyclerViewItemClickListener {
-    private final String TAG = DepartmentsFragment.class.getSimpleName();
+public class DepartmentBottomSheetFragment extends BottomSheetDialogFragment implements RecyclerViewItemClickListener {
+    private final String TAG = DepartmentBottomSheetFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private DepartmentsAdapter mAdapter;
     private AppDatabase mDb;
-
-    public DepartmentsFragment() {
-        // Required empty public constructor
-    }
+    private int departmentId;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,10 +48,10 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragments_rv, container, false);
-
-        //get recycler view
+                //get recycler view
         mRecyclerView = rootView.findViewById(R.id.rv_fragment);
 
         // this setting to improves performance if you know that changes
@@ -90,17 +86,16 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
 
     }
 
-
     /**
      * called when a grid item is clicked
      */
     @Override
     public void onItemClick(int clickedItemId, int clickedItemPosition) {
+        departmentId = clickedItemId;
+    }
 
-
-        Intent intent = new Intent(getActivity() , AddDepartmentActivity.class);
-        intent.putExtra(AddDepartmentActivity.DEPARTMENT_ID_KEY, clickedItemId);
-        startActivity(intent);
+    public int getDepartmentId() {
+        return departmentId;
     }
 
     /**
@@ -144,6 +139,5 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
 
         }
     }
-
-
 }
+

@@ -73,7 +73,7 @@ public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.
 
         @Override
         public void onClick(View v) {
-            mGridItemClickListener.onItemClick((int) mItemView.getTag());
+            mGridItemClickListener.onItemClick((int) mItemView.getTag(),getAdapterPosition());
         }
     }
 }

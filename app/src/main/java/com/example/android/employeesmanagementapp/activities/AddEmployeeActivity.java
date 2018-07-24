@@ -29,6 +29,7 @@ import com.example.android.employeesmanagementapp.utils.AppUtils;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 
 import java.util.Date;
+import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -228,7 +229,12 @@ public class AddEmployeeActivity extends AppCompatActivity {
             AppExecutor.getInstance().diskIO().execute(new Runnable() {
                 @Override
                 public void run() {
-                    mDb.employeesDao().addEmployee(newEmployee);
+                    if (mEmployeeId == DEFAULT_EMPLOYEE_ID)
+                        mDb.employeesDao().addEmployee(newEmployee);
+                    else {
+                        newEmployee.setEmployeeID(mEmployeeId);
+                        mDb.employeesDao().updateEmployee(newEmployee);
+                    }
                 }
             });
             finish();

@@ -133,7 +133,6 @@
                     android:focusable="false"
                     android:hint="@string/hint_task_start_date"
                     android:maxLines="1"
-                    android:onClick="pickDate"
                     tools:text="@tools:sample/date/ddmmyy" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -164,7 +163,6 @@
                     android:hint="@string/hint_task_due_date"
                     android:inputType="date"
                     android:maxLines="1"
-                    android:onClick="pickDate"
                     tools:text="@tools:sample/date/ddmmyy" />
 
             </com.google.android.material.textfield.TextInputLayout>

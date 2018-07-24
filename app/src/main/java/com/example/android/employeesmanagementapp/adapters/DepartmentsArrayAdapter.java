@@ -89,7 +89,7 @@ public class DepartmentsArrayAdapter extends ArrayAdapter<String> {
      * @return its position in the drop down list
      */
     public int getPositionForItemId(int oldTaskDepartmentId) {
-        if (mDepartmentEntryList == null)
+        if (mDepartmentEntryList == null || idToPositionHashMap.size() == 0)
             return 0;
         return mDepartmentEntryList.indexOf(new DepartmentEntry(oldTaskDepartmentId));
 

@@ -1,5 +1,7 @@
 package com.example.android.employeesmanagementapp.adapters;
 
+import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +13,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
+import com.example.android.employeesmanagementapp.RecyclerViewItemLongClickListener;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 
@@ -22,6 +25,11 @@ import androidx.recyclerview.widget.RecyclerView;
 public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.EmployeesViewHolder> {
     private static final String TAG = EmployeesAdapter.class.getSimpleName();
     private List<EmployeeEntry> mData;
+    final private RecyclerViewItemClickListener mClickListener;
+    final private RecyclerViewItemLongClickListener mLongClickListener;
+    private boolean visible = false;
+    private boolean mUseCheckBoxLayout;
+    private int numOfSelected = 0;
     private RecyclerViewItemClickListener mClickListener;
     private CheckBoxClickListener mCheckBoxClickListener;
     private boolean mShowCheckBoxes;
@@ -30,6 +38,11 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
         mClickListener = listener;
         mShowCheckBoxes = showCheckBoxes;
         mCheckBoxClickListener = checkBoxClickListener;
+
+    public EmployeesAdapter(RecyclerViewItemClickListener listener, boolean useCheckBoxLayout, RecyclerViewItemLongClickListener longClickListener) {
+        mClickListener = listener;
+        mUseCheckBoxLayout = useCheckBoxLayout;
+        mLongClickListener = longClickListener;
     }
 
     @NonNull
@@ -62,13 +75,15 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
         void onCheckBoxClicked(int employeeID);
     }
 
-    public class EmployeesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class EmployeesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener , View.OnLongClickListener {
 
         //create object for each view in the item view
         TextView mEmployeeName;
         ImageView mEmployeeImage;
         CheckBox mEmployeeCheckBox;
         View mItemView;
+        boolean isSelected = false;
+
 
         EmployeesViewHolder(View itemView) {
             super(itemView);
@@ -86,6 +101,7 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
 
             // set the item click listener
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
 
         void bind(final int position) {
@@ -103,6 +119,11 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
 
         }
 
+        //if at least one of the items has a long click on it, its color will be grey
+        //and for that, onClick will behave like onLongClick "select items"
+        //if the item is selected and click on it again "long or normal click", its background will return white and will not be selected
+
+        @SuppressLint("ResourceAsColor")
         @Override
         public void onClick(View v) {
             if (v instanceof CheckBox) {
@@ -110,7 +131,32 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
             }
 
             mClickListener.onItemClick((int) mItemView.getTag());
+            if (numOfSelected > 0) {
+               changeItemMode();
+            } else
+                mClickListener.onItemClick((int) mItemView.getTag(),getAdapterPosition());
         }
+
+        @Override
+        public boolean onLongClick(View view) {
+            changeItemMode();
+            return true;
+        }
+
+        private void changeItemMode(){
+            if (!isSelected) {
+                numOfSelected++;
+                mItemView.setBackgroundColor(Color.parseColor("#888888"));
+                isSelected = true;
+            } else {
+                numOfSelected--;
+                mItemView.setBackgroundColor(Color.parseColor("#ffffff"));
+                isSelected = false;
+            }
+            mLongClickListener.onItemLongCLick((int) mItemView.getTag(),getAdapterPosition());
+        }
+
+
     }
 
 
