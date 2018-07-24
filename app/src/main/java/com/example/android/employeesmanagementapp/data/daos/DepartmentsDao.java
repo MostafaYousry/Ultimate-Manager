@@ -39,6 +39,12 @@ public interface DepartmentsDao {
     LiveData<DepartmentEntry> loadDepartmentById(int departmentId);
 
     /**
+     * @return : number of departments in the company
+     */
+    @Query("SELECT COUNT(*) FROM departments")
+    int getNumDepartments();
+
+    /**
      * insert a new department record
      *
      * @param departmentEntry

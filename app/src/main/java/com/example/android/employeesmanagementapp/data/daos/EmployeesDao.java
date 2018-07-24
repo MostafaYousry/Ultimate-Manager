@@ -48,6 +48,12 @@ public interface EmployeesDao {
     LiveData<EmployeeEntry> loadEmployeeById(int employeeId);
 
     /**
+     * @return : number of employees in the company
+     */
+    @Query("SELECT COUNT(*) FROM employees")
+    int getNumEmployees();
+
+    /**
      * insert a new employee record
      *
      * @param employeeEntry

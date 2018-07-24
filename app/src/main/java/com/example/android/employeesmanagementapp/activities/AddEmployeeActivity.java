@@ -21,15 +21,17 @@ import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
+import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
+import com.example.android.employeesmanagementapp.data.factories.DepIdFact;
 import com.example.android.employeesmanagementapp.data.factories.EmpIdFact;
+import com.example.android.employeesmanagementapp.data.viewmodels.AddNewDepViewModel;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewEmployeeViewModel;
 import com.example.android.employeesmanagementapp.fragments.DatePickerFragment;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 
 import java.util.Date;
-import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -178,9 +180,16 @@ public class AddEmployeeActivity extends AppCompatActivity {
         mEmployeeHireDate.setText(employeeEntry.getEmployeeHireDate().toString());
         mCollapsingToolbar.setTitle(employeeEntry.getEmployeeName());
 
-        int x = mArrayAdapter.getPositionForItemId(employeeEntry.getDepartmentId());
+        final LiveData<DepartmentEntry> employeeDep = ViewModelProviders.of(this, new DepIdFact(mDb, employeeEntry.getDepartmentId())).get(AddNewDepViewModel.class).getDepartment();
+        employeeDep.observe(this, new Observer<DepartmentEntry>() {
+            @Override
+            public void onChanged(DepartmentEntry departmentEntry) {
+                employeeDep.removeObserver(this);
+                mEmployeeDepartment.setSelection(mArrayAdapter.getPositionForItemId(departmentEntry));
+            }
+        });
 
-//        mEmployeeDepartment.setSelection();
+
         Glide.with(this).load(AppUtils.getRandomEmployeeImage()).apply(RequestOptions.centerCropTransform()).into(mEmployeeImage);
     }
 

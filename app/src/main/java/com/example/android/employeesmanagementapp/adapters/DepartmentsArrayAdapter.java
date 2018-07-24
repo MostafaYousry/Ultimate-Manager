@@ -85,13 +85,15 @@ public class DepartmentsArrayAdapter extends ArrayAdapter<String> {
      * used when a department is already assigned to an existing task
      * its used to select the previously chosen department for that task
      *
-     * @param oldTaskDepartmentId :
+     * @param departmentEntry:
      * @return its position in the drop down list
      */
-    public int getPositionForItemId(int oldTaskDepartmentId) {
+    public int getPositionForItemId(DepartmentEntry departmentEntry) {
         if (mDepartmentEntryList == null)
             return 0;
-        return mDepartmentEntryList.indexOf(new DepartmentEntry(oldTaskDepartmentId));
+
+        int x = mDepartmentEntryList.indexOf(departmentEntry);
+        return x;
 
     }
 

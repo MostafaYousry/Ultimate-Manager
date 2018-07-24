@@ -65,9 +65,9 @@ public class DepartmentEntry {
         if (getClass() != obj.getClass())
             return false;
         DepartmentEntry other = (DepartmentEntry) obj;
-        if (departmentId != other.getDepartmentId())
-            return false;
-        return true;
+        if (departmentId == other.getDepartmentId() && departmentName.equals(other.departmentName))
+            return true;
+        return false;
 
     }
 }

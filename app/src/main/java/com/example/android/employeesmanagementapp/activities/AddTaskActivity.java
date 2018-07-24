@@ -7,19 +7,27 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
 import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
+import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
+import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
+import com.example.android.employeesmanagementapp.data.factories.DepIdFact;
 import com.example.android.employeesmanagementapp.data.factories.TaskIdFact;
+import com.example.android.employeesmanagementapp.data.viewmodels.AddNewDepViewModel;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewTaskViewModel;
 import com.example.android.employeesmanagementapp.fragments.DatePickerFragment;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.util.Date;
 import java.util.List;
@@ -31,8 +39,10 @@ import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapter.CheckBoxClickListener {
+public class AddTaskActivity extends AppCompatActivity implements RecyclerViewItemClickListener, EmployeesAdapter.CheckBoxClickListener {
 
     private static final String TAG = AddTaskActivity.class.getSimpleName();
 
@@ -41,12 +51,18 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
 
     private int mTaskId;
 
+    private BottomSheetBehavior mSheetBehavior;
+
+    private EmployeesAdapter mEmplyeesAdapter;
+
     private EditText mTaskTitle;
     private EditText mTaskDescription;
     private TextView mTaskStartDate;
     private TextView mTaskDueDate;
     private Spinner mTaskDepartment;
     private Toolbar mToolbar;
+
+    private int mSelectedDepartmentId;
 
     private List<Integer> mTaskEmployeesIds;
 
@@ -120,6 +136,56 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
             }
         });
 
+
+        mTaskDepartment.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                mSelectedDepartmentId = (int) view.getTag();
+                populateBottomSheet(mSelectedDepartmentId);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+    }
+
+    private void setUpEmployeesBS() {
+
+        mSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet_root));
+
+
+        RecyclerView recyclerView = findViewById(R.id.show_dep_emp_rv);
+        mEmplyeesAdapter = new EmployeesAdapter(this, true, this);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(mEmplyeesAdapter);
+
+        populateBottomSheet(mSelectedDepartmentId);
+
+
+        Button showDepEmpButton = findViewById(R.id.show_employees_button);
+        showDepEmpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+                    mSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                } else {
+                    mSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
+            }
+        });
+    }
+
+    private void populateBottomSheet(int depId) {
+        LiveData<List<EmployeeEntry>> employeesInDepartment = ViewModelProviders.of(this, new DepIdFact(mDb, depId)).get(AddNewDepViewModel.class).getEmployees();
+        employeesInDepartment.observe(this, new Observer<List<EmployeeEntry>>() {
+            @Override
+            public void onChanged(List<EmployeeEntry> employeeEntries) {
+                mEmplyeesAdapter.setData(employeeEntries);
+            }
+        });
     }
 
 
@@ -128,7 +194,8 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         mTaskDescription.setText("");
         mTaskStartDate.setText("");
         mTaskDueDate.setText("");
-        mTaskDepartment.setSelection(0);
+        mSelectedDepartmentId = 0;
+        mTaskDepartment.setSelection(mSelectedDepartmentId);
     }
 
     private void populateUI(TaskEntry taskEntry) {
@@ -139,7 +206,16 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         mTaskDescription.setText(taskEntry.getTaskDescription());
         mTaskStartDate.setText(taskEntry.getTaskDueDate().toString());
         mTaskDueDate.setText(taskEntry.getTaskDueDate().toString());
-        mTaskDepartment.setSelection(mDepartmentsArrayAdapter.getPositionForItemId(taskEntry.getDepartmentID()));
+
+        final LiveData<DepartmentEntry> employeeDep = ViewModelProviders.of(this, new DepIdFact(mDb, taskEntry.getDepartmentID())).get(AddNewDepViewModel.class).getDepartment();
+        employeeDep.observe(this, new Observer<DepartmentEntry>() {
+            @Override
+            public void onChanged(DepartmentEntry departmentEntry) {
+                employeeDep.removeObserver(this);
+                mTaskDepartment.setSelection(mDepartmentsArrayAdapter.getPositionForItemId(departmentEntry));
+            }
+        });
+
     }
 
 
@@ -225,5 +301,18 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
     @Override
     public void onCheckBoxClicked(int employeeID) {
 
+    }
+
+    @Override
+    public void onItemClick(int clickedItemRowID, int clickedItemRowPostition) {
+        Intent intent = new Intent(this, AddEmployeeActivity.class);
+        intent.putExtra(AddEmployeeActivity.EMPLOYEE_VIEW_ONLY, true);
+        intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY, clickedItemRowID);
+        startActivity(intent);
+    }
+
+    @Override
+    public boolean onItemLongCLick(int longClickedItemRowId, int longcClickedItemPostition) {
+        return false;
     }
 }
