@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
+import com.example.android.employeesmanagementapp.RecyclerViewItemLongClickListener;
 import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.snackbar.Snackbar;
@@ -19,7 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 
-public class EmployeeBottomSheetFragment extends BottomSheetDialogFragment implements RecyclerViewItemClickListener {
+public class EmployeeBottomSheetFragment extends BottomSheetDialogFragment implements RecyclerViewItemClickListener,RecyclerViewItemLongClickListener {
 
     public static final String TAG = EmployeeBottomSheetFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
@@ -70,7 +71,7 @@ public class EmployeeBottomSheetFragment extends BottomSheetDialogFragment imple
         mRecyclerView.setLayoutManager(layoutManager);
 
         //create object of EmployeesAdapter and send data
-        mEmployeesAdapter = new EmployeesAdapter(this, true);
+        mEmployeesAdapter = new EmployeesAdapter(this, true,this);
 
         //set the employee recycler view adapter
         mRecyclerView.setAdapter(mEmployeesAdapter);
@@ -92,4 +93,8 @@ public class EmployeeBottomSheetFragment extends BottomSheetDialogFragment imple
         return mEmployeesAdapter;
     }
 
+    @Override
+    public boolean onItemLongCLick(int longClickedItemRowId) {
+        return false;
+    }
 }

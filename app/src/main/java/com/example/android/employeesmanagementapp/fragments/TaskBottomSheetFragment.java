@@ -17,7 +17,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class TaskBottomSheetFragment extends BottomSheetDialogFragment  implements RecyclerViewItemClickListener,RecyclerViewItemLongClickListener {
+public class TaskBottomSheetFragment extends BottomSheetDialogFragment  implements RecyclerViewItemClickListener {
     private final String TAG = TasksFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private TasksAdapter mAdapter;
@@ -41,7 +41,7 @@ public class TaskBottomSheetFragment extends BottomSheetDialogFragment  implemen
         mRecyclerView.setLayoutManager(layoutManager);
 
         // specify an adapter
-        mAdapter = new TasksAdapter(this,this);
+        mAdapter = new TasksAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
 
         return view;
@@ -61,8 +61,4 @@ public class TaskBottomSheetFragment extends BottomSheetDialogFragment  implemen
         startActivity(intent);
     }
 
-    @Override
-    public boolean onItemLongCLick(int longClickedItemRowId) {
-        return false;
-    }
 }

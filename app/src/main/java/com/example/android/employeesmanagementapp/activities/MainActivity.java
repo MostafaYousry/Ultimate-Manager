@@ -1,27 +1,39 @@
 package com.example.android.employeesmanagementapp.activities;
 
-import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.data.AppDatabase;
+import com.example.android.employeesmanagementapp.data.AppExecutor;
+import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
+import com.example.android.employeesmanagementapp.data.factories.EmpIdFact;
+import com.example.android.employeesmanagementapp.data.viewmodels.AddNewEmployeeViewModel;
+import com.example.android.employeesmanagementapp.fragments.DepartmentBottomSheetFragment;
 import com.example.android.employeesmanagementapp.fragments.DepartmentsFragment;
+import com.example.android.employeesmanagementapp.fragments.EmployeeBottomSheetFragment;
 import com.example.android.employeesmanagementapp.fragments.EmployeesFragment;
 import com.example.android.employeesmanagementapp.fragments.TasksFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
-public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener, EmployeesFragment.EmployeeSelection {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -29,7 +41,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private int mSelectedFragmentId;
     private Toolbar mToolbar;
     private BottomNavigationView mBottomNavigationView;
-
+    private int numOfSelectedEmployees;
+    private ArrayList<Integer> selectedEmployeesId = new ArrayList<Integer>();
+    private AppDatabase mDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         setSupportActionBar(mToolbar);
 
 
+        mDb = AppDatabase.getInstance(this);
         //setup navigation view
         mBottomNavigationView = findViewById(R.id.bottom_navigation_view);
         mBottomNavigationView.setOnNavigationItemSelectedListener(this);
@@ -55,7 +70,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             getSupportActionBar().setTitle(getString(R.string.tasks));
             mSelectedFragmentId = R.id.nav_tasks;
         }
-
 
     }
 
@@ -72,6 +86,32 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         // This adds menu items to the app bar.
         getMenuInflater().inflate(R.menu.menu_manger_options, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // User clicked on a menu option in the app bar overflow menu
+        if (numOfSelectedEmployees == 0) {
+            Toast.makeText(this, "No employees selected", Toast.LENGTH_LONG).show();
+        } else {
+            switch (item.getItemId()) {
+                case R.id.delete_employees:
+                    Toast.makeText(this, "Delete " + numOfSelectedEmployees + " employees", Toast.LENGTH_LONG).show();
+                    //ToDo delete these employees
+                    mToolbar.setTitle("Employees");
+                    numOfSelectedEmployees = 0;
+                    loadFragment(new EmployeesFragment());
+                    return true;
+
+                case R.id.move_employees:
+                    Toast.makeText(this, "Move " + numOfSelectedEmployees + " employees", Toast.LENGTH_LONG).show();
+                    //ToDo move these employees
+                    DepartmentBottomSheetFragment departmentBottomSheetFragment = new DepartmentBottomSheetFragment();
+                    departmentBottomSheetFragment.show(getSupportFragmentManager(), departmentBottomSheetFragment.getTag());
+                    return true;
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 
@@ -136,4 +176,13 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     }
 
 
+    @Override
+    public void changeMode(ArrayList<Integer> selectedEmployeesId) {
+        this.numOfSelectedEmployees = selectedEmployeesId.size();
+        this.selectedEmployeesId = selectedEmployeesId;
+        if (numOfSelectedEmployees == 0)
+            mToolbar.setTitle(R.string.employees);
+        else
+            mToolbar.setTitle(numOfSelectedEmployees + " selected");
+    }
 }

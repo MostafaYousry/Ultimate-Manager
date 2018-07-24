@@ -25,11 +25,9 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
 
     private List<TaskEntry> mData;
     private RecyclerViewItemClickListener mListClickListener;
-    private RecyclerViewItemLongClickListener mListLongClickListener;
 
-    public TasksAdapter(RecyclerViewItemClickListener clickListener, RecyclerViewItemLongClickListener longClickListener) {
+    public TasksAdapter(RecyclerViewItemClickListener clickListener) {
         mListClickListener = clickListener;
-        mListLongClickListener = longClickListener;
     }
 
     @NonNull
@@ -65,7 +63,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
         notifyDataSetChanged();
     }
 
-    class TasksViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+    class TasksViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         View mItemView;
         TextView mTextView;
 
@@ -74,7 +72,6 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
             mItemView = itemView;
             mTextView = itemView.findViewById(R.id.item_task_title);
             itemView.setOnClickListener(this);
-            itemView.setOnLongClickListener(this);
         }
 
         void bind(int position) {
@@ -87,11 +84,6 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
             mListClickListener.onItemClick((int) mItemView.getTag());
         }
 
-        @Override
-        public boolean onLongClick(View view) {
-            mListLongClickListener.onItemLongCLick((int) mItemView.getTag());
-            return true;
-        }
     }
 
 }

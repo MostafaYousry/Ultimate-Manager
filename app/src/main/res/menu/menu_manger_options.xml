@@ -5,12 +5,12 @@
     tools:context=".MainActivity">
 
     <item
-        android:id="@+id/action_insert_dummy_data"
+        android:id="@+id/delete_employees"
         android:title="Delete employees"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_delete_all_entries"
+        android:id="@+id/move_employees"
         android:title="Move Employees"
         app:showAsAction="never" />
 </menu>
