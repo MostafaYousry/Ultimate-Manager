@@ -12,11 +12,8 @@ import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
-import com.example.android.employeesmanagementapp.data.factories.EmpIdFact;
-import com.example.android.employeesmanagementapp.data.viewmodels.AddNewEmployeeViewModel;
 import com.example.android.employeesmanagementapp.fragments.DepartmentBottomSheetFragment;
 import com.example.android.employeesmanagementapp.fragments.DepartmentsFragment;
-import com.example.android.employeesmanagementapp.fragments.EmployeeBottomSheetFragment;
 import com.example.android.employeesmanagementapp.fragments.EmployeesFragment;
 import com.example.android.employeesmanagementapp.fragments.TasksFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -29,9 +26,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener, EmployeesFragment.EmployeeSelection {
 

@@ -89,5 +89,10 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
         intent.putExtra(AddTaskActivity.TASK_ID_KEY, clickedItemRowID);
         startActivity(intent);
     }
+
+    @Override
+    public boolean onItemLongCLick(int longClickedItemRowId, int longcClickedItemPostition) {
+        return false;
+    }
 }
 

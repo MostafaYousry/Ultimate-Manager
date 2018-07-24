@@ -203,12 +203,17 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
     }
 
     @Override
-    public void onItemClick(int clickedItemRowID) {
+    public void onItemClick(int clickedItemRowID, int clickedItemRowPostition) {
         Log.d(TAG, "item in bottom sheet is clicked");
 
         Intent intent = new Intent(this, AddEmployeeActivity.class);
         intent.putExtra(AddEmployeeActivity.EMPLOYEE_VIEW_ONLY, true);
         intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY, clickedItemRowID);
         startActivity(intent);
+    }
+
+    @Override
+    public boolean onItemLongCLick(int longClickedItemRowId, int longcClickedItemPostition) {
+        return false;
     }
 }

@@ -103,6 +103,11 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
         startActivity(intent);
     }
 
+    @Override
+    public boolean onItemLongCLick(int longClickedItemRowId, int longcClickedItemPostition) {
+        return false;
+    }
+
     /**
      * Converts dp to pixel
      */

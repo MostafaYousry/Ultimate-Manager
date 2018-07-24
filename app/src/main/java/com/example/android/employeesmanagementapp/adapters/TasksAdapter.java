@@ -1,9 +1,6 @@
 package com.example.android.employeesmanagementapp.adapters;
 
 
-import android.annotation.SuppressLint;
-import android.content.Intent;
-import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,9 +8,6 @@ import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
-import com.example.android.employeesmanagementapp.RecyclerViewItemLongClickListener;
-import com.example.android.employeesmanagementapp.activities.AddDepartmentActivity;
-import com.example.android.employeesmanagementapp.activities.AddTaskActivity;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 
 import java.util.List;

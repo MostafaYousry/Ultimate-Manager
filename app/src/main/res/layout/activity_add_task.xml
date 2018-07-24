@@ -25,10 +25,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="?attr/colorPrimary"
-                android:onClick="showTaskEmployees"
                 android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
                 app:layout_collapseMode="pin"
-                app:layout_scrollFlags=""
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
@@ -36,11 +34,11 @@
 
 
     <ScrollView
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:animateLayoutChanges="true"
-        android:overScrollMode="always"
         android:scrollbarStyle="insideInset"
         android:scrollbars="vertical"
         android:scrollHorizontally="false">
@@ -62,10 +60,7 @@
                 android:layout_marginEnd="8dp"
                 app:errorEnabled="true"
                 app:helperText="@string/required_field"
-                app:helperTextEnabled="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:helperTextEnabled="true">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/task_title"
@@ -85,10 +80,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="16dp"
-                android:layout_marginEnd="8dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textInputLayout2">
+                android:layout_marginEnd="8dp">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/task_description"
@@ -116,12 +108,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="8dp"
-                app:helperText="@string/required_field"
-                app:layout_constraintEnd_toStartOf="@+id/textInputLayout5"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintHorizontal_chainStyle="spread_inside"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textInputLayout3">
+                app:helperText="@string/required_field">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/task_start_date"
@@ -146,11 +133,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="8dp"
-                app:helperText="@string/required_field"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/textInputLayout4"
-                app:layout_constraintTop_toBottomOf="@+id/textInputLayout3">
+                app:helperText="@string/required_field">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/task_due_date"
@@ -168,43 +151,16 @@
             </com.google.android.material.textfield.TextInputLayout>
 
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/textInputLayout"
-                android:layout_width="0dp"
+            <Spinner
+                android:id="@+id/task_department"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="8dp"
-                app:helperText="@string/required_field"
-                app:helperTextEnabled="true"
-                app:hintAnimationEnabled="true"
-                app:hintEnabled="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textInputLayout4">
+                app:layout_constraintBottom_toTopOf="@+id/textInputLayout2"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.88">
 
-                <Spinner
-                    android:id="@+id/task_department"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp">
+            </Spinner>
 
-                </Spinner>
-
-                <!--<AutoCompleteTextView-->
-                <!--android:id="@+id/task_department"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="56dp"-->
-                <!--android:completionThreshold="1"-->
-                <!--android:drawableEnd="@drawable/ic_arrow_drop_down"-->
-                <!--android:hint="@string/hint_task_department"-->
-                <!--android:paddingLeft="14dp"-->
-                <!--android:paddingTop="16dp"-->
-                <!--android:paddingBottom="16dp" />-->
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-
-            <!--todo:rate the task when finished only in a popup dialog-->
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

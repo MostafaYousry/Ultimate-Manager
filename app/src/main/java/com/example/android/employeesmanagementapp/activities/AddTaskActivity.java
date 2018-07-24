@@ -16,10 +16,9 @@ import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapt
 import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
-import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.data.factories.TaskIdFact;
-import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
+import com.example.android.employeesmanagementapp.data.viewmodels.AddNewTaskViewModel;
 import com.example.android.employeesmanagementapp.fragments.DatePickerFragment;
 
 import java.util.Date;

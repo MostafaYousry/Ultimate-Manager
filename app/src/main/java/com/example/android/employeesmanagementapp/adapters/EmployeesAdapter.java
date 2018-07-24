@@ -13,7 +13,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
-import com.example.android.employeesmanagementapp.RecyclerViewItemLongClickListener;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 
@@ -26,11 +25,9 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
     private static final String TAG = EmployeesAdapter.class.getSimpleName();
     private List<EmployeeEntry> mData;
     final private RecyclerViewItemClickListener mClickListener;
-    final private RecyclerViewItemLongClickListener mLongClickListener;
     private boolean visible = false;
     private boolean mUseCheckBoxLayout;
     private int numOfSelected = 0;
-    private RecyclerViewItemClickListener mClickListener;
     private CheckBoxClickListener mCheckBoxClickListener;
     private boolean mShowCheckBoxes;
 
@@ -38,11 +35,6 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
         mClickListener = listener;
         mShowCheckBoxes = showCheckBoxes;
         mCheckBoxClickListener = checkBoxClickListener;
-
-    public EmployeesAdapter(RecyclerViewItemClickListener listener, boolean useCheckBoxLayout, RecyclerViewItemLongClickListener longClickListener) {
-        mClickListener = listener;
-        mUseCheckBoxLayout = useCheckBoxLayout;
-        mLongClickListener = longClickListener;
     }
 
     @NonNull
@@ -75,7 +67,7 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
         void onCheckBoxClicked(int employeeID);
     }
 
-    public class EmployeesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener , View.OnLongClickListener {
+    public class EmployeesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
         //create object for each view in the item view
         TextView mEmployeeName;
@@ -130,11 +122,10 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
                 mCheckBoxClickListener.onCheckBoxClicked((int) mItemView.getTag());
             }
 
-            mClickListener.onItemClick((int) mItemView.getTag());
             if (numOfSelected > 0) {
-               changeItemMode();
+                changeItemMode();
             } else
-                mClickListener.onItemClick((int) mItemView.getTag(),getAdapterPosition());
+                mClickListener.onItemClick((int) mItemView.getTag(), getAdapterPosition());
         }
 
         @Override
@@ -143,7 +134,7 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
             return true;
         }
 
-        private void changeItemMode(){
+        private void changeItemMode() {
             if (!isSelected) {
                 numOfSelected++;
                 mItemView.setBackgroundColor(Color.parseColor("#888888"));
@@ -153,7 +144,7 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
                 mItemView.setBackgroundColor(Color.parseColor("#ffffff"));
                 isSelected = false;
             }
-            mLongClickListener.onItemLongCLick((int) mItemView.getTag(),getAdapterPosition());
+            mClickListener.onItemLongCLick((int) mItemView.getTag(), getAdapterPosition());
         }
 
 
