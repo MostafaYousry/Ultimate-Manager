@@ -18,6 +18,7 @@ import com.example.android.employeesmanagementapp.fragments.EmployeesFragment;
 import com.example.android.employeesmanagementapp.fragments.TasksFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private int numOfSelectedEmployees;
     private ArrayList<EmployeeEntry> selectedEmployees = new ArrayList<>();
     private AppDatabase mDb;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
