@@ -17,7 +17,7 @@ public class AddNewDepViewModel extends ViewModel {
 
     public AddNewDepViewModel(AppDatabase database, int depId) {
         mDepartment = database.departmentsDao().loadDepartmentById(depId);
-        mEmployees = database.employeesDao().loadEmployeesOutside(depId);
+        mEmployees = database.employeesDao().loadEmployees(depId);
         mCompletedTasks = database.tasksDao().loadTasksForDepartment(depId, true);
     }
 

@@ -9,6 +9,9 @@
 
     <string name="required_field">*Required</string>
 
+    <!--string for bottom sheet button-->
+    <string name="show_employees">Show employees</string>
+
     <!--strings for add task activity-->
     <string name="label_task_rating">Rating :</string>
     <string name="label_task_department">Department :</string>

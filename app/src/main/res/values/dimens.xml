@@ -4,6 +4,7 @@
     <dimen name="item_task_height">100dp</dimen>
     <dimen name="item_employee_margin">4dp</dimen>
     <dimen name="add_department_margin">15dp</dimen>
+    <dimen name="list_item_avatar_size">70dp</dimen>
 
     <dimen name="add_employee_backdrop_height">256dp</dimen>
 

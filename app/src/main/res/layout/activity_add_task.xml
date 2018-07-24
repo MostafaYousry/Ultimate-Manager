@@ -1,25 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinator"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:focusableInTouchMode="true"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/toolbar"
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        tools:title="Tasks" />
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/collapsing_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            app:contentScrim="?attr/colorPrimary"
+            app:expandedTitleMarginEnd="64dp"
+            app:expandedTitleMarginStart="48dp"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                android:onClick="showTaskEmployees"
+                android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+                app:layout_collapseMode="pin"
+                app:layout_scrollFlags=""
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
 
 
     <ScrollView
@@ -159,7 +172,6 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayout"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -173,67 +185,34 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textInputLayout4">
 
-                <AutoCompleteTextView
+                <Spinner
                     android:id="@+id/task_department"
                     android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:completionThreshold="1"
-                    android:drawableEnd="@drawable/ic_arrow_drop_down"
-                    android:hint="@string/hint_task_department"
-                    android:paddingLeft="14dp"
-                    android:paddingTop="16dp"
-                    android:paddingBottom="16dp" />
+                    android:layout_height="56dp">
+
+                </Spinner>
+
+                <!--<AutoCompleteTextView-->
+                <!--android:id="@+id/task_department"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="56dp"-->
+                <!--android:completionThreshold="1"-->
+                <!--android:drawableEnd="@drawable/ic_arrow_drop_down"-->
+                <!--android:hint="@string/hint_task_department"-->
+                <!--android:paddingLeft="14dp"-->
+                <!--android:paddingTop="16dp"-->
+                <!--android:paddingBottom="16dp" />-->
 
             </com.google.android.material.textfield.TextInputLayout>
 
 
-            <Button
-                android:id="@+id/show_employees_bottom_sheet"
-                style="@style/DepartmentMargin"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
-                android:text="Show task employees"
-                app:layout_constraintBottom_toTopOf="@+id/task_rating"
-                app:layout_constraintEnd_toStartOf="@+id/add_employee_bottom_sheet"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
-
-            <Button
-                android:id="@+id/add_employee_bottom_sheet"
-                style="@style/DepartmentMargin"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
-                android:text="Add more employee to the task"
-                app:layout_constraintBottom_toTopOf="@+id/task_rating"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/show_employees_bottom_sheet"
-                app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
-
-            <RatingBar
-                android:id="@+id/task_rating"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.569"
-                android:max="5"
-                android:numStars="5"
-                android:stepSize="0.5"
-                app:layout_constraintStart_toStartOf="parent" />
+            <!--todo:rate the task when finished only in a popup dialog-->
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
-</LinearLayout>
+    <include layout="@layout/show_emp_bottom_sheet" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
 

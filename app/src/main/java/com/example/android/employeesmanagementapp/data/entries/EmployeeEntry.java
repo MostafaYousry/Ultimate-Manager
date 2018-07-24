@@ -22,6 +22,7 @@ public class EmployeeEntry {
     @ColumnInfo(name = "employee_id")
     private int employeeID;
 
+    @NonNull
     @ColumnInfo(name = "department_id")
     private int departmentId;
 
@@ -38,7 +39,7 @@ public class EmployeeEntry {
 
     //used when creating new EmployeeEntry object
     @Ignore
-    public EmployeeEntry(int departmentId, @NonNull String employeeName, @NonNull int employeeSalary, Date employeeHireDate) {
+    public EmployeeEntry(@NonNull int departmentId, @NonNull String employeeName, @NonNull int employeeSalary, Date employeeHireDate) {
         this.departmentId = departmentId;
         this.employeeName = employeeName;
         this.employeeSalary = employeeSalary;

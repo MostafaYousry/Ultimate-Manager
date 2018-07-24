@@ -7,19 +7,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
-import android.widget.RatingBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
+import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
-import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
-import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
+import com.example.android.employeesmanagementapp.data.factories.TaskIdFact;
+import com.example.android.employeesmanagementapp.data.viewmodels.AddNewTaskViewModel;
 import com.example.android.employeesmanagementapp.fragments.DatePickerFragment;
 
 import java.util.Date;
@@ -33,7 +32,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
-public class AddTaskActivity extends AppCompatActivity {
+public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapter.CheckBoxClickListener {
 
     private static final String TAG = AddTaskActivity.class.getSimpleName();
 
@@ -46,15 +45,14 @@ public class AddTaskActivity extends AppCompatActivity {
     private EditText mTaskDescription;
     private TextView mTaskStartDate;
     private TextView mTaskDueDate;
-    private RatingBar mTaskRatingBar;
-    private AutoCompleteTextView mTaskDepartment;
+    private Spinner mTaskDepartment;
     private Toolbar mToolbar;
+
+    private List<Integer> mTaskEmployeesIds;
 
     private AppDatabase mDb;
 
     private DepartmentsArrayAdapter mDepartmentsArrayAdapter;
-    private int mSelectedDepartmentID;
-
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -85,17 +83,19 @@ public class AddTaskActivity extends AppCompatActivity {
         mTaskDescription = findViewById(R.id.task_description);
         mTaskStartDate = findViewById(R.id.task_start_date);
         mTaskDueDate = findViewById(R.id.task_due_date);
-        mTaskRatingBar = findViewById(R.id.task_rating);
         mTaskDepartment = findViewById(R.id.task_department);
 
 
+        mDepartmentsArrayAdapter = new DepartmentsArrayAdapter(this, this);
+        mTaskDepartment.setAdapter(mDepartmentsArrayAdapter);
+
+
         setUpToolBar();
-        setUpDepartmentDropDown();
 
         if (mTaskId == DEFAULT_TASK_ID) {
             clearViews();
         } else {
-            final LiveData<TaskEntry> task = mDb.tasksDao().loadTaskById(mTaskId);
+            final LiveData<TaskEntry> task = ViewModelProviders.of(this, new TaskIdFact(mDb, mTaskId)).get(AddNewTaskViewModel.class).getTask();
             task.observe(this, new Observer<TaskEntry>() {
                 @Override
                 public void onChanged(@Nullable TaskEntry taskEntry) {
@@ -128,8 +128,7 @@ public class AddTaskActivity extends AppCompatActivity {
         mTaskDescription.setText("");
         mTaskStartDate.setText("");
         mTaskDueDate.setText("");
-        mTaskDepartment.setText(mDepartmentsArrayAdapter.getItem(0));
-        mTaskRatingBar.setRating(0);
+        mTaskDepartment.setSelection(0);
     }
 
     private void populateUI(TaskEntry taskEntry) {
@@ -140,45 +139,7 @@ public class AddTaskActivity extends AppCompatActivity {
         mTaskDescription.setText(taskEntry.getTaskDescription());
         mTaskStartDate.setText(taskEntry.getTaskDueDate().toString());
         mTaskDueDate.setText(taskEntry.getTaskDueDate().toString());
-        mTaskDepartment.setText(mDepartmentsArrayAdapter.getItem(mDepartmentsArrayAdapter.getPositionForItemId(taskEntry.getDepartmentID())));
-        mSelectedDepartmentID = taskEntry.getDepartmentID();
-        mTaskRatingBar.setRating(taskEntry.getTaskRating());
-
-
-    }
-
-
-    private void setUpDepartmentDropDown() {
-
-        mDepartmentsArrayAdapter = new DepartmentsArrayAdapter(AddTaskActivity.this);
-
-
-        LiveData<List<DepartmentEntry>> departments = ViewModelProviders.of(this).get(MainViewModel.class).getAllDepartmentsList();
-        departments.observe(this, new Observer<List<DepartmentEntry>>() {
-            @Override
-            public void onChanged(List<DepartmentEntry> departmentEntries) {
-                mDepartmentsArrayAdapter.setDepartmentEntryList(departmentEntries);
-            }
-        });
-
-
-        mTaskDepartment.setAdapter(mDepartmentsArrayAdapter);
-
-        mTaskDepartment.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                mSelectedDepartmentID = (int) view.getTag();
-            }
-        });
-
-
-        mTaskDepartment.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mTaskDepartment.showDropDown();
-            }
-        });
-
+        mTaskDepartment.setSelection(mDepartmentsArrayAdapter.getPositionForItemId(taskEntry.getDepartmentID()));
     }
 
 
@@ -215,7 +176,7 @@ public class AddTaskActivity extends AppCompatActivity {
     private void saveTask() {
         //todo:insert/update new data into db
         if (valideData()) {
-            int departmentId = mSelectedDepartmentID;
+            int departmentId = (int) mTaskDepartment.getSelectedView().getTag();
             String taskTitle = mTaskTitle.getText().toString();
             String taskDescription = mTaskDescription.getText().toString();
             //todo:change string date to java object date
@@ -254,4 +215,8 @@ public class AddTaskActivity extends AppCompatActivity {
         datePickerFragment.show(getSupportFragmentManager(), "datePicker");
     }
 
+    @Override
+    public void onCheckBoxClicked(int employeeID) {
+
+    }
 }

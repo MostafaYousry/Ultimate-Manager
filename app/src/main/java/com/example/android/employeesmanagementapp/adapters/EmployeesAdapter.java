@@ -7,6 +7,8 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
@@ -20,13 +22,14 @@ import androidx.recyclerview.widget.RecyclerView;
 public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.EmployeesViewHolder> {
     private static final String TAG = EmployeesAdapter.class.getSimpleName();
     private List<EmployeeEntry> mData;
-    final private RecyclerViewItemClickListener mClickListener;
-    private boolean visible = false;
-    private boolean mUseCheckBoxLayout;
+    private RecyclerViewItemClickListener mClickListener;
+    private CheckBoxClickListener mCheckBoxClickListener;
+    private boolean mShowCheckBoxes;
 
-    public EmployeesAdapter(RecyclerViewItemClickListener listener, boolean useCheckBoxLayout) {
-        mClickListener =  listener;
-        mUseCheckBoxLayout = useCheckBoxLayout;
+    public EmployeesAdapter(RecyclerViewItemClickListener listener, boolean showCheckBoxes, CheckBoxClickListener checkBoxClickListener) {
+        mClickListener = listener;
+        mShowCheckBoxes = showCheckBoxes;
+        mCheckBoxClickListener = checkBoxClickListener;
     }
 
     @NonNull
@@ -34,7 +37,7 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
     public EmployeesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         //todo:check which item layout
         //inflate item layout for the view holder
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_employees_rv,parent,false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_employees_rv, parent, false);
 
         EmployeesViewHolder employeesViewHolder = new EmployeesViewHolder(v);
 
@@ -55,21 +58,31 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
     }
 
 
-    public class EmployeesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public interface CheckBoxClickListener {
+        void onCheckBoxClicked(int employeeID);
+    }
+
+    public class EmployeesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         //create object for each view in the item view
-        TextView employeeName;
-        ImageView employeeImage;
-        CheckBox employeeCheckBox;
+        TextView mEmployeeName;
+        ImageView mEmployeeImage;
+        CheckBox mEmployeeCheckBox;
+        View mItemView;
 
         EmployeesViewHolder(View itemView) {
             super(itemView);
 
             //set the objects by the opposite view by id
-            employeeName = itemView.findViewById(R.id.employee_name);
-            employeeImage = itemView.findViewById(R.id.employee_image);
-            employeeCheckBox = itemView.findViewById(R.id.employee_check_box);
-            //todo:check which layout's viewholder
+            mItemView = itemView;
+            mEmployeeName = itemView.findViewById(R.id.employee_name);
+            mEmployeeImage = itemView.findViewById(R.id.employee_image);
+            mEmployeeCheckBox = itemView.findViewById(R.id.employee_check_box);
+            if (mShowCheckBoxes)
+                mEmployeeCheckBox.setVisibility(View.VISIBLE);
+            else
+                mEmployeeCheckBox.setVisibility(View.GONE);
+
 
             // set the item click listener
             itemView.setOnClickListener(this);
@@ -78,17 +91,29 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
         void bind(final int position) {
 
             //change the item data by the position
-            employeeName.setText(mData.get(position).getEmployeeName());
-            employeeImage.setImageResource(AppUtils.getRandomEmployeeImage());
+            mEmployeeName.setText(mData.get(position).getEmployeeName());
+
+            RequestOptions options = new RequestOptions();
+            Glide.with(mEmployeeImage.getContext())
+                    .load(AppUtils.getRandomEmployeeImage())
+                    .apply(options.fitCenter())
+                    .into(mEmployeeImage);
+
+            itemView.setTag(mData.get(position).getEmployeeID());
 
 
         }
 
         @Override
         public void onClick(View v) {
-            mClickListener.onItemClick(getAdapterPosition());
+            if (v instanceof CheckBox) {
+                mCheckBoxClickListener.onCheckBoxClicked((int) mItemView.getTag());
+            }
+
+            mClickListener.onItemClick((int) mItemView.getTag());
         }
     }
+
 
     /**
      * used to update adapters data if any change occurs

@@ -1,19 +1,19 @@
 package com.example.android.employeesmanagementapp.fragments;
 
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
+import com.example.android.employeesmanagementapp.activities.AddEmployeeActivity;
 import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
@@ -70,7 +70,7 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
         mRecyclerView.setLayoutManager(layoutManager);
 
         //create object of EmployeesAdapter and send data
-        mEmployeesAdapter = new EmployeesAdapter(this);
+        mEmployeesAdapter = new EmployeesAdapter(this, false, null);
 
         LiveData<List<EmployeeEntry>> employeesList = ViewModelProviders.of(this).get(MainViewModel.class).getAllEmployeesList();
         employeesList.observe(this, new Observer<List<EmployeeEntry>>() {
@@ -91,12 +91,12 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
      * called when a list item is clicked
      */
     @Override
-    public void onItemClick(int clickedItemIndex) {
+    public void onItemClick(int clickedItemId) {
         //todo:open employee details
-
-        Log.d(TAG,"Item at index " + clickedItemIndex + " is clicked");
-        Snackbar.make(getView(), "Item at index " + clickedItemIndex + " is clicked", Snackbar.LENGTH_SHORT)
-                .show();
+        Intent intent = new Intent(getActivity(), AddEmployeeActivity.class);
+        intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY, clickedItemId);
+        intent.putExtra(AddEmployeeActivity.EMPLOYEE_VIEW_ONLY, false);
+        startActivity(intent);
     }
 
 }

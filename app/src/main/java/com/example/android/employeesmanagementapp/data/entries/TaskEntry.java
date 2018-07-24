@@ -2,6 +2,7 @@ package com.example.android.employeesmanagementapp.data.entries;
 
 import java.util.Date;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
@@ -21,6 +22,7 @@ public class TaskEntry {
     @ColumnInfo(name = "task_id")
     private int taskId;
 
+    @NonNull
     @ColumnInfo(name = "department_id")
     private int departmentID;
 
@@ -45,7 +47,7 @@ public class TaskEntry {
 
     //used when creating new TaskEntry object
     @Ignore
-    public TaskEntry(int departmentID, String taskTitle, String taskDescription, Date taskStartDate, Date taskDueDate) {
+    public TaskEntry(@NonNull int departmentID, String taskTitle, String taskDescription, Date taskStartDate, Date taskDueDate) {
         this.departmentID = departmentID;
         this.taskTitle = taskTitle;
         this.taskDescription = taskDescription;

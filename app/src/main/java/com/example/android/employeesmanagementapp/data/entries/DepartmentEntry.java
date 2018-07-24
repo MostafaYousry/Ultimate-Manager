@@ -28,6 +28,11 @@ public class DepartmentEntry {
         this.departmentName = departmentName;
     }
 
+    @Ignore
+    public DepartmentEntry(int departmentId) {
+        this.departmentId = departmentId;
+    }
+
     //used by room when reading from database
     public DepartmentEntry(int departmentId, @NonNull String departmentName) {
         this.departmentId = departmentId;
@@ -51,4 +56,14 @@ public class DepartmentEntry {
         this.departmentName = departmentName;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof DepartmentEntry))
+            return false;
+        DepartmentEntry other = (DepartmentEntry) obj;
+        if (other.getDepartmentId() == this.getDepartmentId())
+            return true;
+        return false;
+
+    }
 }

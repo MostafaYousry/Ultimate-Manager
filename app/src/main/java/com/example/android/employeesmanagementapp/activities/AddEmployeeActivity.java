@@ -10,43 +10,50 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
-import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
+import com.example.android.employeesmanagementapp.data.factories.EmpIdFact;
+import com.example.android.employeesmanagementapp.data.viewmodels.AddNewEmployeeViewModel;
 import com.example.android.employeesmanagementapp.fragments.DatePickerFragment;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 
 import java.util.Date;
-import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
 public class AddEmployeeActivity extends AppCompatActivity {
 
     private static final String TAG = AddEmployeeActivity.class.getSimpleName();
     public static final String EMPLOYEE_ID_KEY = "employee_id";
+    public static final String EMPLOYEE_VIEW_ONLY = "employee_view_only";
     private static final int DEFAULT_EMPLOYEE_ID = -1;
+    private static final boolean DEFAULT_EMPLOYEE_VIEW_ONLY = false;
+
     private int mEmployeeId;
+    private boolean mIsViewOnly;
 
     private EditText mEmployeeName;
     private EditText mEmployeeSalary;
     private TextView mEmployeeHireDate;
     private Spinner mEmployeeDepartment;
+
+    private DepartmentsArrayAdapter mArrayAdapter;
+
     private Toolbar mToolbar;
     private CollapsingToolbarLayout mCollapsingToolbar;
 
-    private EmployeeEntry mEmployeeEntry;
 
     private AppDatabase mDb;
 
@@ -64,6 +71,7 @@ public class AddEmployeeActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent != null) {
             mEmployeeId = intent.getIntExtra(EMPLOYEE_ID_KEY, DEFAULT_EMPLOYEE_ID);
+            mIsViewOnly = intent.getBooleanExtra(EMPLOYEE_VIEW_ONLY, DEFAULT_EMPLOYEE_VIEW_ONLY);
         }
 
         //set toolbar as actionbar
@@ -82,18 +90,29 @@ public class AddEmployeeActivity extends AppCompatActivity {
         mEmployeeDepartment = findViewById(R.id.employee_department);
         mCollapsingToolbar = findViewById(R.id.collapsing_toolbar);
 
+        mArrayAdapter = new DepartmentsArrayAdapter(this, this);
+        mEmployeeDepartment.setAdapter(mArrayAdapter);
 
-        setUpToolBar();
+
         setUpNameET();
-        setupDepartmentsSpinner();
 
 
         if (mEmployeeId == DEFAULT_EMPLOYEE_ID) {
             clearViews();
         } else {
-            loadEmployeeData();
+            final LiveData<EmployeeEntry> employee = ViewModelProviders.of(this, new EmpIdFact(mDb, mEmployeeId)).get(AddNewEmployeeViewModel.class).getEmployee();
+            employee.observe(this, new Observer<EmployeeEntry>() {
+                @Override
+                public void onChanged(EmployeeEntry employeeEntry) {
+                    employee.removeObservers(AddEmployeeActivity.this);
+                    populateUi(employeeEntry);
+                }
+            });
         }
 
+        if (mIsViewOnly) {
+            deactivateViews();
+        }
 
     }
 
@@ -110,6 +129,7 @@ public class AddEmployeeActivity extends AppCompatActivity {
         //show th dialog
         datePickerFragment.show(getSupportFragmentManager(), "datePicker");
     }
+
 
     private void setUpNameET() {
         mEmployeeName.addTextChangedListener(new TextWatcher() {
@@ -137,55 +157,29 @@ public class AddEmployeeActivity extends AppCompatActivity {
         mEmployeeName.setText("");
         mEmployeeSalary.setText("");
         mEmployeeHireDate.setText("");
+        mCollapsingToolbar.setTitle(getString(R.string.add_new_employee));
+        mEmployeeDepartment.setSelection(0);
 
     }
 
-    private void loadEmployeeData() {
-        //todo:fill with task data
-        LiveData<EmployeeEntry> employeeData = mDb.employeesDao().loadEmployeeById(mEmployeeId);
-        employeeData.observe(this, new Observer<EmployeeEntry>() {
-            @Override
-            public void onChanged(EmployeeEntry employeeEntry) {
-                mEmployeeEntry = employeeEntry;
-            }
-        });
+    private void populateUi(EmployeeEntry employeeEntry) {
+        if (employeeEntry == null)
+            return;
 
-        mEmployeeName.setText(mEmployeeEntry.getEmployeeName());
-        mEmployeeSalary.setText(mEmployeeEntry.getEmployeeSalary());
-        mEmployeeHireDate.setText(mEmployeeEntry.getEmployeeHireDate().toString());
+        mEmployeeName.setText(employeeEntry.getEmployeeName());
+        mEmployeeSalary.setText(String.valueOf(employeeEntry.getEmployeeSalary()));
+        mEmployeeHireDate.setText(employeeEntry.getEmployeeHireDate().toString());
+        mCollapsingToolbar.setTitle(employeeEntry.getEmployeeName());
+        mEmployeeDepartment.setSelection(mArrayAdapter.getPositionForItemId(employeeEntry.getDepartmentId()));
     }
 
 
-    private void setupDepartmentsSpinner() {
-
-        LiveData<List<DepartmentEntry>> departments = mDb.departmentsDao().loadDepartments();
-        departments.observe(this, new Observer<List<DepartmentEntry>>() {
-            @Override
-            public void onChanged(List<DepartmentEntry> departmentEntries) {
-                ArrayAdapter<DepartmentEntry> spinnerAdapter = new ArrayAdapter<DepartmentEntry>(AddEmployeeActivity.this, android.R.layout.simple_spinner_dropdown_item, departmentEntries);
-                mEmployeeDepartment.setAdapter(spinnerAdapter);
-
-
-                if (mEmployeeId == DEFAULT_EMPLOYEE_ID) {
-                    mEmployeeDepartment.setSelection(0);
-                } else {
-                    //todo:change with employee's department
-                    mEmployeeDepartment.setSelection(0);
-                }
-            }
-        });
-
-
+    private void deactivateViews() {
+        mEmployeeName.setEnabled(false);
+        mEmployeeSalary.setEnabled(false);
+        mEmployeeHireDate.setEnabled(false);
+        mEmployeeDepartment.setEnabled(false);
     }
-
-    private void setUpToolBar() {
-        if (mEmployeeId == DEFAULT_EMPLOYEE_ID) {
-            mCollapsingToolbar.setTitle(getString(R.string.add_new_employee));
-        } else {
-            //todo:set toolbar title with employee name
-        }
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -210,7 +204,9 @@ public class AddEmployeeActivity extends AppCompatActivity {
     private void saveEmployee() {
         //todo:insert/update new data into db
         if (valideData()) {
-            final int departmentId = 1;
+            final int departmentId = (int) mEmployeeDepartment.getSelectedView().getTag();
+            Log.d(TAG, "departmentId = " + departmentId);
+
             final String employeeName = mEmployeeName.getText().toString();
             final int employeeSalary = Integer.parseInt(mEmployeeSalary.getText().toString());
             //todo:convert string date to object Date
@@ -225,8 +221,9 @@ public class AddEmployeeActivity extends AppCompatActivity {
                     mDb.employeesDao().addEmployee(newEmployee);
                 }
             });
+            finish();
         }
-        finish();
+
     }
 
     private boolean valideData() {

@@ -2,6 +2,7 @@ package com.example.android.employeesmanagementapp.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -9,32 +10,40 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
+import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
+import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.factories.DepIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewDepViewModel;
-import com.example.android.employeesmanagementapp.fragments.EmployeeBottomSheetFragment;
-import com.example.android.employeesmanagementapp.fragments.TaskBottomSheetFragment;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+
+import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 
-public class AddDepartmentActivity extends AppCompatActivity {
+public class AddDepartmentActivity extends AppCompatActivity implements RecyclerViewItemClickListener {
     public static final String DEPARTMENT_ID_KEY = "department_id";
 
     private static final int DEFAULT_DEPARTMENT_ID = -1;
     private static final String TAG = AddDepartmentActivity.class.getSimpleName();
 
+    private BottomSheetBehavior mSheetBehavior;
+
     private int mDepartmentId;
+
+
     private EditText mDepartmentName;
     private Toolbar mToolbar;
-    private Button mShowEmployeesBottomSheet, mAddEmployeesBottomSheet, mShowCompletedTasksBottomSheet;
-
     private AppDatabase mDb;
 
     @Override
@@ -52,9 +61,6 @@ public class AddDepartmentActivity extends AppCompatActivity {
 
         //find views
         mDepartmentName = findViewById(R.id.department_name);
-        mShowEmployeesBottomSheet = findViewById(R.id.show_employees_bottom_sheet);
-        mAddEmployeesBottomSheet = findViewById(R.id.add_employee_bottom_sheet);
-        mShowCompletedTasksBottomSheet = findViewById(R.id.completed_tasks_bottom_sheet);
 
         //set toolbar as actionbar
         mToolbar = findViewById(R.id.toolbar);
@@ -66,6 +72,10 @@ public class AddDepartmentActivity extends AppCompatActivity {
 
 
         setUpToolBar();
+        setUpEmployeesBS();
+
+
+
         if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
             clearViews();
         } else {
@@ -80,7 +90,7 @@ public class AddDepartmentActivity extends AppCompatActivity {
         }
 
 
-        setUpBottomSheetButtons();
+
 
 
     }
@@ -94,28 +104,6 @@ public class AddDepartmentActivity extends AppCompatActivity {
 
     }
 
-
-    //bottom sheets to show department's employees and completed tasks
-    private void setUpBottomSheetButtons() {
-
-        mAddEmployeesBottomSheet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EmployeeBottomSheetFragment employeesFragment = new EmployeeBottomSheetFragment();
-                employeesFragment.show(getSupportFragmentManager(), employeesFragment.getTag());
-            }
-        });
-
-
-        mShowCompletedTasksBottomSheet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TaskBottomSheetFragment taskFragment = new TaskBottomSheetFragment();
-                taskFragment.show(getSupportFragmentManager(), taskFragment.getTag());
-            }
-        });
-    }
-
     private void clearViews() {
         mDepartmentName.setText("");
     }
@@ -126,6 +114,42 @@ public class AddDepartmentActivity extends AppCompatActivity {
         } else {
             getSupportActionBar().setTitle("Update department");
         }
+    }
+
+    private void setUpEmployeesBS() {
+
+        mSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet_root));
+
+        if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
+            mSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            return;
+        }
+
+        RecyclerView recyclerView = findViewById(R.id.show_dep_emp_rv);
+        final EmployeesAdapter employeesAdapter = new EmployeesAdapter(this, false, null);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(employeesAdapter);
+
+        LiveData<List<EmployeeEntry>> employeesInDepartment = ViewModelProviders.of(this, new DepIdFact(mDb, mDepartmentId)).get(AddNewDepViewModel.class).getEmployees();
+        employeesInDepartment.observe(this, new Observer<List<EmployeeEntry>>() {
+            @Override
+            public void onChanged(List<EmployeeEntry> employeeEntries) {
+                employeesAdapter.setData(employeeEntries);
+            }
+        });
+
+
+        Button showDepEmpButton = findViewById(R.id.show_employees_button);
+        showDepEmpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+                    mSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                } else {
+                    mSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
+            }
+        });
     }
 
 
@@ -151,7 +175,7 @@ public class AddDepartmentActivity extends AppCompatActivity {
     private void saveDepartment() {
         //todo:insert/update new data into db
         if (valideData()) {
-            final String departmentName = mDepartmentName.getText().toString();
+            String departmentName = mDepartmentName.getText().toString();
 
             final DepartmentEntry newDepartment = new DepartmentEntry(departmentName);
 
@@ -161,11 +185,23 @@ public class AddDepartmentActivity extends AppCompatActivity {
                     mDb.departmentsDao().addDepartment(newDepartment);
                 }
             });
+
+            finish();
         }
-        finish();
+
     }
 
     private boolean valideData() {
         return true;
+    }
+
+    @Override
+    public void onItemClick(int clickedItemRowID) {
+        Log.d(TAG, "item in bottom sheet is clicked");
+
+        Intent intent = new Intent(this, AddEmployeeActivity.class);
+        intent.putExtra(AddEmployeeActivity.EMPLOYEE_VIEW_ONLY, true);
+        intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY, clickedItemRowID);
+        startActivity(intent);
     }
 }
