@@ -37,6 +37,7 @@ public class EmployeeEntry {
     @ColumnInfo(name = "employee_hire_date")
     private Date employeeHireDate;
 
+
     //used when creating new EmployeeEntry object
     @Ignore
     public EmployeeEntry(@NonNull int departmentId, @NonNull String employeeName, @NonNull int employeeSalary, Date employeeHireDate) {

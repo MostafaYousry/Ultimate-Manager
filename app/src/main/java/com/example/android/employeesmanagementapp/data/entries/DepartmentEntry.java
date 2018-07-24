@@ -58,12 +58,16 @@ public class DepartmentEntry {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof DepartmentEntry))
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
             return false;
         DepartmentEntry other = (DepartmentEntry) obj;
-        if (other.getDepartmentId() == this.getDepartmentId())
-            return true;
-        return false;
+        if (departmentId != other.getDepartmentId())
+            return false;
+        return true;
 
     }
 }

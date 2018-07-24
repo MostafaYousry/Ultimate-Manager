@@ -11,9 +11,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
@@ -22,6 +25,7 @@ import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.factories.EmpIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewEmployeeViewModel;
 import com.example.android.employeesmanagementapp.fragments.DatePickerFragment;
+import com.example.android.employeesmanagementapp.utils.AppUtils;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 
 import java.util.Date;
@@ -48,6 +52,7 @@ public class AddEmployeeActivity extends AppCompatActivity {
     private EditText mEmployeeSalary;
     private TextView mEmployeeHireDate;
     private Spinner mEmployeeDepartment;
+    private ImageView mEmployeeImage;
 
     private DepartmentsArrayAdapter mArrayAdapter;
 
@@ -89,6 +94,7 @@ public class AddEmployeeActivity extends AppCompatActivity {
         mEmployeeHireDate = findViewById(R.id.employee_hire_date);
         mEmployeeDepartment = findViewById(R.id.employee_department);
         mCollapsingToolbar = findViewById(R.id.collapsing_toolbar);
+        mEmployeeImage = findViewById(R.id.employee_image);
 
         mArrayAdapter = new DepartmentsArrayAdapter(this, this);
         mEmployeeDepartment.setAdapter(mArrayAdapter);
@@ -170,7 +176,11 @@ public class AddEmployeeActivity extends AppCompatActivity {
         mEmployeeSalary.setText(String.valueOf(employeeEntry.getEmployeeSalary()));
         mEmployeeHireDate.setText(employeeEntry.getEmployeeHireDate().toString());
         mCollapsingToolbar.setTitle(employeeEntry.getEmployeeName());
-        mEmployeeDepartment.setSelection(mArrayAdapter.getPositionForItemId(employeeEntry.getDepartmentId()));
+
+        int x = mArrayAdapter.getPositionForItemId(employeeEntry.getDepartmentId());
+
+//        mEmployeeDepartment.setSelection();
+        Glide.with(this).load(AppUtils.getRandomEmployeeImage()).apply(RequestOptions.centerCropTransform()).into(mEmployeeImage);
     }
 
 

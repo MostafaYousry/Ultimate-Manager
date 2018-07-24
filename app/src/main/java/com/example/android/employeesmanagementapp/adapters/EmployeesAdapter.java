@@ -93,10 +93,9 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
             //change the item data by the position
             mEmployeeName.setText(mData.get(position).getEmployeeName());
 
-            RequestOptions options = new RequestOptions();
             Glide.with(mEmployeeImage.getContext())
                     .load(AppUtils.getRandomEmployeeImage())
-                    .apply(options.fitCenter())
+                    .apply(RequestOptions.fitCenterTransform())
                     .into(mEmployeeImage);
 
             itemView.setTag(mData.get(position).getEmployeeID());
