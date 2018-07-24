@@ -81,7 +81,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
 
         @Override
         public void onClick(View v) {
-            mListClickListener.onItemClick((int) mItemView.getTag());
+            mListClickListener.onItemClick((int) mItemView.getTag(), getAdapterPosition());
         }
 
     }

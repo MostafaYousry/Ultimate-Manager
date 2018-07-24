@@ -51,13 +51,14 @@ public class TaskBottomSheetFragment extends BottomSheetDialogFragment  implemen
     /**
      * called when a list item is clicked
      */
-    public void onItemClick(int clickedItemIndex) {
-        Log.d(TAG,"Item at index " + clickedItemIndex + " is clicked");
+    @Override
+    public void onItemClick(int clickedItemId, int clickedItemPosition) {
+        Log.d(TAG,"Item at index " + clickedItemId + " is clicked");
 
 
         Intent intent = new Intent(getActivity() , AddTaskActivity.class);
         //todo:pass rv.getTag ---> item id in db instead index in rv
-        intent.putExtra(AddTaskActivity.TASK_ID_KEY , clickedItemIndex + 0.5);
+        intent.putExtra(AddTaskActivity.TASK_ID_KEY , clickedItemId + 0.5);
         startActivity(intent);
     }
 

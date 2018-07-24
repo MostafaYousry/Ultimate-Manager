@@ -103,7 +103,7 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
             if (numOfSelected > 0) {
                changeItemMode();
             } else
-                mClickListener.onItemClick((int) mItemView.getTag());
+                mClickListener.onItemClick((int) mItemView.getTag(),getAdapterPosition());
         }
 
         @Override
@@ -122,7 +122,7 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
                 mItemView.setBackgroundColor(Color.parseColor("#ffffff"));
                 isSelected = false;
             }
-            mLongClickListener.onItemLongCLick((int) mItemView.getTag());
+            mLongClickListener.onItemLongCLick((int) mItemView.getTag(),getAdapterPosition());
         }
 
 

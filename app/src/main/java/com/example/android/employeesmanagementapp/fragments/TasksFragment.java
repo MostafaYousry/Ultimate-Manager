@@ -83,7 +83,7 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
      * called when a list item is clicked
      */
     @Override
-    public void onItemClick(int clickedItemRowID) {
+    public void onItemClick(int clickedItemRowID, int clickedItemPosition) {
 
         Intent intent = new Intent(getActivity(), AddTaskActivity.class);
         intent.putExtra(AddTaskActivity.TASK_ID_KEY, clickedItemRowID);

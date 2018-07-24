@@ -81,7 +81,7 @@ public class EmployeeBottomSheetFragment extends BottomSheetDialogFragment imple
      * called when a list item is clicked
      */
     @Override
-    public void onItemClick(int clickedItemIndex) {
+    public void onItemClick(int clickedItemIndex, int clickedItemPosition) {
         //todo:open employee details
 
         Log.d(TAG, "Item at index " + clickedItemIndex + " is clicked in bottom sheet");
@@ -94,7 +94,7 @@ public class EmployeeBottomSheetFragment extends BottomSheetDialogFragment imple
     }
 
     @Override
-    public boolean onItemLongCLick(int longClickedItemRowId) {
+    public boolean onItemLongCLick(int longClickedItemRowId, int longClickedItemPosition) {
         return false;
     }
 }

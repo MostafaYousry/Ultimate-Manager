@@ -20,6 +20,8 @@ import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
+import com.example.android.employeesmanagementapp.data.factories.EmpIdFact;
+import com.example.android.employeesmanagementapp.data.viewmodels.AddNewEmployeeViewModel;
 import com.example.android.employeesmanagementapp.fragments.DatePickerFragment;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 
@@ -31,6 +33,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
 public class AddEmployeeActivity extends AppCompatActivity {
 
@@ -81,8 +84,6 @@ public class AddEmployeeActivity extends AppCompatActivity {
         mEmployeeHireDate = findViewById(R.id.employee_hire_date);
         mEmployeeDepartment = findViewById(R.id.employee_department);
         mCollapsingToolbar = findViewById(R.id.collapsing_toolbar);
-
-
         setUpToolBar();
         setUpNameET();
         setupDepartmentsSpinner();
@@ -91,7 +92,16 @@ public class AddEmployeeActivity extends AppCompatActivity {
         if (mEmployeeId == DEFAULT_EMPLOYEE_ID) {
             clearViews();
         } else {
-            loadEmployeeData();
+            final LiveData<EmployeeEntry> employeeData = ViewModelProviders.of(this, new EmpIdFact(mDb, mEmployeeId)).get(AddNewEmployeeViewModel.class).getEmployee();
+            employeeData.observe(this, new Observer<EmployeeEntry>() {
+                @Override
+                public void onChanged(EmployeeEntry employeeEntry) {
+                    mEmployeeEntry = employeeEntry;
+                    employeeData.removeObserver(this);
+                    populateUI();
+                }
+            });
+
         }
 
 
@@ -140,18 +150,12 @@ public class AddEmployeeActivity extends AppCompatActivity {
 
     }
 
-    private void loadEmployeeData() {
+    private void populateUI() {
         //todo:fill with task data
-        LiveData<EmployeeEntry> employeeData = mDb.employeesDao().loadEmployeeById(mEmployeeId);
-        employeeData.observe(this, new Observer<EmployeeEntry>() {
-            @Override
-            public void onChanged(EmployeeEntry employeeEntry) {
-                mEmployeeEntry = employeeEntry;
-            }
-        });
-
+        if (mEmployeeEntry == null)
+            return;
         mEmployeeName.setText(mEmployeeEntry.getEmployeeName());
-        mEmployeeSalary.setText(mEmployeeEntry.getEmployeeSalary());
+        mEmployeeSalary.setText("" + mEmployeeEntry.getEmployeeSalary());
         mEmployeeHireDate.setText(mEmployeeEntry.getEmployeeHireDate().toString());
     }
 
@@ -182,10 +186,10 @@ public class AddEmployeeActivity extends AppCompatActivity {
         if (mEmployeeId == DEFAULT_EMPLOYEE_ID) {
             mCollapsingToolbar.setTitle(getString(R.string.add_new_employee));
         } else {
+            mCollapsingToolbar.setTitle("employee");
             //todo:set toolbar title with employee name
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -222,7 +226,12 @@ public class AddEmployeeActivity extends AppCompatActivity {
             AppExecutor.getInstance().diskIO().execute(new Runnable() {
                 @Override
                 public void run() {
-                    mDb.employeesDao().addEmployee(newEmployee);
+                    if (mEmployeeId == DEFAULT_EMPLOYEE_ID)
+                        mDb.employeesDao().addEmployee(newEmployee);
+                    else {
+                        newEmployee.setEmployeeID(mEmployeeId);
+                        mDb.employeesDao().updateEmployee(newEmployee);
+                    }
                 }
             });
         }

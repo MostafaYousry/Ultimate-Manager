@@ -90,7 +90,7 @@ public class DepartmentBottomSheetFragment extends BottomSheetDialogFragment imp
      * called when a grid item is clicked
      */
     @Override
-    public void onItemClick(int clickedItemId) {
+    public void onItemClick(int clickedItemId, int clickedItemPosition) {
         departmentId = clickedItemId;
     }
 

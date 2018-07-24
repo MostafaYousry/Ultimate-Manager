@@ -3,6 +3,7 @@ package com.example.android.employeesmanagementapp.fragments;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +16,7 @@ import android.widget.Toolbar;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
 import com.example.android.employeesmanagementapp.RecyclerViewItemLongClickListener;
+import com.example.android.employeesmanagementapp.activities.AddEmployeeActivity;
 import com.example.android.employeesmanagementapp.activities.MainActivity;
 import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
@@ -43,11 +45,12 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
     private RecyclerView mRecyclerView;
     private EmployeesAdapter mEmployeesAdapter;
     private AppDatabase mDb;
-    private ArrayList<Integer> selectedEmployeesId = new ArrayList<Integer>();
+    private ArrayList<EmployeeEntry> selectedEmployees = new ArrayList<EmployeeEntry>();
+    private List<EmployeeEntry> employeeList = new ArrayList<EmployeeEntry>();
     EmployeeSelection mEmployeeSelection;
 
     public interface EmployeeSelection {
-         void getSelectedEmployees(ArrayList<Integer> selectedEmployeesId );
+         void getSelectedEmployees(ArrayList<EmployeeEntry> selectedEmployeesId );
     }
 
     @Override
@@ -99,11 +102,12 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
         //create object of EmployeesAdapter and send data
         mEmployeesAdapter = new EmployeesAdapter(this, true, this);
 
-        LiveData<List<EmployeeEntry>> employeesList = ViewModelProviders.of(this).get(MainViewModel.class).getAllEmployeesList();
+        final LiveData<List<EmployeeEntry>> employeesList = ViewModelProviders.of(this).get(MainViewModel.class).getAllEmployeesList();
         employeesList.observe(this, new Observer<List<EmployeeEntry>>() {
             @Override
             public void onChanged(List<EmployeeEntry> employeeEntries) {
                 mEmployeesAdapter.setData(employeeEntries);
+                employeeList = employeeEntries;
             }
         });
 
@@ -117,27 +121,30 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
      * called when a list item is clicked
      */
     @Override
-    public void onItemClick(int clickedItemRowID) {
+    public void onItemClick(int clickedItemRowID, int clickedPosition) {
         //todo:open employee details
 
         Log.d(TAG, "Item with ID =  " + clickedItemRowID + " is clicked");
         Snackbar.make(getView(), "Item with ID =  " + clickedItemRowID + " is clicked", Snackbar.LENGTH_SHORT)
                 .show();
+        Intent intent = new Intent(getContext(),AddEmployeeActivity.class);
+        intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY,clickedItemRowID);
+        startActivity(intent);
     }
 
     @Override
-    public boolean onItemLongCLick(int longClickedItemRowId) {
+    public boolean onItemLongCLick(int longClickedItemRowId, int clickedPosition) {
         //if employeeId doesn't exist in  the array list --> add it
-        if (!selectedEmployeesId.contains(longClickedItemRowId)) {
-            selectedEmployeesId.add(longClickedItemRowId);
+        if (!selectedEmployees.contains(employeeList.get(clickedPosition))) {
+            selectedEmployees.add(employeeList.get(clickedPosition));
             Toast.makeText(getContext(), "employee long click listener with id " + longClickedItemRowId, Toast.LENGTH_LONG).show();
         }
         //if employeeId exists in  the array list --> remove it
         else{
-            selectedEmployeesId.remove(selectedEmployeesId.indexOf(longClickedItemRowId));
+            selectedEmployees.remove(employeeList.get(clickedPosition));
             Toast.makeText(getContext(), "Remove employee with id " + longClickedItemRowId, Toast.LENGTH_LONG).show();
         }
-        mEmployeeSelection.getSelectedEmployees(selectedEmployeesId);
+        mEmployeeSelection.getSelectedEmployees(selectedEmployees);
         return true;
     }
 }

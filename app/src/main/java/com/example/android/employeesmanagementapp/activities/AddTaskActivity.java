@@ -19,6 +19,8 @@ import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
+import com.example.android.employeesmanagementapp.data.factories.TaskIdFact;
+import com.example.android.employeesmanagementapp.data.viewmodels.AddNewTaskViewModel;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
 import com.example.android.employeesmanagementapp.fragments.DatePickerFragment;
 
@@ -95,7 +97,7 @@ public class AddTaskActivity extends AppCompatActivity {
         if (mTaskId == DEFAULT_TASK_ID) {
             clearViews();
         } else {
-            final LiveData<TaskEntry> task = mDb.tasksDao().loadTaskById(mTaskId);
+            final LiveData<TaskEntry> task = ViewModelProviders.of(this, new TaskIdFact(mDb, mTaskId)).get(AddNewTaskViewModel.class).getTask();
             task.observe(this, new Observer<TaskEntry>() {
                 @Override
                 public void onChanged(@Nullable TaskEntry taskEntry) {
@@ -225,20 +227,19 @@ public class AddTaskActivity extends AppCompatActivity {
 
             final TaskEntry newTask = new TaskEntry(departmentId, taskTitle, taskDescription, taskStartDate, taskDueDate);
 
-                AppExecutor.getInstance().diskIO().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (mTaskId == DEFAULT_TASK_ID) {
-                            mDb.tasksDao().addTask(newTask);
-                            System.out.println("new task");
-                        }
-                        else {
-                            newTask.setTaskId(mTaskId);
-                            mDb.tasksDao().updateTask(newTask);
-                            System.out.println("update task");
-                        }
+            AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    if (mTaskId == DEFAULT_TASK_ID) {
+                        mDb.tasksDao().addTask(newTask);
+                        System.out.println("new task");
+                    } else {
+                        newTask.setTaskId(mTaskId);
+                        mDb.tasksDao().updateTask(newTask);
+                        System.out.println("update task");
                     }
-                });
+                }
+            });
         }
         finish();
     }
