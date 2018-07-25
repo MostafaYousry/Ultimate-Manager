@@ -9,6 +9,9 @@
 
     <string name="required_field">*Required</string>
 
+    <!--string for bottom sheet button-->
+    <string name="show_employees">Show employees</string>
+
     <!--strings for add task activity-->
     <string name="label_task_rating">Rating :</string>
     <string name="label_task_department">Department :</string>
@@ -46,5 +49,14 @@
     <string name="edit_employee">Edit employee</string>
     <string name="add_new_department">Add new department</string>
     <string name="edit_department">Edit_department</string>
+    <string name="employee_empty_view_message">No employees to show, please add employees</string>
+    <string name="task_empty_view_message">No tasks to show</string>
+    <string name="department_empty_view_message">No departments to show</string>
+    <string name="action_delete_employees">Delete employees</string>
+    <string name="action_move_employees">Move Employees</string>
+    <string name="choose_department_dialog_title">Move to</string>
+    <string name="choose_department_dialog_positive_button">OK</string>
+    <string name="choose_department_dialog_cancel_button">Cancel</string>
+
 
 </resources>

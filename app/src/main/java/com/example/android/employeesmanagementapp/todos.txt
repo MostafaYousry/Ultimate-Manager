@@ -3,9 +3,34 @@
 
 
 //App database
-//todo:test on main thread
-//todo:add live data
-//todo:add view models
+//todo:empty view
+//todo:disable adding employees when no departments are available
+//todo:move multiple employees , popup dialog to choose moveto department
+//todo:tasks fragment
+//todo:task update (data and employees)
+//todo:fix departments spinner issue
+//todo:filter running tasks to show tasks specific to a department
+//todo:evaluate a task when done in a popu dialog
+//todo:rating for every employee(average of task's rating done by this employee)
+//todo:write a note concerning a certain employee
+
+
+//optional
+//todo:image choose an image for the employee
+//todo:notifications & background services
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -15,7 +40,6 @@
 //todo:apply every widget guideline(elevation,measurements,...)
 //todo:apply transitions,animations,statelist animator, .....
 //todo:apply coordinator layout in activities
-//todo:add feature to load image from phone or take one with camera
 //todo:apply Glide image library for image processing
 //todo:use image color palette to pick background color for department name
 //todo:choose app fonts (Typography)

@@ -29,7 +29,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private BottomNavigationView mBottomNavigationView;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,17 +47,16 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
 
         //when app starts we show the tasks fragment
-        if (savedInstanceState == null){
+        if (savedInstanceState == null) {
             mBottomNavigationView.setSelectedItemId(R.id.nav_tasks);
             loadFragment(new TasksFragment());
             getSupportActionBar().setTitle(getString(R.string.tasks));
             mSelectedFragmentId = R.id.nav_tasks;
         }
 
-
     }
 
-    private void loadFragment(Fragment fragment) {
+    void loadFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, fragment);
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
@@ -66,17 +64,16 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         transaction.commit();
     }
 
-
-    private void setUpFab(){
+    private void setUpFab() {
 
         FloatingActionButton fab = findViewById(R.id.fab);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent  intent = null;
-                switch (mSelectedFragmentId){
-                    case  R.id.nav_tasks:
+                Intent intent = null;
+                switch (mSelectedFragmentId) {
+                    case R.id.nav_tasks:
                         intent = new Intent(MainActivity.this, AddTaskActivity.class);
                         break;
                     case R.id.nav_employees:
@@ -99,15 +96,15 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         //in case item is already selected do nothing
-        if (item.isChecked()){
+        if (item.isChecked()) {
             return true;
         }
 
-        Log.d(TAG , "New Item is selected");
+        Log.d(TAG, "New Item is selected");
 
         mSelectedFragmentId = item.getItemId();
-        switch (mSelectedFragmentId){
-            case  R.id.nav_tasks:
+        switch (mSelectedFragmentId) {
+            case R.id.nav_tasks:
                 loadFragment(new TasksFragment());
                 mToolbar.setTitle(getString(R.string.tasks));
                 break;
@@ -127,5 +124,18 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         return true;
     }
 
-
+    /**
+     * when back is pressed
+     * check first if there is an employee selection is happening
+     * if there is one then end it first
+     */
+    @Override
+    public void onBackPressed() {
+        if (mSelectedFragmentId == R.id.nav_employees) {
+            boolean inMultiSelectionMode = ((EmployeesFragment) getSupportFragmentManager().getFragments().get(0)).isInMultiSelectionMode();
+            if (!inMultiSelectionMode) {
+                super.onBackPressed();
+            }
+        }
+    }
 }

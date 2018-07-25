@@ -9,6 +9,8 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
@@ -37,6 +39,9 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
     private RecyclerView mRecyclerView;
     private DepartmentsAdapter mAdapter;
     private AppDatabase mDb;
+    private LinearLayout emptyView;
+    private TextView emptyViewTextView;
+
 
     public DepartmentsFragment() {
         // Required empty public constructor
@@ -52,11 +57,16 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        getActivity().findViewById(R.id.fab).setEnabled(true);
+
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragments_rv, container, false);
 
         //get recycler view
         mRecyclerView = rootView.findViewById(R.id.rv_fragment);
+
+        emptyView = rootView.findViewById(R.id.empty_view);
+        emptyViewTextView = rootView.findViewById(R.id.empty_view_message_text_view);
 
         // this setting to improves performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -69,7 +79,15 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
         departmentsList.observe(this, new Observer<List<DepartmentEntry>>() {
             @Override
             public void onChanged(List<DepartmentEntry> departmentEntries) {
-                mAdapter.setData(departmentEntries);
+                if (departmentEntries != null) {
+                    mAdapter.setData(departmentEntries);
+                    if (mAdapter.getItemCount() == 0)
+                        showEmptyView();
+                    else
+                        showRecyclerView();
+
+
+                }
             }
         });
 
@@ -90,16 +108,25 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
 
     }
 
+    private void showEmptyView() {
+        mRecyclerView.setVisibility(View.GONE);
+        emptyViewTextView.setText(R.string.department_empty_view_message);
+        emptyView.setVisibility(View.VISIBLE);
+    }
+
+    private void showRecyclerView() {
+        mRecyclerView.setVisibility(View.VISIBLE);
+        emptyView.setVisibility(View.GONE);
+    }
+
 
     /**
      * called when a grid item is clicked
      */
     @Override
-    public void onItemClick(int clickedItemId) {
-
-
-        Intent intent = new Intent(getActivity() , AddDepartmentActivity.class);
-        intent.putExtra(AddDepartmentActivity.DEPARTMENT_ID_KEY, clickedItemId);
+    public void onItemClick(int clickedItemRowID, int clickedItemPosition) {
+        Intent intent = new Intent(getActivity(), AddDepartmentActivity.class);
+        intent.putExtra(AddDepartmentActivity.DEPARTMENT_ID_KEY, clickedItemRowID);
         startActivity(intent);
     }
 
@@ -110,6 +137,7 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
         Resources r = getResources();
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
     }
+
 
     public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
 

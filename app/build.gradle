@@ -8,7 +8,7 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.activity_add_task.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -24,8 +24,8 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha1'
     implementation 'androidx.cardview:cardview:1.0.0-beta01'
     implementation 'com.google.android.material:material:1.0.0-beta01'
+    implementation 'androidx.coordinatorlayout:coordinatorlayout:1.0.0-beta01'
     implementation 'androidx.recyclerview:recyclerview:1.0.0-beta01'
-
 
     //Room
     def room_version = "1.1.1"
@@ -40,8 +40,14 @@ dependencies {
 
     implementation 'androidx.legacy:legacy-support-v4:1.0.0-beta01'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
+    androidTestImplementation 'androidx.activity_add_task:runner:1.1.0-alpha4'
+    androidTestImplementation 'androidx.activity_add_task.espresso:espresso-core:3.1.0-alpha4'
 
+    //todo:reference these libraries in github at the end
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
+    implementation 'com.github.bumptech.glide:glide:4.7.1'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
+    implementation 'de.hdodenhof:circleimageview:2.2.0'
+
+    //todo:use new navigation aac
 }

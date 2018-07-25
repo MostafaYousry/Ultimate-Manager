@@ -1,5 +1,7 @@
 package com.example.android.employeesmanagementapp.data.viewmodels;
 
+import android.app.Application;
+
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
@@ -7,8 +9,8 @@ import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 
 import java.util.List;
 
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.ViewModel;
 
 /**
  * View Model class
@@ -18,20 +20,19 @@ import androidx.lifecycle.ViewModel;
  * ---> departmentsList for DepartmentsFragment
  * ---> employeesList for EmployeesFragment
  */
-public class MainViewModel extends ViewModel {
+public class MainViewModel extends AndroidViewModel {
 
     private LiveData<List<DepartmentEntry>> allDepartmentsList;
     private LiveData<List<TaskEntry>> tasksList;
     private LiveData<List<EmployeeEntry>> allEmployeesList;
 
 
-    public MainViewModel(AppDatabase database) {
+    public MainViewModel(Application application) {
+        super(application);
 
-        allDepartmentsList = database.departmentsDao().loadDepartments();
-        tasksList = database.tasksDao().loadRunningTasks();
-        allEmployeesList = database.employeesDao().loadEmployees();
-
-
+        allDepartmentsList = AppDatabase.getInstance(application.getApplicationContext()).departmentsDao().loadDepartments();
+        tasksList = AppDatabase.getInstance(application.getApplicationContext()).tasksDao().loadRunningTasks();
+        allEmployeesList = AppDatabase.getInstance(application.getApplicationContext()).employeesDao().loadEmployees();
     }
 
 

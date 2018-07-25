@@ -20,7 +20,6 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
     private List<TaskEntry> mData;
     private RecyclerViewItemClickListener mListClickListener;
 
-
     public TasksAdapter(RecyclerViewItemClickListener clickListener) {
         mListClickListener = clickListener;
     }
@@ -37,7 +36,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
     }
 
     @Override
-    public void onBindViewHolder(@NonNull TasksViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final TasksViewHolder holder, int position) {
         holder.bind(position);
     }
 
@@ -61,6 +60,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
     class TasksViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         View mItemView;
         TextView mTextView;
+
         TasksViewHolder(View itemView) {
             super(itemView);
             mItemView = itemView;
@@ -75,8 +75,9 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
 
         @Override
         public void onClick(View v) {
-            mListClickListener.onItemClick((int) mItemView.getTag());
+            mListClickListener.onItemClick((int) mItemView.getTag(), getAdapterPosition());
         }
+
     }
 
 }

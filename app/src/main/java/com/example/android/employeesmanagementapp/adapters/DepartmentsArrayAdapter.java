@@ -7,10 +7,16 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 
-import java.util.HashMap;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 
 /**
  * array adapter for spinners and autocomplete text views
@@ -18,17 +24,37 @@ import java.util.List;
 public class DepartmentsArrayAdapter extends ArrayAdapter<String> {
 
     private List<DepartmentEntry> mDepartmentEntryList;
-    private HashMap<Integer, Integer> idToPositionHashMap;
 
-    public DepartmentsArrayAdapter(Context context) {
+
+    public DepartmentsArrayAdapter(Context context, LifecycleOwner owner) {
         super(context, 0);
-        idToPositionHashMap = new HashMap<>();
-
+        LiveData<List<DepartmentEntry>> departments = AppDatabase.getInstance(context).departmentsDao().loadDepartments();
+        departments.observe(owner, new Observer<List<DepartmentEntry>>() {
+            @Override
+            public void onChanged(List<DepartmentEntry> departmentEntries) {
+                mDepartmentEntryList = departmentEntries;
+                notifyDataSetChanged();
+            }
+        });
     }
 
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+
+        return createView(position, convertView, parent);
+
+    }
+
+    @Override
+    public View getDropDownView(int position, @Nullable View convertView,
+                                @NonNull ViewGroup parent) {
+        return createView(position, convertView, parent);
+    }
+
+
+    private View createView(int position, @Nullable View convertView,
+                            @NonNull ViewGroup parent) {
         if (convertView == null)
             convertView = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
 
@@ -36,13 +62,13 @@ public class DepartmentsArrayAdapter extends ArrayAdapter<String> {
         convertView.setTag(mDepartmentEntryList.get(position).getDepartmentId());
         departmentName.setText(mDepartmentEntryList.get(position).getDepartmentName());
 
-        idToPositionHashMap.put(mDepartmentEntryList.get(position).getDepartmentId(), position);
-
         return convertView;
     }
 
     @Override
     public int getCount() {
+        if (mDepartmentEntryList == null)
+            return 0;
         return mDepartmentEntryList.size();
     }
 
@@ -55,26 +81,18 @@ public class DepartmentsArrayAdapter extends ArrayAdapter<String> {
     }
 
 
-
-
-
-    public void setDepartmentEntryList(List<DepartmentEntry> departmentEntryList) {
-        mDepartmentEntryList = departmentEntryList;
-        notifyDataSetChanged();
-    }
-
-
     /**
      * used when a department is already assigned to an existing task
      * its used to select the previously chosen department for that task
      *
-     * @param oldTaskDepartmentId :
+     * @param departmentEntry:
      * @return its position in the drop down list
      */
-    public int getPositionForItemId(int oldTaskDepartmentId) {
+    public int getPositionForItemId(DepartmentEntry departmentEntry) {
         if (mDepartmentEntryList == null)
             return 0;
-        return idToPositionHashMap.get(oldTaskDepartmentId);
+
+        return mDepartmentEntryList.indexOf(departmentEntry);
 
     }
 

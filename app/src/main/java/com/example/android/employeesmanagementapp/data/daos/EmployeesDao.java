@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
@@ -47,13 +48,10 @@ public interface EmployeesDao {
     LiveData<EmployeeEntry> loadEmployeeById(int employeeId);
 
     /**
-     * load all employees not in this department
-     *
-     * @param departmentId : the department's record id
-     * @return list of EmployeeEntry objects wrapped with LiveData
+     * @return : number of employees in the company
      */
-    @Query("Select * from employees where department_id != :departmentId")
-    LiveData<List<EmployeeEntry>> loadEmployeesOutside(int departmentId);
+    @Query("SELECT COUNT(*) FROM employees")
+    int getNumEmployees();
 
     /**
      * insert a new employee record
@@ -76,7 +74,7 @@ public interface EmployeesDao {
      *
      * @param employeeEntry
      */
-    @Update
+    @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateEmployee(EmployeeEntry employeeEntry);
 
 }

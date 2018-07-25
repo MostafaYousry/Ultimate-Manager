@@ -31,7 +31,7 @@ public final class AppUtils {
 
     public static int getRandomEmployeeImage() {
 
-        return employeeImages.get((int)(Math.random()*employeeImages.size()));
+        return employeeImages.get((int) (Math.random() * employeeImages.size()));
     }
 
     /**

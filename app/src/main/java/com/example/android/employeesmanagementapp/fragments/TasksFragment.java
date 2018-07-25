@@ -6,14 +6,18 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
 import com.example.android.employeesmanagementapp.activities.AddTaskActivity;
 import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
+import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
@@ -34,11 +38,13 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
     private RecyclerView mRecyclerView;
     private TasksAdapter mAdapter;
     private AppDatabase mDb;
+    private LinearLayout emptyView;
+    private TextView emptyViewTextView;
+    private Snackbar mSnackbar;
 
     public TasksFragment() {
         // Required empty public constructor
     }
-
 
 
     @Override
@@ -46,10 +52,12 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
                              Bundle savedInstanceState) {
 
 
-
         mDb = AppDatabase.getInstance(getContext());
 
-        View view =inflater.inflate(R.layout.fragments_rv, container, false);
+        View view = inflater.inflate(R.layout.fragments_rv, container, false);
+
+        emptyView = view.findViewById(R.id.empty_view);
+        emptyViewTextView = view.findViewById(R.id.empty_view_message_text_view);
 
         // Inflate the layout for this fragment
         mRecyclerView = view.findViewById(R.id.rv_fragment);
@@ -70,12 +78,60 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
             @Override
             public void onChanged(List<TaskEntry> taskEntries) {
                 mAdapter.setData(taskEntries);
+                if (mAdapter.getItemCount() == 0)
+                    showEmptyView();
+                else
+                    showRecyclerView();
             }
         });
 
         mRecyclerView.setAdapter(mAdapter);
 
+        setFabActivation();
+
         return view;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mSnackbar != null)
+            mSnackbar.dismiss();
+    }
+
+    private void setFabActivation() {
+        AppExecutor.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                final int depNum = mDb.departmentsDao().getNumDepartments();
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (depNum == 0) {
+                            getActivity().findViewById(R.id.fab).setEnabled(false);
+                            mSnackbar = Snackbar.make(getView(), "please add department first", Snackbar.LENGTH_INDEFINITE);
+                            mSnackbar.show();
+                        } else {
+                            getActivity().findViewById(R.id.fab).setEnabled(true);
+                            if (mSnackbar != null)
+                                mSnackbar.dismiss();
+                        }
+
+                    }
+                });
+            }
+        });
+    }
+
+    private void showEmptyView() {
+        mRecyclerView.setVisibility(View.GONE);
+        emptyViewTextView.setText(R.string.task_empty_view_message);
+        emptyView.setVisibility(View.VISIBLE);
+    }
+
+    private void showRecyclerView() {
+        mRecyclerView.setVisibility(View.VISIBLE);
+        emptyView.setVisibility(View.GONE);
     }
 
 
@@ -83,15 +139,12 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
      * called when a list item is clicked
      */
     @Override
-    public void onItemClick(int clickedItemRowID) {
+    public void onItemClick(int clickedItemRowID, int clickedItemPosition) {
 
         Intent intent = new Intent(getActivity(), AddTaskActivity.class);
         intent.putExtra(AddTaskActivity.TASK_ID_KEY, clickedItemRowID);
         startActivity(intent);
     }
 
-
 }
-
-
 

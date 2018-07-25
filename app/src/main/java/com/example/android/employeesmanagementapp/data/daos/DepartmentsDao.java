@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
@@ -38,6 +39,12 @@ public interface DepartmentsDao {
     LiveData<DepartmentEntry> loadDepartmentById(int departmentId);
 
     /**
+     * @return : number of departments in the company
+     */
+    @Query("SELECT COUNT(*) FROM departments")
+    int getNumDepartments();
+
+    /**
      * insert a new department record
      *
      * @param departmentEntry
@@ -58,7 +65,7 @@ public interface DepartmentsDao {
      *
      * @param departmentEntry
      */
-    @Update
+    @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateDepartment(DepartmentEntry departmentEntry);
 
 
