@@ -135,7 +135,6 @@ public class AddTaskActivity extends AppCompatActivity {
     private void populateUI(TaskEntry taskEntry) {
         if (taskEntry == null)
             return;
-
         mTaskTitle.setText(taskEntry.getTaskTitle());
         mTaskDescription.setText(taskEntry.getTaskDescription());
         mTaskStartDate.setText(taskEntry.getTaskDueDate().toString());

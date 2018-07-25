@@ -72,8 +72,6 @@ public class EmployeeBottomSheetFragment extends BottomSheetDialogFragment imple
         //create object of EmployeesAdapter and send data
         mEmployeesAdapter = new EmployeesAdapter(this);
 
-        ViewModelProviders.of(this, )
-
         //set the employee recycler view adapter
         mRecyclerView.setAdapter(mEmployeesAdapter);
     }
