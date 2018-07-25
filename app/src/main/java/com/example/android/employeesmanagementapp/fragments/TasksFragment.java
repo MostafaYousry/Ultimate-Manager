@@ -14,7 +14,7 @@ import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
 import com.example.android.employeesmanagementapp.activities.AddTaskActivity;
 import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
-import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
+import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
 import com.google.android.material.snackbar.Snackbar;
@@ -87,7 +87,7 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
 
         mRecyclerView.setAdapter(mAdapter);
 
-        setFabEnabled();
+        setFabActivation();
 
         return view;
     }
@@ -99,22 +99,26 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
             mSnackbar.dismiss();
     }
 
-    private void setFabEnabled() {
-        LiveData<List<DepartmentEntry>> departmentList = ViewModelProviders.of(getActivity()).get(MainViewModel.class).getAllDepartmentsList();
-        departmentList.observe(this, new Observer<List<DepartmentEntry>>() {
+    private void setFabActivation() {
+        AppExecutor.getInstance().diskIO().execute(new Runnable() {
             @Override
-            public void onChanged(List<DepartmentEntry> departmentEntries) {
-                if (departmentEntries != null) {
-                    if (departmentEntries.size() == 0) {
-                        getActivity().findViewById(R.id.fab).setEnabled(false);
-                        mSnackbar = Snackbar.make(getView(), "please add department first", Snackbar.LENGTH_INDEFINITE);
-                        mSnackbar.show();
-                    } else {
-                        getActivity().findViewById(R.id.fab).setEnabled(true);
-                        if (mSnackbar != null)
-                            mSnackbar.dismiss();
+            public void run() {
+                final int depNum = mDb.departmentsDao().getNumDepartments();
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (depNum == 0) {
+                            getActivity().findViewById(R.id.fab).setEnabled(false);
+                            mSnackbar = Snackbar.make(getView(), "please add department first", Snackbar.LENGTH_INDEFINITE);
+                            mSnackbar.show();
+                        } else {
+                            getActivity().findViewById(R.id.fab).setEnabled(true);
+                            if (mSnackbar != null)
+                                mSnackbar.dismiss();
+                        }
+
                     }
-                }
+                });
             }
         });
     }
@@ -142,9 +146,5 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
         startActivity(intent);
     }
 
-    @Override
-    public boolean onItemLongCLick(int longClickedItemRowId, int longcClickedItemPostition) {
-        return false;
-    }
 }
 

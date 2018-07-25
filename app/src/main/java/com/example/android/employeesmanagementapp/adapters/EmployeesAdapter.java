@@ -1,6 +1,5 @@
 package com.example.android.employeesmanagementapp.adapters;
 
-import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,25 +21,36 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.EmployeesViewHolder> {
+    public static final int SELECTION_MODE_SINGLE = 1;
+    public static final int SELECTION_MODE_MULTIPLE = 2;
     private static final String TAG = EmployeesAdapter.class.getSimpleName();
-    private List<EmployeeEntry> mData;
     final private RecyclerViewItemClickListener mClickListener;
-    private boolean visible = false;
-    private boolean mUseCheckBoxLayout;
-    private int numOfSelected = 0;
+    private List<EmployeeEntry> mData;
     private CheckBoxClickListener mCheckBoxClickListener;
-    private boolean mShowCheckBoxes;
+    private int employeesSelectionMode;
+    private EmployeeSelectedStateListener mEmployeeSelectedStateListener;
 
-    public EmployeesAdapter(RecyclerViewItemClickListener listener, boolean showCheckBoxes, CheckBoxClickListener checkBoxClickListener) {
+    public EmployeesAdapter(@NonNull RecyclerViewItemClickListener listener) {
         mClickListener = listener;
-        mShowCheckBoxes = showCheckBoxes;
+        employeesSelectionMode = SELECTION_MODE_SINGLE;
+    }
+
+
+    public EmployeesAdapter(@NonNull RecyclerViewItemClickListener listener, @NonNull CheckBoxClickListener checkBoxClickListener) {
+        mClickListener = listener;
         mCheckBoxClickListener = checkBoxClickListener;
+        employeesSelectionMode = SELECTION_MODE_SINGLE;
+    }
+
+    public EmployeesAdapter(@NonNull RecyclerViewItemClickListener listener, @NonNull EmployeeSelectedStateListener employeeSelectedStateListener) {
+        mClickListener = listener;
+        mEmployeeSelectedStateListener = employeeSelectedStateListener;
+        employeesSelectionMode = SELECTION_MODE_SINGLE;
     }
 
     @NonNull
     @Override
     public EmployeesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        //todo:check which item layout
         //inflate item layout for the view holder
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_employees_rv, parent, false);
 
@@ -62,6 +72,38 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
         return mData.size();
     }
 
+    /**
+     * @return : current selectionMode : Single / Multiple
+     */
+    public int getEmployeeSelectionMode() {
+        return employeesSelectionMode;
+    }
+
+    /**
+     * used by employees fragment to start or finish a multi selection operation
+     *
+     * @param selectionMode : Single / Multiple
+     */
+    public void setEmployeeSelectionMode(int selectionMode) {
+        employeesSelectionMode = selectionMode;
+        notifyDataSetChanged();
+    }
+
+    /**
+     * used to update adapters data if any change occurs
+     *
+     * @param employees new employees list
+     */
+    public void setData(List<EmployeeEntry> employees) {
+        mData = employees;
+        notifyDataSetChanged();
+    }
+
+    public interface EmployeeSelectedStateListener {
+        void onEmployeeSelected(EmployeeEntry employeeEntry);
+
+        void onEmployeeDeselected(EmployeeEntry employeeEntry);
+    }
 
     public interface CheckBoxClickListener {
         void onCheckBoxClicked(int employeeID);
@@ -74,7 +116,7 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
         ImageView mEmployeeImage;
         CheckBox mEmployeeCheckBox;
         View mItemView;
-        boolean isSelected = false;
+        boolean mIsItemSelected = false;
 
 
         EmployeesViewHolder(View itemView) {
@@ -85,7 +127,8 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
             mEmployeeName = itemView.findViewById(R.id.employee_name);
             mEmployeeImage = itemView.findViewById(R.id.employee_image);
             mEmployeeCheckBox = itemView.findViewById(R.id.employee_check_box);
-            if (mShowCheckBoxes)
+
+            if (mCheckBoxClickListener != null)
                 mEmployeeCheckBox.setVisibility(View.VISIBLE);
             else
                 mEmployeeCheckBox.setVisibility(View.GONE);
@@ -97,6 +140,11 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
         }
 
         void bind(final int position) {
+
+            if (employeesSelectionMode == SELECTION_MODE_SINGLE && mIsItemSelected) {
+                mIsItemSelected = false;
+                mItemView.setBackgroundColor(Color.parseColor("#ffffff"));
+            }
 
             //change the item data by the position
             mEmployeeName.setText(mData.get(position).getEmployeeName());
@@ -111,53 +159,44 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
 
         }
 
-        //if at least one of the items has a long click on it, its color will be grey
-        //and for that, onClick will behave like onLongClick "select items"
-        //if the item is selected and click on it again "long or normal click", its background will return white and will not be selected
 
-        @SuppressLint("ResourceAsColor")
         @Override
         public void onClick(View v) {
             if (v instanceof CheckBox) {
                 mCheckBoxClickListener.onCheckBoxClicked((int) mItemView.getTag());
             }
 
-            if (numOfSelected > 0) {
-                changeItemMode();
+            //if at least one of the items has a long click on it, its color will be grey
+            //and for that, onClick will behave like onLongClick "select items"
+            //if the item is selected and click on it again "long or normal click", its background will return white and will not be selected
+            if (employeesSelectionMode == SELECTION_MODE_MULTIPLE) {
+                changeItemSelectedState();
             } else
                 mClickListener.onItemClick((int) mItemView.getTag(), getAdapterPosition());
         }
 
         @Override
         public boolean onLongClick(View view) {
-            changeItemMode();
+            if (employeesSelectionMode != SELECTION_MODE_MULTIPLE) {
+                changeItemSelectedState();
+                employeesSelectionMode = SELECTION_MODE_MULTIPLE;
+            }
             return true;
         }
 
-        private void changeItemMode() {
-            if (!isSelected) {
-                numOfSelected++;
+        private void changeItemSelectedState() {
+
+            if (!mIsItemSelected) {
                 mItemView.setBackgroundColor(Color.parseColor("#888888"));
-                isSelected = true;
+                mIsItemSelected = true;
+                mEmployeeSelectedStateListener.onEmployeeSelected(mData.get(getAdapterPosition()));
             } else {
-                numOfSelected--;
                 mItemView.setBackgroundColor(Color.parseColor("#ffffff"));
-                isSelected = false;
+                mIsItemSelected = false;
+                mEmployeeSelectedStateListener.onEmployeeDeselected(mData.get(getAdapterPosition()));
             }
-            mClickListener.onItemLongCLick((int) mItemView.getTag(), getAdapterPosition());
         }
 
 
-    }
-
-
-    /**
-     * used to update adapters data if any change occurs
-     *
-     * @param employees new employees list
-     */
-    public void setData(List<EmployeeEntry> employees) {
-        mData = employees;
-        notifyDataSetChanged();
     }
 }

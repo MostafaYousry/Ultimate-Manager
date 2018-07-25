@@ -14,7 +14,7 @@ import androidx.annotation.NonNull;
  * on background thread.
  * if there is multiple calls they are queued.
  * used specifically for (insert , update , delete)
- *
+ * <p>
  * follows singleton design pattern
  */
 public class AppExecutor {
@@ -40,15 +40,6 @@ public class AppExecutor {
         return sInstance;
     }
 
-    private static class MainThreadExecutor implements Executor {
-        private Handler mainThreadHandler = new Handler(Looper.getMainLooper());
-
-        @Override
-        public void execute(@NonNull Runnable command) {
-            mainThreadHandler.post(command);
-        }
-    }
-
     //single thread executor runs on background thread
     public Executor diskIO() {
         return diskIO;
@@ -57,6 +48,15 @@ public class AppExecutor {
     //main thread executor runs on ui thread
     public Executor mainThread() {
         return mainThread;
+    }
+
+    private static class MainThreadExecutor implements Executor {
+        private Handler mainThreadHandler = new Handler(Looper.getMainLooper());
+
+        @Override
+        public void execute(@NonNull Runnable command) {
+            mainThreadHandler.post(command);
+        }
     }
 
 

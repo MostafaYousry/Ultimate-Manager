@@ -92,8 +92,7 @@ public class DepartmentsArrayAdapter extends ArrayAdapter<String> {
         if (mDepartmentEntryList == null)
             return 0;
 
-        int x = mDepartmentEntryList.indexOf(departmentEntry);
-        return x;
+        return mDepartmentEntryList.indexOf(departmentEntry);
 
     }
 

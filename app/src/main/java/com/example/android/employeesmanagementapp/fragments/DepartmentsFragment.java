@@ -79,9 +79,9 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
         departmentsList.observe(this, new Observer<List<DepartmentEntry>>() {
             @Override
             public void onChanged(List<DepartmentEntry> departmentEntries) {
-                if(departmentEntries != null) {
+                if (departmentEntries != null) {
                     mAdapter.setData(departmentEntries);
-                    if(mAdapter.getItemCount() == 0)
+                    if (mAdapter.getItemCount() == 0)
                         showEmptyView();
                     else
                         showRecyclerView();
@@ -114,7 +114,7 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
         emptyView.setVisibility(View.VISIBLE);
     }
 
-    private void showRecyclerView(){
+    private void showRecyclerView() {
         mRecyclerView.setVisibility(View.VISIBLE);
         emptyView.setVisibility(View.GONE);
     }
@@ -124,17 +124,10 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
      * called when a grid item is clicked
      */
     @Override
-    public void onItemClick(int clickedItemId, int clickedItemPosition) {
-
-
-        Intent intent = new Intent(getActivity() , AddDepartmentActivity.class);
-        intent.putExtra(AddDepartmentActivity.DEPARTMENT_ID_KEY, clickedItemId);
+    public void onItemClick(int clickedItemRowID, int clickedItemPosition) {
+        Intent intent = new Intent(getActivity(), AddDepartmentActivity.class);
+        intent.putExtra(AddDepartmentActivity.DEPARTMENT_ID_KEY, clickedItemRowID);
         startActivity(intent);
-    }
-
-    @Override
-    public boolean onItemLongCLick(int longClickedItemRowId, int longcClickedItemPostition) {
-        return false;
     }
 
     /**
@@ -144,6 +137,7 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
         Resources r = getResources();
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
     }
+
 
     public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
 

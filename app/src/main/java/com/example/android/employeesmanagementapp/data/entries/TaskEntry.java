@@ -15,7 +15,7 @@ import androidx.room.PrimaryKey;
  * and constructors for RoomDatabase
  */
 @Entity(tableName = "tasks",
-foreignKeys = @ForeignKey(entity = DepartmentEntry.class,parentColumns = "department_id",childColumns = "department_id"))
+        foreignKeys = @ForeignKey(entity = DepartmentEntry.class, parentColumns = "department_id", childColumns = "department_id"))
 public class TaskEntry {
 
     @PrimaryKey(autoGenerate = true)

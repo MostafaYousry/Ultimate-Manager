@@ -75,7 +75,6 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
         setUpEmployeesBS();
 
 
-
         if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
             clearViews();
         } else {
@@ -88,9 +87,6 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
                 }
             });
         }
-
-
-
 
 
     }
@@ -126,7 +122,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
         }
 
         RecyclerView recyclerView = findViewById(R.id.show_dep_emp_rv);
-        final EmployeesAdapter employeesAdapter = new EmployeesAdapter(this, false, null);
+        final EmployeesAdapter employeesAdapter = new EmployeesAdapter(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(employeesAdapter);
 
@@ -173,7 +169,6 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
 
 
     private void saveDepartment() {
-        //todo:insert/update new data into db
         if (valideData()) {
             String departmentName = mDepartmentName.getText().toString();
 
@@ -202,18 +197,14 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
         return true;
     }
 
+
     @Override
-    public void onItemClick(int clickedItemRowID, int clickedItemRowPostition) {
+    public void onItemClick(int clickedItemRowID, int clickedItemPosition) {
         Log.d(TAG, "item in bottom sheet is clicked");
 
         Intent intent = new Intent(this, AddEmployeeActivity.class);
         intent.putExtra(AddEmployeeActivity.EMPLOYEE_VIEW_ONLY, true);
         intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY, clickedItemRowID);
         startActivity(intent);
-    }
-
-    @Override
-    public boolean onItemLongCLick(int longClickedItemRowId, int longcClickedItemPostition) {
-        return false;
     }
 }

@@ -21,7 +21,7 @@ import androidx.room.TypeConverters;
  * follows singleton design pattern
  * defines all entities in the database , database name , database version , type converters used
  */
-@Database(entities = {EmployeeEntry.class,TaskEntry.class,DepartmentEntry.class,EmployeesTasksEntry.class},version = 1,exportSchema = false)
+@Database(entities = {EmployeeEntry.class, TaskEntry.class, DepartmentEntry.class, EmployeesTasksEntry.class}, version = 1, exportSchema = false)
 @TypeConverters(DateTypeConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
     private static final String TAG = AppDatabase.class.getSimpleName();
@@ -29,10 +29,10 @@ public abstract class AppDatabase extends RoomDatabase {
     private static final Object LOCK = new Object();
     private static AppDatabase sInstance;
 
-    public static AppDatabase getInstance(Context context){
-        if (sInstance == null){
-            synchronized (LOCK){
-                sInstance = Room.databaseBuilder(context.getApplicationContext(),AppDatabase.class,AppDatabase.DATABASE_NAME)
+    public static AppDatabase getInstance(Context context) {
+        if (sInstance == null) {
+            synchronized (LOCK) {
+                sInstance = Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class, AppDatabase.DATABASE_NAME)
                         .build();
             }
         }

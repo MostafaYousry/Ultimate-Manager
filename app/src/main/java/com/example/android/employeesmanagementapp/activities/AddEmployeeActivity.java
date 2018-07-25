@@ -42,9 +42,9 @@ import androidx.lifecycle.ViewModelProviders;
 
 public class AddEmployeeActivity extends AppCompatActivity {
 
-    private static final String TAG = AddEmployeeActivity.class.getSimpleName();
     public static final String EMPLOYEE_ID_KEY = "employee_id";
     public static final String EMPLOYEE_VIEW_ONLY = "employee_view_only";
+    private static final String TAG = AddEmployeeActivity.class.getSimpleName();
     private static final int DEFAULT_EMPLOYEE_ID = -1;
     private static final boolean DEFAULT_EMPLOYEE_VIEW_ONLY = false;
 
@@ -222,7 +222,6 @@ public class AddEmployeeActivity extends AppCompatActivity {
 
 
     private void saveEmployee() {
-        //todo:insert/update new data into db
         if (valideData()) {
             final int departmentId = (int) mEmployeeDepartment.getSelectedView().getTag();
             Log.d(TAG, "departmentId = " + departmentId);
@@ -232,7 +231,6 @@ public class AddEmployeeActivity extends AppCompatActivity {
             //todo:convert string date to object Date
             final Date employeeHireDate = new Date();
 
-            //todo:update/insert
             final EmployeeEntry newEmployee = new EmployeeEntry(departmentId, employeeName, employeeSalary, employeeHireDate);
 
             AppExecutor.getInstance().diskIO().execute(new Runnable() {

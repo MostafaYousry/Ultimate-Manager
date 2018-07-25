@@ -10,9 +10,9 @@ import androidx.room.ForeignKey;
  * and constructors for RoomDatabase
  */
 @Entity(tableName = "employees_tasks",
-primaryKeys = {"employee_id","task_id"},
-foreignKeys = {@ForeignKey(entity = EmployeeEntry.class,parentColumns = "employee_id",childColumns = "employee_id"),
-@ForeignKey(entity = TaskEntry.class,parentColumns = "task_id",childColumns = "task_id")})
+        primaryKeys = {"employee_id", "task_id"},
+        foreignKeys = {@ForeignKey(entity = EmployeeEntry.class, parentColumns = "employee_id", childColumns = "employee_id"),
+                @ForeignKey(entity = TaskEntry.class, parentColumns = "task_id", childColumns = "task_id")})
 public class EmployeesTasksEntry {
 
     @ColumnInfo(name = "employee_id")

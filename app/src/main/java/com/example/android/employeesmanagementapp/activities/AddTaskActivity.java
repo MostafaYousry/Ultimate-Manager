@@ -44,11 +44,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class AddTaskActivity extends AppCompatActivity implements RecyclerViewItemClickListener, EmployeesAdapter.CheckBoxClickListener {
 
-    private static final String TAG = AddTaskActivity.class.getSimpleName();
-
-    private static final int DEFAULT_TASK_ID = -1;
     public static final String TASK_ID_KEY = "task_id";
-
+    private static final String TAG = AddTaskActivity.class.getSimpleName();
+    private static final int DEFAULT_TASK_ID = -1;
     private int mTaskId;
 
     private BottomSheetBehavior mSheetBehavior;
@@ -158,7 +156,7 @@ public class AddTaskActivity extends AppCompatActivity implements RecyclerViewIt
 
 
         RecyclerView recyclerView = findViewById(R.id.show_dep_emp_rv);
-        mEmplyeesAdapter = new EmployeesAdapter(this, true, this);
+        mEmplyeesAdapter = new EmployeesAdapter(this, this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(mEmplyeesAdapter);
 
@@ -250,7 +248,6 @@ public class AddTaskActivity extends AppCompatActivity implements RecyclerViewIt
 
 
     private void saveTask() {
-        //todo:insert/update new data into db
         if (valideData()) {
             int departmentId = (int) mTaskDepartment.getSelectedView().getTag();
             String taskTitle = mTaskTitle.getText().toString();
@@ -303,16 +300,13 @@ public class AddTaskActivity extends AppCompatActivity implements RecyclerViewIt
 
     }
 
+
     @Override
-    public void onItemClick(int clickedItemRowID, int clickedItemRowPostition) {
+    public void onItemClick(int clickedItemRowID, int clickedItemPosition) {
+
         Intent intent = new Intent(this, AddEmployeeActivity.class);
         intent.putExtra(AddEmployeeActivity.EMPLOYEE_VIEW_ONLY, true);
         intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY, clickedItemRowID);
         startActivity(intent);
-    }
-
-    @Override
-    public boolean onItemLongCLick(int longClickedItemRowId, int longcClickedItemPostition) {
-        return false;
     }
 }
