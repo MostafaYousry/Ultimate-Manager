@@ -136,6 +136,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             if (!inMultiSelectionMode) {
                 super.onBackPressed();
             }
-        }
+        } else super.onBackPressed();
     }
 }

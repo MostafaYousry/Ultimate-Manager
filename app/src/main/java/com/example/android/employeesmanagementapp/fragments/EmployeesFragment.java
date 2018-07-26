@@ -1,7 +1,6 @@
 package com.example.android.employeesmanagementapp.fragments;
 
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -20,6 +19,7 @@ import android.widget.Toast;
 
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
+import com.example.android.employeesmanagementapp.UndoDeleteAction;
 import com.example.android.employeesmanagementapp.activities.AddEmployeeActivity;
 import com.example.android.employeesmanagementapp.activities.MainActivity;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
@@ -103,7 +103,7 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
 
                 int entryPosition = viewHolder.getAdapterPosition();
                 EmployeeEntry employeeEntry = mEmployeesAdapter.getData().get(entryPosition);
-                undoDeleteAction mUndoDeleteAction = new undoDeleteAction( employeeEntry, getContext());
+                UndoDeleteAction mUndoDeleteAction = new UndoDeleteAction( employeeEntry,null, getContext());
                 Snackbar.make(getActivity().findViewById(android.R.id.content), employeeEntry.getEmployeeName()+" will be deleted", Snackbar.LENGTH_LONG).setAction("Undo", mUndoDeleteAction).show();
 
                     System.out.println("deleting");
@@ -339,26 +339,4 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
             ((MainActivity) getActivity()).getSupportActionBar().setTitle(mSelectedEmployees.size() + " selected");
         }
     }
-}
-
-class undoDeleteAction implements View.OnClickListener {
-    private EmployeeEntry mEmployeeEntry;
-    private AppDatabase mDb;
-
-    public undoDeleteAction(final EmployeeEntry employeeEntry, Context context) {
-        mEmployeeEntry = employeeEntry;
-        mDb = AppDatabase.getInstance(context);
-    }
-
-    @Override
-    public void onClick(View view) {
-        AppExecutor.getInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                mDb.employeesDao().addEmployee(mEmployeeEntry);
-            }
-        });
-
-    }
-
 }
