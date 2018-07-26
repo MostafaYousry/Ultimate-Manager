@@ -267,7 +267,7 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
         builder.setPositiveButton(getString(R.string.choose_department_dialog_positive_button), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(getContext(), "Deleting " + mSelectedEmployees.size() + " employees", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "moving " + mSelectedEmployees.size() + " employees", Toast.LENGTH_LONG).show();
                 AppExecutor.getInstance().diskIO().execute(new Runnable() {
                     @Override
                     public void run() {
