@@ -26,6 +26,11 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
     private static final String TAG = EmployeesAdapter.class.getSimpleName();
     final private RecyclerViewItemClickListener mClickListener;
     private List<EmployeeEntry> mData;
+
+    public List<EmployeeEntry> getData() {
+        return mData;
+    }
+
     private CheckBoxClickListener mCheckBoxClickListener;
     private int employeesSelectionMode;
     private EmployeeSelectedStateListener mEmployeeSelectedStateListener;
@@ -96,6 +101,12 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
      */
     public void setData(List<EmployeeEntry> employees) {
         mData = employees;
+        notifyDataSetChanged();
+    }
+
+    public void insertEntry(EmployeeEntry employeeEntry, int position) {
+        mData.add(position,employeeEntry);
+        notifyItemChanged(position);
         notifyDataSetChanged();
     }
 

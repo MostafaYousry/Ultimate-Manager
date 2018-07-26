@@ -1,6 +1,7 @@
 package com.example.android.employeesmanagementapp.fragments;
 
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -37,6 +38,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -82,8 +84,41 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
         emptyViewTextView = rootView.findViewById(R.id.empty_view_message_text_view);
 
         setFabActivation();
+        setUpOnSwipe();
 
         return rootView;
+    }
+
+    private void setUpOnSwipe() {
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            // Called when a user swipes left or right on a ViewHolder
+            @Override
+            public void onSwiped(final RecyclerView.ViewHolder viewHolder, int swipeDir) {
+                // Here is where you'll implement swipe to delete
+
+                int entryPosition = viewHolder.getAdapterPosition();
+                EmployeeEntry employeeEntry = mEmployeesAdapter.getData().get(entryPosition);
+                undoDeleteAction mUndoDeleteAction = new undoDeleteAction( employeeEntry, getContext());
+                Snackbar.make(getActivity().findViewById(android.R.id.content), employeeEntry.getEmployeeName()+" will be deleted", Snackbar.LENGTH_LONG).setAction("Undo", mUndoDeleteAction).show();
+
+                    System.out.println("deleting");
+                    AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            int position = viewHolder.getAdapterPosition();
+                            mDb.employeesDao().deleteEmployee(mEmployeesAdapter.getData().get(position));
+                        }
+                    });
+
+            }
+        }).attachToRecyclerView(mRecyclerView);
+
+
     }
 
     @Override
@@ -304,4 +339,26 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
             ((MainActivity) getActivity()).getSupportActionBar().setTitle(mSelectedEmployees.size() + " selected");
         }
     }
+}
+
+class undoDeleteAction implements View.OnClickListener {
+    private EmployeeEntry mEmployeeEntry;
+    private AppDatabase mDb;
+
+    public undoDeleteAction(final EmployeeEntry employeeEntry, Context context) {
+        mEmployeeEntry = employeeEntry;
+        mDb = AppDatabase.getInstance(context);
+    }
+
+    @Override
+    public void onClick(View view) {
+        AppExecutor.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                mDb.employeesDao().addEmployee(mEmployeeEntry);
+            }
+        });
+
+    }
+
 }
