@@ -9,6 +9,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.activity_add_task.runner.AndroidJUnitRunner"
+       // testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -40,8 +41,8 @@ dependencies {
 
     implementation 'androidx.legacy:legacy-support-v4:1.0.0-beta01'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.activity_add_task:runner:1.1.0-alpha4'
-    androidTestImplementation 'androidx.activity_add_task.espresso:espresso-core:3.1.0-alpha4'
+    androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
 
     //todo:reference these libraries in github at the end
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
