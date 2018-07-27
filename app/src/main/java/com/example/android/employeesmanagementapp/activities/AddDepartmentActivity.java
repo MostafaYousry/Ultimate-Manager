@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
 import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
@@ -20,6 +21,7 @@ import com.example.android.employeesmanagementapp.data.factories.DepIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewDepViewModel;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
+import java.util.Date;
 import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -41,10 +43,10 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
 
     private int mDepartmentId;
 
-
     private EditText mDepartmentName;
     private Toolbar mToolbar;
     private AppDatabase mDb;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +91,21 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
         }
 
 
+    }
+    protected void onStop() {
+        super.onStop();
+
+        Intent intent = new Intent(this, NotificationService.class);
+        // send the due date and the id of the task within the intent
+        //intent.putExtra("task due date", taskDueDate.getTime() - taskStartDAte.getTime())'
+        //intent.putExtra("task id",mTaskId);
+
+        //just for experiment until tasks are done
+        Bundle bundle = new Bundle();
+        bundle.putInt("task id",mDepartmentId);
+        bundle.putLong("task due date",30);
+        intent.putExtras(bundle);
+        startService(intent);
     }
 
 
@@ -178,8 +195,10 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
             AppExecutor.getInstance().diskIO().execute(new Runnable() {
                 @Override
                 public void run() {
-                    if (mDepartmentId == DEFAULT_DEPARTMENT_ID)
+                    if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
                         mDb.departmentsDao().addDepartment(newDepartment);
+                        mDepartmentId = newDepartment.getDepartmentId();
+                    }
                     else {
                         newDepartment.setDepartmentId(mDepartmentId);
                         mDb.departmentsDao().updateDepartment(newDepartment);

@@ -28,6 +28,9 @@ dependencies {
     implementation 'androidx.coordinatorlayout:coordinatorlayout:1.0.0-beta01'
     implementation 'androidx.recyclerview:recyclerview:1.0.0-beta01'
 
+    // create notifications
+    implementation "androidx.core:core:1.0.0-beta01"
+
     //Room
     def room_version = "1.1.1"
     implementation 'androidx.room:room-runtime:2.0.0-beta01'

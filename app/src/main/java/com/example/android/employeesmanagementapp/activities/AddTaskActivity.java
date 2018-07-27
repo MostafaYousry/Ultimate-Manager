@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
@@ -225,6 +226,22 @@ public class AddTaskActivity extends AppCompatActivity implements RecyclerViewIt
         }
     }
 
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Intent intent = new Intent(this, NotificationService.class);
+        // send the due date and the id of the task within the intent
+        //intent.putExtra("task due date", taskDueDate.getTime() - taskStartDAte.getTime())'
+        //intent.putExtra("task id",mTaskId);
+
+        //just for experiment
+        Bundle bundle = new Bundle();
+        bundle.putInt("task id",mTaskId);
+        bundle.putLong("task due date",5);
+        intent.putExtras(bundle);
+        startService(intent);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
