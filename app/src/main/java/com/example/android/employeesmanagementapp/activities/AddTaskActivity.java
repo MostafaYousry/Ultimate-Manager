@@ -177,6 +177,11 @@ public class AddTaskActivity extends AppCompatActivity implements RecyclerViewIt
     }
 
     private void populateBottomSheet(int depId) {
+
+
+        ViewModelProviders.of(this, new TaskIdFact(mDb, 2)).get(AddNewTaskViewModel.class).getTaskEmployees(1);
+
+
         LiveData<List<EmployeeEntry>> employeesInDepartment = ViewModelProviders.of(this, new DepIdFact(mDb, depId)).get(AddNewDepViewModel.class).getEmployees();
         employeesInDepartment.observe(this, new Observer<List<EmployeeEntry>>() {
             @Override
