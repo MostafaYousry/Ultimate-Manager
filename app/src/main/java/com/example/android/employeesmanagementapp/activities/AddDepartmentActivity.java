@@ -177,45 +177,6 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
         }
     }
 
-/*
-    private void setUpEmployeesBS() {
-
-        mSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet_root));
-
-        if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
-            mSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-            return;
-        }
-
-        RecyclerView recyclerView = findViewById(R.id.show_dep_emp_rv);
-        final EmployeesAdapter employeesAdapter = new EmployeesAdapter(this);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(employeesAdapter);
-
-        LiveData<List<EmployeeEntry>> employeesInDepartment = ViewModelProviders.of(this, new DepIdFact(mDb, mDepartmentId)).get(AddNewDepViewModel.class).getEmployees();
-        employeesInDepartment.observe(this, new Observer<List<EmployeeEntry>>() {
-            @Override
-            public void onChanged(List<EmployeeEntry> employeeEntries) {
-                employeesAdapter.setData(employeeEntries);
-            }
-        });
-
-
-        Button showDepEmpButton = findViewById(R.id.show_employees_button);
-        showDepEmpButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
-                    mSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                } else {
-                    mSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                }
-            }
-        });
-    }
-*/
-
-
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
         return true;

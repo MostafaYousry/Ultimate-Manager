@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -173,7 +175,7 @@ public class AddTaskActivity extends AppCompatActivity implements RecyclerViewIt
 
     private void showChooseDepDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("choose employees to be added");
+        builder.setTitle("Choose employees :");
 
         RecyclerView chooseEmployeesRV = new RecyclerView(this);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -356,20 +358,27 @@ public class AddTaskActivity extends AppCompatActivity implements RecyclerViewIt
 }
 
 //Adapter for ALertDialog RecyclerView
-class ChooseEmployeesAdapter extends RecyclerView.Adapter<ChooseEmployeesAdapter.chooseEmployeeViewHolder>{
-private List<EmployeeEntry> mData;
+class ChooseEmployeesAdapter extends RecyclerView.Adapter<ChooseEmployeesAdapter.chooseEmployeeViewHolder> {
+    private List<EmployeeEntry> mData;
+    private final SparseBooleanArray array=new SparseBooleanArray();
+
+
     @NonNull
     @Override
     public chooseEmployeeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.choose_employee_item,parent,false);
+        View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.choose_employee_item, parent, false);
         chooseEmployeeViewHolder chooseEmployeeViewHolder = new chooseEmployeeViewHolder(rootView);
         return chooseEmployeeViewHolder;
     }
 
     @Override
     public void onBindViewHolder(@NonNull chooseEmployeeViewHolder holder, int position) {
+        if(array.get(position)){
+            holder.employeeCheckBox.setChecked(true);
+        }else{
+            holder.employeeCheckBox.setChecked(false);
+        }
         holder.bind(position);
-
     }
 
     @Override
@@ -381,12 +390,21 @@ private List<EmployeeEntry> mData;
         mData = data;
     }
 
-    public class chooseEmployeeViewHolder extends RecyclerView.ViewHolder{
+    public class chooseEmployeeViewHolder extends RecyclerView.ViewHolder {
+
         TextView employeeName;
+        CheckBox employeeCheckBox;
 
         public chooseEmployeeViewHolder(@NonNull View itemView) {
             super(itemView);
             employeeName = itemView.findViewById(R.id.choose_employee_name);
+            employeeCheckBox = itemView.findViewById(R.id.choose_employee_check_box);
+            employeeCheckBox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    array.put(getAdapterPosition(),true);
+                }
+            });
         }
 
         public void bind(int position) {

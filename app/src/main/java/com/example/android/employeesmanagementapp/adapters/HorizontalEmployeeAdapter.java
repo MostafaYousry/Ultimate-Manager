@@ -1,5 +1,6 @@
 package com.example.android.employeesmanagementapp.adapters;
 
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -21,6 +23,7 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
     final private RecyclerViewItemClickListener mClickListener;
     private boolean cancelIconIsVisible;
     private boolean isOnCLick;
+    private final SparseBooleanArray array=new SparseBooleanArray();
 
     public HorizontalEmployeeAdapter(RecyclerViewItemClickListener clickListener, boolean cancelIconIsVisible) {
         mClickListener = clickListener;
@@ -34,12 +37,16 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
     public HorizontalEmployeeAdapter.EmployeesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.employee_horizonatl_rv_item, parent, false);
         HorizontalEmployeeAdapter.EmployeesViewHolder employeesViewHolder = new HorizontalEmployeeAdapter.EmployeesViewHolder(rootView);
-
         return employeesViewHolder;
     }
 
     @Override
     public void onBindViewHolder(@NonNull HorizontalEmployeeAdapter.EmployeesViewHolder holder, int position) {
+        if(array.get(position)){
+            holder.cancelEmployee.setVisibility(View.VISIBLE);
+        }else{
+            holder.cancelEmployee.setVisibility(View.GONE);
+        }
         holder.bind(position);
     }
 
@@ -74,7 +81,12 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
         public void bind(int position) {
             employeeImage.setImageResource(AppUtils.getRandomEmployeeImage());
             employeeName.setText(mData.get(position).getEmployeeName());
-
+            cancelEmployee.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    removeAt(getAdapterPosition());
+                }
+            });
             itemView.setTag(mData.get(position).getEmployeeID());
         }
 
@@ -94,12 +106,7 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
         public boolean onLongClick(View view) {
             if (cancelIconIsVisible) {
                 cancelEmployee.setVisibility(View.VISIBLE);
-                cancelEmployee.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        removeAt(getAdapterPosition());
-                    }
-                });
+                array.put(getAdapterPosition(),true);
             }
             return true;
         }

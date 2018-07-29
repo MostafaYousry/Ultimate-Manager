@@ -101,6 +101,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
                 android:clipToPadding="false"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -116,7 +117,8 @@
                   android:layout_height="wrap_content"
                   android:layout_width="wrap_content"
                   android:text="Tasks : "
-                  android:textSize="24sp"
+                  android:textSize="18sp"
+                  android:textColor="@color/primaryTextColor"
                   android:padding="8dp"/>
 
         <androidx.recyclerview.widget.RecyclerView
