@@ -1,15 +1,19 @@
 package com.example.android.employeesmanagementapp.activities;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -18,6 +22,7 @@ import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
 import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
+import com.example.android.employeesmanagementapp.adapters.HorizontalEmployeeAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
@@ -31,10 +36,14 @@ import com.example.android.employeesmanagementapp.fragments.DatePickerFragment;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.zip.Inflater;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
@@ -61,6 +70,7 @@ public class AddTaskActivity extends AppCompatActivity implements RecyclerViewIt
     private TextView mTaskDueDate;
     private Spinner mTaskDepartment;
     private Toolbar mToolbar;
+    private ImageView addTaskEmployees;
 
     private int mSelectedDepartmentId;
 
@@ -101,6 +111,13 @@ public class AddTaskActivity extends AppCompatActivity implements RecyclerViewIt
         mTaskStartDate = findViewById(R.id.task_start_date);
         mTaskDueDate = findViewById(R.id.task_due_date);
         mTaskDepartment = findViewById(R.id.task_department);
+        addTaskEmployees = findViewById(R.id.add_more_employees);
+        addTaskEmployees.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showChooseDepDialog();
+            }
+        });
 
 
         mDepartmentsArrayAdapter = new DepartmentsArrayAdapter(this, this);
@@ -154,6 +171,37 @@ public class AddTaskActivity extends AppCompatActivity implements RecyclerViewIt
         setUpEmployeesRV();
     }
 
+    private void showChooseDepDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("choose employees to be added");
+
+        RecyclerView chooseEmployeesRV = new RecyclerView(this);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        chooseEmployeesRV.setLayoutManager(linearLayoutManager);
+        chooseEmployeesRV.setHasFixedSize(true);
+
+        ChooseEmployeesAdapter chooseEmployeesAdapter = new ChooseEmployeesAdapter();
+        chooseEmployeesAdapter.setData(AppUtils.getEmployeesFakeData());
+        chooseEmployeesRV.setAdapter(chooseEmployeesAdapter);
+
+        builder.setView(chooseEmployeesRV);
+
+        builder.setPositiveButton(getString(R.string.choose_department_dialog_positive_button), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.setNegativeButton(getString(R.string.choose_department_dialog_cancel_button), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
     private void setUpEmployeesRV() {
         mRecyclerView = findViewById(R.id.department_employees_rv);
 
@@ -163,47 +211,10 @@ public class AddTaskActivity extends AppCompatActivity implements RecyclerViewIt
         layoutManager.setOrientation(RecyclerView.HORIZONTAL);
         mRecyclerView.setLayoutManager(layoutManager);
 
-        HorizontalEmployeeAdapter mAdapter = new HorizontalEmployeeAdapter(this);
-        mAdapter.setData(AppUtils.getEmployeesFakeData(),true);
+        HorizontalEmployeeAdapter mAdapter = new HorizontalEmployeeAdapter(this, true);
+        mAdapter.setData(AppUtils.getEmployeesFakeData());
         mRecyclerView.setAdapter(mAdapter);
     }
-
-    private void setUpEmployeesBS() {
-
-        mSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet_root));
-
-
-        RecyclerView recyclerView = findViewById(R.id.show_dep_emp_rv);
-        mEmplyeesAdapter = new EmployeesAdapter(this, this);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(mEmplyeesAdapter);
-
-        //populateBottomSheet(mSelectedDepartmentId);
-
-
-        Button showDepEmpButton = findViewById(R.id.show_employees_button);
-        showDepEmpButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
-                    mSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                } else {
-                    mSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                }
-            }
-        });
-    }
-
-//    private void populateBottomSheet(int depId) {
-//        LiveData<List<EmployeeEntry>> employeesInDepartment = ViewModelProviders.of(this, new DepIdFact(mDb, depId)).get(AddNewDepViewModel.class).getEmployees();
-//        employeesInDepartment.observe(this, new Observer<List<EmployeeEntry>>() {
-//            @Override
-//            public void onChanged(List<EmployeeEntry> employeeEntries) {
-//                mEmplyeesAdapter.setData(employeeEntries);
-//            }
-//        });
-//    }
-
 
     private void clearViews() {
         mTaskTitle.setText("");
@@ -247,17 +258,17 @@ public class AddTaskActivity extends AppCompatActivity implements RecyclerViewIt
     @Override
     protected void onStop() {
         super.onStop();
-        Intent intent = new Intent(this, NotificationService.class);
-        // send the due date and the id of the task within the intent
-        //intent.putExtra("task due date", taskDueDate.getTime() - taskStartDAte.getTime())'
-        //intent.putExtra("task id",mTaskId);
-
-        //just for experiment
-        Bundle bundle = new Bundle();
-        bundle.putInt("task id",mTaskId);
-        bundle.putLong("task due date",5);
-        intent.putExtras(bundle);
-        startService(intent);
+//        Intent intent = new Intent(this, NotificationService.class);
+//        // send the due date and the id of the task within the intent
+//        //intent.putExtra("task due date", taskDueDate.getTime() - taskStartDAte.getTime())'
+//        //intent.putExtra("task id",mTaskId);
+//
+//        //just for experiment
+//        Bundle bundle = new Bundle();
+//        bundle.putInt("task id",mTaskId);
+//        bundle.putLong("task due date",5);
+//        intent.putExtras(bundle);
+//        startService(intent);
     }
 
     @Override
@@ -334,7 +345,6 @@ public class AddTaskActivity extends AppCompatActivity implements RecyclerViewIt
 
     }
 
-
     @Override
     public void onItemClick(int clickedItemRowID, int clickedItemPosition) {
 
@@ -343,4 +353,45 @@ public class AddTaskActivity extends AppCompatActivity implements RecyclerViewIt
         intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY, clickedItemRowID);
         startActivity(intent);
     }
+}
+
+//Adapter for ALertDialog RecyclerView
+class ChooseEmployeesAdapter extends RecyclerView.Adapter<ChooseEmployeesAdapter.chooseEmployeeViewHolder>{
+private List<EmployeeEntry> mData;
+    @NonNull
+    @Override
+    public chooseEmployeeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.choose_employee_item,parent,false);
+        chooseEmployeeViewHolder chooseEmployeeViewHolder = new chooseEmployeeViewHolder(rootView);
+        return chooseEmployeeViewHolder;
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull chooseEmployeeViewHolder holder, int position) {
+        holder.bind(position);
+
+    }
+
+    @Override
+    public int getItemCount() {
+        return mData.size();
+    }
+
+    public void setData(List<EmployeeEntry> data) {
+        mData = data;
+    }
+
+    public class chooseEmployeeViewHolder extends RecyclerView.ViewHolder{
+        TextView employeeName;
+
+        public chooseEmployeeViewHolder(@NonNull View itemView) {
+            super(itemView);
+            employeeName = itemView.findViewById(R.id.choose_employee_name);
+        }
+
+        public void bind(int position) {
+            employeeName.setText(mData.get(position).getEmployeeName());
+        }
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.example.android.employeesmanagementapp.activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,12 +12,16 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
+import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
 import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
+import com.example.android.employeesmanagementapp.adapters.HorizontalEmployeeAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
@@ -29,6 +34,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.LiveData;
@@ -50,6 +56,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
 
     private EditText mDepartmentName;
     private Toolbar mToolbar;
+
     private AppDatabase mDb;
 
     private RecyclerView mRecyclerView;
@@ -81,7 +88,6 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
 
 
         setUpToolBar();
-        //setUpEmployeesBS();
         setUpEmployeesRV();
 
 
@@ -101,6 +107,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
 
     }
 
+
     private void setUpEmployeesRV() {
         mRecyclerView = findViewById(R.id.department_employees_rv);
 
@@ -110,27 +117,27 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
         layoutManager.setOrientation(RecyclerView.HORIZONTAL);
         mRecyclerView.setLayoutManager(layoutManager);
 
-        HorizontalEmployeeAdapter mAdapter = new HorizontalEmployeeAdapter(this);
-        mAdapter.setData(AppUtils.getEmployeesFakeData(), false);
+        HorizontalEmployeeAdapter mAdapter = new HorizontalEmployeeAdapter(this, false);
+        mAdapter.setData(AppUtils.getEmployeesFakeData());
         mRecyclerView.setAdapter(mAdapter);
 
     }
 
     protected void onStop() {
         super.onStop();
-
-        Intent intent = new Intent(this, NotificationService.class);
-        // send the due date and the id of the task within the intent
-        //intent.putExtra("task due date", taskDueDate.getTime() - taskStartDAte.getTime())'
-        //intent.putExtra("task id",mTaskId);
-
-        //just for experiment until tasks are done
-        Bundle bundle = new Bundle();
-        System.out.println(mDepartmentId);
-        bundle.putInt("task id", 38);
-        bundle.putLong("task due date", 30);
-        intent.putExtras(bundle);
-        startService(intent);
+//
+//        Intent intent = new Intent(this, NotificationService.class);
+//        // send the due date and the id of the task within the intent
+//        //intent.putExtra("task due date", taskDueDate.getTime() - taskStartDAte.getTime())'
+//        //intent.putExtra("task id",mTaskId);
+//
+//        //just for experiment until tasks are done
+//        Bundle bundle = new Bundle();
+//        System.out.println(mDepartmentId);
+//        bundle.putInt("task id", 38);
+//        bundle.putLong("task due date", 30);
+//        intent.putExtras(bundle);
+//        startService(intent);
     }
 
 
@@ -251,81 +258,3 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
     }
 }
 
-class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEmployeeAdapter.EmployeesViewHolder> {
-    private List<EmployeeEntry> mData;
-    final private RecyclerViewItemClickListener mClickListener;
-    private boolean cancelIconIsVisible;
-
-    public HorizontalEmployeeAdapter(RecyclerViewItemClickListener clickListener) {
-        mClickListener = clickListener;
-    }
-
-    @NonNull
-    @Override
-
-    public HorizontalEmployeeAdapter.EmployeesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.employee_horizonatl_rv_item, parent, false);
-        HorizontalEmployeeAdapter.EmployeesViewHolder employeesViewHolder = new HorizontalEmployeeAdapter.EmployeesViewHolder(rootView);
-
-        return employeesViewHolder;
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull HorizontalEmployeeAdapter.EmployeesViewHolder holder, int position) {
-        holder.bind(position);
-    }
-
-    @Override
-    public int getItemCount() {
-        return mData.size();
-    }
-
-    public void setData(List<EmployeeEntry> data, boolean cancelIconIsVisible) {
-        mData = data;
-        this.cancelIconIsVisible = cancelIconIsVisible;
-    }
-
-    public class EmployeesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        ImageView employeeImage;
-        ImageView cancelEmployee;
-        TextView employeeName;
-        View mItemView;
-
-        public EmployeesViewHolder(@NonNull View itemView) {
-            super(itemView);
-            mItemView = itemView;
-            employeeImage = itemView.findViewById(R.id.employee_horizontal_rv_image);
-            employeeName = itemView.findViewById(R.id.employee_horizontal_rv_name);
-            cancelEmployee = itemView.findViewById(R.id.cancel_employee_ic);
-            if(cancelIconIsVisible) {
-                cancelEmployee.setVisibility(View.VISIBLE);
-                cancelEmployee.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        removeAt(getAdapterPosition());
-                    }
-                });
-            }
-
-            itemView.setOnClickListener(this);
-
-        }
-
-        public void bind(int position) {
-            employeeImage.setImageResource(AppUtils.getRandomEmployeeImage());
-            employeeName.setText(mData.get(position).getEmployeeName());
-
-            itemView.setTag(mData.get(position).getEmployeeID());
-        }
-
-        @Override
-        public void onClick(View view) {
-            mClickListener.onItemClick((int) mItemView.getTag(), getAdapterPosition());
-        }
-        public void removeAt(int position) {
-            mData.remove(position);
-            notifyItemRemoved(position);
-            notifyItemRangeChanged(position, mData.size());
-        }
-    }
-}

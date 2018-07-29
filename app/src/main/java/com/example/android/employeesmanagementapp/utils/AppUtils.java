@@ -51,7 +51,6 @@ public final class AppUtils {
         EmployeeEntry employeeEntry7 = new EmployeeEntry(1, "Tony Kroos", 200, new Date());
         EmployeeEntry employeeEntry8 = new EmployeeEntry(1, "Kylian Mbappe", 200, new Date());
 
-
         list.add(employeeEntry1);
         list.add(employeeEntry2);
         list.add(employeeEntry3);
@@ -61,7 +60,6 @@ public final class AppUtils {
         list.add(employeeEntry7);
         list.add(employeeEntry8);
         list.add(employeeEntry9);
-
         return list;
     }
 
