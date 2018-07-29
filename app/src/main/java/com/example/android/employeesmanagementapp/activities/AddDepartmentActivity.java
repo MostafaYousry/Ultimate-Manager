@@ -86,10 +86,8 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
 
-
         setUpToolBar();
         setUpEmployeesRV();
-
 
         if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
             clearViews();
