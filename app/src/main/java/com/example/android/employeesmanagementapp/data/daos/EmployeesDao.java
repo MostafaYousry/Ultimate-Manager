@@ -39,6 +39,14 @@ public interface EmployeesDao {
     LiveData<List<EmployeeEntry>> loadEmployees(int departmentId);
 
     /**
+     * load all employees not in this department
+     *
+     * @return list of EmployeeEntry objects wrapped with LiveData
+     */
+    @Query("Select * from employees  INNER JOIN employees_tasks ON task_id != :taskId where employees.department_id = :departmentId ")
+    LiveData<List<EmployeeEntry>> loadEmployeesNotInDep(int departmentId, int taskId);
+
+    /**
      * load an existing employee record by it's id
      *
      * @param employeeId : the employee record's id

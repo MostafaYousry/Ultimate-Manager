@@ -19,6 +19,6 @@ public class TaskIdFact extends ViewModelProvider.NewInstanceFactory {
 
     @Override
     public <T extends ViewModel> T create(Class<T> modelClass) {
-        return (T) new AddNewTaskViewModel(mDatabase, mTaskId, 0);
+        return (T) new AddNewTaskViewModel(mDatabase, mTaskId);
     }
 }

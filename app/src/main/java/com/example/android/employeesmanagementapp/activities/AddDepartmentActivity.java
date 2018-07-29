@@ -22,6 +22,7 @@ import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
 import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
 import com.example.android.employeesmanagementapp.adapters.HorizontalEmployeeAdapter;
+import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
@@ -54,12 +55,12 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
 
     private int mDepartmentId;
 
+    private RecyclerView mRecyclerView;
     private EditText mDepartmentName;
     private Toolbar mToolbar;
-
     private AppDatabase mDb;
+    private RecyclerView mDepEmployeesRecyclerView;
 
-    private RecyclerView mRecyclerView;
 
 
     @Override
@@ -86,6 +87,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
 
+
         setUpToolBar();
         setUpEmployeesRV();
 
@@ -103,21 +105,37 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
         }
 
 
+        // Lookup the recyclerview in activity layout
+        mRecyclerView= (RecyclerView) findViewById(R.id.rvTasks);
+        mRecyclerView.setNestedScrollingEnabled(false);
+        mRecyclerView.setHasFixedSize(true);
+        // Create adapter passing in the sample user data
+        TasksAdapter mTadapter = new TasksAdapter(this);
+        // Attach the adapter to the recyclerview to populate items
+        mRecyclerView.setAdapter(mTadapter);
+        mTadapter.setData(AppUtils.getTasksFakeData());
+        // Set layout manager to position the items
+        LinearLayoutManager linearLayoutManager=new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        linearLayoutManager.setAutoMeasureEnabled(true);
+        mRecyclerView.setLayoutManager(linearLayoutManager);
+        // That's all!
+
     }
 
 
     private void setUpEmployeesRV() {
-        mRecyclerView = findViewById(R.id.department_employees_rv);
+        mDepEmployeesRecyclerView = findViewById(R.id.department_employees_rv);
 
-        mRecyclerView.setHasFixedSize(true);
+        mDepEmployeesRecyclerView.setHasFixedSize(true);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(RecyclerView.HORIZONTAL);
-        mRecyclerView.setLayoutManager(layoutManager);
+        mDepEmployeesRecyclerView.setLayoutManager(layoutManager);
 
         HorizontalEmployeeAdapter mAdapter = new HorizontalEmployeeAdapter(this, false);
         mAdapter.setData(AppUtils.getEmployeesFakeData());
-        mRecyclerView.setAdapter(mAdapter);
+        mDepEmployeesRecyclerView.setAdapter(mAdapter);
 
     }
 
@@ -159,6 +177,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
         }
     }
 
+/*
     private void setUpEmployeesBS() {
 
         mSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet_root));
@@ -194,6 +213,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
             }
         });
     }
+*/
 
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -225,9 +245,9 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
             AppExecutor.getInstance().diskIO().execute(new Runnable() {
                 @Override
                 public void run() {
-                    if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
+                    if (mDepartmentId == DEFAULT_DEPARTMENT_ID)
                         mDb.departmentsDao().addDepartment(newDepartment);
-                    } else {
+                    else {
                         newDepartment.setDepartmentId(mDepartmentId);
                         mDb.departmentsDao().updateDepartment(newDepartment);
                     }
@@ -248,11 +268,10 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
     @Override
     public void onItemClick(int clickedItemRowID, int clickedItemPosition) {
         Log.d(TAG, "item in bottom sheet is clicked");
-        System.out.println("fyffyfu " + clickedItemRowID + "    " + clickedItemPosition);
+
         Intent intent = new Intent(this, AddEmployeeActivity.class);
         intent.putExtra(AddEmployeeActivity.EMPLOYEE_VIEW_ONLY, true);
         intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY, clickedItemRowID);
         startActivity(intent);
     }
 }
-

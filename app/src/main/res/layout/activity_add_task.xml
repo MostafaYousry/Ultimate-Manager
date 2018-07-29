@@ -150,13 +150,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:cursorVisible="false"
+                    android:onClick="pickDate"
                     android:drawableStart="@drawable/ic_calendar"
                     android:drawablePadding="4dp"
                     android:focusable="false"
                     android:hint="@string/hint_task_due_date"
                     android:inputType="date"
                     android:maxLines="1"
-                    android:onClick="pickDate"
                     tools:text="@tools:sample/date/ddmmyy" />
 
             </com.google.android.material.textfield.TextInputLayout>
