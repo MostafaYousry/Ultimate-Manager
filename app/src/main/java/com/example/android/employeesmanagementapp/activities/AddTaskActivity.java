@@ -150,6 +150,7 @@ public class AddTaskActivity extends AppCompatActivity implements RecyclerViewIt
 
     }
 
+/*
     private void setUpEmployeesBS() {
 
         mSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet_root));
@@ -175,6 +176,7 @@ public class AddTaskActivity extends AppCompatActivity implements RecyclerViewIt
             }
         });
     }
+*/
 
     private void populateBottomSheet(int depId) {
 
