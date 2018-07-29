@@ -21,10 +21,9 @@ public class DepIdFact extends ViewModelProvider.NewInstanceFactory {
     @Override
     public <T extends ViewModel> T create(Class<T> modelClass) {
         if (modelClass.getName().equals(AddNewTaskViewModel.class.getName()))
-            return (T) new AddNewTaskViewModel(mDatabase, 0, mDepId);
+            return (T) new AddNewTaskViewModel(mDatabase, mDepId);
         else
             return (T) new AddNewDepViewModel(mDatabase, mDepId);
 
     }
-
 }

@@ -39,6 +39,16 @@ public interface DepartmentsDao {
     LiveData<DepartmentEntry> loadDepartmentById(int departmentId);
 
     /**
+     * loads all departments with one chosen department on top
+     *
+     * @param firstRowDepartmentID : department's id to put on top
+     * @return list of DepartmentEntry objects wrapped with LiveData
+     */
+    @Query("SELECT * FROM departments WHERE department_id = :firstRowDepartmentID UNION ALL SELECT * FROM departments WHERE department_id != :firstRowDepartmentID")
+    LiveData<List<DepartmentEntry>> loadDepartments(int firstRowDepartmentID);
+
+
+    /**
      * @return : number of departments in the company
      */
     @Query("SELECT COUNT(*) FROM departments")

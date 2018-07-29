@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
+import com.example.android.employeesmanagementapp.UndoDeleteAction;
 import com.example.android.employeesmanagementapp.activities.AddEmployeeActivity;
 import com.example.android.employeesmanagementapp.activities.MainActivity;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
@@ -37,6 +38,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -82,8 +84,41 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
         emptyViewTextView = rootView.findViewById(R.id.empty_view_message_text_view);
 
         setFabActivation();
+        setUpOnSwipe();
 
         return rootView;
+    }
+
+    private void setUpOnSwipe() {
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            // Called when a user swipes left or right on a ViewHolder
+            @Override
+            public void onSwiped(final RecyclerView.ViewHolder viewHolder, int swipeDir) {
+                // Here is where you'll implement swipe to delete
+
+                int entryPosition = viewHolder.getAdapterPosition();
+                EmployeeEntry employeeEntry = mEmployeesAdapter.getData().get(entryPosition);
+                UndoDeleteAction mUndoDeleteAction = new UndoDeleteAction( employeeEntry,null, getContext());
+                Snackbar.make(getActivity().findViewById(android.R.id.content), employeeEntry.getEmployeeName()+" will be deleted", Snackbar.LENGTH_LONG).setAction("Undo", mUndoDeleteAction).show();
+
+                    System.out.println("deleting");
+                    AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            int position = viewHolder.getAdapterPosition();
+                            mDb.employeesDao().deleteEmployee(mEmployeesAdapter.getData().get(position));
+                        }
+                    });
+
+            }
+        }).attachToRecyclerView(mRecyclerView);
+
+
     }
 
     @Override
@@ -232,7 +267,7 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
         builder.setPositiveButton(getString(R.string.choose_department_dialog_positive_button), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(getContext(), "Deleting " + mSelectedEmployees.size() + " employees", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "moving " + mSelectedEmployees.size() + " employees", Toast.LENGTH_LONG).show();
                 AppExecutor.getInstance().diskIO().execute(new Runnable() {
                     @Override
                     public void run() {

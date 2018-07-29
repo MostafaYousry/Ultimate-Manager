@@ -11,6 +11,7 @@ import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -55,6 +56,10 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
     public void setData(List<TaskEntry> tasks) {
         mData = tasks;
         notifyDataSetChanged();
+    }
+
+    public List<TaskEntry> getData() {
+        return mData;
     }
 
     class TasksViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
