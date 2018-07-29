@@ -104,12 +104,6 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
         notifyDataSetChanged();
     }
 
-    public void insertEntry(EmployeeEntry employeeEntry, int position) {
-        mData.add(position,employeeEntry);
-        notifyItemChanged(position);
-        notifyDataSetChanged();
-    }
-
     public interface EmployeeSelectedStateListener {
         void onEmployeeSelected(EmployeeEntry employeeEntry);
 

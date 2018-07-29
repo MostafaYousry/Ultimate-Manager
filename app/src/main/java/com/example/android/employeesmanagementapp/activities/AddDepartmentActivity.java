@@ -3,11 +3,15 @@ package com.example.android.employeesmanagementapp.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
@@ -19,11 +23,12 @@ import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.factories.DepIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewDepViewModel;
+import com.example.android.employeesmanagementapp.utils.AppUtils;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
-import java.util.Date;
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.LiveData;
@@ -46,6 +51,8 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
     private EditText mDepartmentName;
     private Toolbar mToolbar;
     private AppDatabase mDb;
+
+    private RecyclerView mRecyclerView;
 
 
     @Override
@@ -74,7 +81,8 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
 
 
         setUpToolBar();
-        setUpEmployeesBS();
+        //setUpEmployeesBS();
+        setUpEmployeesRV();
 
 
         if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
@@ -92,6 +100,22 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
 
 
     }
+
+    private void setUpEmployeesRV() {
+        mRecyclerView = findViewById(R.id.department_employees_rv);
+
+        mRecyclerView.setHasFixedSize(true);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setOrientation(RecyclerView.HORIZONTAL);
+        mRecyclerView.setLayoutManager(layoutManager);
+
+        HorizontalEmployeeAdapter mAdapter = new HorizontalEmployeeAdapter(this);
+        mAdapter.setData(AppUtils.getEmployeesFakeData(), false);
+        mRecyclerView.setAdapter(mAdapter);
+
+    }
+
     protected void onStop() {
         super.onStop();
 
@@ -102,8 +126,9 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
 
         //just for experiment until tasks are done
         Bundle bundle = new Bundle();
-        bundle.putInt("task id",mDepartmentId);
-        bundle.putLong("task due date",30);
+        System.out.println(mDepartmentId);
+        bundle.putInt("task id", 38);
+        bundle.putLong("task due date", 30);
         intent.putExtras(bundle);
         startService(intent);
     }
@@ -197,9 +222,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
                 public void run() {
                     if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
                         mDb.departmentsDao().addDepartment(newDepartment);
-                        mDepartmentId = newDepartment.getDepartmentId();
-                    }
-                    else {
+                    } else {
                         newDepartment.setDepartmentId(mDepartmentId);
                         mDb.departmentsDao().updateDepartment(newDepartment);
                     }
@@ -220,10 +243,89 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
     @Override
     public void onItemClick(int clickedItemRowID, int clickedItemPosition) {
         Log.d(TAG, "item in bottom sheet is clicked");
-
+        System.out.println("fyffyfu " + clickedItemRowID + "    " + clickedItemPosition);
         Intent intent = new Intent(this, AddEmployeeActivity.class);
         intent.putExtra(AddEmployeeActivity.EMPLOYEE_VIEW_ONLY, true);
         intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY, clickedItemRowID);
         startActivity(intent);
+    }
+}
+
+class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEmployeeAdapter.EmployeesViewHolder> {
+    private List<EmployeeEntry> mData;
+    final private RecyclerViewItemClickListener mClickListener;
+    private boolean cancelIconIsVisible;
+
+    public HorizontalEmployeeAdapter(RecyclerViewItemClickListener clickListener) {
+        mClickListener = clickListener;
+    }
+
+    @NonNull
+    @Override
+
+    public HorizontalEmployeeAdapter.EmployeesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.employee_horizonatl_rv_item, parent, false);
+        HorizontalEmployeeAdapter.EmployeesViewHolder employeesViewHolder = new HorizontalEmployeeAdapter.EmployeesViewHolder(rootView);
+
+        return employeesViewHolder;
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull HorizontalEmployeeAdapter.EmployeesViewHolder holder, int position) {
+        holder.bind(position);
+    }
+
+    @Override
+    public int getItemCount() {
+        return mData.size();
+    }
+
+    public void setData(List<EmployeeEntry> data, boolean cancelIconIsVisible) {
+        mData = data;
+        this.cancelIconIsVisible = cancelIconIsVisible;
+    }
+
+    public class EmployeesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        ImageView employeeImage;
+        ImageView cancelEmployee;
+        TextView employeeName;
+        View mItemView;
+
+        public EmployeesViewHolder(@NonNull View itemView) {
+            super(itemView);
+            mItemView = itemView;
+            employeeImage = itemView.findViewById(R.id.employee_horizontal_rv_image);
+            employeeName = itemView.findViewById(R.id.employee_horizontal_rv_name);
+            cancelEmployee = itemView.findViewById(R.id.cancel_employee_ic);
+            if(cancelIconIsVisible) {
+                cancelEmployee.setVisibility(View.VISIBLE);
+                cancelEmployee.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        removeAt(getAdapterPosition());
+                    }
+                });
+            }
+
+            itemView.setOnClickListener(this);
+
+        }
+
+        public void bind(int position) {
+            employeeImage.setImageResource(AppUtils.getRandomEmployeeImage());
+            employeeName.setText(mData.get(position).getEmployeeName());
+
+            itemView.setTag(mData.get(position).getEmployeeID());
+        }
+
+        @Override
+        public void onClick(View view) {
+            mClickListener.onItemClick((int) mItemView.getTag(), getAdapterPosition());
+        }
+        public void removeAt(int position) {
+            mData.remove(position);
+            notifyItemRemoved(position);
+            notifyItemRangeChanged(position, mData.size());
+        }
     }
 }

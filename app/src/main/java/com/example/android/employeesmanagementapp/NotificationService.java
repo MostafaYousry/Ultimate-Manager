@@ -18,7 +18,6 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 public class NotificationService extends Service {
-
     Timer timer;
     TimerTask timerTask;
     String TAG = "Timers";
@@ -95,7 +94,7 @@ public class NotificationService extends Service {
                     public void run() {
 
                         Intent intent = new Intent(getApplicationContext(), AddDepartmentActivity.class);
-                        //intent.putExtra(AddTaskActivity.TASK_ID_KEY, taskId);
+                        intent.putExtra(AddTaskActivity.TASK_ID_KEY, taskId);
 
                         //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);

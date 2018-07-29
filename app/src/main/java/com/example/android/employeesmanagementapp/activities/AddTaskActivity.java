@@ -28,6 +28,7 @@ import com.example.android.employeesmanagementapp.data.factories.TaskIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewDepViewModel;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewTaskViewModel;
 import com.example.android.employeesmanagementapp.fragments.DatePickerFragment;
+import com.example.android.employeesmanagementapp.utils.AppUtils;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.util.Date;
@@ -68,6 +69,7 @@ public class AddTaskActivity extends AppCompatActivity implements RecyclerViewIt
     private AppDatabase mDb;
 
     private DepartmentsArrayAdapter mDepartmentsArrayAdapter;
+    private RecyclerView mRecyclerView;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -140,7 +142,7 @@ public class AddTaskActivity extends AppCompatActivity implements RecyclerViewIt
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 mSelectedDepartmentId = (int) view.getTag();
-                populateBottomSheet(mSelectedDepartmentId);
+                //populateBottomSheet(mSelectedDepartmentId);
             }
 
             @Override
@@ -149,6 +151,21 @@ public class AddTaskActivity extends AppCompatActivity implements RecyclerViewIt
             }
         });
 
+        setUpEmployeesRV();
+    }
+
+    private void setUpEmployeesRV() {
+        mRecyclerView = findViewById(R.id.department_employees_rv);
+
+        mRecyclerView.setHasFixedSize(true);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setOrientation(RecyclerView.HORIZONTAL);
+        mRecyclerView.setLayoutManager(layoutManager);
+
+        HorizontalEmployeeAdapter mAdapter = new HorizontalEmployeeAdapter(this);
+        mAdapter.setData(AppUtils.getEmployeesFakeData(),true);
+        mRecyclerView.setAdapter(mAdapter);
     }
 
     private void setUpEmployeesBS() {
@@ -161,7 +178,7 @@ public class AddTaskActivity extends AppCompatActivity implements RecyclerViewIt
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(mEmplyeesAdapter);
 
-        populateBottomSheet(mSelectedDepartmentId);
+        //populateBottomSheet(mSelectedDepartmentId);
 
 
         Button showDepEmpButton = findViewById(R.id.show_employees_button);
@@ -177,15 +194,15 @@ public class AddTaskActivity extends AppCompatActivity implements RecyclerViewIt
         });
     }
 
-    private void populateBottomSheet(int depId) {
-        LiveData<List<EmployeeEntry>> employeesInDepartment = ViewModelProviders.of(this, new DepIdFact(mDb, depId)).get(AddNewDepViewModel.class).getEmployees();
-        employeesInDepartment.observe(this, new Observer<List<EmployeeEntry>>() {
-            @Override
-            public void onChanged(List<EmployeeEntry> employeeEntries) {
-                mEmplyeesAdapter.setData(employeeEntries);
-            }
-        });
-    }
+//    private void populateBottomSheet(int depId) {
+//        LiveData<List<EmployeeEntry>> employeesInDepartment = ViewModelProviders.of(this, new DepIdFact(mDb, depId)).get(AddNewDepViewModel.class).getEmployees();
+//        employeesInDepartment.observe(this, new Observer<List<EmployeeEntry>>() {
+//            @Override
+//            public void onChanged(List<EmployeeEntry> employeeEntries) {
+//                mEmplyeesAdapter.setData(employeeEntries);
+//            }
+//        });
+//    }
 
 
     private void clearViews() {
