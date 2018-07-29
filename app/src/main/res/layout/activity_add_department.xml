@@ -109,7 +109,5 @@
 
     </ScrollView>
 
-    <include layout="@layout/show_emp_bottom_sheet" />
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
