@@ -12,12 +12,14 @@ import android.widget.EditText;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
 import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
+import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.factories.DepIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewDepViewModel;
+import com.example.android.employeesmanagementapp.utils.AppUtils;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.util.List;
@@ -41,15 +43,16 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
 
     private int mDepartmentId;
 
-
+    private RecyclerView mRecyclerView;
     private EditText mDepartmentName;
     private Toolbar mToolbar;
     private AppDatabase mDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_department);
+        super.onCreate(savedInstanceState);
+
 
         mDb = AppDatabase.getInstance(this);
 
@@ -72,7 +75,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
 
 
         setUpToolBar();
-        setUpEmployeesBS();
+      //  setUpEmployeesBS();
 
 
         if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
@@ -88,6 +91,22 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
             });
         }
 
+
+        // Lookup the recyclerview in activity layout
+        mRecyclerView= (RecyclerView) findViewById(R.id.rvTasks);
+        mRecyclerView.setNestedScrollingEnabled(false);
+        mRecyclerView.setHasFixedSize(true);
+        // Create adapter passing in the sample user data
+        TasksAdapter mTadapter = new TasksAdapter(this);
+        // Attach the adapter to the recyclerview to populate items
+        mRecyclerView.setAdapter(mTadapter);
+        mTadapter.setData(AppUtils.getTasksFakeData());
+        // Set layout manager to position the items
+        LinearLayoutManager linearLayoutManager=new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        linearLayoutManager.setAutoMeasureEnabled(true);
+        mRecyclerView.setLayoutManager(linearLayoutManager);
+        // That's all!
 
     }
 
@@ -112,6 +131,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
         }
     }
 
+/*
     private void setUpEmployeesBS() {
 
         mSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet_root));
@@ -147,6 +167,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
             }
         });
     }
+*/
 
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -208,3 +229,5 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
         startActivity(intent);
     }
 }
+
+
