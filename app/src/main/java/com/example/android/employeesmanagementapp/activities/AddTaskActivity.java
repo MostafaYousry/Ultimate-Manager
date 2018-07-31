@@ -12,14 +12,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
@@ -38,10 +36,8 @@ import com.example.android.employeesmanagementapp.fragments.DatePickerFragment;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.zip.Inflater;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -55,7 +51,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class AddTaskActivity extends AppCompatActivity implements RecyclerViewItemClickListener, EmployeesAdapter.CheckBoxClickListener {
+public class AddTaskActivity extends AppCompatActivity implements RecyclerViewItemClickListener {
 
     public static final String TASK_ID_KEY = "task_id";
     private static final String TAG = AddTaskActivity.class.getSimpleName();
@@ -341,12 +337,6 @@ public class AddTaskActivity extends AppCompatActivity implements RecyclerViewIt
         //show th dialog
         datePickerFragment.show(getSupportFragmentManager(), "datePicker");
     }
-
-    @Override
-    public void onCheckBoxClicked(int employeeID) {
-
-    }
-
     @Override
     public void onItemClick(int clickedItemRowID, int clickedItemPosition) {
 

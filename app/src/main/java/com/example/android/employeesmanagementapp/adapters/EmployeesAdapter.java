@@ -4,14 +4,15 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
+import com.example.android.employeesmanagementapp.data.EmployeeWithExtras;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 
@@ -25,27 +26,12 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
     public static final int SELECTION_MODE_MULTIPLE = 2;
     private static final String TAG = EmployeesAdapter.class.getSimpleName();
     final private RecyclerViewItemClickListener mClickListener;
-    private List<EmployeeEntry> mData;
+    private List<EmployeeWithExtras> mData;
 
-    public List<EmployeeEntry> getData() {
-        return mData;
-    }
 
-    private CheckBoxClickListener mCheckBoxClickListener;
     private int employeesSelectionMode;
     private EmployeeSelectedStateListener mEmployeeSelectedStateListener;
 
-    public EmployeesAdapter(@NonNull RecyclerViewItemClickListener listener) {
-        mClickListener = listener;
-        employeesSelectionMode = SELECTION_MODE_SINGLE;
-    }
-
-
-    public EmployeesAdapter(@NonNull RecyclerViewItemClickListener listener, @NonNull CheckBoxClickListener checkBoxClickListener) {
-        mClickListener = listener;
-        mCheckBoxClickListener = checkBoxClickListener;
-        employeesSelectionMode = SELECTION_MODE_SINGLE;
-    }
 
     public EmployeesAdapter(@NonNull RecyclerViewItemClickListener listener, @NonNull EmployeeSelectedStateListener employeeSelectedStateListener) {
         mClickListener = listener;
@@ -77,6 +63,11 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
         return mData.size();
     }
 
+
+    public List<EmployeeWithExtras> getData() {
+        return mData;
+    }
+
     /**
      * @return : current selectionMode : Single / Multiple
      */
@@ -99,7 +90,7 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
      *
      * @param employees new employees list
      */
-    public void setData(List<EmployeeEntry> employees) {
+    public void setData(List<EmployeeWithExtras> employees) {
         mData = employees;
         notifyDataSetChanged();
     }
@@ -110,16 +101,13 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
         void onEmployeeDeselected(EmployeeEntry employeeEntry);
     }
 
-    public interface CheckBoxClickListener {
-        void onCheckBoxClicked(int employeeID);
-    }
-
     public class EmployeesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
         //create object for each view in the item view
         TextView mEmployeeName;
         ImageView mEmployeeImage;
-        CheckBox mEmployeeCheckBox;
+        RatingBar mEmployeeRating;
+        TextView mNumRunningTasks;
         View mItemView;
         boolean mIsItemSelected = false;
 
@@ -131,12 +119,8 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
             mItemView = itemView;
             mEmployeeName = itemView.findViewById(R.id.employee_name);
             mEmployeeImage = itemView.findViewById(R.id.employee_image);
-            mEmployeeCheckBox = itemView.findViewById(R.id.employee_check_box);
-
-            if (mCheckBoxClickListener != null)
-                mEmployeeCheckBox.setVisibility(View.VISIBLE);
-            else
-                mEmployeeCheckBox.setVisibility(View.GONE);
+            mEmployeeRating = itemView.findViewById(R.id.employee_rating);
+            mNumRunningTasks = itemView.findViewById(R.id.employee_has_tasks_runnung);
 
 
             // set the item click listener
@@ -152,14 +136,18 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
             }
 
             //change the item data by the position
-            mEmployeeName.setText(mData.get(position).getEmployeeName());
+            mEmployeeName.setText(mData.get(position).employeeEntry.getEmployeeName());
+
+            mEmployeeRating.setRating(mData.get(position).employeeRating);
+
+            mNumRunningTasks.setText(mData.get(position).employeeNumRunningTasks + " running tasks");
 
             Glide.with(mEmployeeImage.getContext())
                     .load(AppUtils.getRandomEmployeeImage())
                     .apply(RequestOptions.fitCenterTransform())
                     .into(mEmployeeImage);
 
-            itemView.setTag(mData.get(position).getEmployeeID());
+            itemView.setTag(mData.get(position).employeeEntry.getEmployeeID());
 
 
         }
@@ -167,9 +155,6 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
 
         @Override
         public void onClick(View v) {
-            if (v instanceof CheckBox) {
-                mCheckBoxClickListener.onCheckBoxClicked((int) mItemView.getTag());
-            }
 
             //if at least one of the items has a long click on it, its color will be grey
             //and for that, onClick will behave like onLongClick "select items"
@@ -194,11 +179,11 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
             if (!mIsItemSelected) {
                 mItemView.setBackgroundColor(Color.parseColor("#888888"));
                 mIsItemSelected = true;
-                mEmployeeSelectedStateListener.onEmployeeSelected(mData.get(getAdapterPosition()));
+                mEmployeeSelectedStateListener.onEmployeeSelected(mData.get(getAdapterPosition()).employeeEntry);
             } else {
                 mItemView.setBackgroundColor(Color.parseColor("#ffffff"));
                 mIsItemSelected = false;
-                mEmployeeSelectedStateListener.onEmployeeDeselected(mData.get(getAdapterPosition()));
+                mEmployeeSelectedStateListener.onEmployeeDeselected(mData.get(getAdapterPosition()).employeeEntry);
             }
         }
 

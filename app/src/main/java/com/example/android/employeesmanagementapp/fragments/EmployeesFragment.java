@@ -26,6 +26,7 @@ import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapt
 import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
+import com.example.android.employeesmanagementapp.data.EmployeeWithExtras;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
 import com.google.android.material.snackbar.Snackbar;
@@ -102,7 +103,7 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
                 // Here is where you'll implement swipe to delete
 
                 int entryPosition = viewHolder.getAdapterPosition();
-                EmployeeEntry employeeEntry = mEmployeesAdapter.getData().get(entryPosition);
+                EmployeeEntry employeeEntry = mEmployeesAdapter.getData().get(entryPosition).employeeEntry;
                 UndoDeleteAction mUndoDeleteAction = new UndoDeleteAction( employeeEntry,null, getContext());
                 Snackbar.make(getActivity().findViewById(android.R.id.content), employeeEntry.getEmployeeName()+" will be deleted", Snackbar.LENGTH_LONG).setAction("Undo", mUndoDeleteAction).show();
 
@@ -111,7 +112,7 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
                         @Override
                         public void run() {
                             int position = viewHolder.getAdapterPosition();
-                            mDb.employeesDao().deleteEmployee(mEmployeesAdapter.getData().get(position));
+                            mDb.employeesDao().deleteEmployee(mEmployeesAdapter.getData().get(position).employeeEntry);
                         }
                     });
 
@@ -170,10 +171,12 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
         //create object of EmployeesAdapter and send data
         mEmployeesAdapter = new EmployeesAdapter(this, this);
 
-        final LiveData<List<EmployeeEntry>> employeesList = ViewModelProviders.of(this).get(MainViewModel.class).getAllEmployeesList();
-        employeesList.observe(this, new Observer<List<EmployeeEntry>>() {
+        final MainViewModel mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+
+        final LiveData<List<EmployeeWithExtras>> employeesList = mainViewModel.getEmployeesWithExtrasList();
+        employeesList.observe(this, new Observer<List<EmployeeWithExtras>>() {
             @Override
-            public void onChanged(List<EmployeeEntry> employeeEntries) {
+            public void onChanged(List<EmployeeWithExtras> employeeEntries) {
                 if (employeeEntries != null) {
                     if (employeeEntries.isEmpty())
                         showEmptyView();

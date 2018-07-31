@@ -48,7 +48,7 @@ public class EmployeeEntry {
     }
 
     //used by room when reading from database
-    public EmployeeEntry(int employeeID, int departmentId, @NonNull String employeeName, @NonNull int employeeSalary, Date employeeHireDate) {
+    public EmployeeEntry(int employeeID, int departmentId, String employeeName, int employeeSalary, Date employeeHireDate) {
         this.employeeID = employeeID;
         this.departmentId = departmentId;
         this.employeeName = employeeName;
@@ -97,5 +97,6 @@ public class EmployeeEntry {
     public void setEmployeeHireDate(Date employeeHireDate) {
         this.employeeHireDate = employeeHireDate;
     }
+
 
 }

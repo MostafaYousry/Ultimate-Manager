@@ -3,8 +3,8 @@ package com.example.android.employeesmanagementapp.data.viewmodels;
 import android.app.Application;
 
 import com.example.android.employeesmanagementapp.data.AppDatabase;
+import com.example.android.employeesmanagementapp.data.EmployeeWithExtras;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
-import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public class MainViewModel extends AndroidViewModel {
 
     private LiveData<List<DepartmentEntry>> allDepartmentsList;
     private LiveData<List<TaskEntry>> tasksList;
-    private LiveData<List<EmployeeEntry>> allEmployeesList;
+    private LiveData<List<EmployeeWithExtras>> employeesWithExtrasList;
 
 
     public MainViewModel(Application application) {
@@ -32,7 +32,7 @@ public class MainViewModel extends AndroidViewModel {
 
         allDepartmentsList = AppDatabase.getInstance(application.getApplicationContext()).departmentsDao().loadDepartments();
         tasksList = AppDatabase.getInstance(application.getApplicationContext()).tasksDao().loadRunningTasks();
-        allEmployeesList = AppDatabase.getInstance(application.getApplicationContext()).employeesDao().loadEmployees();
+        employeesWithExtrasList = AppDatabase.getInstance(application.getApplicationContext()).employeesDao().loadEmployees();
     }
 
 
@@ -44,7 +44,7 @@ public class MainViewModel extends AndroidViewModel {
         return tasksList;
     }
 
-    public LiveData<List<EmployeeEntry>> getAllEmployeesList() {
-        return allEmployeesList;
+    public LiveData<List<EmployeeWithExtras>> getEmployeesWithExtrasList() {
+        return employeesWithExtrasList;
     }
 }
