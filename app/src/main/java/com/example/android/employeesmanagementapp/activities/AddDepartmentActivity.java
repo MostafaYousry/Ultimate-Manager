@@ -89,7 +89,6 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
             setUpTasksRV();
         }
 
-
     }
 
     private void setUpTasksRV() {

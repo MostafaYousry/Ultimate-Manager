@@ -147,7 +147,7 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
     }
 
     private void setUpTasksRV() {
-        mEmployeeCompletedTasks = findViewById(R.id.task_employees_rv);
+        mEmployeeCompletedTasks = findViewById(R.id.employee_tasks_rv);
         mEmployeeCompletedTasks.setHasFixedSize(true);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);

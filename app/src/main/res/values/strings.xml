@@ -58,6 +58,7 @@
     <string name="choose_department_dialog_positive_button">OK</string>
     <string name="choose_department_dialog_cancel_button">Cancel</string>
     <string name="action_delete_department">Delete</string>
+    <string name="action_remove_employee">Remove</string>
 
 
 </resources>

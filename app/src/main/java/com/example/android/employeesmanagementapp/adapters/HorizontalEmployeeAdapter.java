@@ -11,6 +11,7 @@ import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -18,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEmployeeAdapter.EmployeesViewHolder> {
     private List<EmployeeEntry> mData;
+    private List<EmployeeEntry> mAddedEmployees;
     private EmployeesAdapter.EmployeeItemClickListener mClickListener;
     private View.OnLongClickListener mOnEmployeeLongClicked;
 
@@ -45,12 +47,24 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
 
     @Override
     public int getItemCount() {
-        return mData.size();
+        if (mData == null && mAddedEmployees != null)
+            return mAddedEmployees.size();
+        else if (mAddedEmployees == null && mData != null)
+            return mData.size();
+        else if (mData == null && mAddedEmployees == null)
+            return 0;
+        return mData.size() + mAddedEmployees.size();
     }
 
     public void setData(List<EmployeeEntry> data) {
         mData = data;
         notifyDataSetChanged();
+    }
+
+    public void mergeToAddedEmployees(List<EmployeeEntry> chosenEmployees) {
+        if (mAddedEmployees == null)
+            mAddedEmployees = new ArrayList<>();
+        mAddedEmployees.addAll(chosenEmployees);
     }
 
     public class EmployeesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -75,6 +89,12 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
         }
 
         public void bind(int position) {
+            if (position >= mData.size()) {
+                employeeName.setText(mAddedEmployees.get(position).getEmployeeName());
+
+                itemView.setTag(mAddedEmployees.get(position).getEmployeeID());
+            }
+
             employeeName.setText(mData.get(position).getEmployeeName());
 
             itemView.setTag(mData.get(position).getEmployeeID());

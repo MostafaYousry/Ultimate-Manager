@@ -26,6 +26,7 @@ import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.EmployeeWithExtras;
+import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
 import com.google.android.material.snackbar.Snackbar;
@@ -250,7 +251,15 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
 
         final Spinner spinner = new Spinner(getContext());
         spinner.setPaddingRelative(dpToPx(16), 0, dpToPx(16), 0);
-        spinner.setAdapter(new DepartmentsArrayAdapter(getContext(), this));
+        final DepartmentsArrayAdapter departmentsArrayAdapter = new DepartmentsArrayAdapter(getContext());
+        LiveData<List<DepartmentEntry>> departments = ViewModelProviders.of(getActivity()).get(MainViewModel.class).getAllDepartmentsList();
+        departments.observe(this, new Observer<List<DepartmentEntry>>() {
+            @Override
+            public void onChanged(List<DepartmentEntry> departmentEntries) {
+                departmentsArrayAdapter.setData(departmentEntries);
+            }
+        });
+        spinner.setAdapter(departmentsArrayAdapter);
         spinner.setSelection(0);
         builder.setView(spinner);
 

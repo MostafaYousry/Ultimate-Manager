@@ -6,6 +6,7 @@ import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 
 import java.util.List;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -24,7 +25,7 @@ public interface EmployeesTasksDao {
             "INNER JOIN employees_tasks " +
             "ON employees.employee_id=employees_tasks.employee_id " +
             "WHERE employees_tasks.task_id=:taskId")
-    List<EmployeeEntry> getEmployeesForTask(final int taskId);
+    LiveData<List<EmployeeEntry>> getEmployeesForTask(final int taskId);
 
     @Query("SELECT * FROM tasks " +
             "INNER JOIN employees_tasks " +

@@ -69,7 +69,7 @@ public interface EmployeesDao {
      *
      * @return list of EmployeeEntry objects wrapped with LiveData
      */
-    @Query("Select * from employees  INNER JOIN employees_tasks ON task_id != :taskId where employees.department_id = :departmentId ")
+    @Query("SELECT DISTINCT * from employees  INNER JOIN employees_tasks ON task_id != :taskId where employees.department_id = :departmentId ")
     LiveData<List<EmployeeEntry>> loadEmployeesNotInDep(int departmentId, int taskId);
 
     /**
@@ -103,7 +103,7 @@ public interface EmployeesDao {
             "        FROM employees \n" +
             "            LEFT JOIN employee_completedtask_info ON employees.employee_id = employee_completedtask_info.employee_id\n" +
             "            LEFT JOIN employee_notcompleted_info ON employees.employee_id = employee_notcompleted_info.employee_id\n" +
-            "        WHERE employee_id = :employeeId;")
+            "\tWHERE employees.employee_id = :employeeId;")
     LiveData<EmployeeWithExtras> loadEmployeeById(int employeeId);
 
     /**

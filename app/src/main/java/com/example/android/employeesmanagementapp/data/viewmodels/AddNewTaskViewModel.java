@@ -19,11 +19,14 @@ public class AddNewTaskViewModel extends ViewModel {
 
     public AddNewTaskViewModel(AppDatabase appDatabase, int taskId) {
         mAppDatabase = appDatabase;
-        if (taskId > 0) {
+        allDepartments = appDatabase.departmentsDao().loadDepartments();
+
+        if (taskId != -1) {
             task = appDatabase.tasksDao().loadTaskById(taskId);
-        } else {
-            allDepartments = appDatabase.departmentsDao().loadDepartments();
+            taskEmployees = mAppDatabase.employeesTasksDao().getEmployeesForTask(taskId);
+
         }
+
     }
 
 
@@ -31,17 +34,11 @@ public class AddNewTaskViewModel extends ViewModel {
         return task;
     }
 
-    public LiveData<List<EmployeeEntry>> getTaskEmployees(int depId) {
-        taskEmployees = mAppDatabase.employeesDao().loadEmployees(depId);
+    public LiveData<List<EmployeeEntry>> getTaskEmployees() {
         return taskEmployees;
     }
 
     public LiveData<List<DepartmentEntry>> getAllDepartments() {
-        return allDepartments;
-    }
-
-    public LiveData<List<DepartmentEntry>> getAllDepartments(int depId) {
-        allDepartments = mAppDatabase.departmentsDao().loadDepartments(depId);
         return allDepartments;
     }
 

@@ -4,14 +4,13 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.SparseBooleanArray;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -22,19 +21,16 @@ import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
 import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
 import com.example.android.employeesmanagementapp.adapters.HorizontalEmployeeAdapter;
-import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
-import com.example.android.employeesmanagementapp.data.factories.DepIdFact;
 import com.example.android.employeesmanagementapp.data.factories.TaskIdFact;
-import com.example.android.employeesmanagementapp.data.viewmodels.AddNewDepViewModel;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewTaskViewModel;
 import com.example.android.employeesmanagementapp.fragments.DatePickerFragment;
-import com.example.android.employeesmanagementapp.utils.AppUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -42,15 +38,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class AddTaskActivity extends AppCompatActivity implements TasksAdapter.TasksItemClickListener {
+public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapter.EmployeeItemClickListener, PopupMenu.OnMenuItemClickListener {
     public static final String TASK_VIEW_ONLY = "task_view_only";
 
 
@@ -71,10 +69,7 @@ public class AddTaskActivity extends AppCompatActivity implements TasksAdapter.T
     private Toolbar mToolbar;
     private ImageButton addEmployeesToTaskButton;
 
-    private int mSelectedDepartmentId;
-
-    private List<Integer> mTaskEmployeesIds;
-
+    private HorizontalEmployeeAdapter mHorizontalEmployeeAdapter;
     private AppDatabase mDb;
     private AddNewTaskViewModel mViewModel;
 
@@ -116,12 +111,20 @@ public class AddTaskActivity extends AppCompatActivity implements TasksAdapter.T
         addEmployeesToTaskButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showChooseDepDialog();
+                showChooseTaskEmployeesDialog();
             }
         });
 
 
-        mDepartmentsArrayAdapter = new DepartmentsArrayAdapter(this, this);
+        mDepartmentsArrayAdapter = new DepartmentsArrayAdapter(this);
+        LiveData<List<DepartmentEntry>> departments = mViewModel.getAllDepartments();
+        departments.observe(this, new Observer<List<DepartmentEntry>>() {
+            @Override
+            public void onChanged(List<DepartmentEntry> departmentEntries) {
+                mDepartmentsArrayAdapter.setData(departmentEntries);
+            }
+        });
+
         mTaskDepartment.setAdapter(mDepartmentsArrayAdapter);
 
 
@@ -130,7 +133,7 @@ public class AddTaskActivity extends AppCompatActivity implements TasksAdapter.T
         if (mTaskId == DEFAULT_TASK_ID) {
             clearViews();
         } else {
-            final LiveData<TaskEntry> task = ViewModelProviders.of(this, new TaskIdFact(mDb, mTaskId)).get(AddNewTaskViewModel.class).getTask();
+            final LiveData<TaskEntry> task = mViewModel.getTask();
             task.observe(this, new Observer<TaskEntry>() {
                 @Override
                 public void onChanged(@Nullable TaskEntry taskEntry) {
@@ -156,33 +159,27 @@ public class AddTaskActivity extends AppCompatActivity implements TasksAdapter.T
         });
 
 
-        mTaskDepartment.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                mSelectedDepartmentId = (int) view.getTag();
-                //populateBottomSheet(mSelectedDepartmentId);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
         setUpEmployeesRV();
     }
 
-    private void showChooseDepDialog() {
+    private void showChooseTaskEmployeesDialog() {
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Choose employees :");
+        builder.setTitle("Choose employees");
 
         RecyclerView chooseEmployeesRV = new RecyclerView(this);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         chooseEmployeesRV.setLayoutManager(linearLayoutManager);
         chooseEmployeesRV.setHasFixedSize(true);
 
-        ChooseEmployeesAdapter chooseEmployeesAdapter = new ChooseEmployeesAdapter();
-        chooseEmployeesAdapter.setData(AppUtils.getEmployeesFakeData());
+        int depId;
+        if (mTaskId == DEFAULT_TASK_ID) {
+            depId = (int) mTaskDepartment.getSelectedView().getTag();
+        } else {
+            depId = mViewModel.getTask().getValue().getDepartmentID();
+        }
+
+        final ChooseEmployeesAdapter chooseEmployeesAdapter = new ChooseEmployeesAdapter(mViewModel, depId, mTaskId, this);
         chooseEmployeesRV.setAdapter(chooseEmployeesAdapter);
 
         builder.setView(chooseEmployeesRV);
@@ -190,7 +187,8 @@ public class AddTaskActivity extends AppCompatActivity implements TasksAdapter.T
         builder.setPositiveButton(getString(R.string.choose_department_dialog_positive_button), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
+                mHorizontalEmployeeAdapter.mergeToAddedEmployees(chooseEmployeesAdapter.getChosenEmployees());
+                chooseEmployeesAdapter.clearChosenEmployees();
             }
         });
         builder.setNegativeButton(getString(R.string.choose_department_dialog_cancel_button), new DialogInterface.OnClickListener() {
@@ -212,9 +210,32 @@ public class AddTaskActivity extends AppCompatActivity implements TasksAdapter.T
         layoutManager.setOrientation(RecyclerView.HORIZONTAL);
         mRecyclerView.setLayoutManager(layoutManager);
 
-        HorizontalEmployeeAdapter mAdapter = new HorizontalEmployeeAdapter(this, true);
-        mAdapter.setData(AppUtils.getEmployeesFakeData());
-        mRecyclerView.setAdapter(mAdapter);
+        View.OnLongClickListener longClickListener = new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                PopupMenu popupMenu = new PopupMenu(AddTaskActivity.this, view, Gravity.TOP);
+
+                popupMenu.inflate(R.menu.menu_task_employee_options);
+                popupMenu.setOnMenuItemClickListener(AddTaskActivity.this);
+                popupMenu.show();
+                return true;
+
+            }
+        };
+
+        mHorizontalEmployeeAdapter = new HorizontalEmployeeAdapter(this, longClickListener);
+        if (mTaskId == DEFAULT_TASK_ID) {
+            mHorizontalEmployeeAdapter.setData(new ArrayList<EmployeeEntry>());
+        } else {
+            LiveData<List<EmployeeEntry>> taskEmployees = mViewModel.getTaskEmployees();
+            taskEmployees.observe(this, new Observer<List<EmployeeEntry>>() {
+                @Override
+                public void onChanged(List<EmployeeEntry> employeeEntries) {
+                    mHorizontalEmployeeAdapter.setData(employeeEntries);
+                }
+            });
+        }
+        mRecyclerView.setAdapter(mHorizontalEmployeeAdapter);
     }
 
     private void clearViews() {
@@ -222,8 +243,8 @@ public class AddTaskActivity extends AppCompatActivity implements TasksAdapter.T
         mTaskDescription.setText("");
         mTaskStartDate.setText("");
         mTaskDueDate.setText("");
-        mSelectedDepartmentId = 0;
-        mTaskDepartment.setSelection(mSelectedDepartmentId);
+        mTaskDepartment.setSelection(0);
+
     }
 
     private void populateUI(TaskEntry taskEntry) {
@@ -234,15 +255,7 @@ public class AddTaskActivity extends AppCompatActivity implements TasksAdapter.T
         mTaskDescription.setText(taskEntry.getTaskDescription());
         mTaskStartDate.setText(taskEntry.getTaskDueDate().toString());
         mTaskDueDate.setText(taskEntry.getTaskDueDate().toString());
-
-        final LiveData<DepartmentEntry> employeeDep = ViewModelProviders.of(this, new DepIdFact(mDb, taskEntry.getDepartmentID())).get(AddNewDepViewModel.class).getDepartment();
-        employeeDep.observe(this, new Observer<DepartmentEntry>() {
-            @Override
-            public void onChanged(DepartmentEntry departmentEntry) {
-                employeeDep.removeObserver(this);
-                mTaskDepartment.setSelection(mDepartmentsArrayAdapter.getPositionForItemId(departmentEntry));
-            }
-        });
+        mTaskDepartment.setSelection(mDepartmentsArrayAdapter.getPositionForItemId(taskEntry.getDepartmentID()));
 
     }
 
@@ -341,68 +354,123 @@ public class AddTaskActivity extends AppCompatActivity implements TasksAdapter.T
         datePickerFragment.show(getSupportFragmentManager(), "datePicker");
     }
 
+
     @Override
-    public void onTaskClick(int taskRowID, int taskPosition) {
-        Intent intent = new Intent(this, Add.class);
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_remove_employee:
+                AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                    @Override
+                    public void run() {
+
+                    }
+                });
+
+                return true;
+            default:
+                return false;
+        }
+
+    }
+
+    @Override
+    public void onEmployeeClick(int employeeRowID, int employeePosition) {
+        Intent intent = new Intent(this, AddEmployeeActivity.class);
         intent.putExtra(AddEmployeeActivity.EMPLOYEE_VIEW_ONLY, true);
-        intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY, taskRowID);
+        intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY, employeeRowID);
         startActivity(intent);
     }
-}
 
-//Adapter for ALertDialog RecyclerView
-class ChooseEmployeesAdapter extends RecyclerView.Adapter<ChooseEmployeesAdapter.chooseEmployeeViewHolder> {
-    private List<EmployeeEntry> mData;
-    private final SparseBooleanArray array=new SparseBooleanArray();
+    //Adapter for ALertDialog RecyclerView
+    static class ChooseEmployeesAdapter extends RecyclerView.Adapter<ChooseEmployeesAdapter.chooseEmployeeViewHolder> {
+        private static ChooseEmployeesAdapter sChooseEmployeesAdapter;
+        private List<EmployeeEntry> mEmployeesInDepNotTask;
+        private List<EmployeeEntry> chosenEmployees;
 
 
-    @NonNull
-    @Override
-    public chooseEmployeeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.choose_employee_item, parent, false);
-        chooseEmployeeViewHolder chooseEmployeeViewHolder = new chooseEmployeeViewHolder(rootView);
-        return chooseEmployeeViewHolder;
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull chooseEmployeeViewHolder holder, int position) {
-        if(array.get(position)){
-            holder.employeeCheckBox.setChecked(true);
-        }else{
-            holder.employeeCheckBox.setChecked(false);
-        }
-        holder.bind(position);
-    }
-
-    @Override
-    public int getItemCount() {
-        return mData.size();
-    }
-
-    public void setData(List<EmployeeEntry> data) {
-        mData = data;
-    }
-
-    public class chooseEmployeeViewHolder extends RecyclerView.ViewHolder {
-
-        TextView employeeName;
-        CheckBox employeeCheckBox;
-
-        public chooseEmployeeViewHolder(@NonNull View itemView) {
-            super(itemView);
-            employeeName = itemView.findViewById(R.id.choose_employee_name);
-            employeeCheckBox = itemView.findViewById(R.id.choose_employee_check_box);
-            employeeCheckBox.setOnClickListener(new View.OnClickListener() {
+        private ChooseEmployeesAdapter(AddNewTaskViewModel viewModel, int depId, int taskId, final LifecycleOwner owner) {
+            final LiveData<List<EmployeeEntry>> employees = viewModel.getRestOfEmployeesInDep(depId, taskId);
+            employees.observe(owner, new Observer<List<EmployeeEntry>>() {
                 @Override
-                public void onClick(View view) {
-                    array.put(getAdapterPosition(),true);
+                public void onChanged(List<EmployeeEntry> employeeEntries) {
+                    employees.removeObservers(owner);
+                    mEmployeesInDepNotTask = employeeEntries;
                 }
             });
         }
 
-        public void bind(int position) {
-            employeeName.setText(mData.get(position).getEmployeeName());
+        public static ChooseEmployeesAdapter getInstance(AddNewTaskViewModel viewModel, int depId, int taskId, LifecycleOwner owner) {
+            if (sChooseEmployeesAdapter == null) {
+                sChooseEmployeesAdapter = new ChooseEmployeesAdapter(viewModel, depId, taskId, owner);
+            }
+
+            return sChooseEmployeesAdapter;
+        }
+
+        @NonNull
+        @Override
+        public chooseEmployeeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.choose_employee_item, parent, false);
+            chooseEmployeeViewHolder chooseEmployeeViewHolder = new chooseEmployeeViewHolder(rootView);
+            return chooseEmployeeViewHolder;
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull chooseEmployeeViewHolder holder, int position) {
+            holder.bind(position);
+        }
+
+        @Override
+        public int getItemCount() {
+            return mEmployeesInDepNotTask.size();
+        }
+
+        public List<EmployeeEntry> getChosenEmployees() {
+            return chosenEmployees;
+        }
+
+        public void clearChosenEmployees() {
+            chosenEmployees.clear();
+        }
+
+        public class chooseEmployeeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+            TextView employeeName;
+            CheckBox employeeCheckBox;
+
+            public chooseEmployeeViewHolder(@NonNull View itemView) {
+                super(itemView);
+                employeeName = itemView.findViewById(R.id.choose_employee_name);
+                employeeCheckBox = itemView.findViewById(R.id.choose_employee_check_box);
+                itemView.setOnClickListener(this);
+            }
+
+            public void bind(int position) {
+                employeeName.setText(mEmployeesInDepNotTask.get(position).getEmployeeName());
+
+                if (chosenEmployees.contains(mEmployeesInDepNotTask.get(position))) {
+                    employeeCheckBox.setChecked(true);
+                } else {
+                    employeeCheckBox.setChecked(false);
+                }
+
+            }
+
+            @Override
+            public void onClick(View view) {
+                EmployeeEntry entry = mEmployeesInDepNotTask.get(getAdapterPosition());
+                if (chosenEmployees.contains(entry)) {
+                    mEmployeesInDepNotTask.add(entry);
+                    chosenEmployees.remove(entry);
+                    employeeCheckBox.setChecked(false);
+                } else {
+                    mEmployeesInDepNotTask.remove(entry);
+                    chosenEmployees.add(entry);
+                    employeeCheckBox.setChecked(true);
+                }
+            }
         }
     }
 
 }
+
