@@ -1,41 +1,23 @@
 package com.example.android.employeesmanagementapp.activities;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
-import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
-import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
 import com.example.android.employeesmanagementapp.adapters.HorizontalEmployeeAdapter;
 import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
-import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.factories.DepIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewDepViewModel;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
-import java.util.List;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.LiveData;
@@ -46,20 +28,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 public class AddDepartmentActivity extends AppCompatActivity implements RecyclerViewItemClickListener {
-    public static final String DEPARTMENT_ID_KEY = "department_id";
-
-    private static final int DEFAULT_DEPARTMENT_ID = -1;
     private static final String TAG = AddDepartmentActivity.class.getSimpleName();
 
-    private BottomSheetBehavior mSheetBehavior;
-
+    public static final String DEPARTMENT_ID_KEY = "department_id";
+    private static final int DEFAULT_DEPARTMENT_ID = -1;
     private int mDepartmentId;
 
-    private RecyclerView mRecyclerView;
+    private RecyclerView mDepCompletedTasksRV;
     private EditText mDepartmentName;
     private Toolbar mToolbar;
     private AppDatabase mDb;
-    private RecyclerView mDepEmployeesRecyclerView;
+    private RecyclerView mDepEmployeesRV;
 
 
 
@@ -105,37 +84,37 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
         }
 
 
-        // Lookup the recyclerview in activity layout
-        mRecyclerView= (RecyclerView) findViewById(R.id.rvTasks);
-        mRecyclerView.setNestedScrollingEnabled(false);
-        mRecyclerView.setHasFixedSize(true);
+        // Lookup the recycler view in activity layout
+        mDepCompletedTasksRV = findViewById(R.id.department_tasks_rv);
+        mDepCompletedTasksRV.setNestedScrollingEnabled(false);
+        mDepCompletedTasksRV.setHasFixedSize(true);
         // Create adapter passing in the sample user data
         TasksAdapter mTadapter = new TasksAdapter(this);
         // Attach the adapter to the recyclerview to populate items
-        mRecyclerView.setAdapter(mTadapter);
+        mDepCompletedTasksRV.setAdapter(mTadapter);
         mTadapter.setData(AppUtils.getTasksFakeData());
         // Set layout manager to position the items
         LinearLayoutManager linearLayoutManager=new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         linearLayoutManager.setAutoMeasureEnabled(true);
-        mRecyclerView.setLayoutManager(linearLayoutManager);
+        mDepCompletedTasksRV.setLayoutManager(linearLayoutManager);
         // That's all!
 
     }
 
 
     private void setUpEmployeesRV() {
-        mDepEmployeesRecyclerView = findViewById(R.id.department_employees_rv);
+        mDepEmployeesRV = findViewById(R.id.department_employees_rv);
 
-        mDepEmployeesRecyclerView.setHasFixedSize(true);
+        mDepEmployeesRV.setHasFixedSize(true);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(RecyclerView.HORIZONTAL);
-        mDepEmployeesRecyclerView.setLayoutManager(layoutManager);
+        mDepEmployeesRV.setLayoutManager(layoutManager);
 
         HorizontalEmployeeAdapter mAdapter = new HorizontalEmployeeAdapter(this, false);
         mAdapter.setData(AppUtils.getEmployeesFakeData());
-        mDepEmployeesRecyclerView.setAdapter(mAdapter);
+        mDepEmployeesRV.setAdapter(mAdapter);
 
     }
 
