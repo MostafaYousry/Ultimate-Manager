@@ -24,7 +24,6 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
         mTaskClickListener = clickListener;
     }
 
-
     /**
      * interface to handle click events done on a recycler view item
      */
@@ -65,8 +64,8 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
         notifyDataSetChanged();
     }
 
-    public List<TaskEntry> getData() {
-        return mData;
+    public TaskEntry getItem(int position) {
+        return mData.get(position);
     }
 
     class TasksViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

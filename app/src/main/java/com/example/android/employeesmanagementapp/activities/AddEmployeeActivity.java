@@ -47,10 +47,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapter.TasksItemClickListener {
 
-    public static final String EMPLOYEE_ID_KEY = "employee_id";
-    public static final String EMPLOYEE_VIEW_ONLY = "employee_view_only";
     private static final String TAG = AddEmployeeActivity.class.getSimpleName();
+
+
+    public static final String EMPLOYEE_ID_KEY = "employee_id";
     private static final int DEFAULT_EMPLOYEE_ID = -1;
+    public static final String EMPLOYEE_VIEW_ONLY = "employee_view_only";
     private static final boolean DEFAULT_EMPLOYEE_VIEW_ONLY = false;
 
     private int mEmployeeId;
@@ -145,7 +147,7 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
     }
 
     private void setUpTasksRV() {
-        mEmployeeCompletedTasks = findViewById(R.id.department_employees_rv);
+        mEmployeeCompletedTasks = findViewById(R.id.task_employees_rv);
         mEmployeeCompletedTasks.setHasFixedSize(true);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);

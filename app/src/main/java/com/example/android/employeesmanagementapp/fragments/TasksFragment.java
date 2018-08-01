@@ -10,13 +10,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.R;
-import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
 import com.example.android.employeesmanagementapp.UndoDeleteAction;
 import com.example.android.employeesmanagementapp.activities.AddTaskActivity;
 import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
-import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
 import com.google.android.material.snackbar.Snackbar;
@@ -35,7 +33,7 @@ import androidx.recyclerview.widget.RecyclerView;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class TasksFragment extends Fragment implements RecyclerViewItemClickListener {
+public class TasksFragment extends Fragment implements TasksAdapter.TasksItemClickListener {
 
     private final String TAG = TasksFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
@@ -76,15 +74,18 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
         // specify an adapter
         mAdapter = new TasksAdapter(this);
 
-        LiveData<List<TaskEntry>> tasksList = ViewModelProviders.of(this).get(MainViewModel.class).getTasksList();
+        LiveData<List<TaskEntry>> tasksList = ViewModelProviders.of(getActivity()).get(MainViewModel.class).getTasksList();
         tasksList.observe(this, new Observer<List<TaskEntry>>() {
             @Override
             public void onChanged(List<TaskEntry> taskEntries) {
-                mAdapter.setData(taskEntries);
-                if (mAdapter.getItemCount() == 0)
-                    showEmptyView();
-                else
-                    showRecyclerView();
+                if (taskEntries != null) {
+                    if (taskEntries.isEmpty())
+                        showEmptyView();
+                    else {
+                        mAdapter.setData(taskEntries);
+                        showRecyclerView();
+                    }
+                }
             }
         });
 
@@ -109,8 +110,8 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
                 // Here is where you'll implement swipe to delete
 
                 int taskPosition = viewHolder.getAdapterPosition();
-                TaskEntry taskEntry = mAdapter.getData().get(taskPosition);
-                UndoDeleteAction mUndoDeleteAction = new UndoDeleteAction( null,taskEntry, getContext());
+                TaskEntry taskEntry = mAdapter.getItem(taskPosition);
+                UndoDeleteAction mUndoDeleteAction = new UndoDeleteAction(taskEntry, mDb);
                 Snackbar.make(getActivity().findViewById(android.R.id.content), taskEntry.getTaskTitle()+" will be deleted", Snackbar.LENGTH_LONG).setAction("Undo", mUndoDeleteAction).show();
 
                 System.out.println("deleting");
@@ -118,7 +119,7 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
                     @Override
                     public void run() {
                         int position = viewHolder.getAdapterPosition();
-                        mDb.tasksDao().deleteTask(mAdapter.getData().get(position));
+                        mDb.tasksDao().deleteTask(mAdapter.getItem(position));
                     }
                 });
 
@@ -171,16 +172,11 @@ public class TasksFragment extends Fragment implements RecyclerViewItemClickList
     }
 
 
-    /**
-     * called when a list item is clicked
-     */
     @Override
-    public void onItemClick(int clickedItemRowID, int clickedItemPosition) {
-
+    public void onTaskClick(int taskRowID, int taskPosition) {
         Intent intent = new Intent(getActivity(), AddTaskActivity.class);
-        intent.putExtra(AddTaskActivity.TASK_ID_KEY, clickedItemRowID);
+        intent.putExtra(AddTaskActivity.TASK_ID_KEY, taskRowID);
         startActivity(intent);
     }
-
 }
 

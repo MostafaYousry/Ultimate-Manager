@@ -14,15 +14,15 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.R;
-import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
 import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
 import com.example.android.employeesmanagementapp.adapters.HorizontalEmployeeAdapter;
+import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
@@ -34,7 +34,6 @@ import com.example.android.employeesmanagementapp.data.viewmodels.AddNewDepViewM
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewTaskViewModel;
 import com.example.android.employeesmanagementapp.fragments.DatePickerFragment;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.util.Date;
 import java.util.List;
@@ -51,14 +50,16 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class AddTaskActivity extends AppCompatActivity implements RecyclerViewItemClickListener {
+public class AddTaskActivity extends AppCompatActivity implements TasksAdapter.TasksItemClickListener {
+    public static final String TASK_VIEW_ONLY = "task_view_only";
+
 
     public static final String TASK_ID_KEY = "task_id";
     private static final String TAG = AddTaskActivity.class.getSimpleName();
+    private static final boolean DEFAULT_TASK_VIEW_ONLY = false;
     private static final int DEFAULT_TASK_ID = -1;
     private int mTaskId;
 
-    private BottomSheetBehavior mSheetBehavior;
 
     private EmployeesAdapter mEmplyeesAdapter;
 
@@ -68,13 +69,14 @@ public class AddTaskActivity extends AppCompatActivity implements RecyclerViewIt
     private TextView mTaskDueDate;
     private Spinner mTaskDepartment;
     private Toolbar mToolbar;
-    private ImageView addTaskEmployees;
+    private ImageButton addEmployeesToTaskButton;
 
     private int mSelectedDepartmentId;
 
     private List<Integer> mTaskEmployeesIds;
 
     private AppDatabase mDb;
+    private AddNewTaskViewModel mViewModel;
 
     private DepartmentsArrayAdapter mDepartmentsArrayAdapter;
     private RecyclerView mRecyclerView;
@@ -86,6 +88,7 @@ public class AddTaskActivity extends AppCompatActivity implements RecyclerViewIt
         setContentView(R.layout.activity_add_task);
 
         mDb = AppDatabase.getInstance(this);
+        mViewModel = ViewModelProviders.of(this, new TaskIdFact(mDb, mTaskId)).get(AddNewTaskViewModel.class);
 
         //check if activity was opened from a click on rv item or from the fab
         Intent intent = getIntent();
@@ -109,8 +112,8 @@ public class AddTaskActivity extends AppCompatActivity implements RecyclerViewIt
         mTaskStartDate = findViewById(R.id.task_start_date);
         mTaskDueDate = findViewById(R.id.task_due_date);
         mTaskDepartment = findViewById(R.id.task_department);
-        addTaskEmployees = findViewById(R.id.add_more_employees);
-        addTaskEmployees.setOnClickListener(new View.OnClickListener() {
+        addEmployeesToTaskButton = findViewById(R.id.add_employees_to_task_button);
+        addEmployeesToTaskButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showChooseDepDialog();
@@ -201,7 +204,7 @@ public class AddTaskActivity extends AppCompatActivity implements RecyclerViewIt
     }
 
     private void setUpEmployeesRV() {
-        mRecyclerView = findViewById(R.id.department_employees_rv);
+        mRecyclerView = findViewById(R.id.task_employees_rv);
 
         mRecyclerView.setHasFixedSize(true);
 
@@ -337,12 +340,12 @@ public class AddTaskActivity extends AppCompatActivity implements RecyclerViewIt
         //show th dialog
         datePickerFragment.show(getSupportFragmentManager(), "datePicker");
     }
-    @Override
-    public void onItemClick(int clickedItemRowID, int clickedItemPosition) {
 
-        Intent intent = new Intent(this, AddEmployeeActivity.class);
+    @Override
+    public void onTaskClick(int taskRowID, int taskPosition) {
+        Intent intent = new Intent(this, Add.class);
         intent.putExtra(AddEmployeeActivity.EMPLOYEE_VIEW_ONLY, true);
-        intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY, clickedItemRowID);
+        intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY, taskRowID);
         startActivity(intent);
     }
 }

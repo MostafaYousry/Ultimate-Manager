@@ -150,13 +150,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:cursorVisible="false"
-                    android:onClick="pickDate"
                     android:drawableStart="@drawable/ic_calendar"
                     android:drawablePadding="4dp"
                     android:focusable="false"
                     android:hint="@string/hint_task_due_date"
                     android:inputType="date"
                     android:maxLines="1"
+                    android:onClick="pickDate"
                     tools:text="@tools:sample/date/ddmmyy" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -183,29 +183,33 @@
                 android:id="@+id/department_employees_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Task Employees : "
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:text="Task Employees "
                 android:textColor="@color/primaryTextColor"
                 android:textSize="18sp"
-                app:layout_constraintBottom_toTopOf="@+id/department_employees_rv"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.033"
+                app:layout_constraintBottom_toTopOf="@+id/task_employees_rv"
+                app:layout_constraintEnd_toStartOf="@+id/add_employees_to_task_button"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintHorizontal_chainStyle="spread_inside"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/task_department" />
 
-            <ImageView
-                android:id="@+id/add_more_employees"
+            <ImageButton
+                android:id="@+id/add_employees_to_task_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="32dp"
+                android:background="@android:color/transparent"
+                android:padding="16dp"
                 android:src="@drawable/ic_add_circle_outline_black"
-                app:layout_constraintBottom_toTopOf="@+id/department_employees_rv"
+                app:layout_constraintBottom_toTopOf="@+id/task_employees_rv"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.955"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/task_department"
-                app:layout_constraintVertical_bias="0.058" />
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/department_employees_text_view" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/department_employees_rv"
+                android:id="@+id/task_employees_rv"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="16dp"
@@ -215,12 +219,6 @@
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/department_employees_text_view" />
-
-            <androidx.constraintlayout.widget.Barrier
-                android:id="@+id/barrier"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:barrierDirection="left" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

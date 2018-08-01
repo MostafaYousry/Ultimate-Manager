@@ -115,7 +115,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
 
     private void setUpEmployeesRV() {
 
-        mDepEmployeesRV = findViewById(R.id.department_employees_rv);
+        mDepEmployeesRV = findViewById(R.id.task_employees_rv);
         mDepEmployeesRV.setHasFixedSize(true);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
