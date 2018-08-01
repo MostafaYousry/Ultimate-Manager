@@ -57,7 +57,7 @@
     <string name="choose_department_dialog_title">Move to</string>
     <string name="choose_department_dialog_positive_button">OK</string>
     <string name="choose_department_dialog_cancel_button">Cancel</string>
-    <string name="action_delete_departments">Delete departments</string>
+    <string name="action_delete_department">Delete</string>
 
 
 </resources>

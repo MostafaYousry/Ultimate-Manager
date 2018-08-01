@@ -1,47 +1,31 @@
-//todo:fix task start and due date issue
-//todo:AutocompletTextView shows wrong selected department name
-
-
-//App database
-//todo:empty view
-//todo:disable adding employees when no departments are available
-//todo:move multiple employees , popup dialog to choose moveto department
-//todo:tasks fragment
-//todo:task update (data and employees)
-//todo:fix departments spinner issue
-//todo:filter running tasks to show tasks specific to a department
-//todo:evaluate a task when done in a popu dialog
-//todo:rating for every employee(average of task's rating done by this employee)
-//todo:write a note concerning a certain employee
-
-
-//optional
-//todo:image choose an image for the employee
-//todo:notifications & background services
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//App Theme
-//todo:see how to use Theme.material
-//todo:use text input edit text material design component instead of normal edit text
-//todo:apply every widget guideline(elevation,measurements,...)
-//todo:apply transitions,animations,statelist animator, .....
-//todo:apply coordinator layout in activities
-//todo:apply Glide image library for image processing
-//todo:use image color palette to pick background color for department name
-//todo:choose app fonts (Typography)
-//todo:pick app theme colors(see color guidelines and material palette)
-//todo:pick app icons(Iconography) (see material design guide)
+todo(1):rate a task
+todo(2):note on employees
+todo(3):fix task start and due date issue
+todo(4):use xliff tag and and plurals (1 running task / 5 running tasks)
+todo(5):enhance empty views (Add images and actions)
+todo(6):filter running tasks to show tasks specific to a department
+todo(7):choose an image for the employee and department(from phone or by taking a picture)
+todo(8):notifications & background services for notifying a manager when a task due date is met
+*pressing the notification opens the app in the state of rating a completed task
+*see background services and workmanager architecture component
+todo(9):use paging architecture component for loading lists in small chunks
+todo(10):use butter Knife for binding views instead of find view by id
+todo(11):change department and task items layout
+todo(12):add option to color a task item
+todo(13):apply a theme for the app
+*see (https://material.io/design/material-theming/overview.html#)
+*see (https://material.io/design/material-theming/implementing-your-theme.html)
+todo(14):choose colors for the app
+*see (https://material.io/design/color/the-color-system.html)
+*see (https://material.io/design/color/applying-color-to-ui.html)
+*see (https://material.io/design/color/color-usage.html)
+*see (https://material.io/design/color/text-legibility.html)
+todo(15):choose fonts for the app
+*see (https://material.io/design/typography/the-type-system.html)
+*see (https://material.io/design/typography/understanding-typography.html)
+*see (https://material.io/design/typography/language-support.html)
+todo(16):apply every widget guideline(elevation,padding,margins...)
+*see components tab on material.io
+todo(17):apply transitions,animations,statelist animator, .....
+*see motion tab on material.io
+todo(18):use image color palette to pick background color for department name item card

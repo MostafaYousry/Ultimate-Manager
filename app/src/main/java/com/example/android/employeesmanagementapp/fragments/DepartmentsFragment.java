@@ -14,14 +14,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
 import com.example.android.employeesmanagementapp.activities.AddDepartmentActivity;
-import com.example.android.employeesmanagementapp.activities.MainActivity;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsAdapter;
-import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
@@ -31,6 +28,7 @@ import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
@@ -43,15 +41,17 @@ import androidx.recyclerview.widget.RecyclerView;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class DepartmentsFragment extends Fragment implements RecyclerViewItemClickListener , DepartmentsAdapter.DepartmentSelectedStateListener {
+public class DepartmentsFragment extends Fragment implements RecyclerViewItemClickListener, PopupMenu.OnMenuItemClickListener {
+
     private final String TAG = DepartmentsFragment.class.getSimpleName();
+
     private RecyclerView mRecyclerView;
     private DepartmentsAdapter mAdapter;
     private AppDatabase mDb;
-    private LinearLayout emptyView;
-    private TextView emptyViewTextView;
+    private LinearLayout mEmptyView;
+    private TextView mEmptyViewTextView;
     private List<DepartmentEntry> mSelectedDepartments = new ArrayList<>();
-    private LiveData<List<EmployeeEntry>> mhasEmployees ;
+    private LiveData<List<EmployeeEntry>> mhasEmployees;
 
 
     public DepartmentsFragment() {
@@ -69,36 +69,48 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        //enable add departments button
         getActivity().findViewById(R.id.fab).setEnabled(true);
 
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragments_rv, container, false);
 
-        //get recycler view
+        //get views
         mRecyclerView = rootView.findViewById(R.id.rv_fragment);
-
-        emptyView = rootView.findViewById(R.id.empty_view);
-        emptyViewTextView = rootView.findViewById(R.id.empty_view_message_text_view);
+        mEmptyView = rootView.findViewById(R.id.empty_view);
+        mEmptyViewTextView = rootView.findViewById(R.id.empty_view_message_text_view);
 
         // this setting to improves performance if you know that changes
         // in content do not change the layout size of the RecyclerView
         mRecyclerView.setHasFixedSize(true);
 
-        //initialise recycler view adapter
-        mAdapter = new DepartmentsAdapter(this,this);
+        //define a click listener to show popup menu with department options
+        View.OnClickListener clickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PopupMenu popup = new PopupMenu(getContext(), view);
 
-        LiveData<List<DepartmentEntry>> departmentsList = ViewModelProviders.of(this).get(MainViewModel.class).getAllDepartmentsList();
+                // This activity implements OnMenuItemClickListener
+                popup.setOnMenuItemClickListener(DepartmentsFragment.this);
+                popup.inflate(R.menu.menu_department_options);
+                popup.show();
+            }
+        };
+
+        //initialise recycler view adapter
+        mAdapter = new DepartmentsAdapter(this, clickListener);
+
+        LiveData<List<DepartmentEntry>> departmentsList = ViewModelProviders.of(getActivity()).get(MainViewModel.class).getAllDepartmentsList();
         departmentsList.observe(this, new Observer<List<DepartmentEntry>>() {
             @Override
             public void onChanged(List<DepartmentEntry> departmentEntries) {
                 if (departmentEntries != null) {
-                    mAdapter.setData(departmentEntries);
-                    if (mAdapter.getItemCount() == 0)
+                    if (departmentEntries.isEmpty())
                         showEmptyView();
-                    else
+                    else {
+                        mAdapter.setData(departmentEntries);
                         showRecyclerView();
-
-
+                    }
                 }
             }
         });
@@ -122,13 +134,13 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
 
     private void showEmptyView() {
         mRecyclerView.setVisibility(View.GONE);
-        emptyViewTextView.setText(R.string.department_empty_view_message);
-        emptyView.setVisibility(View.VISIBLE);
+        mEmptyViewTextView.setText(R.string.department_empty_view_message);
+        mEmptyView.setVisibility(View.VISIBLE);
     }
 
     private void showRecyclerView() {
         mRecyclerView.setVisibility(View.VISIBLE);
-        emptyView.setVisibility(View.GONE);
+        mEmptyView.setVisibility(View.GONE);
     }
 
 
@@ -144,44 +156,10 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_departments_options, menu);
+        inflater.inflate(R.menu.menu_department_options, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // User clicked on a menu option in the app bar overflow menu
-        if (mSelectedDepartments.isEmpty()) {
-            Toast.makeText(getContext(), "No departments selected", Toast.LENGTH_LONG).show();
-            return true;
-        }
-        switch (item.getItemId()) {
-            case R.id.delete_departments:
-                Toast.makeText(getContext(), "Deleting " + mSelectedDepartments.size() + " departments", Toast.LENGTH_LONG).show();
-                AppExecutor.getInstance().diskIO().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        for (int i = 0; i < mSelectedDepartments.size(); i++) {
-                           //todo: make sure not to delete a full department
-                            //mhasEmployees=  mDb.employeesDao().loadEmployees(mSelectedDepartments.get(i).getDepartmentId());
-                            //if(mhasEmployees != null)
-                             // Toast.makeText(getContext(),"Can't delete this department because it has employees please move them or delete them first", Toast.LENGTH_LONG).show();
-                            mDb.departmentsDao().deleteDepartment(mSelectedDepartments.get(i));
-                        }
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                resetSelection();
-                            }
-                        });
-                    }
-                });
-
-                return true;
-
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     /**
      * Converts dp to pixel
@@ -191,38 +169,27 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
     }
 
-    private void resetSelection() {
-        ((MainActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.departments));
-        mAdapter.setDepartmentSelectionMode(DepartmentsAdapter.SELECTION_MODE_SINGLE);
-        mSelectedDepartments.clear();
-    }
-
-    public boolean isInMultiSelectionMode() {
-        if (mAdapter.getDepartmentSelectionMode() == DepartmentsAdapter.SELECTION_MODE_MULTIPLE) {
-            resetSelection();
-            return true;
-        }
-        return false;
-    }
 
     @Override
-    public void onDepartmentSelected(DepartmentEntry departmentEntry) {
-        //add department to selected list
-        mSelectedDepartments.add(departmentEntry);
-        Toast.makeText(getContext(), "department with id " + departmentEntry.getDepartmentId() + " is added", Toast.LENGTH_SHORT).show();
-        ((MainActivity) getActivity()).getSupportActionBar().setTitle(mSelectedDepartments.size() + " selected");
-    }
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_delete_department:
+                AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (int i = 0; i < mSelectedDepartments.size(); i++) {
+                            //todo: make sure not to delete a full department
+                            //hasEmployees=  mDb.employeesDao().loadEmployees(mSelectedDepartments.get(i).getDepartmentId());
+                            //if(mhasEmployees != null)
+                            // Toast.makeText(getContext(),"Can't delete this department because it has employees please move them or delete them first", Toast.LENGTH_LONG).show();
+                            mDb.departmentsDao().deleteDepartment(mSelectedDepartments.get(i));
+                        }
+                    }
+                });
 
-    @Override
-    public void onDepartmentDeselected(DepartmentEntry departmentEntry) {
-        //remove department from selected list
-        mSelectedDepartments.remove(departmentEntry);
-        Toast.makeText(getContext(), "department with id " + departmentEntry.getDepartmentId() + " is removed", Toast.LENGTH_SHORT).show();
-        if (mSelectedDepartments.isEmpty()) {
-            ((MainActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.departments));
-            mAdapter.setDepartmentSelectionMode(DepartmentsAdapter.SELECTION_MODE_SINGLE);
-        } else {
-            ((MainActivity) getActivity()).getSupportActionBar().setTitle(mSelectedDepartments.size() + " selected");
+                return true;
+            default:
+                return false;
         }
     }
 

@@ -16,9 +16,11 @@ public class AddNewDepViewModel extends ViewModel {
     private LiveData<List<TaskEntry>> mCompletedTasks;
 
     public AddNewDepViewModel(AppDatabase database, int depId) {
-        mDepartment = database.departmentsDao().loadDepartmentById(depId);
-        mEmployees = database.employeesDao().loadEmployees(depId);
-        mCompletedTasks = database.tasksDao().loadTasksForDepartment(depId, true);
+        if (depId > 0) {
+            mDepartment = database.departmentsDao().loadDepartmentById(depId);
+            mEmployees = database.employeesDao().loadEmployees(depId);
+            mCompletedTasks = database.tasksDao().loadTasksForDepartment(depId, true);
+        }
     }
 
     public LiveData<DepartmentEntry> getDepartment() {
