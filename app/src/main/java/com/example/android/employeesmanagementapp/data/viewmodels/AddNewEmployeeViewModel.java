@@ -1,8 +1,9 @@
 package com.example.android.employeesmanagementapp.data.viewmodels;
 
 import com.example.android.employeesmanagementapp.data.AppDatabase;
+import com.example.android.employeesmanagementapp.data.EmployeeWithExtras;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
-import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
+import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 
 import java.util.List;
 
@@ -10,20 +11,19 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
 public class AddNewEmployeeViewModel extends ViewModel {
-    private LiveData<EmployeeEntry> mEmployee;
+    private LiveData<EmployeeWithExtras> mEmployee;
     private LiveData<List<DepartmentEntry>> allDepartments;
-    private AppDatabase mDatabase;
+    private LiveData<List<TaskEntry>> employeeCompletedTasks;
 
     public AddNewEmployeeViewModel(AppDatabase database, int empID) {
-        mDatabase = database;
-        if (empID == -1) {
-            allDepartments = database.departmentsDao().loadDepartments();
-        } else {
+        allDepartments = database.departmentsDao().loadDepartments();
+        if (empID != -1) {
             mEmployee = database.employeesDao().loadEmployeeById(empID);
+            employeeCompletedTasks = database.tasksDao().loadTasksForEmployee(empID, true);
         }
     }
 
-    public LiveData<EmployeeEntry> getEmployee() {
+    public LiveData<EmployeeWithExtras> getEmployee() {
         return mEmployee;
     }
 
@@ -31,8 +31,7 @@ public class AddNewEmployeeViewModel extends ViewModel {
         return allDepartments;
     }
 
-    public LiveData<List<DepartmentEntry>> getAllDepartments(int depId) {
-        allDepartments = mDatabase.departmentsDao().loadDepartments(depId);
-        return allDepartments;
+    public LiveData<List<TaskEntry>> getEmployeeCompletedTasks() {
+        return employeeCompletedTasks;
     }
 }

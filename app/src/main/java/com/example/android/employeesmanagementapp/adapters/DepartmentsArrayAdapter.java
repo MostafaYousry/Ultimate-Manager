@@ -7,16 +7,12 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 
 import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 
 /**
  * array adapter for spinners and autocomplete text views
@@ -26,16 +22,8 @@ public class DepartmentsArrayAdapter extends ArrayAdapter<String> {
     private List<DepartmentEntry> mDepartmentEntryList;
 
 
-    public DepartmentsArrayAdapter(Context context, LifecycleOwner owner) {
+    public DepartmentsArrayAdapter(Context context) {
         super(context, 0);
-        LiveData<List<DepartmentEntry>> departments = AppDatabase.getInstance(context).departmentsDao().loadDepartments();
-        departments.observe(owner, new Observer<List<DepartmentEntry>>() {
-            @Override
-            public void onChanged(List<DepartmentEntry> departmentEntries) {
-                mDepartmentEntryList = departmentEntries;
-                notifyDataSetChanged();
-            }
-        });
     }
 
 
@@ -85,15 +73,19 @@ public class DepartmentsArrayAdapter extends ArrayAdapter<String> {
      * used when a department is already assigned to an existing task
      * its used to select the previously chosen department for that task
      *
-     * @param departmentEntry:
+     * @param depId:
      * @return its position in the drop down list
      */
-    public int getPositionForItemId(DepartmentEntry departmentEntry) {
+    public int getPositionForItemId(int depId) {
         if (mDepartmentEntryList == null)
             return 0;
 
-        return mDepartmentEntryList.indexOf(departmentEntry);
+        return mDepartmentEntryList.indexOf(new DepartmentEntry(depId));
 
     }
 
+    public void setData(List<DepartmentEntry> departmentEntryList) {
+        mDepartmentEntryList = departmentEntryList;
+        notifyDataSetChanged();
+    }
 }

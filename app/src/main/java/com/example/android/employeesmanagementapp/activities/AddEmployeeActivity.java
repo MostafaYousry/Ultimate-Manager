@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -19,19 +20,21 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
+import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
+import com.example.android.employeesmanagementapp.data.EmployeeWithExtras;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
-import com.example.android.employeesmanagementapp.data.factories.DepIdFact;
+import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.data.factories.EmpIdFact;
-import com.example.android.employeesmanagementapp.data.viewmodels.AddNewDepViewModel;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewEmployeeViewModel;
 import com.example.android.employeesmanagementapp.fragments.DatePickerFragment;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 
 import java.util.Date;
+import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -39,8 +42,10 @@ import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-public class AddEmployeeActivity extends AppCompatActivity {
+public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapter.TasksItemClickListener {
 
     public static final String EMPLOYEE_ID_KEY = "employee_id";
     public static final String EMPLOYEE_VIEW_ONLY = "employee_view_only";
@@ -56,14 +61,16 @@ public class AddEmployeeActivity extends AppCompatActivity {
     private TextView mEmployeeHireDate;
     private Spinner mEmployeeDepartment;
     private ImageView mEmployeeImage;
+    private RatingBar mEmployeeRating;
+    private RecyclerView mEmployeeCompletedTasks;
 
     private DepartmentsArrayAdapter mArrayAdapter;
 
     private Toolbar mToolbar;
     private CollapsingToolbarLayout mCollapsingToolbar;
 
-
     private AppDatabase mDb;
+    private AddNewEmployeeViewModel mViewModel;
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -74,6 +81,7 @@ public class AddEmployeeActivity extends AppCompatActivity {
 
         //create db instance
         mDb = AppDatabase.getInstance(this);
+        mViewModel = ViewModelProviders.of(this, new EmpIdFact(mDb, mEmployeeId)).get(AddNewEmployeeViewModel.class);
 
         //check if activity was opened from a click on rv item or from the fab
         Intent intent = getIntent();
@@ -98,8 +106,17 @@ public class AddEmployeeActivity extends AppCompatActivity {
         mEmployeeDepartment = findViewById(R.id.employee_department);
         mCollapsingToolbar = findViewById(R.id.collapsing_toolbar);
         mEmployeeImage = findViewById(R.id.employee_image);
+        mEmployeeRating = findViewById(R.id.employee_rating);
 
-        mArrayAdapter = new DepartmentsArrayAdapter(this, this);
+
+        mArrayAdapter = new DepartmentsArrayAdapter(this);
+        LiveData<List<DepartmentEntry>> departments = mViewModel.getAllDepartments();
+        departments.observe(this, new Observer<List<DepartmentEntry>>() {
+            @Override
+            public void onChanged(List<DepartmentEntry> departmentEntries) {
+                mArrayAdapter.setData(departmentEntries);
+            }
+        });
         mEmployeeDepartment.setAdapter(mArrayAdapter);
 
 
@@ -109,20 +126,42 @@ public class AddEmployeeActivity extends AppCompatActivity {
         if (mEmployeeId == DEFAULT_EMPLOYEE_ID) {
             clearViews();
         } else {
-            final LiveData<EmployeeEntry> employee = ViewModelProviders.of(this, new EmpIdFact(mDb, mEmployeeId)).get(AddNewEmployeeViewModel.class).getEmployee();
-            employee.observe(this, new Observer<EmployeeEntry>() {
+            final LiveData<EmployeeWithExtras> employee = mViewModel.getEmployee();
+            employee.observe(this, new Observer<EmployeeWithExtras>() {
                 @Override
-                public void onChanged(EmployeeEntry employeeEntry) {
+                public void onChanged(EmployeeWithExtras employeeWithExtras) {
                     employee.removeObservers(AddEmployeeActivity.this);
-                    populateUi(employeeEntry);
+                    populateUi(employeeWithExtras);
                 }
             });
+
+            setUpTasksRV();
         }
 
         if (mIsViewOnly) {
             deactivateViews();
         }
 
+    }
+
+    private void setUpTasksRV() {
+        mEmployeeCompletedTasks = findViewById(R.id.department_employees_rv);
+        mEmployeeCompletedTasks.setHasFixedSize(true);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        mEmployeeCompletedTasks.setLayoutManager(layoutManager);
+
+        final TasksAdapter adapter = new TasksAdapter(this);
+
+        final LiveData<List<TaskEntry>> employeeCompletedTasks = mViewModel.getEmployeeCompletedTasks();
+        employeeCompletedTasks.observe(this, new Observer<List<TaskEntry>>() {
+            @Override
+            public void onChanged(List<TaskEntry> tasks) {
+                employeeCompletedTasks.removeObservers(AddEmployeeActivity.this);
+                adapter.setData(tasks);
+            }
+        });
+        mEmployeeCompletedTasks.setAdapter(adapter);
     }
 
 
@@ -168,27 +207,23 @@ public class AddEmployeeActivity extends AppCompatActivity {
         mEmployeeHireDate.setText("");
         mCollapsingToolbar.setTitle(getString(R.string.add_new_employee));
         mEmployeeDepartment.setSelection(0);
+        mEmployeeRating.setVisibility(View.GONE);
+        mEmployeeCompletedTasks.setVisibility(View.GONE);
+        findViewById(R.id.textView3).setVisibility(View.GONE);
+        findViewById(R.id.textView4).setVisibility(View.GONE);
 
     }
 
-    private void populateUi(EmployeeEntry employeeEntry) {
-        if (employeeEntry == null)
+    private void populateUi(EmployeeWithExtras employeeWithExtras) {
+        if (employeeWithExtras == null)
             return;
 
-        mEmployeeName.setText(employeeEntry.getEmployeeName());
-        mEmployeeSalary.setText(String.valueOf(employeeEntry.getEmployeeSalary()));
-        mEmployeeHireDate.setText(employeeEntry.getEmployeeHireDate().toString());
-        mCollapsingToolbar.setTitle(employeeEntry.getEmployeeName());
-
-        final LiveData<DepartmentEntry> employeeDep = ViewModelProviders.of(this, new DepIdFact(mDb, employeeEntry.getDepartmentId())).get(AddNewDepViewModel.class).getDepartment();
-        employeeDep.observe(this, new Observer<DepartmentEntry>() {
-            @Override
-            public void onChanged(DepartmentEntry departmentEntry) {
-                employeeDep.removeObserver(this);
-                mEmployeeDepartment.setSelection(mArrayAdapter.getPositionForItemId(departmentEntry));
-            }
-        });
-
+        mEmployeeName.setText(employeeWithExtras.employeeEntry.getEmployeeName());
+        mEmployeeSalary.setText(String.valueOf(employeeWithExtras.employeeEntry.getEmployeeSalary()));
+        mEmployeeHireDate.setText(employeeWithExtras.employeeEntry.getEmployeeHireDate().toString());
+        mCollapsingToolbar.setTitle(employeeWithExtras.employeeEntry.getEmployeeName());
+        mEmployeeDepartment.setSelection(mArrayAdapter.getPositionForItemId(employeeWithExtras.employeeEntry.getDepartmentId()));
+        mEmployeeRating.setRating(employeeWithExtras.employeeRating);
 
         Glide.with(this).load(AppUtils.getRandomEmployeeImage()).apply(RequestOptions.centerCropTransform()).into(mEmployeeImage);
     }
@@ -251,5 +286,13 @@ public class AddEmployeeActivity extends AppCompatActivity {
 
     private boolean valideData() {
         return true;
+    }
+
+    @Override
+    public void onTaskClick(int taskRowID, int taskPosition) {
+        Intent intent = new Intent(this, AddTaskActivity.class);
+        intent.putExtra(AddTaskActivity.TASK_VIEW_ONLY, true);
+        intent.putExtra(AddTaskActivity.TASK_ID_KEY, taskRowID);
+        startActivity(intent);
     }
 }
