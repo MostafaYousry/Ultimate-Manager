@@ -1,18 +1,16 @@
 package com.example.android.employeesmanagementapp.adapters;
 
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.android.employeesmanagementapp.R;
-import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -20,33 +18,28 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEmployeeAdapter.EmployeesViewHolder> {
     private List<EmployeeEntry> mData;
-    final private RecyclerViewItemClickListener mClickListener;
-    private boolean cancelIconIsVisible;
-    private boolean isOnCLick;
-    private final SparseBooleanArray array=new SparseBooleanArray();
+    private EmployeesAdapter.EmployeeItemClickListener mClickListener;
+    private View.OnLongClickListener mOnEmployeeLongClicked;
 
-    public HorizontalEmployeeAdapter(RecyclerViewItemClickListener clickListener, boolean cancelIconIsVisible) {
+    public HorizontalEmployeeAdapter(EmployeesAdapter.EmployeeItemClickListener clickListener) {
         mClickListener = clickListener;
-        this.cancelIconIsVisible = cancelIconIsVisible;
-        isOnCLick = !(cancelIconIsVisible);
+    }
+
+    public HorizontalEmployeeAdapter(EmployeesAdapter.EmployeeItemClickListener clickListener, View.OnLongClickListener onEmployeeLongClicked) {
+        this(clickListener);
+        mOnEmployeeLongClicked = onEmployeeLongClicked;
     }
 
     @NonNull
     @Override
-
     public HorizontalEmployeeAdapter.EmployeesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.employee_horizonatl_rv_item, parent, false);
+        View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_employee_horizontal_rv, parent, false);
         HorizontalEmployeeAdapter.EmployeesViewHolder employeesViewHolder = new HorizontalEmployeeAdapter.EmployeesViewHolder(rootView);
         return employeesViewHolder;
     }
 
     @Override
     public void onBindViewHolder(@NonNull HorizontalEmployeeAdapter.EmployeesViewHolder holder, int position) {
-        if(array.get(position)){
-            holder.cancelEmployee.setVisibility(View.VISIBLE);
-        }else{
-            holder.cancelEmployee.setVisibility(View.GONE);
-        }
         holder.bind(position);
     }
 
@@ -57,58 +50,40 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
 
     public void setData(List<EmployeeEntry> data) {
         mData = data;
-
+        notifyDataSetChanged();
     }
 
-    public class EmployeesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+    public class EmployeesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView employeeImage;
-        ImageView cancelEmployee;
         TextView employeeName;
         View mItemView;
 
         public EmployeesViewHolder(@NonNull View itemView) {
             super(itemView);
             mItemView = itemView;
-            employeeImage = itemView.findViewById(R.id.employee_horizontal_rv_image);
-            employeeName = itemView.findViewById(R.id.employee_horizontal_rv_name);
-            cancelEmployee = itemView.findViewById(R.id.cancel_employee_ic);
+            employeeImage = itemView.findViewById(R.id.employee_image);
+            employeeName = itemView.findViewById(R.id.employee_name);
+
+            //todo move this to bind when loading different images
+            Glide.with(itemView.getContext()).load(AppUtils.getRandomEmployeeImage())
+                    .into(employeeImage);
 
             itemView.setOnClickListener(this);
-            itemView.setOnLongClickListener(this);
+            if (mOnEmployeeLongClicked != null)
+                itemView.setOnLongClickListener(mOnEmployeeLongClicked);
 
         }
 
         public void bind(int position) {
-            employeeImage.setImageResource(AppUtils.getRandomEmployeeImage());
             employeeName.setText(mData.get(position).getEmployeeName());
-            cancelEmployee.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    removeAt(getAdapterPosition());
-                }
-            });
+
             itemView.setTag(mData.get(position).getEmployeeID());
         }
 
         @Override
         public void onClick(View view) {
-            if (isOnCLick)
-                mClickListener.onItemClick((int) mItemView.getTag(), getAdapterPosition());
+            mClickListener.onEmployeeClick((int) mItemView.getTag(), getAdapterPosition());
         }
 
-        public void removeAt(int position) {
-            mData.remove(position);
-            notifyItemRemoved(position);
-            notifyItemRangeChanged(position, mData.size());
-        }
-
-        @Override
-        public boolean onLongClick(View view) {
-            if (cancelIconIsVisible) {
-                cancelEmployee.setVisibility(View.VISIBLE);
-                array.put(getAdapterPosition(),true);
-            }
-            return true;
-        }
     }
 }

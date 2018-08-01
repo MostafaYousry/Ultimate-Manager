@@ -18,7 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.employeesmanagementapp.R;
-import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
 import com.example.android.employeesmanagementapp.UndoDeleteAction;
 import com.example.android.employeesmanagementapp.activities.AddEmployeeActivity;
 import com.example.android.employeesmanagementapp.activities.MainActivity;
@@ -47,7 +46,7 @@ import androidx.recyclerview.widget.RecyclerView;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class EmployeesFragment extends Fragment implements RecyclerViewItemClickListener, EmployeesAdapter.EmployeeSelectedStateListener {
+public class EmployeesFragment extends Fragment implements EmployeesAdapter.EmployeeItemClickListener, EmployeesAdapter.EmployeeSelectedStateListener {
 
     public static final String TAG = EmployeesFragment.class.getSimpleName();
 
@@ -100,19 +99,18 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
             // Called when a user swipes left or right on a ViewHolder
             @Override
             public void onSwiped(final RecyclerView.ViewHolder viewHolder, int swipeDir) {
-                // Here is where you'll implement swipe to delete
 
                 int entryPosition = viewHolder.getAdapterPosition();
-                EmployeeEntry employeeEntry = mEmployeesAdapter.getData().get(entryPosition).employeeEntry;
-                UndoDeleteAction mUndoDeleteAction = new UndoDeleteAction( employeeEntry,null, getContext());
-                Snackbar.make(getActivity().findViewById(android.R.id.content), employeeEntry.getEmployeeName()+" will be deleted", Snackbar.LENGTH_LONG).setAction("Undo", mUndoDeleteAction).show();
+                EmployeeEntry employeeEntry = mEmployeesAdapter.getItem(entryPosition);
+                UndoDeleteAction undoDeleteAction = new UndoDeleteAction(employeeEntry, mDb);
+                Snackbar.make(getActivity().findViewById(android.R.id.content), employeeEntry.getEmployeeName() + " will be deleted", Snackbar.LENGTH_LONG).setAction("Undo", undoDeleteAction).show();
 
                     System.out.println("deleting");
                     AppExecutor.getInstance().diskIO().execute(new Runnable() {
                         @Override
                         public void run() {
                             int position = viewHolder.getAdapterPosition();
-                            mDb.employeesDao().deleteEmployee(mEmployeesAdapter.getData().get(position).employeeEntry);
+                            mDb.employeesDao().deleteEmployee(mEmployeesAdapter.getItem(position));
                         }
                     });
 
@@ -171,7 +169,7 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
         //create object of EmployeesAdapter and send data
         mEmployeesAdapter = new EmployeesAdapter(this, this);
 
-        final MainViewModel mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        final MainViewModel mainViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
 
         final LiveData<List<EmployeeWithExtras>> employeesList = mainViewModel.getEmployeesWithExtrasList();
         employeesList.observe(this, new Observer<List<EmployeeWithExtras>>() {
@@ -205,17 +203,6 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
         emptyView.setVisibility(View.GONE);
     }
 
-
-    /**
-     * called when a list item is clicked
-     */
-    @Override
-    public void onItemClick(int clickedItemId, int clickedItemPosition) {
-        Intent intent = new Intent(getActivity(), AddEmployeeActivity.class);
-        intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY, clickedItemId);
-        intent.putExtra(AddEmployeeActivity.EMPLOYEE_VIEW_ONLY, false);
-        startActivity(intent);
-    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -341,5 +328,13 @@ public class EmployeesFragment extends Fragment implements RecyclerViewItemClick
         } else {
             ((MainActivity) getActivity()).getSupportActionBar().setTitle(mSelectedEmployees.size() + " selected");
         }
+    }
+
+    @Override
+    public void onEmployeeClick(int employeeRowID, int employeePosition) {
+        Intent intent = new Intent(getActivity(), AddEmployeeActivity.class);
+        intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY, employeeRowID);
+        intent.putExtra(AddEmployeeActivity.EMPLOYEE_VIEW_ONLY, false);
+        startActivity(intent);
     }
 }

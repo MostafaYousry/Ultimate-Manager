@@ -7,11 +7,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.R;
-import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,10 +17,19 @@ import androidx.recyclerview.widget.RecyclerView;
 public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHolder> {
 
     private List<TaskEntry> mData;
-    private RecyclerViewItemClickListener mListClickListener;
+    private TasksItemClickListener mTaskClickListener;
 
-    public TasksAdapter(RecyclerViewItemClickListener clickListener) {
-        mListClickListener = clickListener;
+
+    public TasksAdapter(TasksItemClickListener clickListener) {
+        mTaskClickListener = clickListener;
+    }
+
+
+    /**
+     * interface to handle click events done on a recycler view item
+     */
+    public interface TasksItemClickListener {
+        void onTaskClick(int taskRowID, int taskPosition);
     }
 
     @NonNull
@@ -80,7 +87,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
 
         @Override
         public void onClick(View v) {
-            mListClickListener.onItemClick((int) mItemView.getTag(), getAdapterPosition());
+            mTaskClickListener.onTaskClick((int) mItemView.getTag(), getAdapterPosition());
         }
 
     }

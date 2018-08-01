@@ -2,21 +2,24 @@ package com.example.android.employeesmanagementapp.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 
 import com.example.android.employeesmanagementapp.R;
-import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
+import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
 import com.example.android.employeesmanagementapp.adapters.HorizontalEmployeeAdapter;
 import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
+import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
+import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.data.factories.DepIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewDepViewModel;
-import com.example.android.employeesmanagementapp.utils.AppUtils;
+
+import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -27,7 +30,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
-public class AddDepartmentActivity extends AppCompatActivity implements RecyclerViewItemClickListener {
+public class AddDepartmentActivity extends AppCompatActivity implements EmployeesAdapter.EmployeeItemClickListener, TasksAdapter.TasksItemClickListener {
     private static final String TAG = AddDepartmentActivity.class.getSimpleName();
 
     public static final String DEPARTMENT_ID_KEY = "department_id";
@@ -35,11 +38,12 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
     private int mDepartmentId;
 
     private RecyclerView mDepCompletedTasksRV;
+    private RecyclerView mDepEmployeesRV;
     private EditText mDepartmentName;
     private Toolbar mToolbar;
-    private AppDatabase mDb;
-    private RecyclerView mDepEmployeesRV;
 
+    private AppDatabase mDb;
+    private AddNewDepViewModel mViewModel;
 
 
     @Override
@@ -67,13 +71,12 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
 
 
-        setUpToolBar();
-        setUpEmployeesRV();
+        mViewModel = ViewModelProviders.of(this, new DepIdFact(mDb, mDepartmentId)).get(AddNewDepViewModel.class);
 
         if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
             clearViews();
         } else {
-            final LiveData<DepartmentEntry> department = ViewModelProviders.of(this, new DepIdFact(mDb, mDepartmentId)).get(AddNewDepViewModel.class).getDepartment();
+            final LiveData<DepartmentEntry> department = mViewModel.getDepartment();
             department.observe(this, new Observer<DepartmentEntry>() {
                 @Override
                 public void onChanged(DepartmentEntry departmentEntry) {
@@ -81,40 +84,55 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
                     populateUi(departmentEntry);
                 }
             });
+
+            setUpEmployeesRV();
+            setUpTasksRV();
         }
 
 
-        // Lookup the recycler view in activity layout
-        mDepCompletedTasksRV = findViewById(R.id.department_tasks_rv);
-        mDepCompletedTasksRV.setNestedScrollingEnabled(false);
-        mDepCompletedTasksRV.setHasFixedSize(true);
-        // Create adapter passing in the sample user data
-        TasksAdapter mTadapter = new TasksAdapter(this);
-        // Attach the adapter to the recyclerview to populate items
-        mDepCompletedTasksRV.setAdapter(mTadapter);
-        mTadapter.setData(AppUtils.getTasksFakeData());
-        // Set layout manager to position the items
-        LinearLayoutManager linearLayoutManager=new LinearLayoutManager(this);
-        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        linearLayoutManager.setAutoMeasureEnabled(true);
-        mDepCompletedTasksRV.setLayoutManager(linearLayoutManager);
-        // That's all!
+    }
 
+    private void setUpTasksRV() {
+
+        mDepCompletedTasksRV = findViewById(R.id.department_tasks_rv);
+        mDepCompletedTasksRV.setHasFixedSize(true);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        mDepCompletedTasksRV.setLayoutManager(linearLayoutManager);
+
+        final TasksAdapter adapter = new TasksAdapter(this);
+        final LiveData<List<TaskEntry>> depCompletedTasks = mViewModel.getCompletedTasks();
+        depCompletedTasks.observe(this, new Observer<List<TaskEntry>>() {
+            @Override
+            public void onChanged(List<TaskEntry> tasks) {
+                depCompletedTasks.removeObservers(AddDepartmentActivity.this);
+                adapter.setData(tasks);
+            }
+        });
+        mDepCompletedTasksRV.setAdapter(adapter);
     }
 
 
     private void setUpEmployeesRV() {
-        mDepEmployeesRV = findViewById(R.id.department_employees_rv);
 
+        mDepEmployeesRV = findViewById(R.id.department_employees_rv);
         mDepEmployeesRV.setHasFixedSize(true);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(RecyclerView.HORIZONTAL);
         mDepEmployeesRV.setLayoutManager(layoutManager);
 
-        HorizontalEmployeeAdapter mAdapter = new HorizontalEmployeeAdapter(this, false);
-        mAdapter.setData(AppUtils.getEmployeesFakeData());
-        mDepEmployeesRV.setAdapter(mAdapter);
+        final HorizontalEmployeeAdapter adapter = new HorizontalEmployeeAdapter(this);
+
+        final LiveData<List<EmployeeEntry>> depEmployees = mViewModel.getEmployees();
+        depEmployees.observe(this, new Observer<List<EmployeeEntry>>() {
+            @Override
+            public void onChanged(List<EmployeeEntry> employees) {
+                depEmployees.removeObservers(AddDepartmentActivity.this);
+                adapter.setData(employees);
+            }
+        });
+        mDepEmployeesRV.setAdapter(adapter);
 
     }
 
@@ -140,21 +158,24 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
         if (departmentEntry == null)
             return;
         mDepartmentName.setText(departmentEntry.getDepartmentName());
+        getSupportActionBar().setTitle(departmentEntry.getDepartmentName());
+        mDepCompletedTasksRV.setVisibility(View.VISIBLE);
+        mDepEmployeesRV.setVisibility(View.VISIBLE);
+        findViewById(R.id.textView2).setVisibility(View.VISIBLE);
+        findViewById(R.id.department_employees_text_view).setVisibility(View.VISIBLE);
 
 
     }
 
     private void clearViews() {
+        getSupportActionBar().setTitle("Add new department");
         mDepartmentName.setText("");
+        mDepCompletedTasksRV.setVisibility(View.GONE);
+        mDepEmployeesRV.setVisibility(View.GONE);
+        findViewById(R.id.textView2).setVisibility(View.GONE);
+        findViewById(R.id.department_employees_text_view).setVisibility(View.GONE);
     }
 
-    private void setUpToolBar() {
-        if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
-            getSupportActionBar().setTitle("Add new department");
-        } else {
-            getSupportActionBar().setTitle("Update department");
-        }
-    }
 
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
@@ -206,12 +227,18 @@ public class AddDepartmentActivity extends AppCompatActivity implements Recycler
 
 
     @Override
-    public void onItemClick(int clickedItemRowID, int clickedItemPosition) {
-        Log.d(TAG, "item in bottom sheet is clicked");
-
+    public void onEmployeeClick(int employeeRowID, int employeePosition) {
         Intent intent = new Intent(this, AddEmployeeActivity.class);
         intent.putExtra(AddEmployeeActivity.EMPLOYEE_VIEW_ONLY, true);
-        intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY, clickedItemRowID);
+        intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY, employeeRowID);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onTaskClick(int taskRowID, int taskPosition) {
+        Intent intent = new Intent(this, AddTaskActivity.class);
+        intent.putExtra(AddTaskActivity.TASK_VIEW_ONLY, true);
+        intent.putExtra(AddTaskActivity.TASK_ID_KEY, taskRowID);
         startActivity(intent);
     }
 }

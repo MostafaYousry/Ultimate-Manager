@@ -11,7 +11,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.android.employeesmanagementapp.R;
-import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
 import com.example.android.employeesmanagementapp.data.EmployeeWithExtras;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
@@ -25,7 +24,7 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
     public static final int SELECTION_MODE_SINGLE = 1;
     public static final int SELECTION_MODE_MULTIPLE = 2;
     private static final String TAG = EmployeesAdapter.class.getSimpleName();
-    final private RecyclerViewItemClickListener mClickListener;
+    final private EmployeeItemClickListener mClickListener;
     private List<EmployeeWithExtras> mData;
 
 
@@ -33,10 +32,14 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
     private EmployeeSelectedStateListener mEmployeeSelectedStateListener;
 
 
-    public EmployeesAdapter(@NonNull RecyclerViewItemClickListener listener, @NonNull EmployeeSelectedStateListener employeeSelectedStateListener) {
+    public EmployeesAdapter(@NonNull EmployeeItemClickListener listener, @NonNull EmployeeSelectedStateListener employeeSelectedStateListener) {
         mClickListener = listener;
         mEmployeeSelectedStateListener = employeeSelectedStateListener;
         employeesSelectionMode = SELECTION_MODE_SINGLE;
+    }
+
+    public EmployeeEntry getItem(int position) {
+        return mData.get(position).employeeEntry;
     }
 
     @NonNull
@@ -57,15 +60,16 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
 
     @Override
     public int getItemCount() {
-
         if (mData == null)
             return 0;
         return mData.size();
     }
 
-
-    public List<EmployeeWithExtras> getData() {
-        return mData;
+    /**
+     * interface to handle click events done on a recycler view item
+     */
+    public interface EmployeeItemClickListener {
+        void onEmployeeClick(int employeeRowID, int employeePosition);
     }
 
     /**
@@ -155,14 +159,13 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
 
         @Override
         public void onClick(View v) {
-
             //if at least one of the items has a long click on it, its color will be grey
             //and for that, onClick will behave like onLongClick "select items"
             //if the item is selected and click on it again "long or normal click", its background will return white and will not be selected
             if (employeesSelectionMode == SELECTION_MODE_MULTIPLE) {
                 changeItemSelectedState();
             } else
-                mClickListener.onItemClick((int) mItemView.getTag(), getAdapterPosition());
+                mClickListener.onEmployeeClick((int) mItemView.getTag(), getAdapterPosition());
         }
 
         @Override

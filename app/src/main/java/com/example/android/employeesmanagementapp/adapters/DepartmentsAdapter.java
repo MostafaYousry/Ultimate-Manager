@@ -9,7 +9,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.MultiTransformation;
 import com.example.android.employeesmanagementapp.R;
-import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 
 import java.util.List;
@@ -24,17 +23,25 @@ public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.
     private static final String TAG = DepartmentsAdapter.class.getSimpleName();
 
     private List<DepartmentEntry> mDepartments;
-    private RecyclerViewItemClickListener mGridItemClickListener;
+    private DepartmentItemClickListener mDepartmentItemClickListener;
     private View.OnClickListener mPopupMenuClickListener;
     private MultiTransformation mImageTransformations;
 
 
-    public DepartmentsAdapter(@NonNull RecyclerViewItemClickListener gridItemClickListener, @NonNull View.OnClickListener popupMenuClickListener) {
-        mGridItemClickListener = gridItemClickListener;
+    public DepartmentsAdapter(@NonNull DepartmentItemClickListener gridItemClickListener, @NonNull View.OnClickListener popupMenuClickListener) {
+        mDepartmentItemClickListener = gridItemClickListener;
         mPopupMenuClickListener = popupMenuClickListener;
         mImageTransformations = new MultiTransformation(
                 new RoundedCornersTransformation(6, 0, RoundedCornersTransformation.CornerType.TOP_LEFT),
                 new RoundedCornersTransformation(6, 0, RoundedCornersTransformation.CornerType.TOP_RIGHT));
+    }
+
+
+    /**
+     * interface to handle click events done on a recycler view item
+     */
+    public interface DepartmentItemClickListener {
+        void onDepartmentClick(int departmentRowID, int departmentPosition);
     }
 
     @NonNull
@@ -96,7 +103,7 @@ public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.
 
         @Override
         public void onClick(View v) {
-            mGridItemClickListener.onItemClick((int) mItemView.getTag(), getAdapterPosition());
+            mDepartmentItemClickListener.onDepartmentClick((int) mItemView.getTag(), getAdapterPosition());
         }
 
     }

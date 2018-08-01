@@ -1,6 +1,5 @@
 package com.example.android.employeesmanagementapp;
 
-import android.content.Context;
 import android.view.View;
 
 import com.example.android.employeesmanagementapp.data.AppDatabase;
@@ -13,11 +12,16 @@ public class UndoDeleteAction implements View.OnClickListener {
     private TaskEntry mTaskEntry;
     private AppDatabase mDb;
 
-    public UndoDeleteAction(final EmployeeEntry employeeEntry, final TaskEntry taskEntry, Context context) {
+    public UndoDeleteAction(final EmployeeEntry employeeEntry, AppDatabase database) {
         mEmployeeEntry = employeeEntry;
-        mTaskEntry = taskEntry;
-        mDb = AppDatabase.getInstance(context);
+        mDb = database;
     }
+
+    public UndoDeleteAction(final TaskEntry taskEntry, AppDatabase database) {
+        mTaskEntry = taskEntry;
+        mDb = database;
+    }
+
 
     @Override
     public void onClick(View view) {
@@ -26,7 +30,8 @@ public class UndoDeleteAction implements View.OnClickListener {
             public void run() {
                 if (mEmployeeEntry != null)
                     mDb.employeesDao().addEmployee(mEmployeeEntry);
-                else
+
+                if (mTaskEntry != null)
                     mDb.tasksDao().addTask(mTaskEntry);
             }
         });

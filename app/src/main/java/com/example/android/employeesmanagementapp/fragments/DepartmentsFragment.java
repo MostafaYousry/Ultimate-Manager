@@ -6,9 +6,8 @@ import android.content.res.Resources;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,13 +15,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.R;
-import com.example.android.employeesmanagementapp.RecyclerViewItemClickListener;
 import com.example.android.employeesmanagementapp.activities.AddDepartmentActivity;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
-import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
 
 import java.util.ArrayList;
@@ -41,7 +38,7 @@ import androidx.recyclerview.widget.RecyclerView;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class DepartmentsFragment extends Fragment implements RecyclerViewItemClickListener, PopupMenu.OnMenuItemClickListener {
+public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.DepartmentItemClickListener, PopupMenu.OnMenuItemClickListener {
 
     private final String TAG = DepartmentsFragment.class.getSimpleName();
 
@@ -51,7 +48,6 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
     private LinearLayout mEmptyView;
     private TextView mEmptyViewTextView;
     private List<DepartmentEntry> mSelectedDepartments = new ArrayList<>();
-    private LiveData<List<EmployeeEntry>> mhasEmployees;
 
 
     public DepartmentsFragment() {
@@ -62,7 +58,6 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDb = AppDatabase.getInstance(getContext());
-        setHasOptionsMenu(true);
     }
 
     @Override
@@ -88,7 +83,7 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
         View.OnClickListener clickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PopupMenu popup = new PopupMenu(getContext(), view);
+                PopupMenu popup = new PopupMenu(getContext(), view, Gravity.TOP);
 
                 // This activity implements OnMenuItemClickListener
                 popup.setOnMenuItemClickListener(DepartmentsFragment.this);
@@ -145,23 +140,6 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
 
 
     /**
-     * called when a grid item is clicked
-     */
-    @Override
-    public void onItemClick(int clickedItemRowID, int clickedItemPosition) {
-        Intent intent = new Intent(getActivity(), AddDepartmentActivity.class);
-        intent.putExtra(AddDepartmentActivity.DEPARTMENT_ID_KEY, clickedItemRowID);
-        startActivity(intent);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_department_options, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-
-    /**
      * Converts dp to pixel
      */
     private int dpToPx(int dp) {
@@ -191,6 +169,13 @@ public class DepartmentsFragment extends Fragment implements RecyclerViewItemCli
             default:
                 return false;
         }
+    }
+
+    @Override
+    public void onDepartmentClick(int departmentRowID, int departmentPosition) {
+        Intent intent = new Intent(getActivity(), AddDepartmentActivity.class);
+        intent.putExtra(AddDepartmentActivity.DEPARTMENT_ID_KEY, departmentRowID);
+        startActivity(intent);
     }
 
     public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
