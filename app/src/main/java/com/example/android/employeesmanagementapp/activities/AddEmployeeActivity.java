@@ -46,12 +46,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapter.TasksItemClickListener {
 
-    private static final String TAG = AddEmployeeActivity.class.getSimpleName();
-
-
     public static final String EMPLOYEE_ID_KEY = "employee_id";
-    private static final int DEFAULT_EMPLOYEE_ID = -1;
     public static final String EMPLOYEE_VIEW_ONLY = "employee_view_only";
+    private static final String TAG = AddEmployeeActivity.class.getSimpleName();
+    private static final int DEFAULT_EMPLOYEE_ID = -1;
     private static final boolean DEFAULT_EMPLOYEE_VIEW_ONLY = false;
 
     private int mEmployeeId;
@@ -69,6 +67,9 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
     private Toolbar mToolbar;
     private CollapsingToolbarLayout mCollapsingToolbar;
+
+    private boolean departmentsLoaded;
+    private int clickedEmployeeDepId = -1;
 
     private AppDatabase mDb;
     private AddNewEmployeeViewModel mViewModel;
@@ -118,6 +119,10 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
             @Override
             public void onChanged(List<DepartmentEntry> departmentEntries) {
                 mArrayAdapter.setData(departmentEntries);
+                departmentsLoaded = true;
+                if (clickedEmployeeDepId != -1) {
+                    mEmployeeDepartment.setSelection(mArrayAdapter.getPositionForItemId(clickedEmployeeDepId));
+                }
             }
         });
         mEmployeeDepartment.setAdapter(mArrayAdapter);
@@ -221,11 +226,14 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
         if (employeeWithExtras == null)
             return;
 
+        clickedEmployeeDepId = employeeWithExtras.employeeEntry.getDepartmentId();
+
         mEmployeeName.setText(employeeWithExtras.employeeEntry.getEmployeeName());
         mEmployeeSalary.setText(String.valueOf(employeeWithExtras.employeeEntry.getEmployeeSalary()));
         mEmployeeHireDate.setText(employeeWithExtras.employeeEntry.getEmployeeHireDate().toString());
         mCollapsingToolbar.setTitle(employeeWithExtras.employeeEntry.getEmployeeName());
-        mEmployeeDepartment.setSelection(mArrayAdapter.getPositionForItemId(employeeWithExtras.employeeEntry.getDepartmentId()));
+        if (departmentsLoaded)
+            mEmployeeDepartment.setSelection(mArrayAdapter.getPositionForItemId(employeeWithExtras.employeeEntry.getDepartmentId()));
         mEmployeeRating.setRating(employeeWithExtras.employeeRating);
 
         Glide.with(this).load(AppUtils.getRandomEmployeeImage()).apply(RequestOptions.centerCropTransform()).into(mEmployeeImage);

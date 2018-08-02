@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:clipToPadding="false" />
 
-    <include layout="@layout/empty_view"/>
+    <include layout="@layout/empty_view" />
 
 </RelativeLayout>
 

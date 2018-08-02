@@ -36,14 +36,6 @@ public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.
                 new RoundedCornersTransformation(6, 0, RoundedCornersTransformation.CornerType.TOP_RIGHT));
     }
 
-
-    /**
-     * interface to handle click events done on a recycler view item
-     */
-    public interface DepartmentItemClickListener {
-        void onDepartmentClick(int departmentRowID, int departmentPosition);
-    }
-
     @NonNull
     @Override
     public DepartmentsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -73,6 +65,13 @@ public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.
     public void setData(List<DepartmentEntry> departments) {
         mDepartments = departments;
         notifyDataSetChanged();
+    }
+
+    /**
+     * interface to handle click events done on a recycler view item
+     */
+    public interface DepartmentItemClickListener {
+        void onDepartmentClick(int departmentRowID, int departmentPosition);
     }
 
     public class DepartmentsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

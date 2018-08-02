@@ -78,10 +78,10 @@ public final class AppUtils {
     public static List<TaskEntry> getTasksFakeData() {
         TaskEntry taskEntry1 = new TaskEntry(2, "App code refactor", "wfjjwnfiwnfiwenf", new Date(), new Date());
         TaskEntry taskEntry2 = new TaskEntry(0, "Add new Feature", "wfjjwnfiwnfiwenfasdasd", new Date(), new Date());
-        TaskEntry taskEntry3 = new TaskEntry(3,"rererererererererererer","wfjjwnfiwnfiwenfsdasdasdadsad",new Date(),new Date());
-        TaskEntry taskEntry4 = new TaskEntry(3,"el3ab baleee","wfjjwnfiwnfiwenfasdasd",new Date(),new Date());
-        TaskEntry taskEntry5 = new TaskEntry(1,"skalob baneee","asdasdsdasdadsad",new Date(),new Date());
-        TaskEntry taskEntry6 = new TaskEntry(4,"eboo msh baskoota","wfjjwnfiwnfiwenfasdasdasdsadasdasdsadasdsads",new Date(),new Date());
+        TaskEntry taskEntry3 = new TaskEntry(3, "rererererererererererer", "wfjjwnfiwnfiwenfsdasdasdadsad", new Date(), new Date());
+        TaskEntry taskEntry4 = new TaskEntry(3, "el3ab baleee", "wfjjwnfiwnfiwenfasdasd", new Date(), new Date());
+        TaskEntry taskEntry5 = new TaskEntry(1, "skalob baneee", "asdasdsdasdadsad", new Date(), new Date());
+        TaskEntry taskEntry6 = new TaskEntry(4, "eboo msh baskoota", "wfjjwnfiwnfiwenfasdasdasdsadasdasdsadasdsads", new Date(), new Date());
 
         List<TaskEntry> list = new ArrayList<>();
         list.add(taskEntry1);

@@ -66,13 +66,6 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
     }
 
     /**
-     * interface to handle click events done on a recycler view item
-     */
-    public interface EmployeeItemClickListener {
-        void onEmployeeClick(int employeeRowID, int employeePosition);
-    }
-
-    /**
      * @return : current selectionMode : Single / Multiple
      */
     public int getEmployeeSelectionMode() {
@@ -97,6 +90,13 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
     public void setData(List<EmployeeWithExtras> employees) {
         mData = employees;
         notifyDataSetChanged();
+    }
+
+    /**
+     * interface to handle click events done on a recycler view item
+     */
+    public interface EmployeeItemClickListener {
+        void onEmployeeClick(int employeeRowID, int employeePosition);
     }
 
     public interface EmployeeSelectedStateListener {

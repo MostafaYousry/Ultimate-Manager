@@ -106,14 +106,14 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
                 UndoDeleteAction undoDeleteAction = new UndoDeleteAction(employeeEntry, mDb);
                 Snackbar.make(getActivity().findViewById(android.R.id.content), employeeEntry.getEmployeeName() + " will be deleted", Snackbar.LENGTH_LONG).setAction("Undo", undoDeleteAction).show();
 
-                    System.out.println("deleting");
-                    AppExecutor.getInstance().diskIO().execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            int position = viewHolder.getAdapterPosition();
-                            mDb.employeesDao().deleteEmployee(mEmployeesAdapter.getItem(position));
-                        }
-                    });
+                System.out.println("deleting");
+                AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        int position = viewHolder.getAdapterPosition();
+                        mDb.employeesDao().deleteEmployee(mEmployeesAdapter.getItem(position));
+                    }
+                });
 
             }
         }).attachToRecyclerView(mRecyclerView);

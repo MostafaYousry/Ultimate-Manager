@@ -10,7 +10,6 @@ import android.util.Log;
 import com.example.android.employeesmanagementapp.activities.AddDepartmentActivity;
 import com.example.android.employeesmanagementapp.activities.AddTaskActivity;
 
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -18,12 +17,14 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 public class NotificationService extends Service {
+    //we are going to use a handler to be able to run in our TimerTask
+    final Handler handler = new Handler();
     Timer timer;
     TimerTask timerTask;
     String TAG = "Timers";
     int taskId;
-    Long taskDueDate;
     //int taskId;
+    Long taskDueDate;
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -41,7 +42,6 @@ public class NotificationService extends Service {
         return START_STICKY;
     }
 
-
     @Override
     public void onCreate() {
         Log.e(TAG, "onCreate");
@@ -55,10 +55,6 @@ public class NotificationService extends Service {
         stopTimerTask();
         super.onDestroy();
     }
-
-    //we are going to use a handler to be able to run in our TimerTask
-    final Handler handler = new Handler();
-
 
     public void startTimer() {
         //set a new Timer

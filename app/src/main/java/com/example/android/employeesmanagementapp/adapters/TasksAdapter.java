@@ -24,13 +24,6 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
         mTaskClickListener = clickListener;
     }
 
-    /**
-     * interface to handle click events done on a recycler view item
-     */
-    public interface TasksItemClickListener {
-        void onTaskClick(int taskRowID, int taskPosition);
-    }
-
     @NonNull
     @Override
     public TasksViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -66,6 +59,13 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
 
     public TaskEntry getItem(int position) {
         return mData.get(position);
+    }
+
+    /**
+     * interface to handle click events done on a recycler view item
+     */
+    public interface TasksItemClickListener {
+        void onTaskClick(int taskRowID, int taskPosition);
     }
 
     class TasksViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

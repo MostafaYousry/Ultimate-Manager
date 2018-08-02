@@ -112,7 +112,7 @@ public class TasksFragment extends Fragment implements TasksAdapter.TasksItemCli
                 int taskPosition = viewHolder.getAdapterPosition();
                 TaskEntry taskEntry = mAdapter.getItem(taskPosition);
                 UndoDeleteAction mUndoDeleteAction = new UndoDeleteAction(taskEntry, mDb);
-                Snackbar.make(getActivity().findViewById(android.R.id.content), taskEntry.getTaskTitle()+" will be deleted", Snackbar.LENGTH_LONG).setAction("Undo", mUndoDeleteAction).show();
+                Snackbar.make(getActivity().findViewById(android.R.id.content), taskEntry.getTaskTitle() + " will be deleted", Snackbar.LENGTH_LONG).setAction("Undo", mUndoDeleteAction).show();
 
                 System.out.println("deleting");
                 AppExecutor.getInstance().diskIO().execute(new Runnable() {

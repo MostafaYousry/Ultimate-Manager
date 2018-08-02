@@ -23,6 +23,7 @@ public class DepartmentsArrayAdapter extends ArrayAdapter<String> {
 
 
     public DepartmentsArrayAdapter(Context context) {
+
         super(context, 0);
     }
 
@@ -79,6 +80,7 @@ public class DepartmentsArrayAdapter extends ArrayAdapter<String> {
     public int getPositionForItemId(int depId) {
         if (mDepartmentEntryList == null)
             return 0;
+
 
         return mDepartmentEntryList.indexOf(new DepartmentEntry(depId));
 

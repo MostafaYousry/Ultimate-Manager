@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card_view"
-    android:layout_gravity="center"
     android:layout_width="match_parent"
     android:layout_height="@dimen/item_department_height"
+    android:layout_gravity="center"
     app:cardCornerRadius="6dp"
     app:cardElevation="@dimen/cardview_default_elevation"
     app:cardPreventCornerOverlap="false">

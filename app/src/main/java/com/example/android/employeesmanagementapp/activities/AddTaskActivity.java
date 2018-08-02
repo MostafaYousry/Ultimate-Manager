@@ -73,6 +73,9 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
     private AppDatabase mDb;
     private AddNewTaskViewModel mViewModel;
 
+    boolean departmentsLoaded = false;
+    private int clickedTaskDepId = -1;
+
     private DepartmentsArrayAdapter mDepartmentsArrayAdapter;
     private RecyclerView mRecyclerView;
 
@@ -119,12 +122,19 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
 
         mDepartmentsArrayAdapter = new DepartmentsArrayAdapter(this);
         LiveData<List<DepartmentEntry>> departments = mViewModel.getAllDepartments();
+
+
         departments.observe(this, new Observer<List<DepartmentEntry>>() {
             @Override
             public void onChanged(List<DepartmentEntry> departmentEntries) {
                 mDepartmentsArrayAdapter.setData(departmentEntries);
+                departmentsLoaded = true;
+                if (clickedTaskDepId != -1) {
+                    mTaskDepartment.setSelection(mDepartmentsArrayAdapter.getPositionForItemId(clickedTaskDepId));
+                }
             }
         });
+
 
         mTaskDepartment.setAdapter(mDepartmentsArrayAdapter);
 
@@ -252,11 +262,13 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         if (taskEntry == null)
             return;
 
+        clickedTaskDepId = taskEntry.getDepartmentID();
         mTaskTitle.setText(taskEntry.getTaskTitle());
         mTaskDescription.setText(taskEntry.getTaskDescription());
         mTaskStartDate.setText(taskEntry.getTaskDueDate().toString());
         mTaskDueDate.setText(taskEntry.getTaskDueDate().toString());
-        mTaskDepartment.setSelection(mDepartmentsArrayAdapter.getPositionForItemId(taskEntry.getDepartmentID()));
+        if (departmentsLoaded)
+            mTaskDepartment.setSelection(mDepartmentsArrayAdapter.getPositionForItemId(taskEntry.getDepartmentID()));
 
     }
 
@@ -398,6 +410,8 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
                     mEmployeesInDepNotTask = employeeEntries;
                 }
             });
+
+            chosenEmployees = new ArrayList<>();
         }
 
         public static ChooseEmployeesAdapter getInstance(AddNewTaskViewModel viewModel, int depId, int taskId, LifecycleOwner owner) {
@@ -423,6 +437,8 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
 
         @Override
         public int getItemCount() {
+            if (mEmployeesInDepNotTask == null)
+                return 0;
             return mEmployeesInDepNotTask.size();
         }
 

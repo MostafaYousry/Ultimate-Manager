@@ -31,9 +31,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 public class AddDepartmentActivity extends AppCompatActivity implements EmployeesAdapter.EmployeeItemClickListener, TasksAdapter.TasksItemClickListener {
-    private static final String TAG = AddDepartmentActivity.class.getSimpleName();
-
     public static final String DEPARTMENT_ID_KEY = "department_id";
+    private static final String TAG = AddDepartmentActivity.class.getSimpleName();
     private static final int DEFAULT_DEPARTMENT_ID = -1;
     private int mDepartmentId;
 
