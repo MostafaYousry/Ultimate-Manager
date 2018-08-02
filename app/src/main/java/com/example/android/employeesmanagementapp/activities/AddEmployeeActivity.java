@@ -25,7 +25,6 @@ import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.EmployeeWithExtras;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
-import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.data.factories.EmpIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewEmployeeViewModel;
@@ -83,7 +82,7 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
         //create db instance
         mDb = AppDatabase.getInstance(this);
-        mViewModel = ViewModelProviders.of(this, new EmpIdFact(mDb, mEmployeeId)).get(AddNewEmployeeViewModel.class);
+
 
         //check if activity was opened from a click on rv item or from the fab
         Intent intent = getIntent();
@@ -91,6 +90,8 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
             mEmployeeId = intent.getIntExtra(EMPLOYEE_ID_KEY, DEFAULT_EMPLOYEE_ID);
             mIsViewOnly = intent.getBooleanExtra(EMPLOYEE_VIEW_ONLY, DEFAULT_EMPLOYEE_VIEW_ONLY);
         }
+
+        mViewModel = ViewModelProviders.of(this, new EmpIdFact(mDb, mEmployeeId)).get(AddNewEmployeeViewModel.class);
 
         //set toolbar as actionbar
         mToolbar = findViewById(R.id.toolbar);
@@ -268,7 +269,7 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
             //todo:convert string date to object Date
             final Date employeeHireDate = new Date();
 
-            final EmployeeEntry newEmployee = new EmployeeEntry(departmentId, employeeName, employeeSalary, employeeHireDate);
+            final com.example.android.employeesmanagementapp.data.entries.EmployeeEntry newEmployee = new com.example.android.employeesmanagementapp.data.entries.EmployeeEntry(departmentId, employeeName, employeeSalary, employeeHireDate);
 
             AppExecutor.getInstance().diskIO().execute(new Runnable() {
                 @Override

@@ -83,13 +83,14 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         setContentView(R.layout.activity_add_task);
 
         mDb = AppDatabase.getInstance(this);
-        mViewModel = ViewModelProviders.of(this, new TaskIdFact(mDb, mTaskId)).get(AddNewTaskViewModel.class);
 
         //check if activity was opened from a click on rv item or from the fab
         Intent intent = getIntent();
         if (intent != null) {
             mTaskId = intent.getIntExtra(TASK_ID_KEY, DEFAULT_TASK_ID);
         }
+
+        mViewModel = ViewModelProviders.of(this, new TaskIdFact(mDb, mTaskId)).get(AddNewTaskViewModel.class);
 
 
         //set toolbar as actionbar

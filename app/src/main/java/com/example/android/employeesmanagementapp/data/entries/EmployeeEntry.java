@@ -38,7 +38,7 @@ public class EmployeeEntry {
     private Date employeeHireDate;
 
 
-    //used when creating new EmployeeEntry object
+    //used when creating new EmployeeWithExtras object
     @Ignore
     public EmployeeEntry(@NonNull int departmentId, @NonNull String employeeName, @NonNull int employeeSalary, Date employeeHireDate) {
         this.departmentId = departmentId;

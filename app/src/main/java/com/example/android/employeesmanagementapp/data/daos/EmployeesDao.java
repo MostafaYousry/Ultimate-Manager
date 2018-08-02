@@ -25,7 +25,7 @@ public interface EmployeesDao {
     /**
      * load all employees
      *
-     * @return list of EmployeeEntry objects wrapped with LiveData
+     * @return list of EmployeeWithExtras objects wrapped with LiveData
      */
     @Query("WITH \n" +
             "  -- Common Table Expression 1 - Average of Completed Tasks per employee\n" +
@@ -59,7 +59,7 @@ public interface EmployeesDao {
      * load all employees in an existing department
      *
      * @param departmentId : the department's record id to get the employees for
-     * @return list of EmployeeEntry objects wrapped with LiveData
+     * @return list of EmployeeWithExtras objects wrapped with LiveData
      */
     @Query("Select * from employees where department_id = :departmentId")
     LiveData<List<EmployeeEntry>> loadEmployees(int departmentId);
@@ -67,7 +67,7 @@ public interface EmployeesDao {
     /**
      * load all employees not in this department
      *
-     * @return list of EmployeeEntry objects wrapped with LiveData
+     * @return list of EmployeeWithExtras objects wrapped with LiveData
      */
     @Query("SELECT DISTINCT * from employees  INNER JOIN employees_tasks ON task_id != :taskId where employees.department_id = :departmentId ")
     LiveData<List<EmployeeEntry>> loadEmployeesNotInDep(int departmentId, int taskId);
@@ -76,7 +76,7 @@ public interface EmployeesDao {
      * load an existing employee record by it's id
      *
      * @param employeeId : the employee record's id
-     * @return EmployeeEntry object wrapped with LiveData
+     * @return EmployeeWithExtras object wrapped with LiveData
      */
     @Query("WITH \n" +
             "  -- Common Table Expression 1 - Average of Completed Tasks per employee\n" +
@@ -105,6 +105,7 @@ public interface EmployeesDao {
             "            LEFT JOIN employee_notcompleted_info ON employees.employee_id = employee_notcompleted_info.employee_id\n" +
             "\tWHERE employees.employee_id = :employeeId;")
     LiveData<EmployeeWithExtras> loadEmployeeById(int employeeId);
+
 
     /**
      * @return : number of employees in the company
