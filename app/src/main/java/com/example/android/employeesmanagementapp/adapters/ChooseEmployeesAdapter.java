@@ -23,6 +23,7 @@ public class ChooseEmployeesAdapter extends RecyclerView.Adapter<ChooseEmployees
     private static ChooseEmployeesAdapter sChooseEmployeesAdapter;
     private List<EmployeeEntry> mEmployeesInDepNotTask;
     private List<EmployeeEntry> chosenEmployees;
+    private static int mDepId;
 
     private ChooseEmployeesAdapter() {
     }
@@ -33,7 +34,9 @@ public class ChooseEmployeesAdapter extends RecyclerView.Adapter<ChooseEmployees
             @Override
             public void onChanged(List<EmployeeEntry> employeeEntries) {
                 employees.removeObservers(owner);
-                mEmployeesInDepNotTask = employeeEntries;
+                mEmployeesInDepNotTask = new ArrayList<>();
+                mEmployeesInDepNotTask.addAll(employeeEntries);
+                notifyDataSetChanged();
             }
         });
 
@@ -41,8 +44,9 @@ public class ChooseEmployeesAdapter extends RecyclerView.Adapter<ChooseEmployees
     }
 
     public static ChooseEmployeesAdapter getInstance(AddNewTaskViewModel viewModel, int depId, int taskId, LifecycleOwner owner) {
-        if (sChooseEmployeesAdapter == null) {
+        if (sChooseEmployeesAdapter == null || mDepId != depId) {
             sChooseEmployeesAdapter = new ChooseEmployeesAdapter(viewModel, depId, taskId, owner);
+            mDepId = depId;
         }
 
         return sChooseEmployeesAdapter;
@@ -78,9 +82,15 @@ public class ChooseEmployeesAdapter extends RecyclerView.Adapter<ChooseEmployees
 
     public void removeChosenEmployees() {
 
-        System.out.println("Removing chosen Employees");
         mEmployeesInDepNotTask.removeAll(chosenEmployees);
-        System.out.println("after removing size = " + mEmployeesInDepNotTask.size());
+        notifyDataSetChanged();
+    }
+    public void mergeToEmployeeInDepNotTask(EmployeeEntry employeeEntry){
+        if(mEmployeesInDepNotTask == null){
+            mEmployeesInDepNotTask = new ArrayList<>();
+        }
+        mEmployeesInDepNotTask.add(employeeEntry);
+        System.out.println(mEmployeesInDepNotTask.size());
         notifyDataSetChanged();
     }
 

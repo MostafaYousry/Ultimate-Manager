@@ -31,6 +31,8 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
     }
 
     public List<EmployeeEntry> getAddedEmployees() {
+        mAddedEmployees.removeAll(mData);
+        System.out.println(mAddedEmployees.size());
         return mAddedEmployees;
     }
 
@@ -80,7 +82,7 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
         notifyDataSetChanged();
     }
 
-    public void removeEmployee (){
+    public EmployeeEntry removeEmployee (){
        if(mRemovedEmployees == null)
            mRemovedEmployees = new ArrayList<>();
        mRemovedEmployees.add(mDeletedEmployee);
@@ -90,6 +92,7 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
             mAddedEmployees.remove(mDeletedEmployee);
 
         notifyDataSetChanged();
+        return  mDeletedEmployee;
     }
 
 
@@ -139,7 +142,6 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
             else
                 mDeletedEmployee = mAddedEmployees.get(deletePosition);
             mOnEmployeeLongClicked.onLongClick(view);
-            System.out.println("deleteeeeeee");
             return true;
         }
     }
