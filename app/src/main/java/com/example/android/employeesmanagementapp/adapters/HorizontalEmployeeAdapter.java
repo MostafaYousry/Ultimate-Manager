@@ -22,9 +22,16 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
     private List<EmployeeEntry> mAddedEmployees;
     private EmployeesAdapter.EmployeeItemClickListener mClickListener;
     private View.OnLongClickListener mOnEmployeeLongClicked;
+    private EmployeeEntry mDeletedEmployee;
+    private List<EmployeeEntry> mRemovedEmployees;
+    private int deletePosition;
 
     public HorizontalEmployeeAdapter(EmployeesAdapter.EmployeeItemClickListener clickListener) {
         mClickListener = clickListener;
+    }
+
+    public List<EmployeeEntry> getAddedEmployees() {
+        return mAddedEmployees;
     }
 
     public HorizontalEmployeeAdapter(EmployeesAdapter.EmployeeItemClickListener clickListener, View.OnLongClickListener onEmployeeLongClicked) {
@@ -65,9 +72,23 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
         if (mAddedEmployees == null)
             mAddedEmployees = new ArrayList<>();
         mAddedEmployees.addAll(chosenEmployees);
+        notifyDataSetChanged();
     }
 
-    public class EmployeesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public void removeEmployee (){
+       if(mRemovedEmployees == null)
+           mRemovedEmployees = new ArrayList<>();
+       mRemovedEmployees.add(mDeletedEmployee);
+        if (deletePosition < mData.size())
+            mData.remove(mDeletedEmployee);
+        else
+            mAddedEmployees.remove(mDeletedEmployee);
+
+        notifyDataSetChanged();
+    }
+
+
+    public class EmployeesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         ImageView employeeImage;
         TextView employeeName;
         View mItemView;
@@ -84,20 +105,20 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
 
             itemView.setOnClickListener(this);
             if (mOnEmployeeLongClicked != null)
-                itemView.setOnLongClickListener(mOnEmployeeLongClicked);
+                itemView.setOnLongClickListener(this);
 
         }
 
         public void bind(int position) {
             if (position >= mData.size()) {
-                employeeName.setText(mAddedEmployees.get(position).getEmployeeName());
+                employeeName.setText(mAddedEmployees.get(position - mData.size()).getEmployeeName());
 
-                itemView.setTag(mAddedEmployees.get(position).getEmployeeID());
+                itemView.setTag(mAddedEmployees.get(position - mData.size()).getEmployeeID());
+            } else {
+                employeeName.setText(mData.get(position).getEmployeeName());
+
+                itemView.setTag(mData.get(position).getEmployeeID());
             }
-
-            employeeName.setText(mData.get(position).getEmployeeName());
-
-            itemView.setTag(mData.get(position).getEmployeeID());
         }
 
         @Override
@@ -105,5 +126,16 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
             mClickListener.onEmployeeClick((int) mItemView.getTag(), getAdapterPosition());
         }
 
+        @Override
+        public boolean onLongClick(View view) {
+            deletePosition = getAdapterPosition();
+            if (deletePosition < mData.size())
+                mDeletedEmployee = mData.get(deletePosition);
+            else
+                mDeletedEmployee = mAddedEmployees.get(deletePosition);
+            mOnEmployeeLongClicked.onLongClick(view);
+            System.out.println("deleteeeeeee");
+            return true;
+        }
     }
 }

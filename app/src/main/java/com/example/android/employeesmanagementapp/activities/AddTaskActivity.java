@@ -18,6 +18,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.adapters.ChooseEmployeesAdapter;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
 import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
 import com.example.android.employeesmanagementapp.adapters.HorizontalEmployeeAdapter;
@@ -25,6 +26,7 @@ import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
+import com.example.android.employeesmanagementapp.data.entries.EmployeesTasksEntry;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.data.factories.TaskIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewTaskViewModel;
@@ -190,7 +192,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
             depId = mViewModel.getTask().getValue().getDepartmentID();
         }
 
-        final ChooseEmployeesAdapter chooseEmployeesAdapter = new ChooseEmployeesAdapter(mViewModel, depId, mTaskId, this);
+        final ChooseEmployeesAdapter chooseEmployeesAdapter = ChooseEmployeesAdapter.getInstance(mViewModel, depId, mTaskId, this);
         chooseEmployeesRV.setAdapter(chooseEmployeesAdapter);
 
         builder.setView(chooseEmployeesRV);
@@ -198,7 +200,9 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         builder.setPositiveButton(getString(R.string.choose_department_dialog_positive_button), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                System.out.println(chooseEmployeesAdapter.getChosenEmployees().get(0).getEmployeeName());
                 mHorizontalEmployeeAdapter.mergeToAddedEmployees(chooseEmployeesAdapter.getChosenEmployees());
+                chooseEmployeesAdapter.removeChosenEmployees();
                 chooseEmployeesAdapter.clearChosenEmployees();
             }
         });
@@ -225,7 +229,6 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
             @Override
             public boolean onLongClick(View view) {
                 PopupMenu popupMenu = new PopupMenu(AddTaskActivity.this, view, Gravity.TOP);
-
                 popupMenu.inflate(R.menu.menu_task_employee_options);
                 popupMenu.setOnMenuItemClickListener(AddTaskActivity.this);
                 popupMenu.show();
@@ -335,7 +338,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
                 @Override
                 public void run() {
                     if (mTaskId == DEFAULT_TASK_ID) {
-                        mDb.tasksDao().addTask(newTask);
+                        mTaskId = (int) mDb.tasksDao().addTask(newTask);
                         System.out.println("new task");
                     } else {
                         newTask.setTaskId(mTaskId);
@@ -344,9 +347,22 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
                     }
                 }
             });
-        }
-        finish();
+            final List<EmployeeEntry> addedEmployees = mHorizontalEmployeeAdapter.getAddedEmployees();
+
+            AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    for (int i = 0; i < addedEmployees.size(); i++) {
+                        final EmployeesTasksEntry newEmployeeTask = new EmployeesTasksEntry(addedEmployees.get(i).getEmployeeID(), mTaskId);
+                        mDb.employeesTasksDao().addEmployeeTask(newEmployeeTask);
+                    }
+                }
+            });
     }
+
+    finish();
+
+}
 
 
     private boolean valideData() {
@@ -372,13 +388,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_remove_employee:
-                AppExecutor.getInstance().diskIO().execute(new Runnable() {
-                    @Override
-                    public void run() {
-
-                    }
-                });
-
+                mHorizontalEmployeeAdapter.removeEmployee();
                 return true;
             default:
                 return false;
@@ -393,101 +403,4 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY, employeeRowID);
         startActivity(intent);
     }
-
-    //Adapter for ALertDialog RecyclerView
-    static class ChooseEmployeesAdapter extends RecyclerView.Adapter<ChooseEmployeesAdapter.chooseEmployeeViewHolder> {
-        private static ChooseEmployeesAdapter sChooseEmployeesAdapter;
-        private List<EmployeeEntry> mEmployeesInDepNotTask;
-        private List<EmployeeEntry> chosenEmployees;
-
-
-        private ChooseEmployeesAdapter(AddNewTaskViewModel viewModel, int depId, int taskId, final LifecycleOwner owner) {
-            final LiveData<List<EmployeeEntry>> employees = viewModel.getRestOfEmployeesInDep(depId, taskId);
-            employees.observe(owner, new Observer<List<EmployeeEntry>>() {
-                @Override
-                public void onChanged(List<EmployeeEntry> employeeEntries) {
-                    employees.removeObservers(owner);
-                    mEmployeesInDepNotTask = employeeEntries;
-                }
-            });
-
-            chosenEmployees = new ArrayList<>();
-        }
-
-        public static ChooseEmployeesAdapter getInstance(AddNewTaskViewModel viewModel, int depId, int taskId, LifecycleOwner owner) {
-            if (sChooseEmployeesAdapter == null) {
-                sChooseEmployeesAdapter = new ChooseEmployeesAdapter(viewModel, depId, taskId, owner);
-            }
-
-            return sChooseEmployeesAdapter;
-        }
-
-        @NonNull
-        @Override
-        public chooseEmployeeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.choose_employee_item, parent, false);
-            chooseEmployeeViewHolder chooseEmployeeViewHolder = new chooseEmployeeViewHolder(rootView);
-            return chooseEmployeeViewHolder;
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull chooseEmployeeViewHolder holder, int position) {
-            holder.bind(position);
-        }
-
-        @Override
-        public int getItemCount() {
-            if (mEmployeesInDepNotTask == null)
-                return 0;
-            return mEmployeesInDepNotTask.size();
-        }
-
-        public List<EmployeeEntry> getChosenEmployees() {
-            return chosenEmployees;
-        }
-
-        public void clearChosenEmployees() {
-            chosenEmployees.clear();
-        }
-
-        public class chooseEmployeeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-            TextView employeeName;
-            CheckBox employeeCheckBox;
-
-            public chooseEmployeeViewHolder(@NonNull View itemView) {
-                super(itemView);
-                employeeName = itemView.findViewById(R.id.choose_employee_name);
-                employeeCheckBox = itemView.findViewById(R.id.choose_employee_check_box);
-                itemView.setOnClickListener(this);
-            }
-
-            public void bind(int position) {
-                employeeName.setText(mEmployeesInDepNotTask.get(position).getEmployeeName());
-
-                if (chosenEmployees.contains(mEmployeesInDepNotTask.get(position))) {
-                    employeeCheckBox.setChecked(true);
-                } else {
-                    employeeCheckBox.setChecked(false);
-                }
-
-            }
-
-            @Override
-            public void onClick(View view) {
-                EmployeeEntry entry = mEmployeesInDepNotTask.get(getAdapterPosition());
-                if (chosenEmployees.contains(entry)) {
-                    mEmployeesInDepNotTask.add(entry);
-                    chosenEmployees.remove(entry);
-                    employeeCheckBox.setChecked(false);
-                } else {
-                    mEmployeesInDepNotTask.remove(entry);
-                    chosenEmployees.add(entry);
-                    employeeCheckBox.setChecked(true);
-                }
-            }
-        }
-    }
-
 }
-
