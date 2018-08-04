@@ -352,12 +352,25 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
             AppExecutor.getInstance().diskIO().execute(new Runnable() {
                 @Override
                 public void run() {
-                    for (int i = 0; i < addedEmployees.size(); i++) {
+                    for (int i = 0; addedEmployees != null && i < addedEmployees.size() ; i++) {
                         final EmployeesTasksEntry newEmployeeTask = new EmployeesTasksEntry(addedEmployees.get(i).getEmployeeID(), mTaskId);
                         mDb.employeesTasksDao().addEmployeeTask(newEmployeeTask);
                     }
                 }
             });
+
+            final List<EmployeeEntry> removedEmployees = mHorizontalEmployeeAdapter.getRemovedEmployees();
+
+            AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    for (int i = 0; removedEmployees != null && i < removedEmployees.size(); i++) {
+                        final EmployeesTasksEntry deletedEmployeeTask = new EmployeesTasksEntry(removedEmployees.get(i).getEmployeeID(), mTaskId);
+                        mDb.employeesTasksDao().deleteEmployeeTask(deletedEmployeeTask);
+                    }
+                }
+            });
+
     }
 
     finish();

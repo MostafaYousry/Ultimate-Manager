@@ -34,6 +34,11 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
         return mAddedEmployees;
     }
 
+    public List<EmployeeEntry> getRemovedEmployees()
+    {
+        return mRemovedEmployees;
+    }
+
     public HorizontalEmployeeAdapter(EmployeesAdapter.EmployeeItemClickListener clickListener, View.OnLongClickListener onEmployeeLongClicked) {
         this(clickListener);
         mOnEmployeeLongClicked = onEmployeeLongClicked;
