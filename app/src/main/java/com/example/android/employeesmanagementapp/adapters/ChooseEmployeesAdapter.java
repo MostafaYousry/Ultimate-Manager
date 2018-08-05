@@ -21,8 +21,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class ChooseEmployeesAdapter extends RecyclerView.Adapter<ChooseEmployeesAdapter.chooseEmployeeViewHolder> {
     private static ChooseEmployeesAdapter sChooseEmployeesAdapter;
-    private List<EmployeeEntry> mEmployeesInDepNotTask;
-    private List<EmployeeEntry> chosenEmployees;
+    private List<EmployeeEntry> mEmployeesInDepNotTask = new ArrayList<>();
+    private List<EmployeeEntry> chosenEmployees = new ArrayList<>();
     private static int mDepId;
 
     private ChooseEmployeesAdapter() {
@@ -34,7 +34,6 @@ public class ChooseEmployeesAdapter extends RecyclerView.Adapter<ChooseEmployees
             @Override
             public void onChanged(List<EmployeeEntry> employeeEntries) {
                 employees.removeObservers(owner);
-                mEmployeesInDepNotTask = new ArrayList<>();
                 mEmployeesInDepNotTask.addAll(employeeEntries);
                 notifyDataSetChanged();
             }
@@ -47,6 +46,8 @@ public class ChooseEmployeesAdapter extends RecyclerView.Adapter<ChooseEmployees
         if (sChooseEmployeesAdapter == null || mDepId != depId) {
             sChooseEmployeesAdapter = new ChooseEmployeesAdapter(viewModel, depId, taskId, owner);
             mDepId = depId;
+            System.out.println("create new chosen adapter");
+            //mEmployeesInDepNotTask.clear();
         }
 
         return sChooseEmployeesAdapter;
@@ -67,8 +68,6 @@ public class ChooseEmployeesAdapter extends RecyclerView.Adapter<ChooseEmployees
 
     @Override
     public int getItemCount() {
-        if (mEmployeesInDepNotTask == null)
-            return 0;
         return mEmployeesInDepNotTask.size();
     }
 
@@ -76,21 +75,18 @@ public class ChooseEmployeesAdapter extends RecyclerView.Adapter<ChooseEmployees
         return chosenEmployees;
     }
 
-    public void clearChosenEmployees() {
-        chosenEmployees.clear();
-    }
-
-    public void removeChosenEmployees() {
-
+    public void removeAndClearChosenEmployees() {
         mEmployeesInDepNotTask.removeAll(chosenEmployees);
+        chosenEmployees.clear();
         notifyDataSetChanged();
     }
-    public void mergeToEmployeeInDepNotTask(EmployeeEntry employeeEntry){
-        if(mEmployeesInDepNotTask == null){
-            mEmployeesInDepNotTask = new ArrayList<>();
-        }
+
+    public static void mChosenEmployeesAdapterExecution() {
+        sChooseEmployeesAdapter = null;
+    }
+
+    public void mergeToEmployeeInDepNotTask(EmployeeEntry employeeEntry) {
         mEmployeesInDepNotTask.add(employeeEntry);
-        System.out.println(mEmployeesInDepNotTask.size());
         notifyDataSetChanged();
     }
 
