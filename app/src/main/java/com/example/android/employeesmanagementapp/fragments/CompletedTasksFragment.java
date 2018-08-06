@@ -138,6 +138,7 @@ public class CompletedTasksFragment extends Fragment implements TasksAdapter.Tas
     public void onTaskClick(int taskRowID, int taskPosition) {
         Intent intent = new Intent(getActivity(), AddTaskActivity.class);
         intent.putExtra(AddTaskActivity.TASK_ID_KEY, taskRowID);
+        intent.putExtra(AddTaskActivity.TASK_ENABLE_VIEWS_KEY,false);
         startActivity(intent);
     }
 }

@@ -56,6 +56,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
 
 
     public static final String TASK_ID_KEY = "task_id";
+    public static final String TASK_ENABLE_VIEWS_KEY = "enable_views";
     private static final String TAG = AddTaskActivity.class.getSimpleName();
     private static final boolean DEFAULT_TASK_VIEW_ONLY = false;
     private static final int DEFAULT_TASK_ID = -1;
@@ -81,6 +82,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
 
     boolean departmentsLoaded = false;
     private int clickedTaskDepId = -1;
+    private boolean mEnableViews = true;
 
     private DepartmentsArrayAdapter mDepartmentsArrayAdapter;
     private RecyclerView mRecyclerView;
@@ -97,6 +99,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         Intent intent = getIntent();
         if (intent != null) {
             mTaskId = intent.getIntExtra(TASK_ID_KEY, DEFAULT_TASK_ID);
+            mEnableViews = intent.getBooleanExtra(TASK_ENABLE_VIEWS_KEY, DEFAULT_TASK_VIEW_ONLY);
         }
         if (mTaskId == DEFAULT_TASK_ID)
             addNewTask = true;
@@ -186,7 +189,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
                     setUpEmployeesRV();
                     // or -->
                     // mHorizontalEmployeeAdapter.clearAddedEmployees();
-                    AddTaskActivity.tempTaskDepId = (int)view.getTag();
+                    AddTaskActivity.tempTaskDepId = (int) view.getTag();
                 }
             }
 
@@ -298,6 +301,16 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
 
         mTaskDepartment.setEnabled(false);
 
+        enableViews();
+
+    }
+
+    private void enableViews() {
+        mTaskTitle.setEnabled(mEnableViews);
+        mTaskDescription.setEnabled(mEnableViews);
+        mTaskStartDate.setEnabled(mEnableViews);
+        mTaskDueDate.setEnabled(mEnableViews);
+        addEmployeesToTaskButton.setEnabled(mEnableViews);
     }
 
 
