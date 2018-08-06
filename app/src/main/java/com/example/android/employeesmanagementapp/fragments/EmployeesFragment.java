@@ -131,6 +131,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
 
 
     private void setFabActivation() {
+        getActivity().findViewById(R.id.fab).setVisibility(View.VISIBLE);
         AppExecutor.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {

@@ -19,6 +19,7 @@ import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.data.factories.DepIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewDepViewModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -72,6 +73,9 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
 
         mViewModel = ViewModelProviders.of(this, new DepIdFact(mDb, mDepartmentId)).get(AddNewDepViewModel.class);
 
+        setUpEmployeesRV();
+        setUpTasksRV();
+
         if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
             clearViews();
         } else {
@@ -84,8 +88,6 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
                 }
             });
 
-            setUpEmployeesRV();
-            setUpTasksRV();
         }
 
     }
@@ -97,16 +99,20 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mDepCompletedTasksRV.setLayoutManager(linearLayoutManager);
-
         final TasksAdapter adapter = new TasksAdapter(this);
-        final LiveData<List<TaskEntry>> depCompletedTasks = mViewModel.getCompletedTasks();
-        depCompletedTasks.observe(this, new Observer<List<TaskEntry>>() {
-            @Override
-            public void onChanged(List<TaskEntry> tasks) {
-                depCompletedTasks.removeObservers(AddDepartmentActivity.this);
-                adapter.setData(tasks);
-            }
-        });
+
+        if(mDepartmentId == DEFAULT_DEPARTMENT_ID)
+            adapter.setData(new ArrayList<TaskEntry>());
+        else {
+            final LiveData<List<TaskEntry>> depCompletedTasks = mViewModel.getCompletedTasks();
+            depCompletedTasks.observe(this, new Observer<List<TaskEntry>>() {
+                @Override
+                public void onChanged(List<TaskEntry> tasks) {
+                    depCompletedTasks.removeObservers(AddDepartmentActivity.this);
+                    adapter.setData(tasks);
+                }
+            });
+        }
         mDepCompletedTasksRV.setAdapter(adapter);
     }
 
@@ -122,14 +128,18 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
 
         final HorizontalEmployeeAdapter adapter = new HorizontalEmployeeAdapter(this);
 
-        final LiveData<List<EmployeeEntry>> depEmployees = mViewModel.getEmployees();
-        depEmployees.observe(this, new Observer<List<EmployeeEntry>>() {
-            @Override
-            public void onChanged(List<EmployeeEntry> employees) {
-                depEmployees.removeObservers(AddDepartmentActivity.this);
-                adapter.setData(employees);
-            }
-        });
+        if (mDepartmentId == DEFAULT_DEPARTMENT_ID)
+            adapter.setData(new ArrayList<EmployeeEntry>());
+        else {
+            final LiveData<List<EmployeeEntry>> depEmployees = mViewModel.getEmployees();
+            depEmployees.observe(this, new Observer<List<EmployeeEntry>>() {
+                @Override
+                public void onChanged(List<EmployeeEntry> employees) {
+                    depEmployees.removeObservers(AddDepartmentActivity.this);
+                    adapter.setData(employees);
+                }
+            });
+        }
         mDepEmployeesRV.setAdapter(adapter);
 
     }

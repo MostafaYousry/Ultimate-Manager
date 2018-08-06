@@ -65,6 +65,7 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
                              Bundle savedInstanceState) {
 
         //enable add departments button
+        getActivity().findViewById(R.id.fab).setVisibility(View.VISIBLE);
         getActivity().findViewById(R.id.fab).setEnabled(true);
 
         // Inflate the layout for this fragment

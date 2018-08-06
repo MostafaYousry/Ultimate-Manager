@@ -32,6 +32,7 @@ import com.example.android.employeesmanagementapp.fragments.DatePickerFragment;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -129,6 +130,7 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
 
         setUpNameET();
+        setUpTasksRV();
 
 
         if (mEmployeeId == DEFAULT_EMPLOYEE_ID) {
@@ -143,7 +145,6 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
                 }
             });
 
-            setUpTasksRV();
         }
 
         if (mIsViewOnly) {
@@ -161,14 +162,18 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
         final TasksAdapter adapter = new TasksAdapter(this);
 
-        final LiveData<List<TaskEntry>> employeeCompletedTasks = mViewModel.getEmployeeCompletedTasks();
-        employeeCompletedTasks.observe(this, new Observer<List<TaskEntry>>() {
-            @Override
-            public void onChanged(List<TaskEntry> tasks) {
-                employeeCompletedTasks.removeObservers(AddEmployeeActivity.this);
-                adapter.setData(tasks);
-            }
-        });
+        if(mEmployeeId == DEFAULT_EMPLOYEE_ID)
+            adapter.setData(new ArrayList<TaskEntry>());
+        else {
+            final LiveData<List<TaskEntry>> employeeCompletedTasks = mViewModel.getEmployeeCompletedTasks();
+            employeeCompletedTasks.observe(this, new Observer<List<TaskEntry>>() {
+                @Override
+                public void onChanged(List<TaskEntry> tasks) {
+                    employeeCompletedTasks.removeObservers(AddEmployeeActivity.this);
+                    adapter.setData(tasks);
+                }
+            });
+        }
         mEmployeeCompletedTasks.setAdapter(adapter);
     }
 
