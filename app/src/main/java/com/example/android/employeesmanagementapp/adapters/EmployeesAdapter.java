@@ -1,6 +1,8 @@
 package com.example.android.employeesmanagementapp.adapters;
 
 import android.graphics.Color;
+import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +32,7 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
 
     private int employeesSelectionMode;
     private EmployeeSelectedStateListener mEmployeeSelectedStateListener;
+    private SparseBooleanArray mSelectedEmployees = new SparseBooleanArray();
 
 
     public EmployeesAdapter(@NonNull EmployeeItemClickListener listener, @NonNull EmployeeSelectedStateListener employeeSelectedStateListener) {
@@ -55,6 +58,11 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
 
     @Override
     public void onBindViewHolder(@NonNull EmployeesViewHolder holder, int position) {
+        if(mSelectedEmployees.get(position) == true){
+            holder.itemView.setBackgroundColor(Color.parseColor("#888888"));
+        }
+        else
+            holder.itemView.setBackgroundColor(Color.parseColor("#ffffff"));
         holder.bind(position);
     }
 
@@ -179,13 +187,17 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
 
         private void changeItemSelectedState() {
 
-            if (!mIsItemSelected) {
+            if (!mSelectedEmployees.get(getAdapterPosition())) {
                 mItemView.setBackgroundColor(Color.parseColor("#888888"));
                 mIsItemSelected = true;
+                mSelectedEmployees.append(getAdapterPosition(),true);
+                Log.v("employees" , "adding");
                 mEmployeeSelectedStateListener.onEmployeeSelected(mData.get(getAdapterPosition()).employeeEntry);
             } else {
                 mItemView.setBackgroundColor(Color.parseColor("#ffffff"));
                 mIsItemSelected = false;
+                mSelectedEmployees.delete(getAdapterPosition());
+                Log.v("employees" , "removing");
                 mEmployeeSelectedStateListener.onEmployeeDeselected(mData.get(getAdapterPosition()).employeeEntry);
             }
         }

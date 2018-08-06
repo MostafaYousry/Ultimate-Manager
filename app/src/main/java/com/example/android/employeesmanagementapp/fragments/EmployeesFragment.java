@@ -322,7 +322,8 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
     @Override
     public void onEmployeeSelected(EmployeeEntry employeeEntry) {
         //add employee to selected list
-        mSelectedEmployees.add(employeeEntry);
+        if (!mSelectedEmployees.contains(employeeEntry))
+            mSelectedEmployees.add(employeeEntry);
         Toast.makeText(getContext(), "employee with id " + employeeEntry.getEmployeeID() + " is added", Toast.LENGTH_SHORT).show();
         ((MainActivity) getActivity()).getSupportActionBar().setTitle(mSelectedEmployees.size() + " selected");
     }
@@ -330,7 +331,8 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
     @Override
     public void onEmployeeDeselected(EmployeeEntry employeeEntry) {
         //remove employee from selected list
-        mSelectedEmployees.remove(employeeEntry);
+        if (mSelectedEmployees.contains(employeeEntry))
+            mSelectedEmployees.remove(employeeEntry);
         Toast.makeText(getContext(), "employee with id " + employeeEntry.getEmployeeID() + " is removed", Toast.LENGTH_SHORT).show();
         if (mSelectedEmployees.isEmpty()) {
             ((MainActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.employees));
