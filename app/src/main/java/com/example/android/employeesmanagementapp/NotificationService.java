@@ -65,10 +65,10 @@ public class NotificationService extends Service {
 
         System.out.println("start timer");
         //schedule the timer, after the first 5000ms
-        System.out.println(taskId);
-        System.out.println(taskDueDate);
+        Log.d("intent output","task Id = " + taskId);
+        Log.d("intent output","task due date = " + taskDueDate);
 
-        timer.schedule(timerTask, taskDueDate * 1000);
+        timer.schedule(timerTask, taskDueDate);
         //timer.schedule(timerTask, 5000,1000); //
     }
 
@@ -89,8 +89,9 @@ public class NotificationService extends Service {
                 final boolean notification = handler.post(new Runnable() {
                     public void run() {
 
-                        Intent intent = new Intent(getApplicationContext(), AddDepartmentActivity.class);
+                        Intent intent = new Intent(getApplicationContext(), AddTaskActivity.class);
                         intent.putExtra(AddTaskActivity.TASK_ID_KEY, taskId);
+                        intent.putExtra(AddTaskActivity.TASK_ENABLE_VIEWS_KEY,true);
 
                         //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);

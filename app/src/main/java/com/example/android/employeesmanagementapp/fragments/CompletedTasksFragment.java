@@ -84,42 +84,42 @@ public class CompletedTasksFragment extends Fragment implements TasksAdapter.Tas
 
         mRecyclerView.setAdapter(mAdapter);
 
-        setUpOnSwipe();
+        //setUpOnSwipe();
 
         return view;
     }
 
-    private void setUpOnSwipe() {
-        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-            @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                return false;
-            }
-
-            // Called when a user swipes left or right on a ViewHolder
-            @Override
-            public void onSwiped(final RecyclerView.ViewHolder viewHolder, int swipeDir) {
-                // Here is where you'll implement swipe to delete
-
-                int taskPosition = viewHolder.getAdapterPosition();
-                TaskEntry taskEntry = mAdapter.getItem(taskPosition);
-                UndoDeleteAction mUndoDeleteAction = new UndoDeleteAction(taskEntry, mDb);
-                Snackbar.make(getActivity().findViewById(android.R.id.content), taskEntry.getTaskTitle() + " will be deleted", Snackbar.LENGTH_LONG).setAction("Undo", mUndoDeleteAction).show();
-
-                System.out.println("deleting");
-                AppExecutor.getInstance().diskIO().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        int position = viewHolder.getAdapterPosition();
-                        mDb.tasksDao().deleteTask(mAdapter.getItem(position));
-                    }
-                });
-
-            }
-        }).attachToRecyclerView(mRecyclerView);
-
-
-    }
+//    private void setUpOnSwipe() {
+//        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+//            @Override
+//            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+//                return false;
+//            }
+//
+//            // Called when a user swipes left or right on a ViewHolder
+//            @Override
+//            public void onSwiped(final RecyclerView.ViewHolder viewHolder, int swipeDir) {
+//                // Here is where you'll implement swipe to delete
+//
+//                int taskPosition = viewHolder.getAdapterPosition();
+//                TaskEntry taskEntry = mAdapter.getItem(taskPosition);
+//                UndoDeleteAction mUndoDeleteAction = new UndoDeleteAction(taskEntry, mDb);
+//                Snackbar.make(getActivity().findViewById(android.R.id.content), taskEntry.getTaskTitle() + " will be deleted", Snackbar.LENGTH_LONG).setAction("Undo", mUndoDeleteAction).show();
+//
+//                System.out.println("deleting");
+//                AppExecutor.getInstance().diskIO().execute(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        int position = viewHolder.getAdapterPosition();
+//                        mDb.tasksDao().deleteTask(mAdapter.getItem(position));
+//                    }
+//                });
+//
+//            }
+//        }).attachToRecyclerView(mRecyclerView);
+//
+//
+//    }
 
 
     private void showEmptyView() {

@@ -109,7 +109,7 @@ public class RunningTasksFragment extends Fragment implements TasksAdapter.Tasks
                 // Here is where you'll implement swipe to delete
 
                 int taskPosition = viewHolder.getAdapterPosition();
-                TaskEntry taskEntry = mAdapter.getItem(taskPosition);
+                final TaskEntry taskEntry = mAdapter.getItem(taskPosition);
                 UndoDeleteAction mUndoDeleteAction = new UndoDeleteAction(taskEntry, mDb);
                 Snackbar.make(getActivity().findViewById(android.R.id.content), taskEntry.getTaskTitle() + " will be deleted", Snackbar.LENGTH_LONG).setAction("Undo", mUndoDeleteAction).show();
 
@@ -117,8 +117,9 @@ public class RunningTasksFragment extends Fragment implements TasksAdapter.Tasks
                 AppExecutor.getInstance().diskIO().execute(new Runnable() {
                     @Override
                     public void run() {
-                        int position = viewHolder.getAdapterPosition();
-                        mDb.tasksDao().deleteTask(mAdapter.getItem(position));
+                        taskEntry.setDepartmentID(taskEntry.getDepartmentID());
+                        taskEntry.setTaskId(taskEntry.getTaskId());
+                        mDb.tasksDao().deleteTask(taskEntry);
                     }
                 });
 

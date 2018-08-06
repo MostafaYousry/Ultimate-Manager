@@ -79,12 +79,9 @@ public class TasksScreenSlidePagerFragment extends Fragment {
 
         @Override
         public Fragment getItem(int position) {
-            if(position == 0) {
-                Log.v("page" , "running task");
+            if(position == 0)
                 return new RunningTasksFragment();
-            }
-            Log.v("page" , "completed task");
-            getActivity().findViewById(R.id.fab).setEnabled(false);
+
             return new CompletedTasksFragment();
         }
 

@@ -4,20 +4,19 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.adapters.ChooseEmployeesAdapter;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
@@ -33,18 +32,18 @@ import com.example.android.employeesmanagementapp.data.factories.TaskIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewTaskViewModel;
 import com.example.android.employeesmanagementapp.fragments.DatePickerFragment;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -64,6 +63,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
     private int mTaskId;
     private boolean addNewTask = false;
 
+    private static final SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
     private EmployeesAdapter mEmplyeesAdapter;
 
@@ -200,6 +200,13 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         });
 
         setUpEmployeesRV();
+
+        mTaskDueDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pickDate(view);
+            }
+        });
     }
 
     private void showChooseTaskEmployeesDialog() {
@@ -294,7 +301,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         clickedTaskDepId = taskEntry.getDepartmentID();
         mTaskTitle.setText(taskEntry.getTaskTitle());
         mTaskDescription.setText(taskEntry.getTaskDescription());
-        mTaskStartDate.setText(taskEntry.getTaskDueDate().toString());
+        mTaskStartDate.setText(taskEntry.getTaskStartDate().toString());
         mTaskDueDate.setText(taskEntry.getTaskDueDate().toString());
         if (departmentsLoaded)
             mTaskDepartment.setSelection(mDepartmentsArrayAdapter.getPositionForItemId(taskEntry.getDepartmentID()));
@@ -328,13 +335,13 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         super.onStop();
 //        Intent intent = new Intent(this, NotificationService.class);
 //        // send the due date and the id of the task within the intent
-//        //intent.putExtra("task due date", taskDueDate.getTime() - taskStartDAte.getTime())'
-//        //intent.putExtra("task id",mTaskId);
-//
-//        //just for experiment
 //        Bundle bundle = new Bundle();
 //        bundle.putInt("task id",mTaskId);
-//        bundle.putLong("task due date",5);
+//        try {
+//            bundle.putLong("task due date",FORMAT.parse(mTaskDueDate.toString()).getTime() - new Date().getTime());
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
 //        intent.putExtras(bundle);
 //        startService(intent);
     }
@@ -351,6 +358,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         switch (item.getItemId()) {
             case R.id.action_save:
                 saveTask();
+
                 break;
             case android.R.id.home:
                 mChooseEmployeesAdapter.mChosenEmployeesAdapterExecution();
@@ -370,6 +378,17 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
             //todo:change string date to java object date
             Date taskStartDate = new Date();
             Date taskDueDate = new Date();
+
+
+//            try {
+//                taskStartDate = FORMAT.parse(mTaskStartDate.toString());
+//                taskDueDate = FORMAT.parse(mTaskDueDate.toString());
+//                Log.v("date", "start date " + taskStartDate);
+//                Log.v("date", "due date " + taskDueDate);
+//                System.out.println("**********************************************************");
+//            } catch (ParseException e) {
+//                e.printStackTrace();
+//            }
 
 
             final TaskEntry newTask = new TaskEntry(departmentId, taskTitle, taskDescription, taskStartDate, taskDueDate);
