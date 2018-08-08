@@ -42,8 +42,8 @@ public class AddNewTaskViewModel extends ViewModel {
         return allDepartments;
     }
 
-    public LiveData<List<EmployeeEntry>> getRestOfEmployeesInDep(int depId, List<Integer> employeeIDs) {
-        restOfEmployeesInDep = mAppDatabase.employeesDao().loadEmployeesNotInDep(depId,employeeIDs );
+    public LiveData<List<EmployeeEntry>> getRestOfEmployeesInDep(int depId, int taskId) {
+        restOfEmployeesInDep = mAppDatabase.employeesDao().loadEmployeesNotInDep(depId,taskId);
         return restOfEmployeesInDep;
     }
 }

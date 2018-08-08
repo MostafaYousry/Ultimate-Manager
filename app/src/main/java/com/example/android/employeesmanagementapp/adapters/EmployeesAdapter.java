@@ -194,13 +194,13 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
                 mIsItemSelected = true;
                 mSelectedEmployees.append(getAdapterPosition(),true);
                 Log.v("employees" , "adding");
-                mEmployeeSelectedStateListener.onEmployeeSelected(mData.get(getAdapterPosition()).employeeEntry);
+                mEmployeeSelectedStateListener.onEmployeeSelected(mData.get(getAdapterPosition()));
             } else {
                 mItemView.setBackgroundColor(Color.parseColor("#ffffff"));
                 mIsItemSelected = false;
                 mSelectedEmployees.delete(getAdapterPosition());
                 Log.v("employees" , "removing");
-                mEmployeeSelectedStateListener.onEmployeeDeselected(mData.get(getAdapterPosition()).employeeEntry);
+                mEmployeeSelectedStateListener.onEmployeeDeselected(mData.get(getAdapterPosition()));
             }
         }
 

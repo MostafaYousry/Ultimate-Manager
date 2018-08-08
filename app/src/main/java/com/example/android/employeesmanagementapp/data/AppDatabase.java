@@ -5,12 +5,10 @@ import android.content.Context;
 import com.example.android.employeesmanagementapp.data.daos.DepartmentsDao;
 import com.example.android.employeesmanagementapp.data.daos.EmployeesDao;
 import com.example.android.employeesmanagementapp.data.daos.EmployeesTasksDao;
-import com.example.android.employeesmanagementapp.data.daos.FiredEmployeesDao;
 import com.example.android.employeesmanagementapp.data.daos.TasksDao;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.entries.EmployeesTasksEntry;
-import com.example.android.employeesmanagementapp.data.entries.FiredEmployeeEntry;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 
 import java.util.Date;
@@ -26,7 +24,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
  * follows singleton design pattern
  * defines all entities in the database , database name , database version , type converters used
  */
-@Database(entities = {EmployeeEntry.class, TaskEntry.class, DepartmentEntry.class, EmployeesTasksEntry.class, FiredEmployeeEntry.class}, version = 1, exportSchema = false)
+@Database(entities = {EmployeeEntry.class, TaskEntry.class, DepartmentEntry.class, EmployeesTasksEntry.class}, version = 1, exportSchema = false)
 @TypeConverters(DateTypeConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
     private static final String TAG = AppDatabase.class.getSimpleName();
@@ -58,26 +56,26 @@ public abstract class AppDatabase extends RoomDatabase {
                                         db.departmentsDao().addDepartment(new DepartmentEntry(9, "dep9"));
 
 
-                                        db.employeesDao().addEmployee(new EmployeeEntry(1, 1, "mostafa", 23, new Date()));
-                                        db.employeesDao().addEmployee(new EmployeeEntry(2, 2, "kizo", 23, new Date()));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(1, 1, "mostafa", 23, new Date(),false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(2, 2, "kizo", 23, new Date(),false));
                                         //3ndo completed tasks bas
-                                        db.employeesDao().addEmployee(new EmployeeEntry(3, 3, "ammar", 23, new Date()));
-                                        db.employeesDao().addEmployee(new EmployeeEntry(4, 2, "swidan", 23, new Date()));
-                                        db.employeesDao().addEmployee(new EmployeeEntry(5, 2, "zew", 23, new Date()));
-                                        db.employeesDao().addEmployee(new EmployeeEntry(6, 3, "3as3oos", 23, new Date()));
-                                        db.employeesDao().addEmployee(new EmployeeEntry(7, 4, "abdelrahman", 23, new Date()));
-                                        db.employeesDao().addEmployee(new EmployeeEntry(8, 5, "amr", 23, new Date()));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(3, 3, "ammar", 23, new Date(),false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(4, 2, "swidan", 23, new Date(),false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(5, 2, "zew", 23, new Date(),false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(6, 3, "3as3oos", 23, new Date(),false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(7, 4, "abdelrahman", 23, new Date(),false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(8, 5, "amr", 23, new Date(),false));
                                         //3ndo running bas
-                                        db.employeesDao().addEmployee(new EmployeeEntry(9, 6, "hussein", 23, new Date()));
-                                        db.employeesDao().addEmployee(new EmployeeEntry(10, 6, "fakhr", 23, new Date()));
-                                        db.employeesDao().addEmployee(new EmployeeEntry(11, 7, "wagdy", 23, new Date()));
-                                        db.employeesDao().addEmployee(new EmployeeEntry(12, 8, "ziad", 23, new Date()));
-                                        db.employeesDao().addEmployee(new EmployeeEntry(13, 9, "omar", 23, new Date()));
-                                        db.employeesDao().addEmployee(new EmployeeEntry(14, 2, "zanaty", 23, new Date()));
-                                        db.employeesDao().addEmployee(new EmployeeEntry(15, 2, "ismaeil", 23, new Date()));
-                                        db.employeesDao().addEmployee(new EmployeeEntry(16, 5, "abdallah", 23, new Date()));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(9, 6, "hussein", 23, new Date(),false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(10, 6, "fakhr", 23, new Date(),false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(11, 7, "wagdy", 23, new Date(),false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(12, 8, "ziad", 23, new Date(),false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(13, 9, "omar", 23, new Date(),false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(14, 2, "zanaty", 23, new Date(),false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(15, 2, "ismaeil", 23, new Date(),false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(16, 5, "abdallah", 23, new Date(),false));
                                         //m3ndosh taskat
-                                        db.employeesDao().addEmployee(new EmployeeEntry(17, 5, "shawky", 23, new Date()));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(17, 5, "shawky", 23, new Date(),false));
 
 
                                         db.tasksDao().addTask(new TaskEntry(1, 1, "task1", "askasmas", new Date(), new Date(), 3, true));
@@ -136,5 +134,4 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public abstract EmployeesTasksDao employeesTasksDao();
 
-    public abstract FiredEmployeesDao firedEmployeesDao();
 }

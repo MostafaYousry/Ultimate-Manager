@@ -37,23 +37,28 @@ public class EmployeeEntry {
     @ColumnInfo(name = "employee_hire_date")
     private Date employeeHireDate;
 
+    @ColumnInfo(name = "employee_is_deleted")
+    private boolean employeeIsDeleted;
+
 
     //used when creating new EmployeeWithExtras object
     @Ignore
-    public EmployeeEntry(@NonNull int departmentId, @NonNull String employeeName, @NonNull int employeeSalary, Date employeeHireDate) {
+    public EmployeeEntry(@NonNull int departmentId, @NonNull String employeeName, @NonNull int employeeSalary, Date employeeHireDate, boolean employeeIsDeleted) {
         this.departmentId = departmentId;
         this.employeeName = employeeName;
         this.employeeSalary = employeeSalary;
         this.employeeHireDate = employeeHireDate;
+        this.employeeIsDeleted = employeeIsDeleted;
     }
 
     //used by room when reading from database
-    public EmployeeEntry(int employeeID, int departmentId, String employeeName, int employeeSalary, Date employeeHireDate) {
+    public EmployeeEntry(int employeeID, int departmentId, String employeeName, int employeeSalary, Date employeeHireDate, boolean employeeIsDeleted) {
         this.employeeID = employeeID;
         this.departmentId = departmentId;
         this.employeeName = employeeName;
         this.employeeSalary = employeeSalary;
         this.employeeHireDate = employeeHireDate;
+        this.employeeIsDeleted = employeeIsDeleted;
     }
 
     public int getEmployeeID() {
@@ -92,6 +97,14 @@ public class EmployeeEntry {
 
     public Date getEmployeeHireDate() {
         return employeeHireDate;
+    }
+
+    public boolean getEmployeeIsDeleted() {
+        return employeeIsDeleted;
+    }
+
+    public void setEmployeeIsDeleted(boolean employeeIsDeleted) {
+        this.employeeIsDeleted = employeeIsDeleted;
     }
 
     public void setEmployeeHireDate(Date employeeHireDate) {

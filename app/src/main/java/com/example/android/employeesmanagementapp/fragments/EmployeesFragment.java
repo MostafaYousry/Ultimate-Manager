@@ -318,7 +318,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
                         @Override
                         public void run() {
                             //Fire him
-                            mDb.firedEmployeesDao().addFiredEmployee(employeeEntry);
+                            mDb.employeesDao().deleteEmployeeFromCompletedTask(empID);
                             //Merge his ID to his completed tasks in employee_tasks
 
                             //In the end delete from employees table
@@ -336,9 +336,9 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
                      }
                 else if (taskType.equals("running and completed")) {
                     //Sheelo mel running
-                    //ViewModelProviders.of(getActivity(), new EmpIdFact(mDb, empID)).get(AddNewEmployeeViewModel.class).deleteEmployeeFromRunningTasks(empID);
+                    ViewModelProviders.of(getActivity(), new EmpIdFact(mDb, empID)).get(AddNewEmployeeViewModel.class).deleteEmployeeFromRunningTasks(empID);
                     //Fire him
-                    mDb.firedEmployeesDao().addFiredEmployee(employeeEntry);
+                        mDb.employeesDao().deleteEmployeeFromCompletedTask(empID);
                     //Merge his ID to his completed tasks in employee_tasks
 
                     //In the end delete from employees table
@@ -443,7 +443,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
         //add employee to selected list
         if (!mSelectedEmployees.contains(employeeEntry))
             mSelectedEmployees.add(employeeEntry);
-        Toast.makeText(getContext(), "employee with id " + employeeEntry.getEmployeeID() + " is added", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "employee with id " + employeeEntry.employeeEntry.getEmployeeID() + " is added", Toast.LENGTH_SHORT).show();
         ((MainActivity) getActivity()).getSupportActionBar().setTitle(mSelectedEmployees.size() + " selected");
     }
 
@@ -452,7 +452,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
         //remove employee from selected list
         if (mSelectedEmployees.contains(employeeEntry))
             mSelectedEmployees.remove(employeeEntry);
-        Toast.makeText(getContext(), "employee with id " + employeeEntry.getEmployeeID() + " is removed", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "employee with id " + employeeEntry.employeeEntry.getEmployeeID() + " is removed", Toast.LENGTH_SHORT).show();
         if (mSelectedEmployees.isEmpty()) {
             ((MainActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.employees));
             mEmployeesAdapter.setEmployeeSelectionMode(EmployeesAdapter.SELECTION_MODE_SINGLE);

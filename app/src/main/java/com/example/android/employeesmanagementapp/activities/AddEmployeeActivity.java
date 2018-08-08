@@ -282,7 +282,8 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
             //todo:convert string date to object Date
             final Date employeeHireDate = new Date();
 
-            final com.example.android.employeesmanagementapp.data.entries.EmployeeEntry newEmployee = new com.example.android.employeesmanagementapp.data.entries.EmployeeEntry(departmentId, employeeName, employeeSalary, employeeHireDate);
+            final boolean employeeIsDeleted = false;
+            final com.example.android.employeesmanagementapp.data.entries.EmployeeEntry newEmployee = new com.example.android.employeesmanagementapp.data.entries.EmployeeEntry(departmentId, employeeName, employeeSalary, employeeHireDate, employeeIsDeleted);
 
             AppExecutor.getInstance().diskIO().execute(new Runnable() {
                 @Override

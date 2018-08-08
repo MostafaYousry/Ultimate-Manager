@@ -46,13 +46,13 @@ public interface EmployeesDao {
             "            WHERE tasks.task_is_completed = 0\n" +
             "            GROUP BY employees.employee_id\n" +
             "    )\n" +
-            "    SELECT employees.employee_id,employees.department_id,employees.employee_name , employees.employee_salary,employees.employee_hire_date,\n" +
+            "    SELECT employees.employee_id,employees.department_id,employees.employee_name , employees.employee_salary,employees.employee_hire_date,employees.employee_is_deleted,\n" +
             "        CASE WHEN atr IS NOT NULL THEN atr ELSE 0 END AS average_completed_task_rating,\n" +
             "        CASE WHEN itc IS NOT NULL THEN itc ELSE 0 END AS incomplete_task_count\n" +
             "        FROM employees \n" +
             "            LEFT JOIN employee_completedtask_info ON employees.employee_id = employee_completedtask_info.employee_id\n" +
             "            LEFT JOIN employee_notcompleted_info ON employees.employee_id = employee_notcompleted_info.employee_id\n" +
-            "    ;")
+            " \tWHERE employees.employee_is_deleted = 0   ;")
     LiveData<List<EmployeeWithExtras>> loadEmployees();
 
     /**
@@ -97,7 +97,7 @@ public interface EmployeesDao {
             "            WHERE tasks.task_is_completed = 0\n" +
             "            GROUP BY employees.employee_id\n" +
             "    )\n" +
-            "    SELECT employees.employee_id,employees.department_id,employees.employee_name , employees.employee_salary,employees.employee_hire_date,\n" +
+            "    SELECT employees.employee_id,employees.department_id,employees.employee_name , employees.employee_salary,employees.employee_hire_date,employees.employee_is_deleted,\n" +
             "        CASE WHEN atr IS NOT NULL THEN atr ELSE 0 END AS average_completed_task_rating,\n" +
             "        CASE WHEN itc IS NOT NULL THEN itc ELSE 0 END AS incomplete_task_count\n" +
             "        FROM employees \n" +
@@ -136,5 +136,13 @@ public interface EmployeesDao {
      */
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateEmployee(EmployeeEntry employeeEntry);
+
+    /**
+     * update columns of an existing employee record to fire him
+     *
+     * @param empID
+     */
+    @Query("UPDATE employees SET employee_is_deleted = 1 WHERE employee_id=:empID")
+    void deleteEmployeeFromCompletedTask(int empID);
 
 }
