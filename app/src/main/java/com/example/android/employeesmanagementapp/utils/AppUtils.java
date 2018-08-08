@@ -99,12 +99,12 @@ public final class AppUtils {
      * tobe replaced with data from database
      */
     public static List<DepartmentEntry> getDepartmentsFakeData() {
-        DepartmentEntry departmentEntry1 = new DepartmentEntry("Production");
-        DepartmentEntry departmentEntry2 = new DepartmentEntry("Research and Development");
-        DepartmentEntry departmentEntry3 = new DepartmentEntry("Purchasing");
-        DepartmentEntry departmentEntry4 = new DepartmentEntry("Marketing");
-        DepartmentEntry departmentEntry5 = new DepartmentEntry("Human Resource Management");
-        DepartmentEntry departmentEntry6 = new DepartmentEntry("Accounting and Finance");
+        DepartmentEntry departmentEntry1 = new DepartmentEntry("Production",false);
+        DepartmentEntry departmentEntry2 = new DepartmentEntry("Research and Development",false);
+        DepartmentEntry departmentEntry3 = new DepartmentEntry("Purchasing",false);
+        DepartmentEntry departmentEntry4 = new DepartmentEntry("Marketing",false);
+        DepartmentEntry departmentEntry5 = new DepartmentEntry("Human Resource Management",false);
+        DepartmentEntry departmentEntry6 = new DepartmentEntry("Accounting and Finance",false);
 
         List<DepartmentEntry> list = new ArrayList<>();
         list.add(departmentEntry1);

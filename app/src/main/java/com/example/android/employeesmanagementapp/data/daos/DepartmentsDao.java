@@ -22,12 +22,21 @@ import androidx.room.Update;
 public interface DepartmentsDao {
 
     /**
-     * load all departments
+     * load all  deleted departments
      *
      * @return list of DepartmentEntry objects wrapped with LiveData
      */
-    @Query("Select * From departments")
+    @Query("Select * From departments ")
     LiveData<List<DepartmentEntry>> loadDepartments();
+
+
+    /**
+     * load all non deleted departments
+     *
+     * @return list of DepartmentEntry objects wrapped with LiveData
+     */
+    @Query("Select * From departments where department_is_deleted = 0")
+    LiveData<List<DepartmentEntry>> loadNonDeletedDepartments();
 
     /**
      * load a department record by it's id
@@ -51,7 +60,7 @@ public interface DepartmentsDao {
     /**
      * @return : number of departments in the company
      */
-    @Query("SELECT COUNT(*) FROM departments")
+    @Query("SELECT COUNT(*) FROM departments where department_is_deleted = 0 ")
     int getNumDepartments();
 
     /**

@@ -45,15 +45,15 @@ public abstract class AppDatabase extends RoomDatabase {
                                     public void run() {
                                         AppDatabase db = getInstance(context);
 
-                                        db.departmentsDao().addDepartment(new DepartmentEntry(1, "dep1"));
-                                        db.departmentsDao().addDepartment(new DepartmentEntry(2, "dep2"));
-                                        db.departmentsDao().addDepartment(new DepartmentEntry(3, "dep3"));
-                                        db.departmentsDao().addDepartment(new DepartmentEntry(4, "dep4"));
-                                        db.departmentsDao().addDepartment(new DepartmentEntry(5, "dep5"));
-                                        db.departmentsDao().addDepartment(new DepartmentEntry(6, "dep6"));
-                                        db.departmentsDao().addDepartment(new DepartmentEntry(7, "dep7"));
-                                        db.departmentsDao().addDepartment(new DepartmentEntry(8, "dep8"));
-                                        db.departmentsDao().addDepartment(new DepartmentEntry(9, "dep9"));
+                                        db.departmentsDao().addDepartment(new DepartmentEntry(1, "dep1",false));
+                                        db.departmentsDao().addDepartment(new DepartmentEntry(2, "dep2",false));
+                                        db.departmentsDao().addDepartment(new DepartmentEntry(3, "dep3",false));
+                                        db.departmentsDao().addDepartment(new DepartmentEntry(4, "dep4",false));
+                                        db.departmentsDao().addDepartment(new DepartmentEntry(5, "dep5",false));
+                                        db.departmentsDao().addDepartment(new DepartmentEntry(6, "dep6",false));
+                                        db.departmentsDao().addDepartment(new DepartmentEntry(7, "dep7",false));
+                                        db.departmentsDao().addDepartment(new DepartmentEntry(8, "dep8",false));
+                                        db.departmentsDao().addDepartment(new DepartmentEntry(9, "dep9",false));
 
 
                                         db.employeesDao().addEmployee(new EmployeeEntry(1, 1, "mostafa", 23, new Date(),false));

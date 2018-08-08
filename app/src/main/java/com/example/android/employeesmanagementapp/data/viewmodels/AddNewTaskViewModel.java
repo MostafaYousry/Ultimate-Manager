@@ -14,18 +14,23 @@ public class AddNewTaskViewModel extends ViewModel {
     private LiveData<TaskEntry> task;
     private LiveData<List<EmployeeEntry>> taskEmployees;
     private LiveData<List<DepartmentEntry>> allDepartments;
+    private LiveData<List<DepartmentEntry>> allNonDeletedDepartments;
     private LiveData<List<EmployeeEntry>> restOfEmployeesInDep;
     private AppDatabase mAppDatabase;
 
     public AddNewTaskViewModel(AppDatabase appDatabase, int taskId) {
         mAppDatabase = appDatabase;
-        allDepartments = appDatabase.departmentsDao().loadDepartments();
+
+
 
         if (taskId != -1) {
             task = appDatabase.tasksDao().loadTaskById(taskId);
             taskEmployees = mAppDatabase.employeesTasksDao().getEmployeesForTask(taskId);
+            allDepartments = appDatabase.departmentsDao().loadDepartments();
 
         }
+        else allDepartments = appDatabase.departmentsDao().loadNonDeletedDepartments();
+
 
     }
 

@@ -209,7 +209,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
             String departmentName = mDepartmentName.getText().toString();
 
 
-            final DepartmentEntry newDepartment = new DepartmentEntry(departmentName);
+            final DepartmentEntry newDepartment = new DepartmentEntry(departmentName,false);
 
             AppExecutor.getInstance().diskIO().execute(new Runnable() {
                 @Override

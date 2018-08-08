@@ -65,6 +65,7 @@ public interface EmployeesTasksDao {
             " employees_tasks.employee_id = :empID )and employee_id  = :empID")
     void deleteEmployeeFromRunningTasks(int empID);
 
-
+    @Query("delete from employees_tasks where task_id = :taskId")
+    void deleteDepartmentRunningTasks(int taskId);
 
 }

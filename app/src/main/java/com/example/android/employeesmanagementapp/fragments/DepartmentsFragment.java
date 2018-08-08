@@ -1,10 +1,13 @@
 package com.example.android.employeesmanagementapp.fragments;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -16,10 +19,15 @@ import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.activities.AddDepartmentActivity;
+import com.example.android.employeesmanagementapp.activities.MainActivity;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
+import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
+import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
+import com.example.android.employeesmanagementapp.data.factories.DepIdFact;
+import com.example.android.employeesmanagementapp.data.viewmodels.AddNewDepViewModel;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
 
 import java.util.ArrayList;
@@ -48,7 +56,7 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
     private LinearLayout mEmptyView;
     private TextView mEmptyViewTextView;
     private List<DepartmentEntry> mSelectedDepartments = new ArrayList<>();
-
+    private AddNewDepViewModel mAddNewDepViewModel;
 
     public DepartmentsFragment() {
         // Required empty public constructor
@@ -75,7 +83,6 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
         mRecyclerView = rootView.findViewById(R.id.rv_fragment);
         mEmptyView = rootView.findViewById(R.id.empty_view);
         mEmptyViewTextView = rootView.findViewById(R.id.empty_view_message_text_view);
-
         // this setting to improves performance if you know that changes
         // in content do not change the layout size of the RecyclerView
         mRecyclerView.setHasFixedSize(true);
@@ -150,22 +157,71 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
 
 
     @Override
-    public boolean onMenuItemClick(MenuItem item) {
+    public boolean onMenuItemClick(final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_delete_department:
-                AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        for (int i = 0; i < mSelectedDepartments.size(); i++) {
-                            //todo: make sure not to delete a full department
-                            //hasEmployees=  mDb.employeesDao().loadEmployees(mSelectedDepartments.get(i).getDepartmentId());
-                            //if(mhasEmployees != null)
-                            // Toast.makeText(getContext(),"Can't delete this department because it has employees please move them or delete them first", Toast.LENGTH_LONG).show();
-                            mDb.departmentsDao().deleteDepartment(mSelectedDepartments.get(i));
-                        }
+                        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
+                        alertDialog.setTitle("Alert");
+                        alertDialog.setMessage("if you deleted this Department all its employees and tasks will be deleted");
+                        Log.i("test","yes");
+                        alertDialog.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                mAddNewDepViewModel = ViewModelProviders.of(DepartmentsFragment.this, new DepIdFact(mDb, mAdapter.getClickedDepartment().getDepartmentId())).get(AddNewDepViewModel.class);
+                                final LiveData<List<TaskEntry>> depRunningTasks = mAddNewDepViewModel.getRunningTasks();
+                                depRunningTasks.observe(DepartmentsFragment.this, new Observer<List<TaskEntry>>() {
+                                    @Override
+                                    public void onChanged(final List<TaskEntry> taskEntries) {
+                                        depRunningTasks.removeObserver(this);
+                                        AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                for (TaskEntry taskEntry : taskEntries) {
+                                                    Log.i("test",taskEntry.getTaskTitle());
+                                                    mDb.employeesTasksDao().deleteDepartmentRunningTasks(taskEntry.getTaskId());
+                                                    mDb.tasksDao().deleteTask(taskEntry);
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
+                                final LiveData<List<EmployeeEntry>> depEmployees = mAddNewDepViewModel.getEmployees();
+                                depEmployees.observe(DepartmentsFragment.this, new Observer<List<EmployeeEntry>>() {
+                                    @Override
+                                    public void onChanged(final List<EmployeeEntry> employeeEntries) {
+                                        depEmployees.removeObserver(this);
+                                        AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                for (EmployeeEntry employeeEntry : employeeEntries) {
+                                                    Log.i("test",employeeEntry.getEmployeeName());
+                                                    mDb.employeesDao().deleteEmployeeFromDepartmentTask(employeeEntry.getEmployeeID());
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
+
+                            AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mAdapter.getClickedDepartment().setDepartmentIsDeleted(true);
+                                    Log.i("test", mAdapter.getClickedDepartment().getDepartmentName());
+                                    mDb.departmentsDao().updateDepartment(mAdapter.getClickedDepartment());
+                                }
+                            });
+                            }
+                        });
+                        alertDialog.show();
                     }
                 });
-
+                //todo: make sure not to delete a full department
+                //hasEmployees=  mDb.employeesDao().loadEmployees(mSelectedDepartments.get(i).getDepartmentId());
+                //if(mhasEmployees != null)
+                // Toast.makeText(getContext(),"Can't delete this department because it has employees please move them or delete them first", Toast.LENGTH_LONG).show();
                 return true;
             default:
                 return false;

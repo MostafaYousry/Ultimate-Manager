@@ -22,21 +22,35 @@ public class DepartmentEntry {
     @ColumnInfo(name = "department_name")
     private String departmentName;
 
+    @NonNull
+    @ColumnInfo(name = "department_is_deleted")
+    private boolean departmentIsDeleted;
+
     //used when creating new DepartmentEntry object
     @Ignore
-    public DepartmentEntry(@NonNull String departmentName) {
+    public DepartmentEntry(@NonNull String departmentName, boolean departmentIsDeleted) {
         this.departmentName = departmentName;
+        this.departmentIsDeleted = departmentIsDeleted ;
+    }
+    @Ignore
+    public DepartmentEntry(@NonNull int departmentId) {
+        this.departmentId = departmentId;
     }
 
-    @Ignore
-    public DepartmentEntry(int departmentId) {
-        this.departmentId = departmentId;
+    public boolean isDepartmentIsDeleted() {
+        return departmentIsDeleted;
+    }
+
+    public void setDepartmentIsDeleted(boolean departmentIsDeleted) {
+        this.departmentIsDeleted = departmentIsDeleted;
     }
 
     //used by room when reading from database
-    public DepartmentEntry(int departmentId, @NonNull String departmentName) {
+    public DepartmentEntry(int departmentId, @NonNull String departmentName,boolean departmentIsDeleted) {
         this.departmentId = departmentId;
         this.departmentName = departmentName;
+        this.departmentIsDeleted = departmentIsDeleted ;
+
     }
 
     public int getDepartmentId() {
