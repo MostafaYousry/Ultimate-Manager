@@ -69,9 +69,8 @@ public interface EmployeesDao {
      *
      * @return list of EmployeeWithExtras objects wrapped with LiveData
      */
-//    @Query("SELECT * from employees  INNER JOIN employees_tasks ON task_id != :taskId where employees.department_id = :departmentId not in (:employeesInTask)")
-    @Query("SELECT * from employees  where department_id =:departmentId AND employee_id not in (:employeeIds) ")
-    LiveData<List<EmployeeEntry>> loadEmployeesNotInDep(int departmentId,  List<Integer> employeeIds);
+    @Query(" SELECT * from employees where department_id = :departmentId Except SELECT DISTINCT employees.* from employees  INNER JOIN employees_tasks ON employees.employee_id = employees_tasks.employee_id where employees_tasks.task_id = :taskId and employees.department_id = :departmentId")
+    LiveData<List<EmployeeEntry>> loadEmployeesNotInDep(int departmentId, int taskId);
 
     /**
      * load an existing employee record by it's id

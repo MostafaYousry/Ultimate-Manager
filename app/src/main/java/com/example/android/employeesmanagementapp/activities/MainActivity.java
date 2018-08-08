@@ -9,7 +9,8 @@ import android.view.View;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.fragments.DepartmentsFragment;
 import com.example.android.employeesmanagementapp.fragments.EmployeesFragment;
-import com.example.android.employeesmanagementapp.fragments.TasksFragment;
+import com.example.android.employeesmanagementapp.fragments.RunningTasksFragment;
+import com.example.android.employeesmanagementapp.fragments.TasksScreenSlidePagerFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -17,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
@@ -49,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         //when app starts we show the tasks fragment
         if (savedInstanceState == null) {
             mBottomNavigationView.setSelectedItemId(R.id.nav_tasks);
-            loadFragment(new TasksFragment());
+            loadFragment(new TasksScreenSlidePagerFragment());
             getSupportActionBar().setTitle(getString(R.string.tasks));
             mSelectedFragmentId = R.id.nav_tasks;
         }
@@ -105,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         mSelectedFragmentId = item.getItemId();
         switch (mSelectedFragmentId) {
             case R.id.nav_tasks:
-                loadFragment(new TasksFragment());
+                loadFragment(new TasksScreenSlidePagerFragment());
                 mToolbar.setTitle(getString(R.string.tasks));
                 break;
             case R.id.nav_employees:

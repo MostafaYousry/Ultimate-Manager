@@ -138,6 +138,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
 
 
     private void setFabActivation() {
+        getActivity().findViewById(R.id.fab).setVisibility(View.VISIBLE);
         AppExecutor.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
@@ -437,20 +438,21 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
         return false;
     }
 
-
     @Override
     public void onEmployeeSelected(EmployeeWithExtras employeeEntry) {
         //add employee to selected list
-        mSelectedEmployees.add(employeeEntry);
-        Toast.makeText(getContext(), "employee with id " + employeeEntry.employeeEntry.getEmployeeID() + " is added", Toast.LENGTH_SHORT).show();
+        if (!mSelectedEmployees.contains(employeeEntry))
+            mSelectedEmployees.add(employeeEntry);
+        Toast.makeText(getContext(), "employee with id " + employeeEntry.getEmployeeID() + " is added", Toast.LENGTH_SHORT).show();
         ((MainActivity) getActivity()).getSupportActionBar().setTitle(mSelectedEmployees.size() + " selected");
     }
 
     @Override
     public void onEmployeeDeselected(EmployeeWithExtras employeeEntry) {
         //remove employee from selected list
-        mSelectedEmployees.remove(employeeEntry);
-        Toast.makeText(getContext(), "employee with id " + employeeEntry.employeeEntry.getEmployeeID() + " is removed", Toast.LENGTH_SHORT).show();
+        if (mSelectedEmployees.contains(employeeEntry))
+            mSelectedEmployees.remove(employeeEntry);
+        Toast.makeText(getContext(), "employee with id " + employeeEntry.getEmployeeID() + " is removed", Toast.LENGTH_SHORT).show();
         if (mSelectedEmployees.isEmpty()) {
             ((MainActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.employees));
             mEmployeesAdapter.setEmployeeSelectionMode(EmployeesAdapter.SELECTION_MODE_SINGLE);

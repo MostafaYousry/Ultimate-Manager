@@ -16,14 +16,15 @@ import androidx.lifecycle.LiveData;
  * View Model class
  * <p>
  * caches data for MainActivity
- * ---> tasksList for TasksFragment
+ * ---> runningTasksList for RunningTasksFragment
  * ---> departmentsList for DepartmentsFragment
  * ---> employeesList for EmployeesFragment
  */
 public class MainViewModel extends AndroidViewModel {
 
     private LiveData<List<DepartmentEntry>> allDepartmentsList;
-    private LiveData<List<TaskEntry>> tasksList;
+    private LiveData<List<TaskEntry>> runningTasksList;
+    private LiveData<List<TaskEntry>> completedTasksList;
     private LiveData<List<EmployeeWithExtras>> employeesWithExtrasList;
 
 
@@ -31,7 +32,8 @@ public class MainViewModel extends AndroidViewModel {
         super(application);
 
         allDepartmentsList = AppDatabase.getInstance(application.getApplicationContext()).departmentsDao().loadDepartments();
-        tasksList = AppDatabase.getInstance(application.getApplicationContext()).tasksDao().loadRunningTasks();
+        runningTasksList = AppDatabase.getInstance(application.getApplicationContext()).tasksDao().loadRunningTasks();
+        completedTasksList = AppDatabase.getInstance(application.getApplicationContext()).tasksDao().loadCompletedTasks();
         employeesWithExtrasList = AppDatabase.getInstance(application.getApplicationContext()).employeesDao().loadEmployees();
     }
 
@@ -40,8 +42,12 @@ public class MainViewModel extends AndroidViewModel {
         return allDepartmentsList;
     }
 
-    public LiveData<List<TaskEntry>> getTasksList() {
-        return tasksList;
+    public LiveData<List<TaskEntry>> getRunningTasksList() {
+        return runningTasksList;
+    }
+
+    public LiveData<List<TaskEntry>> getCompletedTasksList() {
+        return completedTasksList;
     }
 
     public LiveData<List<EmployeeWithExtras>> getEmployeesWithExtrasList() {

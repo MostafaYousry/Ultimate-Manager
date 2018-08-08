@@ -33,9 +33,9 @@ import androidx.recyclerview.widget.RecyclerView;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class TasksFragment extends Fragment implements TasksAdapter.TasksItemClickListener {
+public class RunningTasksFragment extends Fragment implements TasksAdapter.TasksItemClickListener {
 
-    private final String TAG = TasksFragment.class.getSimpleName();
+    private final String TAG = RunningTasksFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private TasksAdapter mAdapter;
     private AppDatabase mDb;
@@ -43,7 +43,7 @@ public class TasksFragment extends Fragment implements TasksAdapter.TasksItemCli
     private TextView emptyViewTextView;
     private Snackbar mSnackbar;
 
-    public TasksFragment() {
+    public RunningTasksFragment() {
         // Required empty public constructor
     }
 
@@ -74,7 +74,7 @@ public class TasksFragment extends Fragment implements TasksAdapter.TasksItemCli
         // specify an adapter
         mAdapter = new TasksAdapter(this);
 
-        LiveData<List<TaskEntry>> tasksList = ViewModelProviders.of(getActivity()).get(MainViewModel.class).getTasksList();
+        LiveData<List<TaskEntry>> tasksList = ViewModelProviders.of(getActivity()).get(MainViewModel.class).getRunningTasksList();
         tasksList.observe(this, new Observer<List<TaskEntry>>() {
             @Override
             public void onChanged(List<TaskEntry> taskEntries) {
@@ -93,7 +93,6 @@ public class TasksFragment extends Fragment implements TasksAdapter.TasksItemCli
 
         setFabActivation();
         setUpOnSwipe();
-
         return view;
     }
 
@@ -110,7 +109,7 @@ public class TasksFragment extends Fragment implements TasksAdapter.TasksItemCli
                 // Here is where you'll implement swipe to delete
 
                 int taskPosition = viewHolder.getAdapterPosition();
-                TaskEntry taskEntry = mAdapter.getItem(taskPosition);
+                final TaskEntry taskEntry = mAdapter.getItem(taskPosition);
                 UndoDeleteAction mUndoDeleteAction = new UndoDeleteAction(taskEntry, mDb);
                 Snackbar.make(getActivity().findViewById(android.R.id.content), taskEntry.getTaskTitle() + " will be deleted", Snackbar.LENGTH_LONG).setAction("Undo", mUndoDeleteAction).show();
 
@@ -118,8 +117,9 @@ public class TasksFragment extends Fragment implements TasksAdapter.TasksItemCli
                 AppExecutor.getInstance().diskIO().execute(new Runnable() {
                     @Override
                     public void run() {
-                        int position = viewHolder.getAdapterPosition();
-                        mDb.tasksDao().deleteTask(mAdapter.getItem(position));
+                        taskEntry.setDepartmentID(taskEntry.getDepartmentID());
+                        taskEntry.setTaskId(taskEntry.getTaskId());
+                        mDb.tasksDao().deleteTask(taskEntry);
                     }
                 });
 
@@ -176,6 +176,7 @@ public class TasksFragment extends Fragment implements TasksAdapter.TasksItemCli
     public void onTaskClick(int taskRowID, int taskPosition) {
         Intent intent = new Intent(getActivity(), AddTaskActivity.class);
         intent.putExtra(AddTaskActivity.TASK_ID_KEY, taskRowID);
+        intent.putExtra(AddTaskActivity.TASK_ENABLE_VIEWS_KEY,true);
         startActivity(intent);
     }
 }

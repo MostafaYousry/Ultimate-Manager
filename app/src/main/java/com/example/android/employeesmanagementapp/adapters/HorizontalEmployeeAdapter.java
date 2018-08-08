@@ -18,13 +18,26 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEmployeeAdapter.EmployeesViewHolder> {
-    private List<EmployeeEntry> mData;
-    private List<EmployeeEntry> mAddedEmployees;
+    private List<EmployeeEntry> mData = new ArrayList<>();
+    private List<EmployeeEntry> mDataCopy;
+    private List<EmployeeEntry> mAddedEmployees = new ArrayList<>();
     private EmployeesAdapter.EmployeeItemClickListener mClickListener;
     private View.OnLongClickListener mOnEmployeeLongClicked;
+    private EmployeeEntry mDeletedEmployee;
+    private List<EmployeeEntry> mRemovedEmployees = new ArrayList<>();
+    private int deletePosition;
 
     public HorizontalEmployeeAdapter(EmployeesAdapter.EmployeeItemClickListener clickListener) {
         mClickListener = clickListener;
+    }
+
+    public List<EmployeeEntry> getAddedEmployees() {
+        mAddedEmployees.removeAll(mDataCopy);
+        return mAddedEmployees;
+    }
+
+    public List<EmployeeEntry> getRemovedEmployees() {
+        return mRemovedEmployees;
     }
 
     public HorizontalEmployeeAdapter(EmployeesAdapter.EmployeeItemClickListener clickListener, View.OnLongClickListener onEmployeeLongClicked) {
@@ -51,27 +64,38 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
 
     @Override
     public int getItemCount() {
-        if (mData == null && mAddedEmployees != null)
-            return mAddedEmployees.size();
-        else if (mAddedEmployees == null && mData != null)
-            return mData.size();
-        else if (mData == null && mAddedEmployees == null)
-            return 0;
         return mData.size() + mAddedEmployees.size();
     }
 
     public void setData(List<EmployeeEntry> data) {
         mData = data;
+        mDataCopy = new ArrayList<>(mData);
         notifyDataSetChanged();
     }
 
     public void mergeToAddedEmployees(List<EmployeeEntry> chosenEmployees) {
-        if (mAddedEmployees == null)
-            mAddedEmployees = new ArrayList<>();
         mAddedEmployees.addAll(chosenEmployees);
+        mRemovedEmployees.removeAll(chosenEmployees);
+        notifyDataSetChanged();
     }
 
-    public class EmployeesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public EmployeeEntry removeEmployee() {
+        mRemovedEmployees.add(mDeletedEmployee);
+        if (deletePosition < mData.size())
+            mData.remove(mDeletedEmployee);
+        else
+            mAddedEmployees.remove(mDeletedEmployee);
+
+        notifyDataSetChanged();
+        return mDeletedEmployee;
+    }
+
+    public void clearAddedEmployees() {
+        mAddedEmployees.clear();
+    }
+
+
+    public class EmployeesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         ImageView employeeImage;
         TextView employeeName;
         View mItemView;
@@ -88,20 +112,20 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
 
             itemView.setOnClickListener(this);
             if (mOnEmployeeLongClicked != null)
-                itemView.setOnLongClickListener(mOnEmployeeLongClicked);
+                itemView.setOnLongClickListener(this);
 
         }
 
         public void bind(int position) {
             if (position >= mData.size()) {
-                employeeName.setText(mAddedEmployees.get(position).getEmployeeName());
+                employeeName.setText(mAddedEmployees.get(position - mData.size()).getEmployeeName());
 
-                itemView.setTag(mAddedEmployees.get(position).getEmployeeID());
+                itemView.setTag(mAddedEmployees.get(position - mData.size()).getEmployeeID());
+            } else {
+                employeeName.setText(mData.get(position).getEmployeeName());
+
+                itemView.setTag(mData.get(position).getEmployeeID());
             }
-
-            employeeName.setText(mData.get(position).getEmployeeName());
-
-            itemView.setTag(mData.get(position).getEmployeeID());
         }
 
         @Override
@@ -109,5 +133,15 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
             mClickListener.onEmployeeClick((int) mItemView.getTag(), getAdapterPosition());
         }
 
+        @Override
+        public boolean onLongClick(View view) {
+            deletePosition = getAdapterPosition();
+            if (deletePosition < mData.size())
+                mDeletedEmployee = mData.get(deletePosition);
+            else
+                mDeletedEmployee = mAddedEmployees.get(deletePosition-mData.size());
+            mOnEmployeeLongClicked.onLongClick(view);
+            return true;
+        }
     }
 }

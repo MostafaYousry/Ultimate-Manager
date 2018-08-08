@@ -29,6 +29,14 @@ public interface TasksDao {
     LiveData<List<TaskEntry>> loadRunningTasks();
 
     /**
+     * load all tasks that are running
+     *
+     * @return list of TaskEntry objects wrapped with LiveData
+     */
+    @Query("SELECT * FROM tasks WHERE task_is_completed = 1")
+    LiveData<List<TaskEntry>> loadCompletedTasks();
+
+    /**
      * load all tasks that are running or completed for an existing employee
      *
      * @param taskIsCompleted: true for completed tasks / false for running tasks
