@@ -34,6 +34,12 @@ public interface EmployeesTasksDao {
     List<TaskEntry> getTasksForEmployee(final int empId);
 
 
+    @Query("SELECT COUNT(*) FROM tasks " +
+            "INNER JOIN employees_tasks " +
+            "ON tasks.task_id=employees_tasks.task_id " +
+            "WHERE employees_tasks.employee_id=:empId AND tasks.task_is_completed = 1")
+    int getNumCompletedTasksEmployee(int empId);
+
     /**
      * insert a new employees tasks record
      *
@@ -49,6 +55,16 @@ public interface EmployeesTasksDao {
      */
     @Delete
     void deleteEmployeeTask(EmployeesTasksEntry employeesTasksEntry);
+
+    @Query("DELETE FROM employees_tasks WHERE employee_id = :empID")
+    void deleteEmployeeFromAllTasks(int empID);
+
+    @Query("delete from employees_tasks where task_id in(" +
+            "select employees_tasks.task_id from employees_tasks" +
+            " inner join tasks on (tasks.task_id = employees_tasks.task_id and tasks.task_is_completed = 0) where" +
+            " employees_tasks.employee_id = :empID )and employee_id  = :empID")
+    void deleteEmployeeFromRunningTasks(int empID);
+
 
 
 }

@@ -63,13 +63,18 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
 
     private EditText mTaskTitle;
     private EditText mTaskDescription;
+
+    public HorizontalEmployeeAdapter getHorizontalEmployeeAdapter() {
+        return mHorizontalEmployeeAdapter;
+    }
+
     private TextView mTaskStartDate;
     private TextView mTaskDueDate;
     private Spinner mTaskDepartment;
     private Toolbar mToolbar;
     private ImageButton addEmployeesToTaskButton;
 
-    private HorizontalEmployeeAdapter mHorizontalEmployeeAdapter;
+    public HorizontalEmployeeAdapter mHorizontalEmployeeAdapter;
     private AppDatabase mDb;
     private AddNewTaskViewModel mViewModel;
 
@@ -190,7 +195,12 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
             depId = mViewModel.getTask().getValue().getDepartmentID();
         }
 
-        final ChooseEmployeesAdapter chooseEmployeesAdapter = new ChooseEmployeesAdapter(mViewModel, depId, mTaskId, this);
+        List<Integer> employeeIDs = new ArrayList<>();
+        for(EmployeeEntry e : mHorizontalEmployeeAdapter.getData()){
+            employeeIDs.add(e.getEmployeeID());
+        }
+
+        final ChooseEmployeesAdapter chooseEmployeesAdapter = new ChooseEmployeesAdapter(mViewModel, depId, employeeIDs, this);
         chooseEmployeesRV.setAdapter(chooseEmployeesAdapter);
 
         builder.setView(chooseEmployeesRV);
@@ -401,8 +411,8 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         private List<EmployeeEntry> chosenEmployees;
 
 
-        private ChooseEmployeesAdapter(AddNewTaskViewModel viewModel, int depId, int taskId, final LifecycleOwner owner) {
-            final LiveData<List<EmployeeEntry>> employees = viewModel.getRestOfEmployeesInDep(depId, taskId);
+        private ChooseEmployeesAdapter(AddNewTaskViewModel viewModel, int depId, List<Integer> employeeIDs, final LifecycleOwner owner) {
+            final LiveData<List<EmployeeEntry>> employees = viewModel.getRestOfEmployeesInDep(depId, employeeIDs );
             employees.observe(owner, new Observer<List<EmployeeEntry>>() {
                 @Override
                 public void onChanged(List<EmployeeEntry> employeeEntries) {
@@ -414,9 +424,9 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
             chosenEmployees = new ArrayList<>();
         }
 
-        public static ChooseEmployeesAdapter getInstance(AddNewTaskViewModel viewModel, int depId, int taskId, LifecycleOwner owner) {
+        public static ChooseEmployeesAdapter getInstance(AddNewTaskViewModel viewModel, int depId, List<Integer> employeeIDs, LifecycleOwner owner) {
             if (sChooseEmployeesAdapter == null) {
-                sChooseEmployeesAdapter = new ChooseEmployeesAdapter(viewModel, depId, taskId, owner);
+                sChooseEmployeesAdapter = new ChooseEmployeesAdapter(viewModel, depId, employeeIDs, owner);
             }
 
             return sChooseEmployeesAdapter;

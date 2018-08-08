@@ -100,9 +100,11 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
     }
 
     public interface EmployeeSelectedStateListener {
-        void onEmployeeSelected(EmployeeEntry employeeEntry);
+        //void onEmployeeSelected(EmployeeEntry employeeEntry);
 
-        void onEmployeeDeselected(EmployeeEntry employeeEntry);
+        void onEmployeeSelected(EmployeeWithExtras employeeEntry);
+
+        void onEmployeeDeselected(EmployeeWithExtras employeeEntry);
     }
 
     public class EmployeesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
@@ -182,11 +184,11 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
             if (!mIsItemSelected) {
                 mItemView.setBackgroundColor(Color.parseColor("#888888"));
                 mIsItemSelected = true;
-                mEmployeeSelectedStateListener.onEmployeeSelected(mData.get(getAdapterPosition()).employeeEntry);
+                mEmployeeSelectedStateListener.onEmployeeSelected(mData.get(getAdapterPosition()));
             } else {
                 mItemView.setBackgroundColor(Color.parseColor("#ffffff"));
                 mIsItemSelected = false;
-                mEmployeeSelectedStateListener.onEmployeeDeselected(mData.get(getAdapterPosition()).employeeEntry);
+                mEmployeeSelectedStateListener.onEmployeeDeselected(mData.get(getAdapterPosition()));
             }
         }
 

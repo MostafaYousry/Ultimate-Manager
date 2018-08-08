@@ -45,6 +45,10 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
         holder.bind(position);
     }
 
+    public List<EmployeeEntry> getData(){
+        return mData;
+    }
+
     @Override
     public int getItemCount() {
         if (mData == null && mAddedEmployees != null)
