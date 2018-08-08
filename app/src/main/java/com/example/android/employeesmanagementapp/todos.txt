@@ -1,4 +1,4 @@
-todo(1):rate a task
+todo(1):rate a task--
 todo(2):note on employees
 todo(3):fix task start and due date issue
 todo(4):use xliff tag and and plurals (1 running task / 5 running tasks)
@@ -10,9 +10,9 @@ todo(8):notifications & background services for notifying a manager when a task 
 *see background services and workmanager architecture component
 todo(9):use paging architecture component for loading lists in small chunks
 todo(10):use butter Knife for binding views instead of find view by id
-todo(11):change department and task items layout
-todo(12):add option to color a task item
-todo(13):apply a theme for the app
+todo(11):change department and task items layout--
+todo(12):add option to color a task item--
+todo(13):apply a theme for the app--
 *see (https://material.io/design/material-theming/overview.html#)
 *see (https://material.io/design/material-theming/implementing-your-theme.html)
 todo(14):choose colors for the app
