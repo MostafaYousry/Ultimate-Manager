@@ -9,7 +9,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.activity_add_task.runner.AndroidJUnitRunner"
-        //testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -25,31 +25,37 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha1'
     implementation 'androidx.cardview:cardview:1.0.0-beta01'
     implementation 'com.google.android.material:material:1.0.0-beta01'
-    implementation 'androidx.coordinatorlayout:coordinatorlayout:1.0.0-beta01'
+    implementation 'androidx.coordinatorlayout:coordinatorlayout:1.0.0-rc01'
     implementation 'androidx.recyclerview:recyclerview:1.0.0-beta01'
 
-    // create notifications
-    implementation "androidx.core:core:1.0.0-beta01"
+    //for notifications
+    implementation "androidx.core:core:1.0.0-rc01"
 
     //Room
-    def room_version = "1.1.1"
     implementation 'androidx.room:room-runtime:2.0.0-beta01'
     annotationProcessor 'androidx.room:room-compiler:2.0.0-beta01'
 
-    def lifecycle_version = "1.1.1"
+
 
     // ViewModel and LiveData
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0-beta01'
     annotationProcessor 'androidx.lifecycle:lifecycle-compiler:2.0.0-beta01'
 
+
+
+    //todo:reference these libraries in github at the end
+    //Glide image loading library
+    implementation 'com.github.bumptech.glide:glide:4.7.1'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
+    implementation 'jp.wasabeef:glide-transformations:3.3.0'
+
+    //circle image view for employee avatar
+    implementation 'de.hdodenhof:circleimageview:2.2.0'
+
+
+
     implementation 'androidx.legacy:legacy-support-v4:1.0.0-beta01'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
-
-    //todo:reference these libraries in github at the end
-    implementation 'com.github.bumptech.glide:glide:4.7.1'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
-    implementation 'de.hdodenhof:circleimageview:2.2.0'
-    implementation 'jp.wasabeef:glide-transformations:3.3.0'
 }

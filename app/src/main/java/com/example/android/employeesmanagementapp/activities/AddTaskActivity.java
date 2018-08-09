@@ -4,9 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -17,7 +15,6 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.adapters.ChooseEmployeesAdapter;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
@@ -33,7 +30,6 @@ import com.example.android.employeesmanagementapp.data.factories.TaskIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewTaskViewModel;
 import com.example.android.employeesmanagementapp.fragments.DatePickerFragment;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -255,7 +251,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
     }
 
     private void setUpEmployeesRV() {
-        mRecyclerView = findViewById(R.id.task_employees_rv);
+        mRecyclerView = findViewById(R.id.department_employees_rv);
 
         mRecyclerView.setHasFixedSize(true);
 

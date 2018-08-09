@@ -188,7 +188,7 @@
                 android:text="Task Employees "
                 android:textColor="@color/primaryTextColor"
                 android:textSize="18sp"
-                app:layout_constraintBottom_toTopOf="@+id/task_employees_rv"
+                app:layout_constraintBottom_toTopOf="@+id/department_employees_rv"
                 app:layout_constraintEnd_toStartOf="@+id/add_employees_to_task_button"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintHorizontal_chainStyle="spread_inside"
@@ -203,13 +203,13 @@
                 android:background="@android:color/transparent"
                 android:padding="16dp"
                 android:src="@drawable/ic_add_circle_outline_black"
-                app:layout_constraintBottom_toTopOf="@+id/task_employees_rv"
+                app:layout_constraintBottom_toTopOf="@+id/department_employees_rv"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/department_employees_text_view" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/task_employees_rv"
+                android:id="@+id/department_employees_rv"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="16dp"

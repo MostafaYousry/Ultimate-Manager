@@ -2,10 +2,12 @@ package com.example.android.employeesmanagementapp.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
@@ -19,7 +21,6 @@ import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.data.factories.DepIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewDepViewModel;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,15 +33,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 public class AddDepartmentActivity extends AppCompatActivity implements EmployeesAdapter.EmployeeItemClickListener, TasksAdapter.TasksItemClickListener {
-    public static final String DEPARTMENT_ID_KEY = "department_id";
+
     private static final String TAG = AddDepartmentActivity.class.getSimpleName();
+
+    public static final String DEPARTMENT_ID_KEY = "department_id";
     private static final int DEFAULT_DEPARTMENT_ID = -1;
     private int mDepartmentId;
 
     private RecyclerView mDepCompletedTasksRV;
+    private RecyclerView mDepRunningTasksRV;
     private RecyclerView mDepEmployeesRV;
     private EditText mDepartmentName;
     private Toolbar mToolbar;
+
+    private Toast mToast;
 
     private AppDatabase mDb;
     private AddNewDepViewModel mViewModel;
@@ -61,6 +67,10 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
 
         //find views
         mDepartmentName = findViewById(R.id.department_name);
+        mDepEmployeesRV = findViewById(R.id.department_employees_rv);
+        mDepRunningTasksRV = findViewById(R.id.department_running_tasks_rv);
+        mDepCompletedTasksRV = findViewById(R.id.department_completed_tasks_rv);
+
 
         //set toolbar as actionbar
         mToolbar = findViewById(R.id.toolbar);
@@ -73,8 +83,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
 
         mViewModel = ViewModelProviders.of(this, new DepIdFact(mDb, mDepartmentId)).get(AddNewDepViewModel.class);
 
-        setUpEmployeesRV();
-        setUpTasksRV();
+
 
         if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
             clearViews();
@@ -88,38 +97,15 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
                 }
             });
 
+            setUpEmployeesRV();
+            setUpDepRunningTasksRV();
+            setUpDepCompletedTasksRV();
         }
 
     }
-
-    private void setUpTasksRV() {
-
-        mDepCompletedTasksRV = findViewById(R.id.department_tasks_rv);
-        mDepCompletedTasksRV.setHasFixedSize(true);
-
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        mDepCompletedTasksRV.setLayoutManager(linearLayoutManager);
-        final TasksAdapter adapter = new TasksAdapter(this);
-
-        if(mDepartmentId == DEFAULT_DEPARTMENT_ID)
-            adapter.setData(new ArrayList<TaskEntry>());
-        else {
-            final LiveData<List<TaskEntry>> depCompletedTasks = mViewModel.getCompletedTasks();
-            depCompletedTasks.observe(this, new Observer<List<TaskEntry>>() {
-                @Override
-                public void onChanged(List<TaskEntry> tasks) {
-                    depCompletedTasks.removeObservers(AddDepartmentActivity.this);
-                    adapter.setData(tasks);
-                }
-            });
-        }
-        mDepCompletedTasksRV.setAdapter(adapter);
-    }
-
 
     private void setUpEmployeesRV() {
 
-        mDepEmployeesRV = findViewById(R.id.task_employees_rv);
         mDepEmployeesRV.setHasFixedSize(true);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -127,22 +113,76 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
         mDepEmployeesRV.setLayoutManager(layoutManager);
 
         final HorizontalEmployeeAdapter adapter = new HorizontalEmployeeAdapter(this);
-
-        if (mDepartmentId == DEFAULT_DEPARTMENT_ID)
-            adapter.setData(new ArrayList<EmployeeEntry>());
-        else {
-            final LiveData<List<EmployeeEntry>> depEmployees = mViewModel.getEmployees();
-            depEmployees.observe(this, new Observer<List<EmployeeEntry>>() {
-                @Override
-                public void onChanged(List<EmployeeEntry> employees) {
-                    depEmployees.removeObservers(AddDepartmentActivity.this);
-                    adapter.setData(employees);
-                }
-            });
-        }
         mDepEmployeesRV.setAdapter(adapter);
 
+
+        final LiveData<List<EmployeeEntry>> depEmployees = mViewModel.getEmployees();
+        depEmployees.observe(this, new Observer<List<EmployeeEntry>>() {
+            @Override
+            public void onChanged(List<EmployeeEntry> employees) {
+                if (employees != null && !employees.isEmpty())
+                    adapter.setData(employees);
+                else {
+                    findViewById(R.id.department_employees_text_view).setVisibility(View.GONE);
+                    mDepEmployeesRV.setVisibility(View.GONE);
+                }
+            }
+        });
+
+
     }
+
+    private void setUpDepRunningTasksRV() {
+
+        mDepRunningTasksRV.setHasFixedSize(true);
+
+        mDepRunningTasksRV.setLayoutManager(new LinearLayoutManager(this));
+        final TasksAdapter adapter = new TasksAdapter(this);
+        mDepRunningTasksRV.setAdapter(adapter);
+
+
+        final LiveData<List<TaskEntry>> depCompletedTasks = mViewModel.getRunningTasks();
+        depCompletedTasks.observe(this, new Observer<List<TaskEntry>>() {
+            @Override
+            public void onChanged(List<TaskEntry> tasks) {
+                if (tasks != null && !tasks.isEmpty())
+                    adapter.setData(tasks);
+                else {
+                    findViewById(R.id.textView2).setVisibility(View.GONE);
+                    mDepRunningTasksRV.setVisibility(View.GONE);
+                }
+            }
+        });
+    }
+
+    private void setUpDepCompletedTasksRV() {
+
+        mDepCompletedTasksRV.setHasFixedSize(true);
+
+        mDepCompletedTasksRV.setLayoutManager(new LinearLayoutManager(this));
+        final TasksAdapter adapter = new TasksAdapter(this);
+        mDepCompletedTasksRV.setAdapter(adapter);
+
+
+
+            final LiveData<List<TaskEntry>> depCompletedTasks = mViewModel.getCompletedTasks();
+            depCompletedTasks.observe(this, new Observer<List<TaskEntry>>() {
+                @Override
+                public void onChanged(List<TaskEntry> tasks) {
+                    if (tasks != null && !tasks.isEmpty())
+                        adapter.setData(tasks);
+                    else {
+                        findViewById(R.id.textView3).setVisibility(View.GONE);
+                        mDepCompletedTasksRV.setVisibility(View.GONE);
+                    }
+                }
+            });
+
+    }
+
+
+
+
 
     protected void onStop() {
         super.onStop();
@@ -165,22 +205,21 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
     private void populateUi(DepartmentEntry departmentEntry) {
         if (departmentEntry == null)
             return;
+
         mDepartmentName.setText(departmentEntry.getDepartmentName());
         getSupportActionBar().setTitle(departmentEntry.getDepartmentName());
-        mDepCompletedTasksRV.setVisibility(View.VISIBLE);
-        mDepEmployeesRV.setVisibility(View.VISIBLE);
-        findViewById(R.id.textView2).setVisibility(View.VISIBLE);
-        findViewById(R.id.department_employees_text_view).setVisibility(View.VISIBLE);
-
 
     }
 
     private void clearViews() {
-        getSupportActionBar().setTitle("Add new department");
+        getSupportActionBar().setTitle("Add department");
         mDepartmentName.setText("");
+
         mDepCompletedTasksRV.setVisibility(View.GONE);
+        mDepRunningTasksRV.setVisibility(View.GONE);
         mDepEmployeesRV.setVisibility(View.GONE);
         findViewById(R.id.textView2).setVisibility(View.GONE);
+        findViewById(R.id.textView3).setVisibility(View.GONE);
         findViewById(R.id.department_employees_text_view).setVisibility(View.GONE);
     }
 
@@ -205,11 +244,11 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
 
 
     private void saveDepartment() {
-        if (valideData()) {
+        if (isValidData()) {
             String departmentName = mDepartmentName.getText().toString();
 
 
-            final DepartmentEntry newDepartment = new DepartmentEntry(departmentName,false);
+            final DepartmentEntry newDepartment = new DepartmentEntry(departmentName);
 
             AppExecutor.getInstance().diskIO().execute(new Runnable() {
                 @Override
@@ -229,7 +268,17 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
 
     }
 
-    private boolean valideData() {
+    private boolean isValidData() {
+        if (TextUtils.isEmpty(mDepartmentName.getText())) {
+            if (mToast != null) {
+                mToast.cancel();
+                mToast.show();
+            }
+            mToast = Toast.makeText(this, "Please enter a valid data", Toast.LENGTH_LONG);
+            mToast.show();
+            return false;
+        }
+
         return true;
     }
 
@@ -237,7 +286,6 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
     @Override
     public void onEmployeeClick(int employeeRowID, int employeePosition) {
         Intent intent = new Intent(this, AddEmployeeActivity.class);
-        intent.putExtra(AddEmployeeActivity.EMPLOYEE_VIEW_ONLY, true);
         intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY, employeeRowID);
         startActivity(intent);
     }
@@ -245,7 +293,6 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
     @Override
     public void onTaskClick(int taskRowID, int taskPosition) {
         Intent intent = new Intent(this, AddTaskActivity.class);
-        intent.putExtra(AddTaskActivity.TASK_VIEW_ONLY, true);
         intent.putExtra(AddTaskActivity.TASK_ID_KEY, taskRowID);
         startActivity(intent);
     }

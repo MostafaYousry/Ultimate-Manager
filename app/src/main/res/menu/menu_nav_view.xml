@@ -3,7 +3,6 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_tasks"
-
             android:icon="@drawable/ic_tasks"
             android:title="@string/tasks" />
 
@@ -13,7 +12,6 @@
             android:title="@string/employees" />
         <item
             android:id="@+id/nav_departments"
-
             android:icon="@drawable/ic_departments"
             android:title="@string/departments" />
 

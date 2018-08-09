@@ -28,21 +28,14 @@ public class DepartmentEntry {
 
     //used when creating new DepartmentEntry object
     @Ignore
-    public DepartmentEntry(@NonNull String departmentName, boolean departmentIsDeleted) {
+    public DepartmentEntry(@NonNull String departmentName) {
         this.departmentName = departmentName;
-        this.departmentIsDeleted = departmentIsDeleted ;
     }
+
+    //used with index of for department spinner
     @Ignore
     public DepartmentEntry(@NonNull int departmentId) {
         this.departmentId = departmentId;
-    }
-
-    public boolean isDepartmentIsDeleted() {
-        return departmentIsDeleted;
-    }
-
-    public void setDepartmentIsDeleted(boolean departmentIsDeleted) {
-        this.departmentIsDeleted = departmentIsDeleted;
     }
 
     //used by room when reading from database
@@ -68,6 +61,14 @@ public class DepartmentEntry {
 
     public void setDepartmentName(@NonNull String departmentName) {
         this.departmentName = departmentName;
+    }
+
+    public boolean isDepartmentIsDeleted() {
+        return departmentIsDeleted;
+    }
+
+    public void setDepartmentIsDeleted(boolean departmentIsDeleted) {
+        this.departmentIsDeleted = departmentIsDeleted;
     }
 
     @Override
