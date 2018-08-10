@@ -19,7 +19,6 @@ import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.activities.AddDepartmentActivity;
-import com.example.android.employeesmanagementapp.activities.MainActivity;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
@@ -66,7 +65,10 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDb = AppDatabase.getInstance(getContext());
+
+        setUpFab();
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -131,9 +133,21 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
         //applying default rv animations
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
+
         return rootView;
 
     }
+
+    private void setUpFab() {
+        getActivity().findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), AddDepartmentActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+
 
     private void showEmptyView() {
         mRecyclerView.setVisibility(View.GONE);
@@ -166,7 +180,7 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
                         AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
                         alertDialog.setTitle("Alert");
                         alertDialog.setMessage("if you deleted this Department all its employees and tasks will be deleted");
-                        Log.i("test","yes");
+                        Log.i("test", "yes");
                         alertDialog.setPositiveButton("ok", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
@@ -180,7 +194,7 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
                                             @Override
                                             public void run() {
                                                 for (TaskEntry taskEntry : taskEntries) {
-                                                    Log.i("test",taskEntry.getTaskTitle());
+                                                    Log.i("test", taskEntry.getTaskTitle());
                                                     mDb.employeesTasksDao().deleteDepartmentRunningTasks(taskEntry.getTaskId());
                                                     mDb.tasksDao().deleteTask(taskEntry);
                                                 }
@@ -197,7 +211,7 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
                                             @Override
                                             public void run() {
                                                 for (EmployeeEntry employeeEntry : employeeEntries) {
-                                                    Log.i("test",employeeEntry.getEmployeeName());
+                                                    Log.i("test", employeeEntry.getEmployeeName());
                                                     mDb.employeesDao().deleteEmployeeFromDepartmentTask(employeeEntry.getEmployeeID());
                                                 }
                                             }
@@ -205,14 +219,14 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
                                     }
                                 });
 
-                            AppExecutor.getInstance().diskIO().execute(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mAdapter.getClickedDepartment().setDepartmentIsDeleted(true);
-                                    Log.i("test", mAdapter.getClickedDepartment().getDepartmentName());
-                                    mDb.departmentsDao().updateDepartment(mAdapter.getClickedDepartment());
-                                }
-                            });
+                                AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mAdapter.getClickedDepartment().setDepartmentIsDeleted(true);
+                                        Log.i("test", mAdapter.getClickedDepartment().getDepartmentName());
+                                        mDb.departmentsDao().updateDepartment(mAdapter.getClickedDepartment());
+                                    }
+                                });
                             }
                         });
                         alertDialog.show();

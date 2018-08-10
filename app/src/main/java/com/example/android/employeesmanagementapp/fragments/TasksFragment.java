@@ -35,6 +35,15 @@ public class TasksFragment extends Fragment {
         return rootView;
     }
 
+
+    private void setUpViewPager(View rootView) {
+        mViewPager = rootView.findViewById(R.id.tasks_view_pager);
+        mPagerAdapter = new TasksPagerAdapter(getActivity().getSupportFragmentManager());
+        mViewPager.setAdapter(mPagerAdapter);
+        mTabLayout = getActivity().findViewById(R.id.tab_layout);
+        mTabLayout.setupWithViewPager(mViewPager);
+    }
+
     private void setUpViewPagerOnPageChangeListener() {
         mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 
@@ -43,20 +52,11 @@ public class TasksFragment extends Fragment {
             public void onPageSelected(int position) {
                 if (position == 0)
                     mFab.show();
-                else mFab.hide();
+                else
+                    mFab.hide();
             }
         });
 
-    }
-
-
-
-    private void setUpViewPager(View rootView) {
-        mViewPager = rootView.findViewById(R.id.tasks_view_pager);
-        mPagerAdapter = new TasksPagerAdapter(getActivity().getSupportFragmentManager());
-        mViewPager.setAdapter(mPagerAdapter);
-        mTabLayout = getActivity().findViewById(R.id.tab_layout);
-        mTabLayout.setupWithViewPager(mViewPager);
     }
 
 

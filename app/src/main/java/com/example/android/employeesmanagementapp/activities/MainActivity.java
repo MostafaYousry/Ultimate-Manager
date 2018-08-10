@@ -1,6 +1,5 @@
 package com.example.android.employeesmanagementapp.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -11,7 +10,6 @@ import com.example.android.employeesmanagementapp.fragments.DepartmentsFragment;
 import com.example.android.employeesmanagementapp.fragments.EmployeesFragment;
 import com.example.android.employeesmanagementapp.fragments.TasksFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
 import androidx.annotation.NonNull;
@@ -36,7 +34,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setUpFab();
 
         //set toolbar as actionbar
         mToolbar = findViewById(R.id.toolbar);
@@ -68,31 +65,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         transaction.commit();
     }
 
-    private void setUpFab() {
-
-        FloatingActionButton fab = findViewById(R.id.fab);
-
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = null;
-                switch (mSelectedFragmentId) {
-                    case R.id.nav_tasks:
-                        intent = new Intent(MainActivity.this, AddTaskActivity.class);
-                        break;
-                    case R.id.nav_employees:
-                        intent = new Intent(MainActivity.this, AddEmployeeActivity.class);
-                        break;
-
-                    case R.id.nav_departments:
-                        intent = new Intent(MainActivity.this, AddDepartmentActivity.class);
-                        break;
-
-                }
-                startActivity(intent);
-            }
-        });
-    }
 
     /**
      * used to handle switching between fragments when a new navigation item is selected

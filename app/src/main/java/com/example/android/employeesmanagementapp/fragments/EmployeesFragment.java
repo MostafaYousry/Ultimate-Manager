@@ -1,7 +1,6 @@
 package com.example.android.employeesmanagementapp.fragments;
 
 
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -20,8 +19,8 @@ import android.widget.Toast;
 
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.UndoDeleteAction;
+import com.example.android.employeesmanagementapp.activities.AddDepartmentActivity;
 import com.example.android.employeesmanagementapp.activities.AddEmployeeActivity;
-import com.example.android.employeesmanagementapp.activities.AddTaskActivity;
 import com.example.android.employeesmanagementapp.activities.MainActivity;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
 import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
@@ -30,7 +29,6 @@ import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.EmployeeWithExtras;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
-import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.data.factories.EmpIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewEmployeeViewModel;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
@@ -41,10 +39,8 @@ import java.util.List;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.ListFragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -68,13 +64,12 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
     private LinearLayout emptyView;
     private TextView emptyViewTextView;
 
-    private Snackbar mSnackbar;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDb = AppDatabase.getInstance(getContext());
+        setUpFab();
         setHasOptionsMenu(true);
     }
 
@@ -91,7 +86,6 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
         emptyView = rootView.findViewById(R.id.empty_view);
         emptyViewTextView = rootView.findViewById(R.id.empty_view_message_text_view);
 
-        setFabActivation();
         setUpOnSwipe();
 
         return rootView;
@@ -128,39 +122,50 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
 
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
 
-        if (mSnackbar != null)
-            mSnackbar.dismiss();
-    }
-
-
-    private void setFabActivation() {
-        getActivity().findViewById(R.id.fab).setVisibility(View.VISIBLE);
-        AppExecutor.getInstance().diskIO().execute(new Runnable() {
+    private void setUpFab() {
+        ViewModelProviders.of(getActivity()).get(MainViewModel.class).getAllDepartmentsList().observe(this, new Observer<List<DepartmentEntry>>() {
             @Override
-            public void run() {
-                final int depNum = mDb.departmentsDao().getNumDepartments();
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (depNum == 0) {
-                            getActivity().findViewById(R.id.fab).setEnabled(false);
-                            mSnackbar = Snackbar.make(getView(), "please add department first", Snackbar.LENGTH_INDEFINITE);
-                            mSnackbar.show();
-                        } else {
-                            getActivity().findViewById(R.id.fab).setEnabled(true);
-                            if (mSnackbar != null)
-                                mSnackbar.dismiss();
-                        }
+            public void onChanged(List<DepartmentEntry> departmentEntries) {
+                if (departmentEntries.isEmpty()) {
+                    getActivity().findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                            builder.setTitle("No Departments");
+                            builder.setMessage("Please create a department first");
+                            builder.setPositiveButton("CREATE", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    Intent intent = new Intent(getActivity(), AddDepartmentActivity.class);
+                                    startActivity(intent);
+                                    dialogInterface.dismiss();
+                                }
+                            });
 
-                    }
-                });
+                            builder.setNegativeButton("NOT NOW", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    dialogInterface.dismiss();
+                                }
+                            });
+
+                            builder.show();
+                        }
+                    });
+                } else {
+                    getActivity().findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent intent = new Intent(getActivity(), AddEmployeeActivity.class);
+                            startActivity(intent);
+                        }
+                    });
+                }
             }
         });
     }
+
 
     private void setupRecyclerView(View rootView) {
 
@@ -230,61 +235,50 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
             case R.id.delete_employees:
                 Toast.makeText(getContext(), "Deleting " + mSelectedEmployees.size() + " employees", Toast.LENGTH_LONG).show();
 
-                        AppExecutor.getInstance().diskIO().execute(new Runnable() {
-                        @Override
-                        public void run() {
-                           for (int i = 0; i < mSelectedEmployees.size(); i++) {
-                                   final int empID= mSelectedEmployees.get(i).employeeEntry.getEmployeeID();
-                                   final int j=i;
-                                    //if kbeera bel or 3ando el 2?
-                                System.out.println("-------------------------------------------------------------------------- "+mDb.employeesTasksDao().getNumCompletedTasksEmployee(empID));
-                                if(mSelectedEmployees.get(i).employeeNumRunningTasks == 0 && mDb.employeesTasksDao().getNumCompletedTasksEmployee(empID)>0) {
-                                    getActivity().runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            showDialogue(mSelectedEmployees.get(j).employeeEntry,empID,"completed");
-                                        }
-                                    });
-                                        }
-
-                                    else if(mSelectedEmployees.get(i).employeeNumRunningTasks > 0 && mDb.employeesTasksDao().getNumCompletedTasksEmployee(empID)==0) {
-                                    getActivity().runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            showDialogue(mSelectedEmployees.get(j).employeeEntry,empID,"running");
-                                        }
-                                    });
-                                            }
-                                            else if(mSelectedEmployees.get(i).employeeNumRunningTasks > 0 && mDb.employeesTasksDao().getNumCompletedTasksEmployee(empID)>0){
-                                    getActivity().runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            showDialogue(mSelectedEmployees.get(j).employeeEntry,empID,"running and completed");
-                                        }
-                                    });
-                                }
-                                            else {
-                                        mDb.employeesDao().deleteEmployee(mSelectedEmployees.get(i).employeeEntry);
-                                         }
+                AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (int i = 0; i < mSelectedEmployees.size(); i++) {
+                            final int empID = mSelectedEmployees.get(i).employeeEntry.getEmployeeID();
+                            final int j = i;
+                            //if kbeera bel or 3ando el 2?
+                            System.out.println("-------------------------------------------------------------------------- " + mDb.employeesTasksDao().getNumCompletedTasksEmployee(empID));
+                            if (mSelectedEmployees.get(i).employeeNumRunningTasks == 0 && mDb.employeesTasksDao().getNumCompletedTasksEmployee(empID) > 0) {
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        showDialogue(mSelectedEmployees.get(j).employeeEntry, empID, "completed");
+                                    }
+                                });
+                            } else if (mSelectedEmployees.get(i).employeeNumRunningTasks > 0 && mDb.employeesTasksDao().getNumCompletedTasksEmployee(empID) == 0) {
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        showDialogue(mSelectedEmployees.get(j).employeeEntry, empID, "running");
+                                    }
+                                });
+                            } else if (mSelectedEmployees.get(i).employeeNumRunningTasks > 0 && mDb.employeesTasksDao().getNumCompletedTasksEmployee(empID) > 0) {
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        showDialogue(mSelectedEmployees.get(j).employeeEntry, empID, "running and completed");
+                                    }
+                                });
+                            } else {
+                                mDb.employeesDao().deleteEmployee(mSelectedEmployees.get(i).employeeEntry);
                             }
-
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    resetSelection();
-                                }
-                            });
-
                         }
 
-            });
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                resetSelection();
+                            }
+                        });
 
+                    }
 
-
-
-
-
-
+                });
 
 
                 return true;
@@ -298,25 +292,42 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
 
     private void showDialogue(final EmployeeEntry employeeEntry, final int empID, final String taskType) {
 
-         boolean choice = false;
+        boolean choice = false;
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Deleting Employee");
 
-        builder.setMessage("You are deleting employee(s) having "+ taskType +" tasks , are you sure you want to delete them ?");
+        builder.setMessage("You are deleting employee(s) having " + taskType + " tasks , are you sure you want to delete them ?");
 
 
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(final DialogInterface dialog, int which) {
-               AppExecutor.getInstance().diskIO().execute(new Runnable() {
-                 @Override
-                public void run() {
-                if(taskType.equals("completed"))
-                {
-                    AppExecutor.getInstance().diskIO().execute(new Runnable() {
-                        @Override
-                        public void run() {
+                AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (taskType.equals("completed")) {
+                            AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    //Fire him
+                                    mDb.employeesDao().deleteEmployeeFromCompletedTask(empID);
+                                    //Merge his ID to his completed tasks in employee_tasks
+
+                                    //In the end delete from employees table
+                                    //mDb.employeesDao().deleteEmployee(employeeEntry);
+                                    dialog.dismiss();
+                                }
+                            });
+
+                        } else if (taskType.equals("running")) {
+                            //lazem bel tarteeb dah w ykon 3ndo running bas -- mmkn testa5dem method delete men running tasks bas bardo
+                            ViewModelProviders.of(getActivity(), new EmpIdFact(mDb, empID)).get(AddNewEmployeeViewModel.class).deleteEmployeeFromAllTasks(empID);
+                            mDb.employeesDao().deleteEmployee(employeeEntry);
+                            dialog.dismiss();
+                        } else if (taskType.equals("running and completed")) {
+                            //Sheelo mel running
+                            ViewModelProviders.of(getActivity(), new EmpIdFact(mDb, empID)).get(AddNewEmployeeViewModel.class).deleteEmployeeFromRunningTasks(empID);
                             //Fire him
                             mDb.employeesDao().deleteEmployeeFromCompletedTask(empID);
                             //Merge his ID to his completed tasks in employee_tasks
@@ -325,28 +336,8 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
                             //mDb.employeesDao().deleteEmployee(employeeEntry);
                             dialog.dismiss();
                         }
-                    });
-
-                }
-                     else if (taskType.equals("running")) {
-                         //lazem bel tarteeb dah w ykon 3ndo running bas -- mmkn testa5dem method delete men running tasks bas bardo
-                         ViewModelProviders.of(getActivity(), new EmpIdFact(mDb, empID)).get(AddNewEmployeeViewModel.class).deleteEmployeeFromAllTasks(empID);
-                         mDb.employeesDao().deleteEmployee(employeeEntry);
-                         dialog.dismiss();
-                     }
-                else if (taskType.equals("running and completed")) {
-                    //Sheelo mel running
-                    ViewModelProviders.of(getActivity(), new EmpIdFact(mDb, empID)).get(AddNewEmployeeViewModel.class).deleteEmployeeFromRunningTasks(empID);
-                    //Fire him
-                        mDb.employeesDao().deleteEmployeeFromCompletedTask(empID);
-                    //Merge his ID to his completed tasks in employee_tasks
-
-                    //In the end delete from employees table
-                    //mDb.employeesDao().deleteEmployee(employeeEntry);
-                    dialog.dismiss();
-                }
-                 }
-               });
+                    }
+                });
 
 
             }
@@ -360,7 +351,6 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
         });
 
         builder.show();
-
 
 
     }
