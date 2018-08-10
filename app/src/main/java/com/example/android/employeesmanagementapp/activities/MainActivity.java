@@ -9,16 +9,15 @@ import android.view.View;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.fragments.DepartmentsFragment;
 import com.example.android.employeesmanagementapp.fragments.EmployeesFragment;
-import com.example.android.employeesmanagementapp.fragments.RunningTasksFragment;
-import com.example.android.employeesmanagementapp.fragments.TasksScreenSlidePagerFragment;
+import com.example.android.employeesmanagementapp.fragments.TasksFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.tabs.TabLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
@@ -29,6 +28,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private int mSelectedFragmentId;
     private Toolbar mToolbar;
     private BottomNavigationView mBottomNavigationView;
+    private TabLayout mTabLayout;
 
 
     @Override
@@ -48,10 +48,12 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         mBottomNavigationView.setOnNavigationItemSelectedListener(this);
 
 
+        mTabLayout = findViewById(R.id.tab_layout);
+
         //when app starts we show the tasks fragment
         if (savedInstanceState == null) {
             mBottomNavigationView.setSelectedItemId(R.id.nav_tasks);
-            loadFragment(new TasksScreenSlidePagerFragment());
+            loadFragment(new TasksFragment());
             getSupportActionBar().setTitle(getString(R.string.tasks));
             mSelectedFragmentId = R.id.nav_tasks;
         }
@@ -107,15 +109,18 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         mSelectedFragmentId = item.getItemId();
         switch (mSelectedFragmentId) {
             case R.id.nav_tasks:
-                loadFragment(new TasksScreenSlidePagerFragment());
+                loadFragment(new TasksFragment());
+                mTabLayout.setVisibility(View.VISIBLE);
                 mToolbar.setTitle(getString(R.string.tasks));
                 break;
             case R.id.nav_employees:
                 loadFragment(new EmployeesFragment());
+                mTabLayout.setVisibility(View.GONE);
                 mToolbar.setTitle(getString(R.string.employees));
                 break;
             case R.id.nav_departments:
                 loadFragment(new DepartmentsFragment());
+                mTabLayout.setVisibility(View.GONE);
                 mToolbar.setTitle(getString(R.string.departments));
                 break;
 
@@ -126,18 +131,4 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         return true;
     }
 
-    /**
-     * when back is pressed
-     * check first if there is an employee selection is happening
-     * if there is one then end it first
-     */
-    @Override
-    public void onBackPressed() {
-        if (mSelectedFragmentId == R.id.nav_employees) {
-            boolean inMultiSelectionMode = ((EmployeesFragment) getSupportFragmentManager().getFragments().get(0)).isInMultiSelectionMode();
-            if (!inMultiSelectionMode) {
-                super.onBackPressed();
-            }
-        } else super.onBackPressed();
-    }
 }

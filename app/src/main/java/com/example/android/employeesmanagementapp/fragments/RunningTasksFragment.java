@@ -10,7 +10,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.R;
-import com.example.android.employeesmanagementapp.UndoDeleteAction;
 import com.example.android.employeesmanagementapp.activities.AddTaskActivity;
 import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
@@ -25,7 +24,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -92,41 +90,7 @@ public class RunningTasksFragment extends Fragment implements TasksAdapter.Tasks
         mRecyclerView.setAdapter(mAdapter);
 
         setFabActivation();
-        setUpOnSwipe();
         return view;
-    }
-
-    private void setUpOnSwipe() {
-        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-            @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                return false;
-            }
-
-            // Called when a user swipes left or right on a ViewHolder
-            @Override
-            public void onSwiped(final RecyclerView.ViewHolder viewHolder, int swipeDir) {
-                // Here is where you'll implement swipe to delete
-
-                int taskPosition = viewHolder.getAdapterPosition();
-                final TaskEntry taskEntry = mAdapter.getItem(taskPosition);
-                UndoDeleteAction mUndoDeleteAction = new UndoDeleteAction(taskEntry, mDb);
-                Snackbar.make(getActivity().findViewById(android.R.id.content), taskEntry.getTaskTitle() + " will be deleted", Snackbar.LENGTH_LONG).setAction("Undo", mUndoDeleteAction).show();
-
-                System.out.println("deleting");
-                AppExecutor.getInstance().diskIO().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        taskEntry.setDepartmentID(taskEntry.getDepartmentID());
-                        taskEntry.setTaskId(taskEntry.getTaskId());
-                        mDb.tasksDao().deleteTask(taskEntry);
-                    }
-                });
-
-            }
-        }).attachToRecyclerView(mRecyclerView);
-
-
     }
 
     @Override
@@ -176,7 +140,6 @@ public class RunningTasksFragment extends Fragment implements TasksAdapter.Tasks
     public void onTaskClick(int taskRowID, int taskPosition) {
         Intent intent = new Intent(getActivity(), AddTaskActivity.class);
         intent.putExtra(AddTaskActivity.TASK_ID_KEY, taskRowID);
-        intent.putExtra(AddTaskActivity.TASK_ENABLE_VIEWS_KEY,true);
         startActivity(intent);
     }
 }
