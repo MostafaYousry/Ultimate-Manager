@@ -39,10 +39,10 @@ public class DepartmentEntry {
     }
 
     //used by room when reading from database
-    public DepartmentEntry(int departmentId, @NonNull String departmentName,boolean departmentIsDeleted) {
+    public DepartmentEntry(int departmentId, @NonNull String departmentName, boolean departmentIsDeleted) {
         this.departmentId = departmentId;
         this.departmentName = departmentName;
-        this.departmentIsDeleted = departmentIsDeleted ;
+        this.departmentIsDeleted = departmentIsDeleted;
 
     }
 
@@ -80,9 +80,8 @@ public class DepartmentEntry {
         if (getClass() != obj.getClass())
             return false;
         DepartmentEntry other = (DepartmentEntry) obj;
-        if (departmentId == other.getDepartmentId())
-            return true;
-        return false;
+
+        return departmentId == other.getDepartmentId();
 
     }
 }

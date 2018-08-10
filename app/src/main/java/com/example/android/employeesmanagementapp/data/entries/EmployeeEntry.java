@@ -7,6 +7,7 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Ignore;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 /**
@@ -15,6 +16,7 @@ import androidx.room.PrimaryKey;
  * and constructors for RoomDatabase
  */
 @Entity(tableName = "employees",
+        indices = {@Index(value = {"department_id"})},
         foreignKeys = @ForeignKey(entity = DepartmentEntry.class, parentColumns = "department_id", childColumns = "department_id"))
 public class EmployeeEntry {
 
@@ -99,16 +101,16 @@ public class EmployeeEntry {
         return employeeHireDate;
     }
 
+    public void setEmployeeHireDate(Date employeeHireDate) {
+        this.employeeHireDate = employeeHireDate;
+    }
+
     public boolean getEmployeeIsDeleted() {
         return employeeIsDeleted;
     }
 
     public void setEmployeeIsDeleted(boolean employeeIsDeleted) {
         this.employeeIsDeleted = employeeIsDeleted;
-    }
-
-    public void setEmployeeHireDate(Date employeeHireDate) {
-        this.employeeHireDate = employeeHireDate;
     }
 
 
