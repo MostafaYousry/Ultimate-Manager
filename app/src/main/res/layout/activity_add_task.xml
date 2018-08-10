@@ -9,7 +9,8 @@
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:liftOnScroll="true">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
@@ -185,7 +186,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="16dp"
-                android:text="Task Employees "
+                android:text="Employees"
                 android:textColor="@color/primaryTextColor"
                 android:textSize="18sp"
                 app:layout_constraintBottom_toTopOf="@+id/department_employees_rv"
@@ -202,14 +203,16 @@
                 android:layout_marginEnd="32dp"
                 android:background="@android:color/transparent"
                 android:padding="16dp"
+                android:onClick="showChooseTaskEmployeesDialog"
                 android:src="@drawable/ic_add_circle_outline_black"
                 app:layout_constraintBottom_toTopOf="@+id/department_employees_rv"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/department_employees_text_view" />
+                app:layout_constraintStart_toEndOf="@+id/department_employees_text_view"
+                app:layout_constraintTop_toBottomOf="@+id/task_department" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/department_employees_rv"
+                android:id="@+id/task_employees_rv"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="16dp"
@@ -224,8 +227,6 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>
-
-    <!--<include layout="@layout/show_emp_bottom_sheet" />-->
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

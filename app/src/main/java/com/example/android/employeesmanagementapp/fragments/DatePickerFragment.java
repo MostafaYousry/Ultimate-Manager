@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.DatePicker;
 import android.widget.TextView;
 
+import com.example.android.employeesmanagementapp.utils.AppUtils;
+
 import java.util.Calendar;
 import java.util.Date;
 
@@ -45,7 +47,11 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
         TextView textView = (TextView) viewToShowDateIn;
-        textView.setText(dayOfMonth + "/" + month + "/" + year);
+        Calendar cal = Calendar.getInstance();
+        cal.set(year, month, dayOfMonth);
+        Date currentDate = cal.getTime();
+        textView.setText(AppUtils.getFriendlyDate(currentDate));
+        textView.setTag(currentDate);
     }
 
 

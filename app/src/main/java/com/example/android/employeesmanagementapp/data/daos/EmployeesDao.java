@@ -59,18 +59,20 @@ public interface EmployeesDao {
      * load all employees in an existing department
      *
      * @param departmentId : the department's record id to get the employees for
-     * @return list of EmployeeWithExtras objects wrapped with LiveData
+     * @return list of EmployeeEntry objects wrapped with LiveData
      */
     @Query("Select * from employees where department_id = :departmentId AND employee_is_deleted = 0")
-    LiveData<List<EmployeeEntry>> loadEmployees(int departmentId);
+    LiveData<List<EmployeeEntry>> loadEmployeesInDep(int departmentId);
 
     /**
-     * load all employees not in this department
+     * load all employees in this department except certain employees
+     * <p>
+     * used in add employees to tasks dialog
      *
      * @return list of EmployeeWithExtras objects wrapped with LiveData
      */
-    @Query(" SELECT * from employees where department_id = :departmentId Except SELECT DISTINCT employees.* from employees  INNER JOIN employees_tasks ON employees.employee_id = employees_tasks.employee_id where employees_tasks.task_id = :taskId and employees.department_id = :departmentId AND employee_is_deleted = 0")
-    LiveData<List<EmployeeEntry>> loadEmployeesNotInDep(int departmentId, int taskId);
+    @Query(" SELECT * from employees where department_id = :departmentId AND employee_is_deleted = 0 AND employee_id NOT IN (:exceptThese)")
+    LiveData<List<EmployeeEntry>> loadEmployeesInDep(int departmentId, List<Integer> exceptThese);
 
     /**
      * load an existing employee record by it's id

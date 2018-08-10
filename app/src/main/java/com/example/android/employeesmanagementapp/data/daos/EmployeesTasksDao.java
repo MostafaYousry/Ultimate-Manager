@@ -20,19 +20,17 @@ import androidx.room.Query;
 @Dao
 public interface EmployeesTasksDao {
 
-
-    @Query("SELECT * FROM employees " +
+    @Query("SELECT employees.employee_id , employees.department_id, employees.employee_name, employees.employee_salary, employees.employee_hire_date, employees.employee_is_deleted FROM employees " +
             "INNER JOIN employees_tasks " +
             "ON employees.employee_id=employees_tasks.employee_id " +
             "WHERE employees_tasks.task_id=:taskId")
-    LiveData<List<EmployeeEntry>> getEmployeesForTask(final int taskId);
+    LiveData<List<EmployeeEntry>> getEmployeesForTask(int taskId);
 
-    @Query("SELECT * FROM tasks " +
+    @Query("SELECT tasks.task_id, tasks.department_id, tasks.task_title, tasks.task_description , tasks.task_start_date, tasks.task_due_date , tasks.task_rating, tasks.task_is_completed FROM tasks " +
             "INNER JOIN employees_tasks " +
             "ON tasks.task_id=employees_tasks.task_id " +
             "WHERE employees_tasks.employee_id=:empId")
-    List<TaskEntry> getTasksForEmployee(final int empId);
-
+    List<TaskEntry> getTasksForEmployee(int empId);
 
     @Query("SELECT COUNT(*) FROM tasks " +
             "INNER JOIN employees_tasks " +

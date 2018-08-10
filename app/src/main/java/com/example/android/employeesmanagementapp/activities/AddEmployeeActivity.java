@@ -25,6 +25,7 @@ import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.EmployeeWithExtras;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
+import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.data.factories.EmpIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewEmployeeViewModel;
@@ -162,7 +163,7 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
         final TasksAdapter adapter = new TasksAdapter(this);
 
-        if(mEmployeeId == DEFAULT_EMPLOYEE_ID)
+        if (mEmployeeId == DEFAULT_EMPLOYEE_ID)
             adapter.setData(new ArrayList<TaskEntry>());
         else {
             final LiveData<List<TaskEntry>> employeeCompletedTasks = mViewModel.getEmployeeCompletedTasks();
@@ -235,7 +236,8 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
         mEmployeeName.setText(employeeWithExtras.employeeEntry.getEmployeeName());
         mEmployeeSalary.setText(String.valueOf(employeeWithExtras.employeeEntry.getEmployeeSalary()));
-        mEmployeeHireDate.setText(employeeWithExtras.employeeEntry.getEmployeeHireDate().toString());
+        mEmployeeHireDate.setText(AppUtils.getFriendlyDate(employeeWithExtras.employeeEntry.getEmployeeHireDate()));
+        mEmployeeHireDate.setTag(employeeWithExtras.employeeEntry.getEmployeeHireDate());
         mCollapsingToolbar.setTitle(employeeWithExtras.employeeEntry.getEmployeeName());
         if (departmentsLoaded)
             mEmployeeDepartment.setSelection(mArrayAdapter.getPositionForItemId(employeeWithExtras.employeeEntry.getDepartmentId()));
@@ -273,17 +275,13 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
 
     private void saveEmployee() {
-        if (valideData()) {
-            final int departmentId = (int) mEmployeeDepartment.getSelectedView().getTag();
-            Log.d(TAG, "departmentId = " + departmentId);
+        if (isDataValid()) {
+            String employeeName = mEmployeeName.getText().toString();
+            int employeeSalary = Integer.parseInt(mEmployeeSalary.getText().toString());
+            Date employeeHireDate = (Date) mEmployeeHireDate.getTag();
+            int departmentId = (int) mEmployeeDepartment.getSelectedView().getTag();
 
-            final String employeeName = mEmployeeName.getText().toString();
-            final int employeeSalary = Integer.parseInt(mEmployeeSalary.getText().toString());
-            //todo:convert string date to object Date
-            final Date employeeHireDate = new Date();
-
-            final boolean employeeIsDeleted = false;
-            final com.example.android.employeesmanagementapp.data.entries.EmployeeEntry newEmployee = new com.example.android.employeesmanagementapp.data.entries.EmployeeEntry(departmentId, employeeName, employeeSalary, employeeHireDate, employeeIsDeleted);
+            final EmployeeEntry newEmployee = new EmployeeEntry(departmentId, employeeName, employeeSalary, employeeHireDate);
 
             AppExecutor.getInstance().diskIO().execute(new Runnable() {
                 @Override
@@ -301,14 +299,43 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
     }
 
-    private boolean valideData() {
+    private boolean isDataValid() {
+
+        if (true)
+            return true;
+
+        if (TextUtils.isEmpty(mEmployeeName.getText())) {
+            showError("name");
+            return false;
+        }
+        if (!TextUtils.isDigitsOnly(mEmployeeSalary.getText())) {
+            showError("salary");
+            return false;
+        }
+        if (mEmployeeHireDate.getTag() == null) {
+            showError("hireDate");
+            return false;
+        }
+
         return true;
+
+
+    }
+
+    private void showError(String error) {
+        switch (error) {
+            case "name":
+                break;
+            case "salary":
+                break;
+            case "hireDate":
+                break;
+        }
     }
 
     @Override
     public void onTaskClick(int taskRowID, int taskPosition) {
         Intent intent = new Intent(this, AddTaskActivity.class);
-        intent.putExtra(AddTaskActivity.TASK_VIEW_ONLY, true);
         intent.putExtra(AddTaskActivity.TASK_ID_KEY, taskRowID);
         startActivity(intent);
     }

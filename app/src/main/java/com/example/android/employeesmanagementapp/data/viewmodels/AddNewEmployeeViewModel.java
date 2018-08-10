@@ -8,7 +8,6 @@ import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import java.util.List;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 public class AddNewEmployeeViewModel extends ViewModel {
@@ -20,12 +19,12 @@ public class AddNewEmployeeViewModel extends ViewModel {
 
 
     public AddNewEmployeeViewModel(AppDatabase database, int empID) {
-        mAppDatabase=database;
+        mAppDatabase = database;
         allDepartments = database.departmentsDao().loadDepartments();
         if (empID != -1) {
             mEmployee = database.employeesDao().loadEmployeeById(empID);
             employeeCompletedTasks = database.tasksDao().loadTasksForEmployee(empID, true);
-            employeeRunningTasks = database.tasksDao().loadTasksForEmployee(empID,false);
+            employeeRunningTasks = database.tasksDao().loadTasksForEmployee(empID, false);
 
 
         }
@@ -45,12 +44,13 @@ public class AddNewEmployeeViewModel extends ViewModel {
     }
 
 
-    public void deleteEmployeeFromAllTasks(int empID){
+    public void deleteEmployeeFromAllTasks(int empID) {
         mAppDatabase.employeesTasksDao().deleteEmployeeFromAllTasks(empID);
     }
 
-    public void deleteEmployeeFromRunningTasks(int empID){
-        mAppDatabase.employeesTasksDao().deleteEmployeeFromRunningTasks(empID);}
+    public void deleteEmployeeFromRunningTasks(int empID) {
+        mAppDatabase.employeesTasksDao().deleteEmployeeFromRunningTasks(empID);
+    }
 
     public LiveData<List<TaskEntry>> getEmployeeCompletedTasks() {
         return employeeCompletedTasks;

@@ -45,12 +45,11 @@ public class EmployeeEntry {
 
     //used when creating new EmployeeWithExtras object
     @Ignore
-    public EmployeeEntry(@NonNull int departmentId, @NonNull String employeeName, @NonNull int employeeSalary, Date employeeHireDate, boolean employeeIsDeleted) {
+    public EmployeeEntry(@NonNull int departmentId, @NonNull String employeeName, @NonNull int employeeSalary, Date employeeHireDate) {
         this.departmentId = departmentId;
         this.employeeName = employeeName;
         this.employeeSalary = employeeSalary;
         this.employeeHireDate = employeeHireDate;
-        this.employeeIsDeleted = employeeIsDeleted;
     }
 
     //used by room when reading from database

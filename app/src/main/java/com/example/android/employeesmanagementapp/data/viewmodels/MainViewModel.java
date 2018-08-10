@@ -31,7 +31,7 @@ public class MainViewModel extends AndroidViewModel {
     public MainViewModel(Application application) {
         super(application);
 
-        allDepartmentsList = AppDatabase.getInstance(application.getApplicationContext()).departmentsDao().loadNonDeletedDepartments();
+        allDepartmentsList = AppDatabase.getInstance(application.getApplicationContext()).departmentsDao().loadDepartments();
         runningTasksList = AppDatabase.getInstance(application.getApplicationContext()).tasksDao().loadRunningTasks();
         completedTasksList = AppDatabase.getInstance(application.getApplicationContext()).tasksDao().loadCompletedTasks();
         employeesWithExtrasList = AppDatabase.getInstance(application.getApplicationContext()).employeesDao().loadEmployees();
