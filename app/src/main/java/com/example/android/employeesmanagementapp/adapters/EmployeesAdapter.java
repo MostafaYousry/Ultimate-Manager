@@ -58,10 +58,9 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
 
     @Override
     public void onBindViewHolder(@NonNull EmployeesViewHolder holder, int position) {
-        if(mSelectedEmployees.get(position) == true){
+        if (mSelectedEmployees.get(position) == true) {
             holder.itemView.setBackgroundColor(Color.parseColor("#888888"));
-        }
-        else
+        } else
             holder.itemView.setBackgroundColor(Color.parseColor("#ffffff"));
         holder.bind(position);
     }
@@ -154,7 +153,9 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
 
             mEmployeeRating.setRating(mData.get(position).employeeRating);
 
-            mNumRunningTasks.setText(mData.get(position).employeeNumRunningTasks + " running tasks");
+            int numberRunningTasks = mData.get(position).employeeNumRunningTasks;
+            String runningTasksStr = itemView.getContext().getResources().getQuantityString(R.plurals.numberOfRunningTasks, numberRunningTasks, numberRunningTasks);
+            mNumRunningTasks.setText(runningTasksStr);
 
             Glide.with(mEmployeeImage.getContext())
                     .load(AppUtils.getRandomEmployeeImage())
@@ -192,14 +193,14 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
             if (!mSelectedEmployees.get(getAdapterPosition())) {
                 mItemView.setBackgroundColor(Color.parseColor("#888888"));
                 mIsItemSelected = true;
-                mSelectedEmployees.append(getAdapterPosition(),true);
-                Log.v("employees" , "adding");
+                mSelectedEmployees.append(getAdapterPosition(), true);
+                Log.v("employees", "adding");
                 mEmployeeSelectedStateListener.onEmployeeSelected(mData.get(getAdapterPosition()));
             } else {
                 mItemView.setBackgroundColor(Color.parseColor("#ffffff"));
                 mIsItemSelected = false;
                 mSelectedEmployees.delete(getAdapterPosition());
-                Log.v("employees" , "removing");
+                Log.v("employees", "removing");
                 mEmployeeSelectedStateListener.onEmployeeDeselected(mData.get(getAdapterPosition()));
             }
         }

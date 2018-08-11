@@ -66,4 +66,10 @@
     <string name="action_color_task">color</string>
 
 
+    <plurals name="numberOfRunningTasks">
+        <item quantity="one">%d running task</item>
+        <item quantity="other">%d running tasks</item>
+    </plurals>
+
+
 </resources>
