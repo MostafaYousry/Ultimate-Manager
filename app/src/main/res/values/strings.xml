@@ -60,6 +60,10 @@
     <string name="action_delete_department">Delete</string>
     <string name="action_remove_employee">Remove</string>
     <string name="cancel_delete_employee">Cancel</string>
+    <string name="to">to</string>
+    <string name="action_mark_as_done">mark as done</string>
+    <string name="action_delete_task">delete</string>
+    <string name="action_color_task">color</string>
 
 
 </resources>

@@ -18,6 +18,8 @@
             android:id="@+id/item_task_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
             android:gravity="center_vertical"
             android:textColor="@color/secondaryTextColor"
             android:textSize="18sp"
@@ -25,24 +27,44 @@
             card_view:layout_constraintTop_toTopOf="parent"
             tools:text="Prepare meeting papers" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:textColor="@color/secondaryTextColor"
-            android:textSize="18sp"
-            card_view:layout_constraintBottom_toBottomOf="parent"
-            card_view:layout_constraintEnd_toEndOf="parent"
-            tools:text="22/8/2018 - 30/10/2018" />
 
         <ImageButton
+            android:id="@+id/task_options_button"
             style="@style/Widget.MaterialComponents.Button.IconButton"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:background="@android:color/transparent"
-            android:src="@drawable/ic_color_picker"
+            android:src="@drawable/ic_pop_up_menu"
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/task_start_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="TextView"
+            card_view:layout_constraintBottom_toBottomOf="parent"
+            card_view:layout_constraintEnd_toStartOf="@+id/textView7"
+            tools:text="Aug,20,8" />
+
+        <TextView
+            android:id="@+id/task_due_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TextView"
+            card_view:layout_constraintBottom_toBottomOf="parent"
+            card_view:layout_constraintEnd_toEndOf="parent"
+            tools:text="Nov,24,2" />
+
+        <TextView
+            android:id="@+id/textView7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="@string/to"
+            card_view:layout_constraintBottom_toBottomOf="parent"
+            card_view:layout_constraintEnd_toStartOf="@+id/task_due_date" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
