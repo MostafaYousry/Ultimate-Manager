@@ -1,10 +1,14 @@
 package com.example.android.employeesmanagementapp.activities;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
+import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
 import com.example.android.employeesmanagementapp.fragments.DepartmentsFragment;
 import com.example.android.employeesmanagementapp.fragments.EmployeesFragment;
 import com.example.android.employeesmanagementapp.fragments.TasksFragment;
@@ -12,11 +16,16 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
+import java.util.List;
+
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
@@ -33,6 +42,12 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private DepartmentsFragment departmentsFragment;
 
     private Fragment activeFragment;
+
+    private View.OnClickListener mFabClickListenerNoDeps;
+    private View.OnClickListener mFabClickListenerTasks;
+    private View.OnClickListener mFabClickListenerEmployees;
+    private View.OnClickListener mFabClickListenerDepartments;
+
 
 
     @Override
@@ -54,6 +69,30 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         mTabLayout = findViewById(R.id.tab_layout);
         mFab = findViewById(R.id.fab);
 
+        setUpFabClickListeners();
+
+        ViewModelProviders.of(this).get(MainViewModel.class).getAllDepartmentsList().observe(this, new Observer<List<DepartmentEntry>>() {
+            @Override
+            public void onChanged(List<DepartmentEntry> departmentEntries) {
+                if (departmentEntries != null) {
+
+                    if (activeFragment instanceof TasksFragment) {
+                        if (departmentEntries.isEmpty())
+                            mFab.setOnClickListener(mFabClickListenerNoDeps);
+                        else mFab.setOnClickListener(mFabClickListenerTasks);
+
+                    } else if (activeFragment instanceof EmployeesFragment) {
+                        if (departmentEntries.isEmpty())
+                            mFab.setOnClickListener(mFabClickListenerNoDeps);
+                        else mFab.setOnClickListener(mFabClickListenerEmployees);
+                    } else {
+                        mFab.setOnClickListener(mFabClickListenerDepartments);
+                    }
+
+                }
+            }
+        });
+
         if (savedInstanceState == null) {
             tasksFragment = new TasksFragment();
             employeesFragment = new EmployeesFragment();
@@ -73,6 +112,59 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             mBottomNavigationView.setSelectedItemId(savedInstanceState.getInt("selected_fragment_id"));
         }
 
+    }
+
+    private void setUpFabClickListeners() {
+
+        mFabClickListenerNoDeps = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("No Departments");
+                builder.setMessage("Please create a department first");
+                builder.setPositiveButton("CREATE", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Intent intent = new Intent(MainActivity.this, AddDepartmentActivity.class);
+                        startActivity(intent);
+                        dialogInterface.dismiss();
+                    }
+                });
+
+                builder.setNegativeButton("NOT NOW", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+
+                builder.show();
+            }
+        };
+
+        mFabClickListenerEmployees = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, AddEmployeeActivity.class);
+                startActivity(intent);
+            }
+        };
+
+        mFabClickListenerTasks = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, AddTaskActivity.class);
+                startActivity(intent);
+            }
+        };
+
+        mFabClickListenerDepartments = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, AddDepartmentActivity.class);
+                startActivity(intent);
+            }
+        };
     }
 
     void loadFragment(Fragment fragment) {
@@ -98,6 +190,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 loadFragment(tasksFragment);
                 mTabLayout.setVisibility(View.VISIBLE);
                 getSupportActionBar().setTitle(getString(R.string.tasks));
+                mFab.setOnClickListener(mFabClickListenerTasks);
                 if (mTabLayout.getSelectedTabPosition() == 1)
                     mFab.hide();
                 else mFab.show();
@@ -106,12 +199,14 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 loadFragment(employeesFragment);
                 mTabLayout.setVisibility(View.GONE);
                 getSupportActionBar().setTitle(getString(R.string.employees));
+                mFab.setOnClickListener(mFabClickListenerEmployees);
                 mFab.show();
                 break;
             case R.id.nav_departments:
                 loadFragment(departmentsFragment);
                 mTabLayout.setVisibility(View.GONE);
                 getSupportActionBar().setTitle(getString(R.string.departments));
+                mFab.setOnClickListener(mFabClickListenerDepartments);
                 mFab.show();
                 break;
 
@@ -127,16 +222,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         super.onSaveInstanceState(outState);
 
         getSupportFragmentManager().putFragment(outState, "tasks_fragment", tasksFragment);
-
-
         getSupportFragmentManager().putFragment(outState, "employees_fragment", employeesFragment);
-
-
         getSupportFragmentManager().putFragment(outState, "departments_fragment", departmentsFragment);
-
         outState.putInt("selected_fragment_id", mBottomNavigationView.getSelectedItemId());
-
-
     }
 
 

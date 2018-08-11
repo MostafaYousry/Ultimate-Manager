@@ -72,4 +72,5 @@ public class TasksFragment extends Fragment {
         super.onSaveInstanceState(outState);
         outState.putInt(PAGE_INDEX_KEY, mViewPager.getCurrentItem());
     }
+
 }

@@ -57,16 +57,16 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
     private List<DepartmentEntry> mSelectedDepartments = new ArrayList<>();
     private AddNewDepViewModel mAddNewDepViewModel;
 
+
     public DepartmentsFragment() {
         // Required empty public constructor
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDb = AppDatabase.getInstance(getContext());
-
-        setUpFab();
     }
 
 
@@ -136,16 +136,6 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
 
         return rootView;
 
-    }
-
-    private void setUpFab() {
-        getActivity().findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), AddDepartmentActivity.class);
-                startActivity(intent);
-            }
-        });
     }
 
 

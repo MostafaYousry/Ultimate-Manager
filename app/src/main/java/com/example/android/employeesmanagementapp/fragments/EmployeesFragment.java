@@ -19,7 +19,6 @@ import android.widget.Toast;
 
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.UndoDeleteAction;
-import com.example.android.employeesmanagementapp.activities.AddDepartmentActivity;
 import com.example.android.employeesmanagementapp.activities.AddEmployeeActivity;
 import com.example.android.employeesmanagementapp.activities.MainActivity;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
@@ -69,7 +68,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDb = AppDatabase.getInstance(getContext());
-        setUpFab();
+
         setHasOptionsMenu(true);
     }
 
@@ -122,49 +121,6 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
 
     }
 
-
-    private void setUpFab() {
-        ViewModelProviders.of(getActivity()).get(MainViewModel.class).getAllDepartmentsList().observe(this, new Observer<List<DepartmentEntry>>() {
-            @Override
-            public void onChanged(List<DepartmentEntry> departmentEntries) {
-                if (departmentEntries.isEmpty()) {
-                    getActivity().findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                            builder.setTitle("No Departments");
-                            builder.setMessage("Please create a department first");
-                            builder.setPositiveButton("CREATE", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    Intent intent = new Intent(getActivity(), AddDepartmentActivity.class);
-                                    startActivity(intent);
-                                    dialogInterface.dismiss();
-                                }
-                            });
-
-                            builder.setNegativeButton("NOT NOW", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    dialogInterface.dismiss();
-                                }
-                            });
-
-                            builder.show();
-                        }
-                    });
-                } else {
-                    getActivity().findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Intent intent = new Intent(getActivity(), AddEmployeeActivity.class);
-                            startActivity(intent);
-                        }
-                    });
-                }
-            }
-        });
-    }
 
 
     private void setupRecyclerView(View rootView) {
@@ -455,7 +411,6 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
     public void onEmployeeClick(int employeeRowID, int employeePosition) {
         Intent intent = new Intent(getActivity(), AddEmployeeActivity.class);
         intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY, employeeRowID);
-        intent.putExtra(AddEmployeeActivity.EMPLOYEE_VIEW_ONLY, false);
         startActivity(intent);
     }
 }
