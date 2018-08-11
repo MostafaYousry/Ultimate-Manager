@@ -29,7 +29,6 @@ import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.data.factories.EmpIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewEmployeeViewModel;
-import com.example.android.employeesmanagementapp.fragments.DatePickerFragment;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 
@@ -39,7 +38,6 @@ import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -49,13 +47,10 @@ import androidx.recyclerview.widget.RecyclerView;
 public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapter.TasksItemClickListener {
 
     public static final String EMPLOYEE_ID_KEY = "employee_id";
-    public static final String EMPLOYEE_VIEW_ONLY = "employee_view_only";
     private static final String TAG = AddEmployeeActivity.class.getSimpleName();
     private static final int DEFAULT_EMPLOYEE_ID = -1;
-    private static final boolean DEFAULT_EMPLOYEE_VIEW_ONLY = false;
 
     private int mEmployeeId;
-    private boolean mIsViewOnly;
 
     private EditText mEmployeeName;
     private EditText mEmployeeSalary;
@@ -91,7 +86,6 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
         Intent intent = getIntent();
         if (intent != null) {
             mEmployeeId = intent.getIntExtra(EMPLOYEE_ID_KEY, DEFAULT_EMPLOYEE_ID);
-            mIsViewOnly = intent.getBooleanExtra(EMPLOYEE_VIEW_ONLY, DEFAULT_EMPLOYEE_VIEW_ONLY);
         }
 
         mViewModel = ViewModelProviders.of(this, new EmpIdFact(mDb, mEmployeeId)).get(AddNewEmployeeViewModel.class);
@@ -148,10 +142,6 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
         }
 
-        if (mIsViewOnly) {
-            deactivateViews();
-        }
-
     }
 
     private void setUpTasksRV() {
@@ -180,16 +170,7 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
 
     public void pickDate(View view) {
-        //create a bundle containing id of clicked text view (startDateTextView or dueDateTextView)
-        Bundle bundle = new Bundle();
-        bundle.putInt("date_view_id", view.getId());
-
-        //instantiate a DatePickerFragment to show date picker dialog
-        DialogFragment datePickerFragment = new DatePickerFragment();
-        datePickerFragment.setArguments(bundle);
-
-        //show th dialog
-        datePickerFragment.show(getSupportFragmentManager(), "datePicker");
+        AppUtils.showDatePicker(this, view, true);
     }
 
 
@@ -247,16 +228,9 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
     }
 
 
-    private void deactivateViews() {
-        mEmployeeName.setEnabled(false);
-        mEmployeeSalary.setEnabled(false);
-        mEmployeeHireDate.setEnabled(false);
-        mEmployeeDepartment.setEnabled(false);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        getMenuInflater().inflate(R.menu.menu_toolbar, menu);
         return true;
     }
 

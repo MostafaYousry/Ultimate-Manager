@@ -22,7 +22,11 @@ import androidx.fragment.app.DialogFragment;
  */
 public class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
-    private View viewToShowDateIn;
+    public static final String KEY_ALLOW_PAST_DATES = "allow_past_dates";
+    public static final String KEY_DISPLAY_VIEW_ID = "date_view_id";
+
+    private View mViewToShowDateIn;
+    private boolean mAllowPastDates;
 
 
     @NonNull
@@ -30,8 +34,14 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Bundle bundle = getArguments();
 
-        if (bundle != null && bundle.containsKey("date_view_id"))
-            viewToShowDateIn = getActivity().findViewById(bundle.getInt("date_view_id"));
+        if (bundle != null) {
+            if (bundle.containsKey(KEY_DISPLAY_VIEW_ID))
+                mViewToShowDateIn = getActivity().findViewById(bundle.getInt(KEY_DISPLAY_VIEW_ID));
+
+            if (bundle.containsKey(KEY_ALLOW_PAST_DATES))
+                mAllowPastDates = bundle.getBoolean(KEY_ALLOW_PAST_DATES);
+        }
+
 
         // populate with current date as the default date in the picker
         final Calendar calendar = Calendar.getInstance();
@@ -46,7 +56,7 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-        TextView textView = (TextView) viewToShowDateIn;
+        TextView textView = (TextView) mViewToShowDateIn;
         Calendar cal = Calendar.getInstance();
         cal.set(year, month, dayOfMonth);
         Date currentDate = cal.getTime();
@@ -67,6 +77,10 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
 
 
         public void onDateChanged(final DatePicker view, int year, int month, int day) {
+
+            if (mAllowPastDates)
+                return;
+
             Calendar cal = Calendar.getInstance();
             cal.set(year, month, day);
             Date currentDate = cal.getTime();
@@ -75,8 +89,9 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
             if (!minDate.before(currentDate)) {
                 cal.setTime(minDate);
                 view.updateDate(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
-
             }
+
+
         }
 
 

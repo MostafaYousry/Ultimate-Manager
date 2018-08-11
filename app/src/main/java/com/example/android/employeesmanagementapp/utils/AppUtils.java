@@ -40,10 +40,11 @@ public final class AppUtils {
         return employeeImages.get((int) (Math.random() * employeeImages.size()));
     }
 
-    public static void showDatePicker(Context context, View view) {
+    public static void showDatePicker(Context context, View view, boolean allowPastDates) {
         //create a bundle containing id of clicked text view (startDateTextView or dueDateTextView)
         Bundle bundle = new Bundle();
-        bundle.putInt("date_view_id", view.getId());
+        bundle.putInt(DatePickerFragment.KEY_DISPLAY_VIEW_ID, view.getId());
+        bundle.putBoolean(DatePickerFragment.KEY_ALLOW_PAST_DATES, allowPastDates);
 
         //instantiate a DatePickerFragment to show date picker dialog
         DialogFragment datePickerFragment = new DatePickerFragment();

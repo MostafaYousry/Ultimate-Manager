@@ -346,7 +346,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        getMenuInflater().inflate(R.menu.menu_toolbar, menu);
         return true;
     }
 
@@ -437,6 +437,15 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
             showError("dueDate");
             return false;
         }
+
+        Date startDate = (Date) mTaskStartDate.getTag();
+        Date dueDate = (Date) mTaskDueDate.getTag();
+
+        if (!startDate.before(dueDate)) {
+            showError("dateError");
+            return false;
+        }
+
         if (mHorizontalEmployeeAdapter.getItemCount() == 0) {
             showError("employees");
             return false;
@@ -455,6 +464,8 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
                 break;
             case "dueDate":
                 break;
+            case "dateError":
+                break;
             case "employees":
                 AlertDialog.Builder builder = new AlertDialog.Builder(AddTaskActivity.this);
                 builder.setMessage("There must be at least one employee assigned to this task.");
@@ -471,7 +482,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
 
 
     public void pickDate(View view) {
-        AppUtils.showDatePicker(this, view);
+        AppUtils.showDatePicker(this, view, false);
     }
 
 
