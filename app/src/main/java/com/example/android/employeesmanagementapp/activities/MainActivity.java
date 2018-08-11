@@ -23,10 +23,15 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private static final String TAG = MainActivity.class.getSimpleName();
 
 
-    private int mSelectedFragmentId;
     private Toolbar mToolbar;
     private BottomNavigationView mBottomNavigationView;
     private TabLayout mTabLayout;
+
+    private TasksFragment tasksFragment;
+    private EmployeesFragment employeesFragment;
+    private DepartmentsFragment departmentsFragment;
+
+    private Fragment activeFragment;
 
 
     @Override
@@ -47,20 +52,35 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         mTabLayout = findViewById(R.id.tab_layout);
 
-        //when app starts we show the tasks fragment
         if (savedInstanceState == null) {
+            tasksFragment = new TasksFragment();
+            employeesFragment = new EmployeesFragment();
+            departmentsFragment = new DepartmentsFragment();
+            activeFragment = tasksFragment;
+
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, departmentsFragment, "departments").hide(departmentsFragment).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, employeesFragment, "employees").hide(employeesFragment).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, tasksFragment, "tasks").commit();
+
             mBottomNavigationView.setSelectedItemId(R.id.nav_tasks);
-            loadFragment(new TasksFragment());
-            getSupportActionBar().setTitle(getString(R.string.tasks));
-            mSelectedFragmentId = R.id.nav_tasks;
+        } else {
+            tasksFragment = (TasksFragment) getSupportFragmentManager().getFragment(savedInstanceState, "tasks_fragment");
+            employeesFragment = (EmployeesFragment) getSupportFragmentManager().getFragment(savedInstanceState, "employees_fragment");
+            departmentsFragment = (DepartmentsFragment) getSupportFragmentManager().getFragment(savedInstanceState, "departments_fragment");
+
+            mBottomNavigationView.setSelectedItemId(savedInstanceState.getInt("selected_fragment_id"));
         }
 
     }
 
     void loadFragment(Fragment fragment) {
+        if (activeFragment == fragment)
+            return;
+
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, fragment);
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        transaction.hide(activeFragment).show(fragment);
+        activeFragment = fragment;
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 //        transaction.addToBackStack(null);
         transaction.commit();
     }
@@ -71,29 +91,24 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
      */
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        //in case item is already selected do nothing
-        if (item.isChecked()) {
-            return true;
-        }
 
-        Log.d(TAG, "New Item is selected");
+        Log.d(TAG, "Item is selected");
 
-        mSelectedFragmentId = item.getItemId();
-        switch (mSelectedFragmentId) {
+        switch (item.getItemId()) {
             case R.id.nav_tasks:
-                loadFragment(new TasksFragment());
+                loadFragment(tasksFragment);
                 mTabLayout.setVisibility(View.VISIBLE);
-                mToolbar.setTitle(getString(R.string.tasks));
+                getSupportActionBar().setTitle(getString(R.string.tasks));
                 break;
             case R.id.nav_employees:
-                loadFragment(new EmployeesFragment());
+                loadFragment(employeesFragment);
                 mTabLayout.setVisibility(View.GONE);
-                mToolbar.setTitle(getString(R.string.employees));
+                getSupportActionBar().setTitle(getString(R.string.employees));
                 break;
             case R.id.nav_departments:
-                loadFragment(new DepartmentsFragment());
+                loadFragment(departmentsFragment);
                 mTabLayout.setVisibility(View.GONE);
-                mToolbar.setTitle(getString(R.string.departments));
+                getSupportActionBar().setTitle(getString(R.string.departments));
                 break;
 
         }
@@ -103,4 +118,21 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         return true;
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        getSupportFragmentManager().putFragment(outState, "tasks_fragment", tasksFragment);
+
+
+        getSupportFragmentManager().putFragment(outState, "employees_fragment", employeesFragment);
+
+
+        getSupportFragmentManager().putFragment(outState, "departments_fragment", departmentsFragment);
+
+        outState.putInt("selected_fragment_id", mBottomNavigationView.getSelectedItemId());
+
+
+    }
 }
+

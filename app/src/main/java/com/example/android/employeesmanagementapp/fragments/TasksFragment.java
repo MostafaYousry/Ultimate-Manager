@@ -22,7 +22,15 @@ public class TasksFragment extends Fragment {
     private TasksPagerAdapter mPagerAdapter;
     private TabLayout mTabLayout;
     private FloatingActionButton mFab;
+    private static final String PAGE_INDEX_KEY = "page index";
 
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null)
+            mViewPager.setCurrentItem(savedInstanceState.getInt(PAGE_INDEX_KEY), true);
+    }
 
     @Nullable
     @Override
@@ -59,5 +67,9 @@ public class TasksFragment extends Fragment {
 
     }
 
-
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(PAGE_INDEX_KEY, mViewPager.getCurrentItem());
+    }
 }
