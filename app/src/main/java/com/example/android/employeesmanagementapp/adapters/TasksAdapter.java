@@ -79,7 +79,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
         TextView mTaskDueDate;
         ImageButton mTaskOptions;
 
-        TasksViewHolder(View itemView) {
+        TasksViewHolder(final View itemView) {
             super(itemView);
             mItemView = itemView;
             mTaskTitle = itemView.findViewById(R.id.item_task_title);
@@ -96,7 +96,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
                         public boolean onMenuItemClick(MenuItem item) {
                             switch (item.getItemId()) {
                                 case R.id.action_mark_as_done:
-                                    //handle menu1 click
+                                    AppUtils.showRateTaskDialog(itemView.getContext(), (int) itemView.getTag());
                                     return true;
                                 case R.id.action_delete_task:
                                     //handle menu2 click

@@ -91,5 +91,14 @@ public interface TasksDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateTask(TaskEntry taskEntry);
 
+    /**
+     * update rating of a completed task
+     *
+     * @param taskRating : int number of stars
+     * @param taskID
+     */
+    @Query("UPDATE tasks SET task_rating = :taskRating , task_is_completed = 1 WHERE task_id=:taskID")
+    void rateTask(float taskRating, int taskID);
+
 
 }

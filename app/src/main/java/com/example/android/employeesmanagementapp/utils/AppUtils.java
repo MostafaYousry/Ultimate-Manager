@@ -1,10 +1,17 @@
 package com.example.android.employeesmanagementapp.utils;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.RatingBar;
 
 import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.data.AppDatabase;
+import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.fragments.DatePickerFragment;
 
 import java.text.SimpleDateFormat;
@@ -12,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
@@ -52,6 +60,46 @@ public final class AppUtils {
 
         //show th dialog
         datePickerFragment.show(((AppCompatActivity) context).getSupportFragmentManager(), "datePicker");
+    }
+
+    public static void showRateTaskDialog(final Context context, final int taskID) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Task done");
+        builder.setMessage("Please rate task");
+
+        View rateDialogView = LayoutInflater.from(context).inflate(R.layout.rating_bar, null, false);
+        final RatingBar ratingBar = rateDialogView.findViewById(R.id.rating_bar);
+//        ratingBar.setPaddingRelative(dpToPx(context ,16), 0, dpToPx(context,16), 0);
+        builder.setView(rateDialogView);
+
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(final DialogInterface dialog, int which) {
+                AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        AppDatabase.getInstance(context).tasksDao().rateTask(ratingBar.getRating(), taskID);
+                        dialog.dismiss();
+                    }
+                });
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.show();
+    }
+
+    /**
+     * Converts dp to pixel
+     */
+    public static int dpToPx(Context context, int dp) {
+        Resources r = context.getResources();
+        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
     }
 
     public static String getFriendlyDate(Date date) {

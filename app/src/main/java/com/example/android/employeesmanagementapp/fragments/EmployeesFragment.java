@@ -3,9 +3,7 @@ package com.example.android.employeesmanagementapp.fragments;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,6 +29,7 @@ import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.factories.EmpIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewEmployeeViewModel;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
+import com.example.android.employeesmanagementapp.utils.AppUtils;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
@@ -316,7 +315,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
         builder.setTitle(getString(R.string.choose_department_dialog_title));
 
         final Spinner spinner = new Spinner(getContext());
-        spinner.setPaddingRelative(dpToPx(16), 0, dpToPx(16), 0);
+        spinner.setPaddingRelative(AppUtils.dpToPx(getContext(), 16), 0, AppUtils.dpToPx(getContext(), 16), 0);
         final DepartmentsArrayAdapter departmentsArrayAdapter = new DepartmentsArrayAdapter(getContext());
         LiveData<List<DepartmentEntry>> departments = ViewModelProviders.of(getActivity()).get(MainViewModel.class).getAllDepartmentsList();
         departments.observe(this, new Observer<List<DepartmentEntry>>() {
@@ -360,14 +359,6 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
         });
 
         builder.show();
-    }
-
-    /**
-     * Converts dp to pixel
-     */
-    private int dpToPx(int dp) {
-        Resources r = getResources();
-        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
     }
 
     private void resetSelection() {
