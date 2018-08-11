@@ -1,7 +1,6 @@
 package com.example.android.employeesmanagementapp.activities;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -10,6 +9,7 @@ import com.example.android.employeesmanagementapp.fragments.DepartmentsFragment;
 import com.example.android.employeesmanagementapp.fragments.EmployeesFragment;
 import com.example.android.employeesmanagementapp.fragments.TasksFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
 import androidx.annotation.NonNull;
@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private Toolbar mToolbar;
     private BottomNavigationView mBottomNavigationView;
     private TabLayout mTabLayout;
+    private FloatingActionButton mFab;
 
     private TasksFragment tasksFragment;
     private EmployeesFragment employeesFragment;
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
 
         mTabLayout = findViewById(R.id.tab_layout);
+        mFab = findViewById(R.id.fab);
 
         if (savedInstanceState == null) {
             tasksFragment = new TasksFragment();
@@ -81,7 +83,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         transaction.hide(activeFragment).show(fragment);
         activeFragment = fragment;
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-//        transaction.addToBackStack(null);
         transaction.commit();
     }
 
@@ -92,23 +93,26 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-        Log.d(TAG, "Item is selected");
-
         switch (item.getItemId()) {
             case R.id.nav_tasks:
                 loadFragment(tasksFragment);
                 mTabLayout.setVisibility(View.VISIBLE);
                 getSupportActionBar().setTitle(getString(R.string.tasks));
+                if (mTabLayout.getSelectedTabPosition() == 1)
+                    mFab.hide();
+                else mFab.show();
                 break;
             case R.id.nav_employees:
                 loadFragment(employeesFragment);
                 mTabLayout.setVisibility(View.GONE);
                 getSupportActionBar().setTitle(getString(R.string.employees));
+                mFab.show();
                 break;
             case R.id.nav_departments:
                 loadFragment(departmentsFragment);
                 mTabLayout.setVisibility(View.GONE);
                 getSupportActionBar().setTitle(getString(R.string.departments));
+                mFab.show();
                 break;
 
         }
@@ -133,6 +137,16 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         outState.putInt("selected_fragment_id", mBottomNavigationView.getSelectedItemId());
 
 
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        if (!(activeFragment instanceof TasksFragment)) {
+            mBottomNavigationView.setSelectedItemId(R.id.nav_tasks);
+        } else {
+            super.onBackPressed();
+        }
     }
 }
 
