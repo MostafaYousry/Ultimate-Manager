@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.fragments.DepartmentsFragment;
 import com.example.android.employeesmanagementapp.fragments.EmployeesFragment;
@@ -35,6 +36,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        NotificationService.setBadge(getApplicationContext(),0);
+        NotificationService.setCount(0);
 
         setUpFab();
 

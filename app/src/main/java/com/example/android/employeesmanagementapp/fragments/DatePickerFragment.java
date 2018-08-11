@@ -45,7 +45,12 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
         TextView textView = (TextView) viewToShowDateIn;
+        Calendar cal = Calendar.getInstance();
+        cal.set(year, month, dayOfMonth);
+        Date currentDate = cal.getTime();
+
         textView.setText(dayOfMonth + "/" + month + "/" + year);
+        textView.setTag(currentDate);
     }
 
 

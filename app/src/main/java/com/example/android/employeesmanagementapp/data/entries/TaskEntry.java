@@ -47,15 +47,15 @@ public class TaskEntry {
 
     //used when creating new TaskEntry object
     @Ignore
-    public TaskEntry(@NonNull int departmentID, String taskTitle, String taskDescription, Date taskStartDate, Date taskDueDate) {
+    public TaskEntry(@NonNull int departmentID, String taskTitle, String taskDescription, Date taskStartDate, Date taskDueDate,float taskRating, boolean taskIsCompleted) {
         this.departmentID = departmentID;
         this.taskTitle = taskTitle;
         this.taskDescription = taskDescription;
         this.taskStartDate = taskStartDate;
         this.taskDueDate = taskDueDate;
 
-        taskRating = 0; //rating defaults to false
-        taskIsCompleted = false; //new tasks are not yet completed
+        this.taskRating = taskRating; //rating defaults to false
+        this.taskIsCompleted = taskIsCompleted; //new tasks are not yet completed
     }
 
 

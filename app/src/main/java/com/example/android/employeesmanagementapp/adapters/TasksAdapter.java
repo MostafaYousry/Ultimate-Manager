@@ -1,14 +1,18 @@
 package com.example.android.employeesmanagementapp.adapters;
 
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 
+import java.util.Date;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -71,17 +75,22 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
     class TasksViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         View mItemView;
         TextView mTextView;
+        ImageView mNotificationImage;
 
         TasksViewHolder(View itemView) {
             super(itemView);
             mItemView = itemView;
             mTextView = itemView.findViewById(R.id.item_task_title);
+            mNotificationImage = itemView.findViewById(R.id.notification_image);
             itemView.setOnClickListener(this);
         }
 
         void bind(int position) {
             mTextView.setText(mData.get(position).getTaskTitle());
             mItemView.setTag(mData.get(position).getTaskId());
+            if(mData.get(position).getTaskDueDate().compareTo(new Date()) <= 0  && !mData.get(position).isTaskIsCompleted())
+                mNotificationImage.setVisibility(View.VISIBLE);
+            else mNotificationImage.setVisibility(View.GONE);
         }
 
         @Override

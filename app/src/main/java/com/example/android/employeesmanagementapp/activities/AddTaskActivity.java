@@ -63,8 +63,8 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
     private static int tempTaskDepId = -1;
     private int mTaskId;
     private boolean addNewTask = false;
+    private TaskEntry mTaskEntry;
 
-    private static final SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
     private EmployeesAdapter mEmplyeesAdapter;
 
@@ -78,6 +78,8 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
     private TextView mTaskStartDate;
     private TextView mTaskDueDate;
     private Spinner mTaskDepartment;
+    private float mTaskRating;
+    private boolean mTaskIsCompleted;
     private Toolbar mToolbar;
     private ImageButton addEmployeesToTaskButton;
 
@@ -106,6 +108,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         if (intent != null) {
             mTaskId = intent.getIntExtra(TASK_ID_KEY, DEFAULT_TASK_ID);
             mEnableViews = intent.getBooleanExtra(TASK_ENABLE_VIEWS_KEY, DEFAULT_TASK_VIEW_ONLY);
+            System.out.println("open task details with task id = " + mTaskId);
         }
         if (mTaskId == DEFAULT_TASK_ID)
             addNewTask = true;
@@ -166,6 +169,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
                 @Override
                 public void onChanged(@Nullable TaskEntry taskEntry) {
                     task.removeObserver(this);
+                    mTaskEntry = taskEntry;
                     populateUI(taskEntry);
                 }
             });
@@ -208,6 +212,12 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         setUpEmployeesRV();
 
         mTaskDueDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pickDate(view);
+            }
+        });
+        mTaskStartDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 pickDate(view);
@@ -309,6 +319,8 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         mTaskDescription.setText(taskEntry.getTaskDescription());
         mTaskStartDate.setText(taskEntry.getTaskStartDate().toString());
         mTaskDueDate.setText(taskEntry.getTaskDueDate().toString());
+        mTaskRating = taskEntry.getTaskRating();
+        mTaskIsCompleted = taskEntry.isTaskIsCompleted();
         if (departmentsLoaded)
             mTaskDepartment.setSelection(mDepartmentsArrayAdapter.getPositionForItemId(taskEntry.getDepartmentID()));
 
@@ -339,17 +351,16 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
     @Override
     protected void onStop() {
         super.onStop();
-//        Intent intent = new Intent(this, NotificationService.class);
-//        // send the due date and the id of the task within the intent
-//        Bundle bundle = new Bundle();
-//        bundle.putInt("task id",mTaskId);
-//        try {
-//            bundle.putLong("task due date",FORMAT.parse(mTaskDueDate.toString()).getTime() - new Date().getTime());
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-//        intent.putExtras(bundle);
-//        startService(intent);
+        Intent intent = new Intent(this, NotificationService.class);
+        // send the due date and the id of the task within the intent
+        Bundle bundle = new Bundle();
+        bundle.putInt("task id", mTaskId);
+        //Log.v("date", "" + ((Date) mTaskDueDate.getTag()).getTime());
+        //bundle.putLong("task due date", 20000 + ((Date) mTaskDueDate.getTag()).getTime() - new Date().getTime());
+        bundle.putLong("task due date", 20000);
+        intent.putExtras(bundle);
+        startService(intent);
+
     }
 
     @Override
@@ -380,31 +391,32 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
             String taskTitle = mTaskTitle.getText().toString();
             String taskDescription = mTaskDescription.getText().toString();
             //todo:change string date to java object date
-            Date taskStartDate = new Date();
-            Date taskDueDate = new Date();
+            Date taskStartDate;
+            Date taskDueDate;
+            if (mTaskStartDate.getTag() == null) {
+                taskStartDate = mTaskEntry.getTaskStartDate();
+            } else
+                taskStartDate = (Date) mTaskStartDate.getTag();
+            if (mTaskDueDate.getTag() == null) {
+                taskDueDate = mTaskEntry.getTaskDueDate();
+            } else taskDueDate = (Date) mTaskDueDate.getTag();
 
+            TaskEntry newTask;
 
-//            try {
-//                taskStartDate = FORMAT.parse(mTaskStartDate.toString());
-//                taskDueDate = FORMAT.parse(mTaskDueDate.toString());
-//                Log.v("date", "start date " + taskStartDate);
-//                Log.v("date", "due date " + taskDueDate);
-//                System.out.println("**********************************************************");
-//            } catch (ParseException e) {
-//                e.printStackTrace();
-//            }
+            if (mTaskId == -1)
+                newTask = new TaskEntry(departmentId, taskTitle, taskDescription, taskStartDate, taskDueDate, 0, false);
+            else
+                newTask = new TaskEntry(departmentId, taskTitle, taskDescription, taskStartDate, taskDueDate, mTaskRating, mTaskIsCompleted);
 
-
-            final TaskEntry newTask = new TaskEntry(departmentId, taskTitle, taskDescription, taskStartDate, taskDueDate);
-
+            final TaskEntry finalNewTask = newTask;
             AppExecutor.getInstance().diskIO().execute(new Runnable() {
                 @Override
                 public void run() {
                     if (mTaskId == DEFAULT_TASK_ID) {
-                        mTaskId = (int) mDb.tasksDao().addTask(newTask);
+                        mTaskId = (int) mDb.tasksDao().addTask(finalNewTask);
                     } else {
-                        newTask.setTaskId(mTaskId);
-                        mDb.tasksDao().updateTask(newTask);
+                        finalNewTask.setTaskId(mTaskId);
+                        mDb.tasksDao().updateTask(finalNewTask);
                     }
                 }
             });
