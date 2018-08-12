@@ -42,23 +42,28 @@ public class EmployeeEntry {
     @ColumnInfo(name = "employee_is_deleted")
     private boolean employeeIsDeleted;
 
+    @ColumnInfo(name = "employee_image_uri")
+    private String employeeImageUri;
 
     //used when creating new EmployeeWithExtras object
     @Ignore
-    public EmployeeEntry(@NonNull int departmentId, @NonNull String employeeName, @NonNull int employeeSalary, Date employeeHireDate) {
+    public EmployeeEntry(int departmentId, String employeeName, int employeeSalary, Date employeeHireDate, String employeeImageUri) {
         this.departmentId = departmentId;
         this.employeeName = employeeName;
         this.employeeSalary = employeeSalary;
         this.employeeHireDate = employeeHireDate;
+        this.employeeImageUri = employeeImageUri;
     }
 
+
     //used by room when reading from database
-    public EmployeeEntry(int employeeID, int departmentId, String employeeName, int employeeSalary, Date employeeHireDate, boolean employeeIsDeleted) {
+    public EmployeeEntry(int employeeID, int departmentId, String employeeName, int employeeSalary, Date employeeHireDate, String employeeImageUri, boolean employeeIsDeleted) {
         this.employeeID = employeeID;
         this.departmentId = departmentId;
         this.employeeName = employeeName;
         this.employeeSalary = employeeSalary;
         this.employeeHireDate = employeeHireDate;
+        this.employeeImageUri = employeeImageUri;
         this.employeeIsDeleted = employeeIsDeleted;
     }
 
@@ -112,5 +117,11 @@ public class EmployeeEntry {
         this.employeeIsDeleted = employeeIsDeleted;
     }
 
+    public String getEmployeeImageUri() {
+        return employeeImageUri;
+    }
 
+    public void setEmployeeImageUri(String employeeImageUri) {
+        this.employeeImageUri = employeeImageUri;
+    }
 }

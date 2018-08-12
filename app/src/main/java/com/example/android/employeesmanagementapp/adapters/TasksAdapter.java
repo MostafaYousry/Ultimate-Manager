@@ -18,6 +18,7 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHolder> {
@@ -130,7 +131,10 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
             mTaskTitle.setText(mData.get(position).getTaskTitle());
             mTaskStartDate.setText(AppUtils.getFriendlyDate(mData.get(position).getTaskStartDate()));
             mTaskDueDate.setText(AppUtils.getFriendlyDate(mData.get(position).getTaskDueDate()));
-            mItemView.setCardBackgroundColor(itemView.getContext().getResources().getColor(mData.get(position).getTaskColorResource()));
+
+            int taskColor = ResourcesCompat.getColor(itemView.getResources(), mData.get(position).getTaskColorResource(), itemView.getContext().getTheme());
+
+            mItemView.setCardBackgroundColor(taskColor);
 
             mItemView.setTag(mData.get(position).getTaskId());
         }

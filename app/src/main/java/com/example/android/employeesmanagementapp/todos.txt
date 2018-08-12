@@ -1,10 +1,14 @@
 todo validate before insert and update
 
 
-todo(2):note on employees
-discard changes dialog zy contacts
 todo(7):choose an image for the employee and department(from phone or by taking a picture)
-zy contacts bardo
+todo hide fab when selecting multiple employees
+
+todo(2):note on employees
+
+todo discard changes dialog zy contacts app
+
+
 todo hide fab with bottom nav on scroll
 
 

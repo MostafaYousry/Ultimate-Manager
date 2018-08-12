@@ -16,9 +16,8 @@ import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.TextDrawable;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
 import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
@@ -224,7 +223,9 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
             mEmployeeDepartment.setSelection(mArrayAdapter.getPositionForItemId(employeeWithExtras.employeeEntry.getDepartmentId()));
         mEmployeeRating.setRating(employeeWithExtras.employeeRating);
 
-        Glide.with(this).load(AppUtils.getRandomEmployeeImage()).apply(RequestOptions.centerCropTransform()).into(mEmployeeImage);
+
+        TextDrawable textDrawable = new TextDrawable(this, employeeWithExtras.employeeEntry, AppUtils.dpToPx(this, 70), AppUtils.dpToPx(this, 70), AppUtils.spToPx(this, 28));
+        mEmployeeImage.setImageDrawable(textDrawable);
     }
 
 
@@ -255,7 +256,7 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
             Date employeeHireDate = (Date) mEmployeeHireDate.getTag();
             int departmentId = (int) mEmployeeDepartment.getSelectedView().getTag();
 
-            final EmployeeEntry newEmployee = new EmployeeEntry(departmentId, employeeName, employeeSalary, employeeHireDate);
+            final EmployeeEntry newEmployee = new EmployeeEntry(departmentId, employeeName, employeeSalary, employeeHireDate, null);
 
             AppExecutor.getInstance().diskIO().execute(new Runnable() {
                 @Override

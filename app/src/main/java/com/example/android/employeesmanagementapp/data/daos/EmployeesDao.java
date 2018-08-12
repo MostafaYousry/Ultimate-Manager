@@ -46,7 +46,7 @@ public interface EmployeesDao {
             "            WHERE tasks.task_is_completed = 0\n" +
             "            GROUP BY employees.employee_id\n" +
             "    )\n" +
-            "    SELECT employees.employee_id,employees.department_id,employees.employee_name , employees.employee_salary,employees.employee_hire_date,employees.employee_is_deleted,\n" +
+            "    SELECT employees.employee_id,employees.department_id,employees.employee_name , employees.employee_salary,employees.employee_hire_date,employees.employee_image_uri,employees.employee_is_deleted,\n" +
             "        CASE WHEN atr IS NOT NULL THEN atr ELSE 0 END AS average_completed_task_rating,\n" +
             "        CASE WHEN itc IS NOT NULL THEN itc ELSE 0 END AS incomplete_task_count\n" +
             "        FROM employees \n" +
@@ -99,7 +99,7 @@ public interface EmployeesDao {
             "            WHERE tasks.task_is_completed = 0\n" +
             "            GROUP BY employees.employee_id\n" +
             "    )\n" +
-            "    SELECT employees.employee_id,employees.department_id,employees.employee_name , employees.employee_salary,employees.employee_hire_date,employees.employee_is_deleted,\n" +
+            "    SELECT employees.employee_id,employees.department_id,employees.employee_name , employees.employee_salary,employees.employee_hire_date,employees.employee_image_uri,employees.employee_is_deleted,\n" +
             "        CASE WHEN atr IS NOT NULL THEN atr ELSE 0 END AS average_completed_task_rating,\n" +
             "        CASE WHEN itc IS NOT NULL THEN itc ELSE 0 END AS incomplete_task_count\n" +
             "        FROM employees \n" +

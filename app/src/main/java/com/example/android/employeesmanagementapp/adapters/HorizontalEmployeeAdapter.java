@@ -1,5 +1,6 @@
 package com.example.android.employeesmanagementapp.adapters;
 
+import android.content.Context;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -8,8 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.TextDrawable;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 
@@ -114,9 +115,6 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
             employeeImage = itemView.findViewById(R.id.employee_image);
             employeeName = itemView.findViewById(R.id.employee_name);
 
-            //todo move this to bind when loading different images
-            Glide.with(itemView.getContext()).load(AppUtils.getRandomEmployeeImage())
-                    .into(employeeImage);
 
             itemView.setOnClickListener(this);
 
@@ -130,9 +128,36 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
                 int addedEmployeeIndex = position - mData.size();
 
                 employeeName.setText(mAddedEmployees.get(addedEmployeeIndex).getEmployeeName());
+
+                if (mData.get(position).getEmployeeImageUri() == null) {
+                    Context context = itemView.getContext();
+
+                    TextDrawable textDrawable = new TextDrawable(context, mData.get(position), AppUtils.dpToPx(context, 70), AppUtils.dpToPx(context, 70), AppUtils.spToPx(context, 28));
+                    employeeImage.setImageDrawable(textDrawable);
+                } else {
+//                Glide.with(mEmployeeImage.getContext())
+//                        .load()
+//                        .apply(RequestOptions.fitCenterTransform())
+//                        .into(mEmployeeImage);
+                }
+
                 itemView.setTag(mAddedEmployees.get(addedEmployeeIndex).getEmployeeID());
+
             } else {
                 employeeName.setText(mData.get(position).getEmployeeName());
+
+                if (mData.get(position).getEmployeeImageUri() == null) {
+                    Context context = itemView.getContext();
+
+                    TextDrawable textDrawable = new TextDrawable(context, mData.get(position), AppUtils.dpToPx(context, 70), AppUtils.dpToPx(context, 70), AppUtils.spToPx(context, 28));
+                    employeeImage.setImageDrawable(textDrawable);
+                } else {
+//                Glide.with(mEmployeeImage.getContext())
+//                        .load()
+//                        .apply(RequestOptions.fitCenterTransform())
+//                        .into(mEmployeeImage);
+                }
+
                 itemView.setTag(mData.get(position).getEmployeeID());
             }
         }

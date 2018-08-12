@@ -1,5 +1,6 @@
 package com.example.android.employeesmanagementapp.adapters;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.util.Log;
 import android.util.SparseBooleanArray;
@@ -10,9 +11,8 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.TextDrawable;
 import com.example.android.employeesmanagementapp.data.EmployeeWithExtras;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
@@ -157,10 +157,19 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
             String runningTasksStr = itemView.getContext().getResources().getQuantityString(R.plurals.numberOfRunningTasks, numberRunningTasks, numberRunningTasks);
             mNumRunningTasks.setText(runningTasksStr);
 
-            Glide.with(mEmployeeImage.getContext())
-                    .load(AppUtils.getRandomEmployeeImage())
-                    .apply(RequestOptions.fitCenterTransform())
-                    .into(mEmployeeImage);
+            if (mData.get(position).employeeEntry.getEmployeeImageUri() == null) {
+                Context context = itemView.getContext();
+
+                TextDrawable textDrawable = new TextDrawable(context, mData.get(position).employeeEntry, AppUtils.dpToPx(context, 70), AppUtils.dpToPx(context, 70), AppUtils.spToPx(context, 28));
+                mEmployeeImage.setImageDrawable(textDrawable);
+            } else {
+//                Glide.with(mEmployeeImage.getContext())
+//                        .load()
+//                        .apply(RequestOptions.fitCenterTransform())
+//                        .into(mEmployeeImage);
+            }
+
+
 
             itemView.setTag(mData.get(position).employeeEntry.getEmployeeID());
 

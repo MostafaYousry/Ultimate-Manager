@@ -35,7 +35,7 @@ public class ColorPickerDialogFragment extends DialogFragment implements ColorAd
         mGrid.setLayoutManager(new GridLayoutManager(getActivity(), 4));
 
 
-        ColorAdapter colorAdapter = new ColorAdapter(AppUtils.getColorResources(), this);
+        ColorAdapter colorAdapter = new ColorAdapter(AppUtils.getTaskColorResources(), this);
         mGrid.setAdapter(colorAdapter);
 
         builder.setCancelable(true);
