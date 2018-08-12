@@ -43,7 +43,7 @@ public interface TasksDao {
      * @param employeeId:      the employee record id for loading tasks for
      * @return list of TaskEntry objects wrapped with LiveData
      */
-    @Query("select  tasks.task_id , department_id , task_title , task_description,task_start_date,task_due_date,task_rating,task_is_completed from tasks " +
+    @Query("select  tasks.task_id , department_id , task_title , task_description,task_start_date,task_due_date,task_rating,task_is_completed , task_color_resource from tasks " +
             "inner join employees_tasks on tasks.task_id = employees_tasks.task_id where employees_tasks.employee_id = :employeeId AND task_is_completed = :taskIsCompleted")
     LiveData<List<TaskEntry>> loadTasksForEmployee(int employeeId, boolean taskIsCompleted);
 
@@ -99,6 +99,16 @@ public interface TasksDao {
      */
     @Query("UPDATE tasks SET task_rating = :taskRating , task_is_completed = 1 WHERE task_id=:taskID")
     void rateTask(float taskRating, int taskID);
+
+
+    /**
+     * update task color
+     *
+     * @param colorRes : color resource
+     * @param taskID
+     */
+    @Query("UPDATE tasks SET task_color_resource = :colorRes WHERE task_id=:taskID")
+    void updateTaskColor(int colorRes, int taskID);
 
 
 }

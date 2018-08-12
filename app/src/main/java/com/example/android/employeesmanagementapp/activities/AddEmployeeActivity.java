@@ -125,7 +125,7 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
 
         setUpNameET();
-        setUpTasksRV();
+        setUpCompletedTasksRV();
 
 
         if (mEmployeeId == DEFAULT_EMPLOYEE_ID) {
@@ -144,14 +144,14 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
     }
 
-    private void setUpTasksRV() {
+    private void setUpCompletedTasksRV() {
         mEmployeeCompletedTasks = findViewById(R.id.employee_tasks_rv);
         mEmployeeCompletedTasks.setHasFixedSize(true);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mEmployeeCompletedTasks.setLayoutManager(layoutManager);
 
-        final TasksAdapter adapter = new TasksAdapter(this);
+        final TasksAdapter adapter = new TasksAdapter(this, true);
 
         if (mEmployeeId == DEFAULT_EMPLOYEE_ID)
             adapter.setData(new ArrayList<TaskEntry>());

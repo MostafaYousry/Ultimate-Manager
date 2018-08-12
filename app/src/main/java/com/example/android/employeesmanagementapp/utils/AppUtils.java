@@ -12,7 +12,8 @@ import android.widget.RatingBar;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
-import com.example.android.employeesmanagementapp.fragments.DatePickerFragment;
+import com.example.android.employeesmanagementapp.fragments.ColorPickerDialogFragment;
+import com.example.android.employeesmanagementapp.fragments.DatePickerDialogFragment;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,7 +30,8 @@ import androidx.fragment.app.DialogFragment;
  */
 public final class AppUtils {
 
-    public static List<Integer> employeeImages = new ArrayList<>();
+    private static List<Integer> employeeImages = new ArrayList<>();
+    private static int[] taskColorResources = new int[12];
 
     static {
         employeeImages.add(R.drawable.griezmann);
@@ -41,6 +43,20 @@ public final class AppUtils {
         employeeImages.add(R.drawable.dybala);
         employeeImages.add(R.drawable.kroos);
         employeeImages.add(R.drawable.mbappe);
+
+        taskColorResources[0] = R.color.task_color_1;
+        taskColorResources[1] = R.color.task_color_2;
+        taskColorResources[2] = R.color.task_color_3;
+        taskColorResources[3] = R.color.task_color_4;
+        taskColorResources[4] = R.color.task_color_5;
+        taskColorResources[5] = R.color.task_color_6;
+        taskColorResources[6] = R.color.task_color_7;
+        taskColorResources[7] = R.color.task_color_8;
+        taskColorResources[8] = R.color.task_color_9;
+        taskColorResources[9] = R.color.task_color_10;
+        taskColorResources[10] = R.color.task_color_11;
+        taskColorResources[11] = R.color.task_color_12;
+
     }
 
     public static int getRandomEmployeeImage() {
@@ -51,15 +67,28 @@ public final class AppUtils {
     public static void showDatePicker(Context context, View view, boolean allowPastDates) {
         //create a bundle containing id of clicked text view (startDateTextView or dueDateTextView)
         Bundle bundle = new Bundle();
-        bundle.putInt(DatePickerFragment.KEY_DISPLAY_VIEW_ID, view.getId());
-        bundle.putBoolean(DatePickerFragment.KEY_ALLOW_PAST_DATES, allowPastDates);
+        bundle.putInt(DatePickerDialogFragment.KEY_DISPLAY_VIEW_ID, view.getId());
+        bundle.putBoolean(DatePickerDialogFragment.KEY_ALLOW_PAST_DATES, allowPastDates);
 
-        //instantiate a DatePickerFragment to show date picker dialog
-        DialogFragment datePickerFragment = new DatePickerFragment();
+        //instantiate a DatePickerDialogFragment to show date picker dialog
+        DialogFragment datePickerFragment = new DatePickerDialogFragment();
         datePickerFragment.setArguments(bundle);
 
         //show th dialog
         datePickerFragment.show(((AppCompatActivity) context).getSupportFragmentManager(), "datePicker");
+    }
+
+    public static void showColorPicker(Context context, int taskId) {
+        //create a bundle containing id of task
+        Bundle bundle = new Bundle();
+        bundle.putInt(ColorPickerDialogFragment.KEY_TASK_ID, taskId);
+
+        //instantiate a ColorPickerDialogFragment
+        DialogFragment colorPickerDialogFragment = new ColorPickerDialogFragment();
+        colorPickerDialogFragment.setArguments(bundle);
+
+        //show th dialog
+        colorPickerDialogFragment.show(((AppCompatActivity) context).getSupportFragmentManager(), "colorPicker");
     }
 
     public static void showRateTaskDialog(final Context context, final int taskID) {
@@ -106,4 +135,7 @@ public final class AppUtils {
         return SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM).format(date);
     }
 
+    public static int[] getColorResources() {
+        return taskColorResources;
+    }
 }

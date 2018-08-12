@@ -2,6 +2,7 @@ package com.example.android.employeesmanagementapp.adapters;
 
 
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
+import com.google.android.material.card.MaterialCardView;
 
 import java.util.List;
 
@@ -22,10 +24,12 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
 
     private List<TaskEntry> mData;
     private TasksItemClickListener mTaskClickListener;
+    private boolean mTasksAreCompleted;
 
 
-    public TasksAdapter(TasksItemClickListener clickListener) {
+    public TasksAdapter(TasksItemClickListener clickListener, boolean tasksAreCompleted) {
         mTaskClickListener = clickListener;
+        mTasksAreCompleted = tasksAreCompleted;
     }
 
     @NonNull
@@ -73,7 +77,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
     }
 
     class TasksViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        View mItemView;
+        MaterialCardView mItemView;
         TextView mTaskTitle;
         TextView mTaskStartDate;
         TextView mTaskDueDate;
@@ -81,7 +85,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
 
         TasksViewHolder(final View itemView) {
             super(itemView);
-            mItemView = itemView;
+            mItemView = (MaterialCardView) itemView;
             mTaskTitle = itemView.findViewById(R.id.item_task_title);
             mTaskStartDate = itemView.findViewById(R.id.task_start_date);
             mTaskDueDate = itemView.findViewById(R.id.task_due_date);
@@ -91,6 +95,13 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
                 public void onClick(View view) {
                     PopupMenu popup = new PopupMenu(view.getContext(), mTaskOptions);
                     popup.inflate(R.menu.menu_task_options);
+
+                    if (mTasksAreCompleted) {
+                        Menu menu = popup.getMenu();
+                        menu.removeItem(R.id.action_mark_as_done);
+                        menu.removeItem(R.id.action_delete_task);
+                    }
+
                     popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         @Override
                         public boolean onMenuItemClick(MenuItem item) {
@@ -102,7 +113,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
                                     //handle menu2 click
                                     return true;
                                 case R.id.action_color_task:
-                                    //handle menu3 click
+                                    AppUtils.showColorPicker(itemView.getContext(), (int) itemView.getTag());
                                     return true;
                                 default:
                                     return false;
@@ -119,6 +130,8 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
             mTaskTitle.setText(mData.get(position).getTaskTitle());
             mTaskStartDate.setText(AppUtils.getFriendlyDate(mData.get(position).getTaskStartDate()));
             mTaskDueDate.setText(AppUtils.getFriendlyDate(mData.get(position).getTaskDueDate()));
+            mItemView.setCardBackgroundColor(itemView.getContext().getResources().getColor(mData.get(position).getTaskColorResource()));
+
             mItemView.setTag(mData.get(position).getTaskId());
         }
 

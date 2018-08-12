@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.example.android.employeesmanagementapp.activities.AddDepartmentActivity;
 import com.example.android.employeesmanagementapp.activities.AddTaskActivity;
 
 import java.util.Timer;
@@ -65,8 +64,8 @@ public class NotificationService extends Service {
 
         System.out.println("start timer");
         //schedule the timer, after the first 5000ms
-        Log.d("intent output","task Id = " + taskId);
-        Log.d("intent output","task due date = " + taskDueDate);
+        Log.d("intent output", "task Id = " + taskId);
+        Log.d("intent output", "task due date = " + taskDueDate);
 
         timer.schedule(timerTask, taskDueDate);
         //timer.schedule(timerTask, 5000,1000); //
@@ -91,7 +90,6 @@ public class NotificationService extends Service {
 
                         Intent intent = new Intent(getApplicationContext(), AddTaskActivity.class);
                         intent.putExtra(AddTaskActivity.TASK_ID_KEY, taskId);
-                        intent.putExtra(AddTaskActivity.TASK_ENABLE_VIEWS_KEY,true);
 
                         //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);

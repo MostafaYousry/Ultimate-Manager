@@ -2,7 +2,6 @@ package com.example.android.employeesmanagementapp.data.daos;
 
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.entries.EmployeesTasksEntry;
-import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 
 import java.util.List;
 
@@ -25,12 +24,6 @@ public interface EmployeesTasksDao {
             "ON employees.employee_id=employees_tasks.employee_id " +
             "WHERE employees_tasks.task_id=:taskId")
     LiveData<List<EmployeeEntry>> getEmployeesForTask(int taskId);
-
-    @Query("SELECT tasks.task_id, tasks.department_id, tasks.task_title, tasks.task_description , tasks.task_start_date, tasks.task_due_date , tasks.task_rating, tasks.task_is_completed FROM tasks " +
-            "INNER JOIN employees_tasks " +
-            "ON tasks.task_id=employees_tasks.task_id " +
-            "WHERE employees_tasks.employee_id=:empId")
-    List<TaskEntry> getTasksForEmployee(int empId);
 
     @Query("SELECT COUNT(*) FROM tasks " +
             "INNER JOIN employees_tasks " +

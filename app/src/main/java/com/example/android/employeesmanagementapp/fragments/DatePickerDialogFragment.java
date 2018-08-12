@@ -20,7 +20,7 @@ import androidx.fragment.app.DialogFragment;
  * a dialog fragment that pops to allow user to choose a date
  * and displays that date in a given view id (TextView).
  */
-public class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
+public class DatePickerDialogFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
     public static final String KEY_ALLOW_PAST_DATES = "allow_past_dates";
     public static final String KEY_DISPLAY_VIEW_ID = "date_view_id";

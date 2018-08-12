@@ -34,9 +34,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class AddDepartmentActivity extends AppCompatActivity implements EmployeesAdapter.EmployeeItemClickListener, TasksAdapter.TasksItemClickListener {
 
-    private static final String TAG = AddDepartmentActivity.class.getSimpleName();
-
     public static final String DEPARTMENT_ID_KEY = "department_id";
+    private static final String TAG = AddDepartmentActivity.class.getSimpleName();
     private static final int DEFAULT_DEPARTMENT_ID = -1;
     private int mDepartmentId;
 
@@ -84,7 +83,6 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
         mViewModel = ViewModelProviders.of(this, new DepIdFact(mDb, mDepartmentId)).get(AddNewDepViewModel.class);
 
 
-
         if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
             clearViews();
         } else {
@@ -112,7 +110,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
         layoutManager.setOrientation(RecyclerView.HORIZONTAL);
         mDepEmployeesRV.setLayoutManager(layoutManager);
 
-        final HorizontalEmployeeAdapter adapter = new HorizontalEmployeeAdapter(this);
+        final HorizontalEmployeeAdapter adapter = new HorizontalEmployeeAdapter(this, false);
         mDepEmployeesRV.setAdapter(adapter);
 
 
@@ -137,7 +135,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
         mDepRunningTasksRV.setHasFixedSize(true);
 
         mDepRunningTasksRV.setLayoutManager(new LinearLayoutManager(this));
-        final TasksAdapter adapter = new TasksAdapter(this);
+        final TasksAdapter adapter = new TasksAdapter(this, false);
         mDepRunningTasksRV.setAdapter(adapter);
 
 
@@ -160,28 +158,24 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
         mDepCompletedTasksRV.setHasFixedSize(true);
 
         mDepCompletedTasksRV.setLayoutManager(new LinearLayoutManager(this));
-        final TasksAdapter adapter = new TasksAdapter(this);
+        final TasksAdapter adapter = new TasksAdapter(this, true);
         mDepCompletedTasksRV.setAdapter(adapter);
 
 
-
-            final LiveData<List<TaskEntry>> depCompletedTasks = mViewModel.getCompletedTasks();
-            depCompletedTasks.observe(this, new Observer<List<TaskEntry>>() {
-                @Override
-                public void onChanged(List<TaskEntry> tasks) {
-                    if (tasks != null && !tasks.isEmpty())
-                        adapter.setData(tasks);
-                    else {
-                        findViewById(R.id.textView3).setVisibility(View.GONE);
-                        mDepCompletedTasksRV.setVisibility(View.GONE);
-                    }
+        final LiveData<List<TaskEntry>> depCompletedTasks = mViewModel.getCompletedTasks();
+        depCompletedTasks.observe(this, new Observer<List<TaskEntry>>() {
+            @Override
+            public void onChanged(List<TaskEntry> tasks) {
+                if (tasks != null && !tasks.isEmpty())
+                    adapter.setData(tasks);
+                else {
+                    findViewById(R.id.textView3).setVisibility(View.GONE);
+                    mDepCompletedTasksRV.setVisibility(View.GONE);
                 }
-            });
+            }
+        });
 
     }
-
-
-
 
 
     protected void onStop() {
@@ -225,7 +219,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
 
 
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        getMenuInflater().inflate(R.menu.menu_toolbar, menu);
         return true;
     }
 

@@ -2,6 +2,7 @@ package com.example.android.employeesmanagementapp.data;
 
 import android.content.Context;
 
+import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.data.daos.DepartmentsDao;
 import com.example.android.employeesmanagementapp.data.daos.EmployeesDao;
 import com.example.android.employeesmanagementapp.data.daos.EmployeesTasksDao;
@@ -75,42 +76,42 @@ public abstract class AppDatabase extends RoomDatabase {
                                         db.employeesDao().addEmployee(new EmployeeEntry(17, 5, "shawky", 23, new Date(), false));
 
 
-                                        db.tasksDao().addTask(new TaskEntry(1, 1, "task1", "askasmas", new Date(), new Date(), 3, true));
+                                        db.tasksDao().addTask(new TaskEntry(1, 1, "task1", "askasmas", new Date(), new Date(), 3, true, R.color.task_color_1));
                                         db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(1, 1));
 
-                                        db.tasksDao().addTask(new TaskEntry(2, 5, "task2", "askasmas", new Date(), new Date(), 2, true));
+                                        db.tasksDao().addTask(new TaskEntry(2, 5, "task2", "askasmas", new Date(), new Date(), 2, true, R.color.task_color_1));
                                         db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(8, 2));
                                         db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(16, 2));
 
-                                        db.tasksDao().addTask(new TaskEntry(3, 2, "task3", "askasmas", new Date(), new Date(), 1, true));
+                                        db.tasksDao().addTask(new TaskEntry(3, 2, "task3", "askasmas", new Date(), new Date(), 1, true, R.color.task_color_1));
                                         db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(4, 3));
                                         db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(5, 3));
                                         db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(2, 3));
 
-                                        db.tasksDao().addTask(new TaskEntry(4, 2, "task4", "askasmas", new Date(), new Date(), 0, true));
+                                        db.tasksDao().addTask(new TaskEntry(4, 2, "task4", "askasmas", new Date(), new Date(), 0, true, R.color.task_color_1));
                                         db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(5, 4));
                                         db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(4, 4));
                                         db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(15, 4));
 
-                                        db.tasksDao().addTask(new TaskEntry(5, 8, "task5", "askasmas", new Date(), new Date(), 0, false));
+                                        db.tasksDao().addTask(new TaskEntry(5, 8, "task5", "askasmas", new Date(), new Date(), 0, false, R.color.task_color_1));
                                         db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(12, 5));
 
-                                        db.tasksDao().addTask(new TaskEntry(6, 9, "task6", "askasmas", new Date(), new Date(), 0, false));
+                                        db.tasksDao().addTask(new TaskEntry(6, 9, "task6", "askasmas", new Date(), new Date(), 0, false, R.color.task_color_1));
                                         db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(13, 6));
 
-                                        db.tasksDao().addTask(new TaskEntry(7, 2, "task7", "askasmas", new Date(), new Date(), 0, false));
+                                        db.tasksDao().addTask(new TaskEntry(7, 2, "task7", "askasmas", new Date(), new Date(), 0, false, R.color.task_color_1));
                                         db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(14, 7));
                                         db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(15, 7));
                                         db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(2, 7));
 
-                                        db.tasksDao().addTask(new TaskEntry(8, 5, "task8", "askasmas", new Date(), new Date(), 0, false));
+                                        db.tasksDao().addTask(new TaskEntry(8, 5, "task8", "askasmas", new Date(), new Date(), 0, false, R.color.task_color_1));
                                         db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(8, 8));
 
-                                        db.tasksDao().addTask(new TaskEntry(9, 6, "task9", "askasmas", new Date(), new Date(), 0, false));
+                                        db.tasksDao().addTask(new TaskEntry(9, 6, "task9", "askasmas", new Date(), new Date(), 0, false, R.color.task_color_1));
                                         db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(9, 9));
                                         db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(10, 9));
 
-                                        db.tasksDao().addTask(new TaskEntry(10, 6, "task10", "askasmas", new Date(), new Date(), 0, false));
+                                        db.tasksDao().addTask(new TaskEntry(10, 6, "task10", "askasmas", new Date(), new Date(), 0, false, R.color.task_color_1));
                                         db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(9, 10));
                                     }
                                 });

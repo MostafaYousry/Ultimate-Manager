@@ -1,4 +1,5 @@
 <resources>
+
     <color name="primaryColor">#009688</color>
     <color name="primaryLightColor">#52c7b8</color>
     <color name="primaryDarkColor">#00675b</color>
@@ -7,5 +8,22 @@
     <color name="secondaryDarkColor">#c77c02</color>
     <color name="primaryTextColor">#000000</color>
     <color name="secondaryTextColor">#000000</color>
+
+
+    <color name="color_swatch_border">#bdbdbd</color>
+
+    <color name="task_color_1">#FAFAFA</color>
+    <color name="task_color_2">#FF8A80</color>
+    <color name="task_color_3">#FFD180</color>
+    <color name="task_color_4">#FFFF8D</color>
+    <color name="task_color_5">#CCFF90</color>
+    <color name="task_color_6">#A7FFEB</color>
+    <color name="task_color_7">#80D8FF</color>
+    <color name="task_color_8">#82B1FF</color>
+    <color name="task_color_9">#B388FF</color>
+    <color name="task_color_10">#F8BBD0</color>
+    <color name="task_color_11">#D7CCC8</color>
+    <color name="task_color_12">#CFD8DC</color>
+
 
 </resources>

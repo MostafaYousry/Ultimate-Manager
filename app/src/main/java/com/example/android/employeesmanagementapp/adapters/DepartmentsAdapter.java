@@ -26,11 +26,7 @@ public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.
     private DepartmentItemClickListener mDepartmentItemClickListener;
     private View.OnClickListener mPopupMenuClickListener;
     private MultiTransformation mImageTransformations;
-    private int clickedPosition=0;
-
-    public DepartmentEntry getClickedDepartment(){
-        return mDepartments.get(clickedPosition);
-    }
+    private int clickedPosition = 0;
 
     public DepartmentsAdapter(@NonNull DepartmentItemClickListener gridItemClickListener, @NonNull View.OnClickListener popupMenuClickListener) {
         mDepartmentItemClickListener = gridItemClickListener;
@@ -38,6 +34,10 @@ public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.
         mImageTransformations = new MultiTransformation(
                 new RoundedCornersTransformation(6, 0, RoundedCornersTransformation.CornerType.TOP_LEFT),
                 new RoundedCornersTransformation(6, 0, RoundedCornersTransformation.CornerType.TOP_RIGHT));
+    }
+
+    public DepartmentEntry getClickedDepartment() {
+        return mDepartments.get(clickedPosition);
     }
 
     @NonNull
