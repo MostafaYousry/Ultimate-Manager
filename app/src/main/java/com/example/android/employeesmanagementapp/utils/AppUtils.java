@@ -144,6 +144,7 @@ public final class AppUtils {
         builder.show();
     }
 
+
     /**
      * Converts dp to pixel
      */

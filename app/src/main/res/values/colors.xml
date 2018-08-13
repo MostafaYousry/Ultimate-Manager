@@ -62,5 +62,7 @@
     <color name="A700_15">#FF6D00</color>
     <color name="A700_16">#DD2C00</color>
 
+    <color name="camera_add_background_color">#42a5f5</color>
+
 
 </resources>

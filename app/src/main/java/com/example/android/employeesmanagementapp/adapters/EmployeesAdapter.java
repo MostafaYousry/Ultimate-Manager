@@ -2,6 +2,7 @@ package com.example.android.employeesmanagementapp.adapters;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.net.Uri;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.example.android.employeesmanagementapp.GlideApp;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.TextDrawable;
 import com.example.android.employeesmanagementapp.data.EmployeeWithExtras;
@@ -149,29 +151,33 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
             }
 
             //change the item data by the position
-            mEmployeeName.setText(mData.get(position).employeeEntry.getEmployeeName());
+            EmployeeWithExtras employeeWithExtras = mData.get(position);
 
-            mEmployeeRating.setRating(mData.get(position).employeeRating);
 
-            int numberRunningTasks = mData.get(position).employeeNumRunningTasks;
+            mEmployeeName.setText(employeeWithExtras.employeeEntry.getEmployeeName());
+
+            mEmployeeRating.setRating(employeeWithExtras.employeeRating);
+
+            int numberRunningTasks = employeeWithExtras.employeeNumRunningTasks;
             String runningTasksStr = itemView.getContext().getResources().getQuantityString(R.plurals.numberOfRunningTasks, numberRunningTasks, numberRunningTasks);
             mNumRunningTasks.setText(runningTasksStr);
 
-            if (mData.get(position).employeeEntry.getEmployeeImageUri() == null) {
+            if (employeeWithExtras.employeeEntry.getEmployeeImageUri() == null) {
                 Context context = itemView.getContext();
 
-                TextDrawable textDrawable = new TextDrawable(context, mData.get(position).employeeEntry, AppUtils.dpToPx(context, 70), AppUtils.dpToPx(context, 70), AppUtils.spToPx(context, 28));
+                GlideApp.with(context).clear(mEmployeeImage);
+
+                TextDrawable textDrawable = new TextDrawable(context, employeeWithExtras.employeeEntry, AppUtils.dpToPx(context, 70), AppUtils.dpToPx(context, 70), AppUtils.spToPx(context, 28));
                 mEmployeeImage.setImageDrawable(textDrawable);
             } else {
-//                Glide.with(mEmployeeImage.getContext())
-//                        .load()
-//                        .apply(RequestOptions.fitCenterTransform())
-//                        .into(mEmployeeImage);
+                GlideApp.with(itemView.getContext())
+                        .asBitmap()
+                        .load(Uri.parse(employeeWithExtras.employeeEntry.getEmployeeImageUri()))
+                        .into(mEmployeeImage);
             }
 
 
-
-            itemView.setTag(mData.get(position).employeeEntry.getEmployeeID());
+            itemView.setTag(employeeWithExtras.employeeEntry.getEmployeeID());
 
 
         }

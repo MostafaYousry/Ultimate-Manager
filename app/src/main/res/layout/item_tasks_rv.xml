@@ -30,7 +30,6 @@
 
         <ImageButton
             android:id="@+id/task_options_button"
-            style="@style/Widget.MaterialComponents.Button.IconButton"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:background="@android:color/transparent"

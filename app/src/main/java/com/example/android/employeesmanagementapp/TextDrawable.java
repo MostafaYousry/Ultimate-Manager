@@ -33,7 +33,7 @@ public class TextDrawable extends ShapeDrawable {
         mLetter = Character.toUpperCase(mEmployee.getEmployeeName().charAt(0));
 
 
-        int a700Color = ResourcesCompat.getColor(context.getResources(), AppUtils.getLetterColor(mEmployee.getEmployeeName()), context.getTheme());
+        int a700Color = ResourcesCompat.getColor(context.getResources(), AppUtils.getLetterColor(mEmployee), context.getTheme());
 
         textPaint = new Paint();
         textPaint.setColor(a700Color);
@@ -44,7 +44,7 @@ public class TextDrawable extends ShapeDrawable {
         textPaint.setTextAlign(Paint.Align.CENTER);
 
 
-        int a100Color = ResourcesCompat.getColor(context.getResources(), AppUtils.getLetterBackgroundColor(mEmployee.getEmployeeName()), context.getTheme());
+        int a100Color = ResourcesCompat.getColor(context.getResources(), AppUtils.getLetterBackgroundColor(mEmployee), context.getTheme());
 
         Paint drawablePaint = getPaint();
         drawablePaint.setColor(a100Color);

@@ -124,4 +124,9 @@ public class EmployeeEntry {
     public void setEmployeeImageUri(String employeeImageUri) {
         this.employeeImageUri = employeeImageUri;
     }
+
+    @Override
+    public int hashCode() {
+        return employeeName.hashCode();
+    }
 }

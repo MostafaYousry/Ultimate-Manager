@@ -2,6 +2,7 @@ package com.example.android.employeesmanagementapp.activities;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -16,6 +17,7 @@ import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.TextDrawable;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
@@ -29,6 +31,7 @@ import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.data.factories.EmpIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewEmployeeViewModel;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
+import com.example.android.employeesmanagementapp.utils.ImageUtils;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 
 import java.util.ArrayList;
@@ -37,6 +40,7 @@ import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -58,6 +62,7 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
     private ImageView mEmployeeImage;
     private RatingBar mEmployeeRating;
     private RecyclerView mEmployeeCompletedTasks;
+    private String mEmployeePicturePath;
 
     private DepartmentsArrayAdapter mArrayAdapter;
 
@@ -105,6 +110,12 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
         mEmployeeDepartment = findViewById(R.id.employee_department);
         mCollapsingToolbar = findViewById(R.id.collapsing_toolbar);
         mEmployeeImage = findViewById(R.id.employee_image);
+        mEmployeeImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ImageUtils.showPhotoCameraDialog(AddEmployeeActivity.this);
+            }
+        });
         mEmployeeRating = findViewById(R.id.employee_rating);
 
 
@@ -206,6 +217,10 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
         findViewById(R.id.textView3).setVisibility(View.GONE);
         findViewById(R.id.textView4).setVisibility(View.GONE);
 
+        mEmployeeImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_camera_add));
+        mEmployeeImage.setScaleType(ImageView.ScaleType.CENTER);
+        mEmployeeImage.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.camera_add_background_color, getTheme()));
+
     }
 
     private void populateUi(EmployeeWithExtras employeeWithExtras) {
@@ -223,9 +238,17 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
             mEmployeeDepartment.setSelection(mArrayAdapter.getPositionForItemId(employeeWithExtras.employeeEntry.getDepartmentId()));
         mEmployeeRating.setRating(employeeWithExtras.employeeRating);
 
+        if (employeeWithExtras.employeeEntry.getEmployeeImageUri() == null) {
+            TextDrawable textDrawable = new TextDrawable(this, employeeWithExtras.employeeEntry, AppUtils.dpToPx(this, 70), AppUtils.dpToPx(this, 70), AppUtils.spToPx(this, 28));
+            mEmployeeImage.setImageDrawable(textDrawable);
+        } else {
+            Glide.with(this)
+                    .asBitmap()
+                    .load(Uri.parse(mEmployeePicturePath))
+                    .into(mEmployeeImage);
+        }
 
-        TextDrawable textDrawable = new TextDrawable(this, employeeWithExtras.employeeEntry, AppUtils.dpToPx(this, 70), AppUtils.dpToPx(this, 70), AppUtils.spToPx(this, 28));
-        mEmployeeImage.setImageDrawable(textDrawable);
+
     }
 
 
@@ -248,6 +271,25 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == ImageUtils.REQUEST_IMAGE_GET && resultCode == RESULT_OK) {
+            Uri fullPhotoUri = data.getData();
+            mEmployeePicturePath = fullPhotoUri.toString();
+            Glide.with(this)
+                    .asBitmap()
+                    .load(fullPhotoUri)
+                    .into(mEmployeeImage);
+
+        } else if (requestCode == ImageUtils.REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            mEmployeePicturePath = ImageUtils.sCameraImageURI;
+            Glide.with(this)
+                    .asBitmap()
+                    .load(Uri.parse(mEmployeePicturePath))
+                    .into(mEmployeeImage);
+        }
+
+    }
 
     private void saveEmployee() {
         if (isDataValid()) {
@@ -256,7 +298,7 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
             Date employeeHireDate = (Date) mEmployeeHireDate.getTag();
             int departmentId = (int) mEmployeeDepartment.getSelectedView().getTag();
 
-            final EmployeeEntry newEmployee = new EmployeeEntry(departmentId, employeeName, employeeSalary, employeeHireDate, null);
+            final EmployeeEntry newEmployee = new EmployeeEntry(departmentId, employeeName, employeeSalary, employeeHireDate, mEmployeePicturePath);
 
             AppExecutor.getInstance().diskIO().execute(new Runnable() {
                 @Override
