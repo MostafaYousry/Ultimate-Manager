@@ -3,8 +3,6 @@ package com.example.android.employeesmanagementapp.adapters;
 import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
-import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,25 +16,29 @@ import com.example.android.employeesmanagementapp.TextDrawable;
 import com.example.android.employeesmanagementapp.data.EmployeeWithExtras;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
+import com.google.android.material.card.MaterialCardView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.EmployeesViewHolder> {
+    public static final int SELECTION_MODE_SINGLE = 1;
+
     private Context mContext;
 
-    public static final int SELECTION_MODE_SINGLE = 1;
-    public static final int SELECTION_MODE_MULTIPLE = 2;
-    private static final String TAG = EmployeesAdapter.class.getSimpleName();
+
     final private EmployeeItemClickListener mClickListener;
     private List<EmployeeWithExtras> mData;
-
-
+    public static final int SELECTION_MODE_MULTIPLE = 2;
+    private static final String TAG = EmployeesAdapter.class.getSimpleName();
+    private static final int HIGHLIGHT_COLOR = 0x999be6ff;
     private int employeesSelectionMode;
+    private List<EmployeeWithExtras> mSelectedOnes;
+
     private EmployeeSelectedStateListener mEmployeeSelectedStateListener;
-    private SparseBooleanArray mSelectedEmployees = new SparseBooleanArray();
 
 
     public EmployeesAdapter(Context context, @NonNull EmployeeItemClickListener listener, @NonNull EmployeeSelectedStateListener employeeSelectedStateListener) {
@@ -74,20 +76,23 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
     }
 
     /**
-     * @return : current selectionMode : Single / Multiple
-     */
-    public int getEmployeeSelectionMode() {
-        return employeesSelectionMode;
-    }
-
-    /**
      * used by employees fragment to start or finish a multi selection operation
      *
      * @param selectionMode : Single / Multiple
      */
     public void setEmployeeSelectionMode(int selectionMode) {
+        if (selectionMode == SELECTION_MODE_MULTIPLE) {
+            if (mSelectedOnes == null)
+                mSelectedOnes = new ArrayList<>();
+        } else {
+            for (EmployeeWithExtras extras : mSelectedOnes) {
+                extras.employeeEntry.setChecked(false);
+                notifyItemChanged(mData.indexOf(extras));
+
+            }
+            mSelectedOnes = null;
+        }
         employeesSelectionMode = selectionMode;
-        notifyDataSetChanged();
     }
 
     /**
@@ -108,11 +113,13 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
     }
 
     public interface EmployeeSelectedStateListener {
-        //void onEmployeeSelected(EmployeeEntry employeeEntry);
 
-        void onEmployeeSelected(EmployeeWithExtras employeeEntry);
+        void onMultiSelectStart();
 
-        void onEmployeeDeselected(EmployeeWithExtras employeeEntry);
+        void onMultiSelectFinish();
+
+        void onSelectedNumChanged(int numSelected);
+
     }
 
     public class EmployeesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
@@ -120,19 +127,20 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
         //create object for each view in the item view
         TextView mEmployeeName;
         ImageView mEmployeeImage;
+        ImageView mCheckIcon;
         RatingBar mEmployeeRating;
         TextView mNumRunningTasks;
-        View mItemView;
-        boolean mIsItemSelected = false;
+        MaterialCardView mItemView;
 
 
         EmployeesViewHolder(View itemView) {
             super(itemView);
 
             //set the objects by the opposite view by id
-            mItemView = itemView;
+            mItemView = (MaterialCardView) itemView;
             mEmployeeName = itemView.findViewById(R.id.employee_name);
             mEmployeeImage = itemView.findViewById(R.id.employee_image);
+            mCheckIcon = itemView.findViewById(R.id.check_icon);
             mEmployeeRating = itemView.findViewById(R.id.employee_rating);
             mNumRunningTasks = itemView.findViewById(R.id.employee_has_tasks_runnung);
 
@@ -144,10 +152,8 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
 
         void bind(final int position) {
 
-            if (employeesSelectionMode == SELECTION_MODE_SINGLE && mIsItemSelected) {
-                mIsItemSelected = false;
-                mItemView.setBackgroundColor(Color.parseColor("#ffffff"));
-            }
+            updateCheckedState(mData.get(position).employeeEntry);
+
 
             //change the item data by the position
             EmployeeWithExtras employeeWithExtras = mData.get(position);
@@ -184,11 +190,27 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
 
         @Override
         public void onClick(View v) {
-            //if at least one of the items has a long click on it, its color will be grey
-            //and for that, onClick will behave like onLongClick "select items"
-            //if the item is selected and click on it again "long or normal click", its background will return white and will not be selected
+
             if (employeesSelectionMode == SELECTION_MODE_MULTIPLE) {
-                changeItemSelectedState();
+                EmployeeWithExtras extras = mData.get(getAdapterPosition());
+                extras.employeeEntry.setChecked(!extras.employeeEntry.isChecked());
+                updateCheckedState(extras.employeeEntry);
+
+
+                if (extras.employeeEntry.isChecked()) {
+                    mSelectedOnes.add(extras);
+                } else {
+                    mSelectedOnes.remove(extras);
+                }
+
+                if (mSelectedOnes.isEmpty()) {
+                    mEmployeeSelectedStateListener.onMultiSelectFinish();
+                    employeesSelectionMode = SELECTION_MODE_SINGLE;
+                    mSelectedOnes = null;
+                } else {
+                    mEmployeeSelectedStateListener.onSelectedNumChanged(mSelectedOnes.size());
+                }
+
             } else
                 mClickListener.onEmployeeClick((int) mItemView.getTag(), getAdapterPosition());
         }
@@ -196,27 +218,32 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
         @Override
         public boolean onLongClick(View view) {
             if (employeesSelectionMode != SELECTION_MODE_MULTIPLE) {
-                changeItemSelectedState();
+                mEmployeeSelectedStateListener.onMultiSelectStart();
+
+                mData.get(getAdapterPosition()).employeeEntry.setChecked(true);
+                updateCheckedState(mData.get(getAdapterPosition()).employeeEntry);
+
+                mSelectedOnes = new ArrayList<>();
+                mSelectedOnes.add(mData.get(getAdapterPosition()));
+                mEmployeeSelectedStateListener.onSelectedNumChanged(mSelectedOnes.size());
+
                 employeesSelectionMode = SELECTION_MODE_MULTIPLE;
             }
             return true;
         }
 
-        private void changeItemSelectedState() {
+        private void updateCheckedState(EmployeeEntry employeeEntry) {
 
-            if (!mSelectedEmployees.get(getAdapterPosition())) {
-                mItemView.setBackgroundColor(Color.parseColor("#888888"));
-                mIsItemSelected = true;
-                mSelectedEmployees.append(getAdapterPosition(), true);
-                Log.v("employees", "adding");
-                mEmployeeSelectedStateListener.onEmployeeSelected(mData.get(getAdapterPosition()));
+            if (employeeEntry.isChecked()) {
+                mCheckIcon.setVisibility(View.VISIBLE);
+                mEmployeeImage.setVisibility(View.GONE);
+                mItemView.setCardBackgroundColor(HIGHLIGHT_COLOR);
             } else {
-                mItemView.setBackgroundColor(Color.parseColor("#ffffff"));
-                mIsItemSelected = false;
-                mSelectedEmployees.delete(getAdapterPosition());
-                Log.v("employees", "removing");
-                mEmployeeSelectedStateListener.onEmployeeDeselected(mData.get(getAdapterPosition()));
+                mCheckIcon.setVisibility(View.GONE);
+                mEmployeeImage.setVisibility(View.VISIBLE);
+                mItemView.setCardBackgroundColor(Color.WHITE);
             }
+
         }
 
 

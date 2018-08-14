@@ -230,7 +230,12 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     @Override
     public void onBackPressed() {
+
         if (!(activeFragment instanceof TasksFragment)) {
+            if (activeFragment instanceof EmployeesFragment && ((EmployeesFragment) activeFragment).isInMultiSelectMode()) {
+                ((EmployeesFragment) activeFragment).abortMultiSelection();
+                return;
+            }
             mBottomNavigationView.setSelectedItemId(R.id.nav_tasks);
         } else {
             super.onBackPressed();

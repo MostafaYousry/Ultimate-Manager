@@ -16,9 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.employeesmanagementapp.R;
-import com.example.android.employeesmanagementapp.UndoDeleteAction;
 import com.example.android.employeesmanagementapp.activities.AddEmployeeActivity;
-import com.example.android.employeesmanagementapp.activities.MainActivity;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
 import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
@@ -30,17 +28,17 @@ import com.example.android.employeesmanagementapp.data.factories.EmpIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewEmployeeViewModel;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
-import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -62,6 +60,12 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
     private LinearLayout emptyView;
     private TextView emptyViewTextView;
 
+    private boolean mIsInMultiSelectMode;
+
+    private Toolbar mActivityToolBar;
+    private FloatingActionButton mActivityFab;
+    private boolean selectOptionPressed;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -69,6 +73,25 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
         mDb = AppDatabase.getInstance(getContext());
 
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        mActivityToolBar = getActivity().findViewById(R.id.toolbar);
+        mActivityToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                abortMultiSelection();
+            }
+        });
+        mActivityFab = getActivity().findViewById(R.id.fab);
+    }
+
+    public void abortMultiSelection() {
+        onMultiSelectFinish();
+        mEmployeesAdapter.setEmployeeSelectionMode(EmployeesAdapter.SELECTION_MODE_SINGLE);
     }
 
     @Override
@@ -84,43 +107,13 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
         emptyView = rootView.findViewById(R.id.empty_view);
         emptyViewTextView = rootView.findViewById(R.id.empty_view_message_text_view);
 
-        setUpOnSwipe();
-
         return rootView;
     }
 
-    private void setUpOnSwipe() {
-        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-            @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                return false;
-            }
 
-            // Called when a user swipes left or right on a ViewHolder
-            @Override
-            public void onSwiped(final RecyclerView.ViewHolder viewHolder, int swipeDir) {
-
-                int entryPosition = viewHolder.getAdapterPosition();
-                EmployeeEntry employeeEntry = mEmployeesAdapter.getItem(entryPosition);
-                UndoDeleteAction undoDeleteAction = new UndoDeleteAction(employeeEntry, mDb);
-                Snackbar.make(getActivity().findViewById(android.R.id.content), employeeEntry.getEmployeeName() + " will be deleted", Snackbar.LENGTH_LONG).setAction("Undo", undoDeleteAction).show();
-
-                System.out.println("deleting");
-                AppExecutor.getInstance().diskIO().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        int position = viewHolder.getAdapterPosition();
-                        mDb.employeesDao().deleteEmployee(mEmployeesAdapter.getItem(position));
-                    }
-                });
-
-            }
-        }).attachToRecyclerView(mRecyclerView);
-
-
+    public boolean isInMultiSelectMode() {
+        return mIsInMultiSelectMode;
     }
-
-
 
     private void setupRecyclerView(View rootView) {
 
@@ -172,22 +165,47 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
         emptyView.setVisibility(View.GONE);
     }
 
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+
+        if (selectOptionPressed) {
+            menu.findItem(R.id.action_delete_employees).setVisible(false);
+            menu.findItem(R.id.action_move_employees).setVisible(false);
+            menu.findItem(R.id.action_select).setVisible(false);
+            return;
+        }
+
+
+        if (mIsInMultiSelectMode) {
+            menu.findItem(R.id.action_delete_employees).setVisible(true);
+            menu.findItem(R.id.action_move_employees).setVisible(true);
+            menu.findItem(R.id.action_select).setVisible(false);
+        } else {
+            menu.findItem(R.id.action_delete_employees).setVisible(false);
+            menu.findItem(R.id.action_move_employees).setVisible(false);
+            menu.findItem(R.id.action_select).setVisible(true);
+        }
+    }
+
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_employees_options, menu);
+        inflater.inflate(R.menu.menu_employees_fragment, menu);
+
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // User clicked on a menu option in the app bar overflow menu
-        if (mSelectedEmployees.isEmpty()) {
-            Toast.makeText(getContext(), "No employees selected", Toast.LENGTH_LONG).show();
-            return true;
-        }
+
         switch (item.getItemId()) {
-            case R.id.delete_employees:
+            case R.id.action_select:
+                selectOptionPressed = true;
+                onMultiSelectStart();
+                mEmployeesAdapter.setEmployeeSelectionMode(EmployeesAdapter.SELECTION_MODE_MULTIPLE);
+                break;
+            case R.id.action_delete_employees:
                 Toast.makeText(getContext(), "Deleting " + mSelectedEmployees.size() + " employees", Toast.LENGTH_LONG).show();
 
                 AppExecutor.getInstance().diskIO().execute(new Runnable() {
@@ -227,7 +245,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                resetSelection();
+//                                resetSelection();
                             }
                         });
 
@@ -238,7 +256,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
 
                 return true;
 
-            case R.id.move_employees:
+            case R.id.action_move_employees:
                 showChooseDepDialog();
                 return true;
         }
@@ -343,7 +361,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                resetSelection();
+//                                resetSelection();
                             }
                         });
                     }
@@ -354,49 +372,18 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
-                resetSelection();
+//                resetSelection();
             }
         });
 
         builder.show();
     }
 
-    private void resetSelection() {
-        ((MainActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.employees));
-        mEmployeesAdapter.setEmployeeSelectionMode(EmployeesAdapter.SELECTION_MODE_SINGLE);
-        mSelectedEmployees.clear();
-    }
-
-    public boolean isInMultiSelectionMode() {
-        if (mEmployeesAdapter.getEmployeeSelectionMode() == EmployeesAdapter.SELECTION_MODE_MULTIPLE) {
-            resetSelection();
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public void onEmployeeSelected(EmployeeWithExtras employeeEntry) {
-        //add employee to selected list
-        if (!mSelectedEmployees.contains(employeeEntry))
-            mSelectedEmployees.add(employeeEntry);
-        Toast.makeText(getContext(), "employee with id " + employeeEntry.employeeEntry.getEmployeeID() + " is added", Toast.LENGTH_SHORT).show();
-        ((MainActivity) getActivity()).getSupportActionBar().setTitle(mSelectedEmployees.size() + " selected");
-    }
-
-    @Override
-    public void onEmployeeDeselected(EmployeeWithExtras employeeEntry) {
-        //remove employee from selected list
-        if (mSelectedEmployees.contains(employeeEntry))
-            mSelectedEmployees.remove(employeeEntry);
-        Toast.makeText(getContext(), "employee with id " + employeeEntry.employeeEntry.getEmployeeID() + " is removed", Toast.LENGTH_SHORT).show();
-        if (mSelectedEmployees.isEmpty()) {
-            ((MainActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.employees));
-            mEmployeesAdapter.setEmployeeSelectionMode(EmployeesAdapter.SELECTION_MODE_SINGLE);
-        } else {
-            ((MainActivity) getActivity()).getSupportActionBar().setTitle(mSelectedEmployees.size() + " selected");
-        }
-    }
+//    private void resetSelection() {
+//        ((MainActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.employees));
+//        mEmployeesAdapter.setEmployeeSelectionMode(EmployeesAdapter.SELECTION_MODE_SINGLE);
+//        mSelectedEmployees.clear();
+//    }
 
     @Override
     public void onEmployeeClick(int employeeRowID, int employeePosition) {
@@ -404,4 +391,32 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
         intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY, employeeRowID);
         startActivity(intent);
     }
+
+    @Override
+    public void onMultiSelectStart() {
+        mIsInMultiSelectMode = true;
+        getActivity().invalidateOptionsMenu();
+        mActivityToolBar.setNavigationIcon(R.drawable.ic_close);
+        mActivityFab.hide();
+    }
+
+    @Override
+    public void onMultiSelectFinish() {
+        mIsInMultiSelectMode = false;
+        getActivity().invalidateOptionsMenu();
+        mActivityToolBar.setNavigationIcon(null);
+        mActivityToolBar.setTitle(R.string.employees);
+        mActivityFab.show();
+    }
+
+    @Override
+    public void onSelectedNumChanged(int numSelected) {
+        if (selectOptionPressed) {
+            selectOptionPressed = false;
+            getActivity().invalidateOptionsMenu();
+        }
+        mActivityToolBar.setTitle(String.valueOf(numSelected));
+    }
+
+
 }

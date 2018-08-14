@@ -6,18 +6,21 @@
     android:layout_height="150dp"
     android:layout_gravity="center"
     android:layout_margin="@dimen/item_employee_margin"
+    app:cardBackgroundColor="@android:color/transparent"
     app:cardElevation="@dimen/cardview_default_elevation">
 
     <ImageView
         android:id="@+id/employee_image"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:scaleType="centerCrop" />
+        android:scaleType="centerCrop"
+        tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
         android:id="@+id/employee_name"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
+        android:background="@android:color/white"
         android:layout_gravity="bottom"
         android:padding="8dp"
         android:textColor="@color/primaryTextColor"

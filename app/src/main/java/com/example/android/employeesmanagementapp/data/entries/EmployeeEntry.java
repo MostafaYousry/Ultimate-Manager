@@ -128,6 +128,13 @@ public class EmployeeEntry {
         this.employeeImageUri = employeeImageUri;
     }
 
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(boolean checked) {
+        isChecked = checked;
+    }
 
     @Override
     public int hashCode() {
