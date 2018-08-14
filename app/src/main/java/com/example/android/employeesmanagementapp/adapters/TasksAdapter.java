@@ -1,6 +1,7 @@
 package com.example.android.employeesmanagementapp.adapters;
 
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -10,6 +11,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.data.AppDatabase;
+import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 import com.google.android.material.card.MaterialCardView;
@@ -23,12 +26,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHolder> {
 
+    private Context mContext;
+
     private List<TaskEntry> mData;
     private TasksItemClickListener mTaskClickListener;
     private boolean mTasksAreCompleted;
 
 
-    public TasksAdapter(TasksItemClickListener clickListener, boolean tasksAreCompleted) {
+    public TasksAdapter(Context context, TasksItemClickListener clickListener, boolean tasksAreCompleted) {
+        mContext = context;
         mTaskClickListener = clickListener;
         mTasksAreCompleted = tasksAreCompleted;
     }
@@ -105,16 +111,24 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
 
                     popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         @Override
-                        public boolean onMenuItemClick(MenuItem item) {
+                        public boolean onMenuItemClick(final MenuItem item) {
                             switch (item.getItemId()) {
                                 case R.id.action_mark_as_done:
-                                    AppUtils.showRateTaskDialog(itemView.getContext(), (int) itemView.getTag());
+                                    AppUtils.showRateTaskDialog(mContext, (int) itemView.getTag());
                                     return true;
                                 case R.id.action_delete_task:
-                                    //handle menu2 click
+
+                                    AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            AppDatabase.getInstance(mContext).employeesTasksDao().deleteTaskJoinRecords(mData.get(getAdapterPosition()).getTaskId());
+                                            AppDatabase.getInstance(mContext).tasksDao().deleteTask(mData.get(getAdapterPosition()));
+                                        }
+                                    });
+
                                     return true;
                                 case R.id.action_color_task:
-                                    AppUtils.showColorPicker(itemView.getContext(), (int) itemView.getTag());
+                                    AppUtils.showColorPicker(mContext, (int) itemView.getTag());
                                     return true;
                                 default:
                                     return false;
@@ -132,7 +146,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
             mTaskStartDate.setText(AppUtils.getFriendlyDate(mData.get(position).getTaskStartDate()));
             mTaskDueDate.setText(AppUtils.getFriendlyDate(mData.get(position).getTaskDueDate()));
 
-            int taskColor = ResourcesCompat.getColor(itemView.getResources(), mData.get(position).getTaskColorResource(), itemView.getContext().getTheme());
+            int taskColor = ResourcesCompat.getColor(itemView.getResources(), mData.get(position).getTaskColorResource(), mContext.getTheme());
 
             mItemView.setCardBackgroundColor(taskColor);
 

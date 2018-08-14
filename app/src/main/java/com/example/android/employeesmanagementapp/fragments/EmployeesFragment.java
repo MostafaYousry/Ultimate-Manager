@@ -136,7 +136,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
         mRecyclerView.setLayoutManager(layoutManager);
 
         //create object of EmployeesAdapter and send data
-        mEmployeesAdapter = new EmployeesAdapter(this, this);
+        mEmployeesAdapter = new EmployeesAdapter(getContext(), this, this);
 
         final MainViewModel mainViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
 

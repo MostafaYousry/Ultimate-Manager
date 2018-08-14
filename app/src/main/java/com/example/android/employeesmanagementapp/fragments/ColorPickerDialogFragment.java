@@ -9,7 +9,7 @@ import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.adapters.ColorAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
-import com.example.android.employeesmanagementapp.utils.AppUtils;
+import com.example.android.employeesmanagementapp.utils.ColorUtils;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
@@ -35,7 +35,7 @@ public class ColorPickerDialogFragment extends DialogFragment implements ColorAd
         mGrid.setLayoutManager(new GridLayoutManager(getActivity(), 4));
 
 
-        ColorAdapter colorAdapter = new ColorAdapter(AppUtils.getTaskColorResources(), this);
+        ColorAdapter colorAdapter = new ColorAdapter(ColorUtils.getTaskColorResources(), this);
         mGrid.setAdapter(colorAdapter);
 
         builder.setCancelable(true);

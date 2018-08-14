@@ -74,7 +74,7 @@ public class RunningTasksFragment extends Fragment implements TasksAdapter.Tasks
         mRecyclerView.setLayoutManager(layoutManager);
 
         // specify an adapter
-        mAdapter = new TasksAdapter(this, false);
+        mAdapter = new TasksAdapter(getContext(), this, false);
 
         LiveData<List<TaskEntry>> tasksList = ViewModelProviders.of(getActivity()).get(MainViewModel.class).getRunningTasksList();
         tasksList.observe(this, new Observer<List<TaskEntry>>() {

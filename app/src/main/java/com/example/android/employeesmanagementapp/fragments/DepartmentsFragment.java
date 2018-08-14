@@ -103,7 +103,7 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
         };
 
         //initialise recycler view adapter
-        mAdapter = new DepartmentsAdapter(this, clickListener);
+        mAdapter = new DepartmentsAdapter(getContext(), this, clickListener);
 
         LiveData<List<DepartmentEntry>> departmentsList = ViewModelProviders.of(getActivity()).get(MainViewModel.class).getAllDepartmentsList();
         departmentsList.observe(this, new Observer<List<DepartmentEntry>>() {
@@ -185,7 +185,7 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
                                             public void run() {
                                                 for (TaskEntry taskEntry : taskEntries) {
                                                     Log.i("test", taskEntry.getTaskTitle());
-                                                    mDb.employeesTasksDao().deleteDepartmentRunningTasks(taskEntry.getTaskId());
+                                                    mDb.employeesTasksDao().deleteTaskJoinRecords(taskEntry.getTaskId());
                                                     mDb.tasksDao().deleteTask(taskEntry);
                                                 }
                                             }

@@ -1,5 +1,5 @@
 todo validate before insert and update
-
+todo solve rotation problems
 
 todo(7):choose an image for the employee and department(from phone or by taking a picture)
 todo hide fab when selecting multiple employees

@@ -61,7 +61,7 @@ public class CompletedTasksFragment extends Fragment implements TasksAdapter.Tas
         mRecyclerView.setLayoutManager(layoutManager);
 
         // specify an adapter
-        mAdapter = new TasksAdapter(this, true);
+        mAdapter = new TasksAdapter(getContext(), this, true);
 
         LiveData<List<TaskEntry>> tasksList = ViewModelProviders.of(getActivity()).get(MainViewModel.class).getCompletedTasksList();
         tasksList.observe(this, new Observer<List<TaskEntry>>() {

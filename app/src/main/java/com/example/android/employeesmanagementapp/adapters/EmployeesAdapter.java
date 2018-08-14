@@ -25,6 +25,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.EmployeesViewHolder> {
+    private Context mContext;
+
     public static final int SELECTION_MODE_SINGLE = 1;
     public static final int SELECTION_MODE_MULTIPLE = 2;
     private static final String TAG = EmployeesAdapter.class.getSimpleName();
@@ -37,14 +39,11 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
     private SparseBooleanArray mSelectedEmployees = new SparseBooleanArray();
 
 
-    public EmployeesAdapter(@NonNull EmployeeItemClickListener listener, @NonNull EmployeeSelectedStateListener employeeSelectedStateListener) {
+    public EmployeesAdapter(Context context, @NonNull EmployeeItemClickListener listener, @NonNull EmployeeSelectedStateListener employeeSelectedStateListener) {
+        mContext = context;
         mClickListener = listener;
         mEmployeeSelectedStateListener = employeeSelectedStateListener;
         employeesSelectionMode = SELECTION_MODE_SINGLE;
-    }
-
-    public EmployeeEntry getItem(int position) {
-        return mData.get(position).employeeEntry;
     }
 
     @NonNull
@@ -60,10 +59,6 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
 
     @Override
     public void onBindViewHolder(@NonNull EmployeesViewHolder holder, int position) {
-        if (mSelectedEmployees.get(position) == true) {
-            holder.itemView.setBackgroundColor(Color.parseColor("#888888"));
-        } else
-            holder.itemView.setBackgroundColor(Color.parseColor("#ffffff"));
         holder.bind(position);
     }
 
@@ -72,6 +67,10 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
         if (mData == null)
             return 0;
         return mData.size();
+    }
+
+    public EmployeeEntry getItem(int position) {
+        return mData.get(position).employeeEntry;
     }
 
     /**
@@ -159,18 +158,18 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
             mEmployeeRating.setRating(employeeWithExtras.employeeRating);
 
             int numberRunningTasks = employeeWithExtras.employeeNumRunningTasks;
-            String runningTasksStr = itemView.getContext().getResources().getQuantityString(R.plurals.numberOfRunningTasks, numberRunningTasks, numberRunningTasks);
+            String runningTasksStr = mContext.getResources().getQuantityString(R.plurals.numberOfRunningTasks, numberRunningTasks, numberRunningTasks);
             mNumRunningTasks.setText(runningTasksStr);
 
             if (employeeWithExtras.employeeEntry.getEmployeeImageUri() == null) {
-                Context context = itemView.getContext();
+                Context context = mContext;
 
                 GlideApp.with(context).clear(mEmployeeImage);
 
                 TextDrawable textDrawable = new TextDrawable(context, employeeWithExtras.employeeEntry, AppUtils.dpToPx(context, 70), AppUtils.dpToPx(context, 70), AppUtils.spToPx(context, 28));
                 mEmployeeImage.setImageDrawable(textDrawable);
             } else {
-                GlideApp.with(itemView.getContext())
+                GlideApp.with(mContext)
                         .asBitmap()
                         .load(Uri.parse(employeeWithExtras.employeeEntry.getEmployeeImageUri()))
                         .into(mEmployeeImage);

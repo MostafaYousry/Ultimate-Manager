@@ -18,6 +18,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.example.android.employeesmanagementapp.GlideApp;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.TextDrawable;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
@@ -161,7 +162,7 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mEmployeeCompletedTasks.setLayoutManager(layoutManager);
 
-        final TasksAdapter adapter = new TasksAdapter(this, true);
+        final TasksAdapter adapter = new TasksAdapter(this, this, true);
 
         if (mEmployeeId == DEFAULT_EMPLOYEE_ID)
             adapter.setData(new ArrayList<TaskEntry>());
@@ -242,9 +243,9 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
             TextDrawable textDrawable = new TextDrawable(this, employeeWithExtras.employeeEntry, AppUtils.dpToPx(this, 70), AppUtils.dpToPx(this, 70), AppUtils.spToPx(this, 28));
             mEmployeeImage.setImageDrawable(textDrawable);
         } else {
-            Glide.with(this)
+            GlideApp.with(this)
                     .asBitmap()
-                    .load(Uri.parse(mEmployeePicturePath))
+                    .load(Uri.parse(employeeWithExtras.employeeEntry.getEmployeeImageUri()))
                     .into(mEmployeeImage);
         }
 
@@ -275,14 +276,18 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == ImageUtils.REQUEST_IMAGE_GET && resultCode == RESULT_OK) {
             Uri fullPhotoUri = data.getData();
-            mEmployeePicturePath = fullPhotoUri.toString();
             Glide.with(this)
                     .asBitmap()
                     .load(fullPhotoUri)
                     .into(mEmployeeImage);
 
+            ImageUtils.importCopy(this, fullPhotoUri);
+            mEmployeePicturePath = ImageUtils.sImageURI;
+
+
+
         } else if (requestCode == ImageUtils.REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            mEmployeePicturePath = ImageUtils.sCameraImageURI;
+            mEmployeePicturePath = ImageUtils.sImageURI;
             Glide.with(this)
                     .asBitmap()
                     .load(Uri.parse(mEmployeePicturePath))

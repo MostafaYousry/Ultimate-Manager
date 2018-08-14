@@ -246,7 +246,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         layoutManager.setOrientation(RecyclerView.HORIZONTAL);
         mTaskEmployeesRV.setLayoutManager(layoutManager);
 
-        mHorizontalEmployeeAdapter = new HorizontalEmployeeAdapter(this, true);
+        mHorizontalEmployeeAdapter = new HorizontalEmployeeAdapter(this, this, true);
         mTaskEmployeesRV.setAdapter(mHorizontalEmployeeAdapter);
 
         if (mTaskId == DEFAULT_TASK_ID) {

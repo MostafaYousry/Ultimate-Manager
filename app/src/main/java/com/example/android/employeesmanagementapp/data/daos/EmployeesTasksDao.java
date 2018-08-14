@@ -47,8 +47,6 @@ public interface EmployeesTasksDao {
     @Delete
     void deleteEmployeeTask(EmployeesTasksEntry employeesTasksEntry);
 
-    @Query("DELETE FROM employees_tasks WHERE employee_id = :empID")
-    void deleteEmployeeFromAllTasks(int empID);
 
     @Query("delete from employees_tasks where task_id in(" +
             "select employees_tasks.task_id from employees_tasks" +
@@ -56,7 +54,10 @@ public interface EmployeesTasksDao {
             " employees_tasks.employee_id = :empID )and employee_id  = :empID")
     void deleteEmployeeFromRunningTasks(int empID);
 
+    @Query("DELETE FROM employees_tasks WHERE employee_id = :empID")
+    void deleteEmployeeJoinRecords(int empID);
+
     @Query("delete from employees_tasks where task_id = :taskId")
-    void deleteDepartmentRunningTasks(int taskId);
+    void deleteTaskJoinRecords(int taskId);
 
 }

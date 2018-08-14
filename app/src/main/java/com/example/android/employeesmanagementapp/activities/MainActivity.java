@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, employeesFragment, "employees").hide(employeesFragment).commit();
             getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, tasksFragment, "tasks").commit();
 
-            mBottomNavigationView.setSelectedItemId(R.id.nav_employees);
+            mBottomNavigationView.setSelectedItemId(R.id.nav_tasks);
         } else {
             tasksFragment = (TasksFragment) getSupportFragmentManager().getFragment(savedInstanceState, "tasks_fragment");
             employeesFragment = (EmployeesFragment) getSupportFragmentManager().getFragment(savedInstanceState, "employees_fragment");
@@ -235,6 +235,16 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        mFabClickListenerNoDeps = null;
+        mFabClickListenerTasks = null;
+        mFabClickListenerEmployees = null;
+        mFabClickListenerDepartments = null;
     }
 }
 

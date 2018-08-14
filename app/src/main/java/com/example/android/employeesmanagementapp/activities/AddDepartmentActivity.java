@@ -110,7 +110,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
         layoutManager.setOrientation(RecyclerView.HORIZONTAL);
         mDepEmployeesRV.setLayoutManager(layoutManager);
 
-        final HorizontalEmployeeAdapter adapter = new HorizontalEmployeeAdapter(this, false);
+        final HorizontalEmployeeAdapter adapter = new HorizontalEmployeeAdapter(this, this, false);
         mDepEmployeesRV.setAdapter(adapter);
 
 
@@ -135,7 +135,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
         mDepRunningTasksRV.setHasFixedSize(true);
 
         mDepRunningTasksRV.setLayoutManager(new LinearLayoutManager(this));
-        final TasksAdapter adapter = new TasksAdapter(this, false);
+        final TasksAdapter adapter = new TasksAdapter(this, this, false);
         mDepRunningTasksRV.setAdapter(adapter);
 
 
@@ -158,7 +158,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
         mDepCompletedTasksRV.setHasFixedSize(true);
 
         mDepCompletedTasksRV.setLayoutManager(new LinearLayoutManager(this));
-        final TasksAdapter adapter = new TasksAdapter(this, true);
+        final TasksAdapter adapter = new TasksAdapter(this, this, true);
         mDepCompletedTasksRV.setAdapter(adapter);
 
 

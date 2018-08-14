@@ -1,6 +1,7 @@
 package com.example.android.employeesmanagementapp.adapters;
 
 import android.content.Context;
+import android.net.Uri;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.android.employeesmanagementapp.GlideApp;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.TextDrawable;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
@@ -22,6 +24,7 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEmployeeAdapter.EmployeesViewHolder> {
+    private Context mContext;
     private List<EmployeeEntry> mData;
     private List<EmployeeEntry> mAddedEmployees;
     private List<EmployeeEntry> mRemovedEmployees;
@@ -29,7 +32,8 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
     private EmployeesAdapter.EmployeeItemClickListener mClickListener;
     private boolean mLongClickEnabled;
 
-    public HorizontalEmployeeAdapter(EmployeesAdapter.EmployeeItemClickListener clickListener, boolean longClickEnabled) {
+    public HorizontalEmployeeAdapter(Context context, EmployeesAdapter.EmployeeItemClickListener clickListener, boolean longClickEnabled) {
+        mContext = context;
         mClickListener = clickListener;
         mLongClickEnabled = longClickEnabled;
     }
@@ -79,6 +83,7 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
         else
             mAddedEmployees.addAll(chosenEmployees);
         notifyDataSetChanged();
+//        notifyItemRangeInserted(mData.size() , chosenEmployees.size());
     }
 
     public void clearAdapter() {
@@ -125,37 +130,37 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
 
         void bind(int position) {
             if (position >= mData.size()) {
-                int addedEmployeeIndex = position - mData.size();
+                position = position - mData.size();
 
-                employeeName.setText(mAddedEmployees.get(addedEmployeeIndex).getEmployeeName());
+                employeeName.setText(mAddedEmployees.get(position).getEmployeeName());
 
-                if (mData.get(position).getEmployeeImageUri() == null) {
-                    Context context = itemView.getContext();
+                if (mAddedEmployees.get(position).getEmployeeImageUri() == null) {
+                    GlideApp.with(mContext).clear(employeeImage);
 
-                    TextDrawable textDrawable = new TextDrawable(context, mData.get(position), AppUtils.dpToPx(context, 70), AppUtils.dpToPx(context, 70), AppUtils.spToPx(context, 28));
+                    TextDrawable textDrawable = new TextDrawable(mContext, mAddedEmployees.get(position), AppUtils.dpToPx(mContext, 70), AppUtils.dpToPx(mContext, 70), AppUtils.spToPx(mContext, 28));
                     employeeImage.setImageDrawable(textDrawable);
                 } else {
-//                Glide.with(mEmployeeImage.getContext())
-//                        .load()
-//                        .apply(RequestOptions.fitCenterTransform())
-//                        .into(mEmployeeImage);
+                    GlideApp.with(mContext)
+                            .load(Uri.parse(mAddedEmployees.get(position).getEmployeeImageUri()))
+                            .into(employeeImage);
                 }
 
-                itemView.setTag(mAddedEmployees.get(addedEmployeeIndex).getEmployeeID());
+                itemView.setTag(mAddedEmployees.get(position).getEmployeeID());
 
             } else {
                 employeeName.setText(mData.get(position).getEmployeeName());
 
                 if (mData.get(position).getEmployeeImageUri() == null) {
-                    Context context = itemView.getContext();
+                    GlideApp.with(mContext).clear(employeeImage);
 
-                    TextDrawable textDrawable = new TextDrawable(context, mData.get(position), AppUtils.dpToPx(context, 70), AppUtils.dpToPx(context, 70), AppUtils.spToPx(context, 28));
+                    TextDrawable textDrawable = new TextDrawable(mContext, mData.get(position), AppUtils.dpToPx(mContext, 70), AppUtils.dpToPx(mContext, 70), AppUtils.spToPx(mContext, 28));
                     employeeImage.setImageDrawable(textDrawable);
+
                 } else {
-//                Glide.with(mEmployeeImage.getContext())
-//                        .load()
-//                        .apply(RequestOptions.fitCenterTransform())
-//                        .into(mEmployeeImage);
+                    GlideApp.with(mContext)
+                            .asBitmap()
+                            .load(Uri.parse(mData.get(position).getEmployeeImageUri()))
+                            .into(employeeImage);
                 }
 
                 itemView.setTag(mData.get(position).getEmployeeID());
@@ -182,10 +187,12 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
                                 if (mRemovedEmployees == null)
                                     mRemovedEmployees = new ArrayList<>();
                                 mRemovedEmployees.add(mData.remove(deletePosition));
-                                notifyItemRemoved(deletePosition);
+//                                notifyItemRemoved(deletePosition);
+                                notifyDataSetChanged();
                             } else {
                                 mAddedEmployees.remove(deletePosition - mData.size());
-                                notifyItemRemoved(deletePosition - mData.size());
+//                                notifyItemRemoved(deletePosition - mData.size());
+                                notifyDataSetChanged();
                             }
                             return true;
                         default:

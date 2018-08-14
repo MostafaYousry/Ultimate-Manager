@@ -1,5 +1,6 @@
 package com.example.android.employeesmanagementapp.adapters;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,13 +23,16 @@ import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
 public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.DepartmentsViewHolder> {
     private static final String TAG = DepartmentsAdapter.class.getSimpleName();
 
+    private Context mContext;
+
     private List<DepartmentEntry> mDepartments;
     private DepartmentItemClickListener mDepartmentItemClickListener;
     private View.OnClickListener mPopupMenuClickListener;
     private MultiTransformation mImageTransformations;
     private int clickedPosition = 0;
 
-    public DepartmentsAdapter(@NonNull DepartmentItemClickListener gridItemClickListener, @NonNull View.OnClickListener popupMenuClickListener) {
+    public DepartmentsAdapter(Context context, @NonNull DepartmentItemClickListener gridItemClickListener, @NonNull View.OnClickListener popupMenuClickListener) {
+        mContext = context;
         mDepartmentItemClickListener = gridItemClickListener;
         mPopupMenuClickListener = popupMenuClickListener;
         mImageTransformations = new MultiTransformation(
@@ -91,7 +95,7 @@ public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.
             itemView.findViewById(R.id.pop_up_menu).setOnClickListener(mPopupMenuClickListener);
 
             //todo move this to bind when loading different images
-            Glide.with(itemView.getContext()).load(R.drawable.google)
+            Glide.with(mContext).load(R.drawable.google)
                     .apply(bitmapTransform(mImageTransformations))
                     .into(mDepartmentImage);
 

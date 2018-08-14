@@ -45,6 +45,9 @@ public class EmployeeEntry {
     @ColumnInfo(name = "employee_image_uri")
     private String employeeImageUri;
 
+    @Ignore
+    private boolean isChecked;
+
     //used when creating new EmployeeWithExtras object
     @Ignore
     public EmployeeEntry(int departmentId, String employeeName, int employeeSalary, Date employeeHireDate, String employeeImageUri) {
@@ -124,6 +127,7 @@ public class EmployeeEntry {
     public void setEmployeeImageUri(String employeeImageUri) {
         this.employeeImageUri = employeeImageUri;
     }
+
 
     @Override
     public int hashCode() {
