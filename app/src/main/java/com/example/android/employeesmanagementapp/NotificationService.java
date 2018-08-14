@@ -12,7 +12,10 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.example.android.employeesmanagementapp.activities.MainActivity;
+import com.example.android.employeesmanagementapp.data.AppDatabase;
+import com.example.android.employeesmanagementapp.data.AppExecutor;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
@@ -22,19 +25,22 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 public class NotificationService extends Service {
-    //we are going to use a handler to be able to run in our TimerTask
-    final Handler handler = new Handler();
-    Timer timer;
-    TimerTask timerTask;
-    String TAG = "Timers";
-    static int count = 0;
-    int taskId;
-    //int taskId;
-    Long taskDueDate;
-    static HashMap<Integer, Timer> mTaskTimer = new HashMap<>();
+    //we are going to use a mHandler to be able to run in our TimerTask
+    private final Handler mHandler = new Handler();
+    private Timer mTimer;
+    private TimerTask mTimerTask;
+    private String TAG = "Timers";
+    private static int mTasksCount = 0;
+    private int mTaskId;
+    private Long mTaskDueDate;
+    private boolean appIsDestroyed = true;
+    private static HashMap<Integer, Timer> mTaskTimer = new HashMap<>();
 
-    public static void setCount(int count) {
-        NotificationService.count = count;
+
+    public NotificationService() {}
+
+    public static void setTasksCount(int tasksCount) {
+        NotificationService.mTasksCount = tasksCount;
     }
 
     @Override
@@ -47,69 +53,61 @@ public class NotificationService extends Service {
         Log.e(TAG, "onStartCommand");
         super.onStartCommand(intent, flags, startId);
         if (intent != null) {
-            taskId = intent.getExtras().getInt("task id");
-            taskDueDate = intent.getExtras().getLong("task due date");
-            startTimer();
-            sendBroadcast(intent);
+            mTaskId = intent.getExtras().getInt("task id");
+            mTaskDueDate = intent.getExtras().getLong("task due date");
+            appIsDestroyed = intent.getExtras().getBoolean("app is destroyed");
         }
+        startTimer();
         return START_STICKY;
     }
 
-    @Override
-    public void onCreate() {
-        Log.e(TAG, "onCreate");
-
-
-    }
-
-    @Override
-    public void onDestroy() {
-        Log.e(TAG, "onDestroy");
-        stopTimerTask();
-        super.onDestroy();
-    }
-
-
     public void startTimer() {
+        if (!appIsDestroyed) {
+            if (mTaskTimer.containsKey(mTaskId)) {
+                mTimer = mTaskTimer.get(mTaskId);
+                stopTimerTask();
+                mTaskTimer.remove(mTaskId);
+            }
+            mTimer = new Timer();
+            mTaskTimer.put(mTaskId, mTimer);
+            initializeTimerTask();
+            mTimer.schedule(mTimerTask, 10000);
+            //mTimer.schedule(mTimerTask,mTaskDueDate);
+        } else {
+            mTimer = new Timer();
+            AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    List<Date> allTasksDueDate = AppDatabase.getInstance(getApplicationContext()).tasksDao().getAllTasksDueDate();
+                    for (int i = 0; i < allTasksDueDate.size(); i++) {
+                        initializeTimerTask();
+                        mTimer.schedule(mTimerTask, 10000 + i * 1000);
+                        Log.i("tasks due date", " task number = " + (i + 1));
+                        //mTimer.schedule(mTimerTask,allTasksDueDate.get(i));
+                    }
+                }
+            });
 
-        if(mTaskTimer.containsKey(taskId)){
-            timer = mTaskTimer.get(taskId);
-            stopTimerTask();
-            mTaskTimer.remove(taskId);
         }
 
-        //set a new Timer
-        timer = new Timer();
-        mTaskTimer.put(taskId,timer);
-
-        //initialize the TimerTask's job
-        initializeTimerTask();
-
-        System.out.println("start timer");
-        //schedule the timer, after the first 5000ms
-        Log.d("intent output", "task Id = " + taskId);
-        Log.d("intent output", "task due date = " + taskDueDate);
-
-        timer.schedule(timerTask, taskDueDate);
-        //timer.schedule(timerTask, 5000,1000); //
-
+        System.out.println("start mTimer");
     }
 
     public void stopTimerTask() {
-        //stop the timer, if it's not already null
-        if (timer != null) {
-            timer.cancel();
-            timer = null;
+        //stop the mTimer, if it's not already null
+        if (mTimer != null) {
+            mTimer.cancel();
+            mTimer = null;
         }
     }
 
     public void initializeTimerTask() {
 
-        timerTask = new TimerTask() {
+        mTimerTask = new TimerTask() {
             public void run() {
 
-                //use a handler to run a toast that shows the current timestamp
-                final boolean notification = handler.post(new Runnable() {
+                //use a mHandler to run a toast that shows the current timestamp
+                final boolean notification = mHandler.post(new Runnable() {
                     public void run() {
 
                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
@@ -119,20 +117,20 @@ public class NotificationService extends Service {
                         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext())
                                 .setSmallIcon(R.mipmap.ic_launcher)
                                 .setContentTitle(getResources().getText(R.string.app_name))
-                                .setContentText(++count + " tasks due date are met")
+                                .setContentText(++mTasksCount + " tasks due date are met")
                                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                                 // Set the intent that will fire when the user taps the notification
                                 .setContentIntent(pendingIntent)
                                 .setAutoCancel(true)
                                 .setVisibility(1)
                                 .setDefaults(Notification.DEFAULT_ALL); //To control the level of detail visible in the notification from the lock screen
-                        if(count == 1)
-                            mBuilder.setContentText(count + " task due date is met");
+                        if (mTasksCount == 1)
+                            mBuilder.setContentText(mTasksCount + " task due date is met");
 
                         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
                         // notificationId is a unique int for each notification that you must define
                         notificationManager.notify(0, mBuilder.build());
-                        setBadge(getApplicationContext(), count);
+                        setBadge(getApplicationContext(), mTasksCount);
 
                     }
                 });

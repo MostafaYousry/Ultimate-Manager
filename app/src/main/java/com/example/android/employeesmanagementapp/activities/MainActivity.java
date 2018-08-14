@@ -10,7 +10,6 @@ import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.fragments.DepartmentsFragment;
 import com.example.android.employeesmanagementapp.fragments.EmployeesFragment;
-import com.example.android.employeesmanagementapp.fragments.RunningTasksFragment;
 import com.example.android.employeesmanagementapp.fragments.TasksScreenSlidePagerFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -19,7 +18,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
@@ -37,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         NotificationService.setBadge(getApplicationContext(),0);
-        NotificationService.setCount(0);
+        NotificationService.setTasksCount(0);
 
         setUpFab();
 
@@ -59,6 +57,13 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             mSelectedFragmentId = R.id.nav_tasks;
         }
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        NotificationService.setBadge(getApplicationContext(),0);
+        NotificationService.setTasksCount(0);
+        super.onDestroy();
     }
 
     void loadFragment(Fragment fragment) {

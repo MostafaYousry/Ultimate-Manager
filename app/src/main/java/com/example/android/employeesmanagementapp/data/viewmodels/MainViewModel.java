@@ -7,6 +7,7 @@ import com.example.android.employeesmanagementapp.data.EmployeeWithExtras;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 
+import java.util.Date;
 import java.util.List;
 
 import androidx.lifecycle.AndroidViewModel;
@@ -26,6 +27,7 @@ public class MainViewModel extends AndroidViewModel {
     private LiveData<List<TaskEntry>> runningTasksList;
     private LiveData<List<TaskEntry>> completedTasksList;
     private LiveData<List<EmployeeWithExtras>> employeesWithExtrasList;
+//    private LiveData<List<Date>> allTasksDueDate;
 
 
     public MainViewModel(Application application) {
@@ -35,6 +37,7 @@ public class MainViewModel extends AndroidViewModel {
         runningTasksList = AppDatabase.getInstance(application.getApplicationContext()).tasksDao().loadRunningTasks();
         completedTasksList = AppDatabase.getInstance(application.getApplicationContext()).tasksDao().loadCompletedTasks();
         employeesWithExtrasList = AppDatabase.getInstance(application.getApplicationContext()).employeesDao().loadEmployees();
+//        allTasksDueDate = AppDatabase.getInstance(application.getApplicationContext()).tasksDao().getAllTasksDueDate();
     }
 
 
@@ -53,4 +56,8 @@ public class MainViewModel extends AndroidViewModel {
     public LiveData<List<EmployeeWithExtras>> getEmployeesWithExtrasList() {
         return employeesWithExtrasList;
     }
+
+//    public LiveData<List<Date>> getAllTasksDueDate() {
+//        return allTasksDueDate;
+//    }
 }

@@ -6,6 +6,7 @@ import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 
 import java.util.List;
+import java.util.Timer;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
@@ -20,9 +21,6 @@ public class AddNewTaskViewModel extends ViewModel {
 
     public AddNewTaskViewModel(AppDatabase appDatabase, int taskId) {
         mAppDatabase = appDatabase;
-
-
-
         if (taskId != -1) {
             task = appDatabase.tasksDao().loadTaskById(taskId);
             taskEmployees = mAppDatabase.employeesTasksDao().getEmployeesForTask(taskId);
@@ -30,7 +28,6 @@ public class AddNewTaskViewModel extends ViewModel {
 
         }
         else allDepartments = appDatabase.departmentsDao().loadNonDeletedDepartments();
-
 
     }
 

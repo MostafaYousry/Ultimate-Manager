@@ -2,7 +2,9 @@ package com.example.android.employeesmanagementapp.data.daos;
 
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Timer;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
@@ -91,5 +93,6 @@ public interface TasksDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateTask(TaskEntry taskEntry);
 
-
+    @Query("SELECT task_due_date FROM tasks WHERE task_is_completed = 0")
+    List<Date> getAllTasksDueDate();
 }

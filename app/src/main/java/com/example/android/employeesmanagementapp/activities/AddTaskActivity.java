@@ -1,6 +1,9 @@
 package com.example.android.employeesmanagementapp.activities;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,8 +20,10 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.example.android.employeesmanagementapp.MyAlarmReceiver;
 import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.TimedNotificationService;
 import com.example.android.employeesmanagementapp.adapters.ChooseEmployeesAdapter;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
 import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
@@ -64,6 +69,8 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
     private int mTaskId;
     private boolean addNewTask = false;
     private TaskEntry mTaskEntry;
+    Date taskStartDate;
+    Date taskDueDate;
 
 
     private EmployeesAdapter mEmplyeesAdapter;
@@ -325,6 +332,8 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
             mTaskDepartment.setSelection(mDepartmentsArrayAdapter.getPositionForItemId(taskEntry.getDepartmentID()));
 
         mTaskDepartment.setEnabled(false);
+        taskStartDate = taskEntry.getTaskStartDate();
+        taskDueDate = taskEntry.getTaskDueDate();
 
         enableViews();
 
@@ -351,16 +360,36 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
     @Override
     protected void onStop() {
         super.onStop();
+
         Intent intent = new Intent(this, NotificationService.class);
-        // send the due date and the id of the task within the intent
-        Bundle bundle = new Bundle();
-        bundle.putInt("task id", mTaskId);
-        //Log.v("date", "" + ((Date) mTaskDueDate.getTag()).getTime());
-        //bundle.putLong("task due date", 20000 + ((Date) mTaskDueDate.getTag()).getTime() - new Date().getTime());
-        bundle.putLong("task due date", 20000);
-        intent.putExtras(bundle);
+        intent.putExtra("task id", mTaskId);
+        intent.putExtra("task due date", taskDueDate.getTime() - new Date().getTime());
+        intent.putExtra("app is destroyed", false);
+//        // send the due date and the id of the task within the intent
+//        Bundle bundle = new Bundle();
+//        bundle.putInt("task id", mTaskId);
+//        //Log.v("date", "" + ((Date) mTaskDueDate.getTag()).getTime());
+//        //bundle.putLong("task due date", 20000 + ((Date) mTaskDueDate.getTag()).getTime() - new Date().getTime());
+//        bundle.putLong("task due date", 20000);
+//        intent.putExtras(bundle);
         startService(intent);
 
+    }
+
+    private void scheduleAlarm() {
+        // Construct an intent that will execute the AlarmReceiver
+        Intent intent = new Intent(getApplicationContext(), MyAlarmReceiver.class);
+        // Create a PendingIntent to be triggered when the alarm goes off
+        final PendingIntent pIntent = PendingIntent.getBroadcast(this, MyAlarmReceiver.REQUEST_CODE,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        // Setup periodic alarm every every half hour from this point onwards
+        long firstMillis = System.currentTimeMillis(); // alarm is set right away
+        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        // First parameter is the type: ELAPSED_REALTIME, ELAPSED_REALTIME_WAKEUP, RTC_WAKEUP
+        // Interval can be INTERVAL_FIFTEEN_MINUTES, INTERVAL_HALF_HOUR, INTERVAL_HOUR, INTERVAL_DAY
+        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, 10000,
+                10000, pIntent);
+//        alarm.set(AlarmManager.RTC_WAKEUP, 10000, pIntent);
     }
 
     @Override
@@ -391,8 +420,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
             String taskTitle = mTaskTitle.getText().toString();
             String taskDescription = mTaskDescription.getText().toString();
             //todo:change string date to java object date
-            Date taskStartDate;
-            Date taskDueDate;
+
             if (mTaskStartDate.getTag() == null) {
                 taskStartDate = mTaskEntry.getTaskStartDate();
             } else
