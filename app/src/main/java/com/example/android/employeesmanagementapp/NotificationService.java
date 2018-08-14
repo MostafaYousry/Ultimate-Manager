@@ -37,7 +37,8 @@ public class NotificationService extends Service {
     private static HashMap<Integer, Timer> mTaskTimer = new HashMap<>();
 
 
-    public NotificationService() {}
+    public NotificationService() {
+    }
 
     public static void setTasksCount(int tasksCount) {
         NotificationService.mTasksCount = tasksCount;
@@ -61,6 +62,16 @@ public class NotificationService extends Service {
         return START_STICKY;
     }
 
+    @Override
+    public void onCreate() {
+        super.onCreate();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
     public void startTimer() {
         if (!appIsDestroyed) {
             if (mTaskTimer.containsKey(mTaskId)) {
@@ -71,19 +82,21 @@ public class NotificationService extends Service {
             mTimer = new Timer();
             mTaskTimer.put(mTaskId, mTimer);
             initializeTimerTask();
-            mTimer.schedule(mTimerTask, 10000);
-            //mTimer.schedule(mTimerTask,mTaskDueDate);
+            //mTimer.schedule(mTimerTask, 10000);
+            mTimer.schedule(mTimerTask,mTaskDueDate);
         } else {
-            mTimer = new Timer();
             AppExecutor.getInstance().diskIO().execute(new Runnable() {
                 @Override
                 public void run() {
                     List<Date> allTasksDueDate = AppDatabase.getInstance(getApplicationContext()).tasksDao().getAllTasksDueDate();
-                    for (int i = 0; i < allTasksDueDate.size(); i++) {
+                    List<Integer> allTasksId = AppDatabase.getInstance(getApplicationContext()).tasksDao().getAllTasksId();
+                    for (int i = 0; i < allTasksDueDate.size() && allTasksDueDate.get(i).compareTo(new Date()) >= 0; i++) {
+                        mTimer = new Timer();
+                        mTaskTimer.put(allTasksId.get(i), mTimer);
                         initializeTimerTask();
-                        mTimer.schedule(mTimerTask, 10000 + i * 1000);
+                        //mTimer.schedule(mTimerTask, 10000 + i * 1000);
                         Log.i("tasks due date", " task number = " + (i + 1));
-                        //mTimer.schedule(mTimerTask,allTasksDueDate.get(i));
+                        mTimer.schedule(mTimerTask,allTasksDueDate.get(i));
                     }
                 }
             });

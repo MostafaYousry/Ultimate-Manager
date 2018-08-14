@@ -45,11 +45,6 @@
             </intent-filter>
         </service>
 
-        <receiver
-            android:name=".MyAlarmReceiver"
-            android:process=":remote" >
-        </receiver>
-
         <!--<service-->
             <!--android:name=".TimedNotificationService"-->
             <!--android:enabled="true"-->

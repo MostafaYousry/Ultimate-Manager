@@ -7,9 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -20,10 +18,8 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.example.android.employeesmanagementapp.MyAlarmReceiver;
 import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
-import com.example.android.employeesmanagementapp.TimedNotificationService;
 import com.example.android.employeesmanagementapp.adapters.ChooseEmployeesAdapter;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
 import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
@@ -38,8 +34,6 @@ import com.example.android.employeesmanagementapp.data.factories.TaskIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewTaskViewModel;
 import com.example.android.employeesmanagementapp.fragments.DatePickerFragment;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -365,31 +359,8 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         intent.putExtra("task id", mTaskId);
         intent.putExtra("task due date", taskDueDate.getTime() - new Date().getTime());
         intent.putExtra("app is destroyed", false);
-//        // send the due date and the id of the task within the intent
-//        Bundle bundle = new Bundle();
-//        bundle.putInt("task id", mTaskId);
-//        //Log.v("date", "" + ((Date) mTaskDueDate.getTag()).getTime());
-//        //bundle.putLong("task due date", 20000 + ((Date) mTaskDueDate.getTag()).getTime() - new Date().getTime());
-//        bundle.putLong("task due date", 20000);
-//        intent.putExtras(bundle);
         startService(intent);
 
-    }
-
-    private void scheduleAlarm() {
-        // Construct an intent that will execute the AlarmReceiver
-        Intent intent = new Intent(getApplicationContext(), MyAlarmReceiver.class);
-        // Create a PendingIntent to be triggered when the alarm goes off
-        final PendingIntent pIntent = PendingIntent.getBroadcast(this, MyAlarmReceiver.REQUEST_CODE,
-                intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        // Setup periodic alarm every every half hour from this point onwards
-        long firstMillis = System.currentTimeMillis(); // alarm is set right away
-        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        // First parameter is the type: ELAPSED_REALTIME, ELAPSED_REALTIME_WAKEUP, RTC_WAKEUP
-        // Interval can be INTERVAL_FIFTEEN_MINUTES, INTERVAL_HALF_HOUR, INTERVAL_HOUR, INTERVAL_DAY
-        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, 10000,
-                10000, pIntent);
-//        alarm.set(AlarmManager.RTC_WAKEUP, 10000, pIntent);
     }
 
     @Override

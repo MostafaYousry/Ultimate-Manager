@@ -95,4 +95,7 @@ public interface TasksDao {
 
     @Query("SELECT task_due_date FROM tasks WHERE task_is_completed = 0")
     List<Date> getAllTasksDueDate();
+
+    @Query("SELECT task_id FROM tasks WHERE task_is_completed = 0")
+    List<Integer> getAllTasksId();
 }
