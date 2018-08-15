@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
 import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
@@ -25,6 +26,7 @@ import com.example.android.employeesmanagementapp.data.entries.EmployeesTasksEnt
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.data.factories.TaskIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewTaskViewModel;
+import com.example.android.employeesmanagementapp.fragments.TimePickerFragment;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -36,6 +38,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -320,7 +323,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
 
         Intent intent = new Intent(this, NotificationService.class);
         intent.putExtra("task id", mTaskId);
-        intent.putExtra("task due date", taskDueDate.getTime() - new Date().getTime());
+        intent.putExtra("task due date", ((Date) mTaskDueDate.getTag()).getTime() - new Date().getTime());
         intent.putExtra("app is destroyed", false);
         startService(intent);
 
@@ -437,6 +440,9 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
             valid = false;
         }
 
+        return valid;
+    }
+
     public void pickTime(View view) {
         //create a bundle containing id of clicked text view (startDateTextView or dueDateTextView)
         Bundle bundle = new Bundle();
@@ -448,9 +454,6 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
 
         //show th dialog
         timePickerFragment.show(getSupportFragmentManager(), "timePicker");
-    }
-
-        return valid;
     }
 
     private void updateErrorVisibility(String key, boolean show) {

@@ -2,6 +2,7 @@ package com.example.android.employeesmanagementapp.data.daos;
 
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 
+import java.util.Date;
 import java.util.List;
 
 import androidx.lifecycle.LiveData;
@@ -27,6 +28,7 @@ public interface TasksDao {
      */
     @Query("SELECT * FROM tasks WHERE task_is_completed = 0")
     LiveData<List<TaskEntry>> loadRunningTasks();
+
 
     /**
      * load all tasks that are running
@@ -65,6 +67,12 @@ public interface TasksDao {
      */
     @Query("SELECT * FROM tasks WHERE task_id = :taskId")
     LiveData<TaskEntry> loadTaskById(int taskId);
+
+    @Query("SELECT task_due_date FROM tasks WHERE task_is_completed = 0")
+    List<Date> getAllTasksDueDate();
+
+    @Query("SELECT task_id FROM tasks WHERE task_is_completed = 0")
+    List<Integer> getAllTasksId();
 
     /**
      * insert a new task record
