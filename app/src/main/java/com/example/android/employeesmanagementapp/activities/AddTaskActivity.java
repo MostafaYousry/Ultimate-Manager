@@ -33,6 +33,7 @@ import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.data.factories.TaskIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewTaskViewModel;
 import com.example.android.employeesmanagementapp.fragments.DatePickerFragment;
+import com.example.android.employeesmanagementapp.fragments.TimePickerFragment;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -466,6 +467,19 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
 
         //show th dialog
         datePickerFragment.show(getSupportFragmentManager(), "datePicker");
+    }
+
+    public void pickTime(View view) {
+        //create a bundle containing id of clicked text view (startDateTextView or dueDateTextView)
+        Bundle bundle = new Bundle();
+        bundle.putInt("time_view_id", view.getId());
+
+        //instantiate a DatePickerFragment to show date picker dialog
+        DialogFragment timePickerFragment = new TimePickerFragment();
+        timePickerFragment.setArguments(bundle);
+
+        //show th dialog
+        timePickerFragment.show(getSupportFragmentManager(), "timePicker");
     }
 
 
