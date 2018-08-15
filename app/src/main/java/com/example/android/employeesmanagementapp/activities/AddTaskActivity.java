@@ -317,17 +317,13 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
     @Override
     protected void onStop() {
         super.onStop();
-//        Intent intent = new Intent(this, NotificationService.class);
-//        // send the due date and the id of the task within the intent
-//        Bundle bundle = new Bundle();
-//        bundle.putInt("task id",mTaskId);
-//        try {
-//            bundle.putLong("task due date",FORMAT.parse(mTaskDueDate.toString()).getTime() - new Date().getTime());
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-//        intent.putExtras(bundle);
-//        startService(intent);
+
+        Intent intent = new Intent(this, NotificationService.class);
+        intent.putExtra("task id", mTaskId);
+        intent.putExtra("task due date", taskDueDate.getTime() - new Date().getTime());
+        intent.putExtra("app is destroyed", false);
+        startService(intent);
+
     }
 
     @Override
@@ -440,6 +436,19 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
             updateErrorVisibility("employees", true);
             valid = false;
         }
+
+    public void pickTime(View view) {
+        //create a bundle containing id of clicked text view (startDateTextView or dueDateTextView)
+        Bundle bundle = new Bundle();
+        bundle.putInt("time_view_id", view.getId());
+
+        //instantiate a DatePickerFragment to show date picker dialog
+        DialogFragment timePickerFragment = new TimePickerFragment();
+        timePickerFragment.setArguments(bundle);
+
+        //show th dialog
+        timePickerFragment.show(getSupportFragmentManager(), "timePicker");
+    }
 
         return valid;
     }

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
@@ -54,6 +55,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        NotificationService.setBadge(getApplicationContext(),0);
+        NotificationService.setTasksCount(0);
 
 
         //set toolbar as actionbar
@@ -167,6 +170,17 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         };
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        NotificationService.setBadge(getApplicationContext(),0);
+        NotificationService.setTasksCount(0);
+        mFabClickListenerNoDeps = null;
+        mFabClickListenerTasks = null;
+        mFabClickListenerEmployees = null;
+        mFabClickListenerDepartments = null;
+    }
+
     void loadFragment(Fragment fragment) {
         if (activeFragment == fragment)
             return;
@@ -248,15 +262,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        mFabClickListenerNoDeps = null;
-        mFabClickListenerTasks = null;
-        mFabClickListenerEmployees = null;
-        mFabClickListenerDepartments = null;
-    }
 
 }
 
