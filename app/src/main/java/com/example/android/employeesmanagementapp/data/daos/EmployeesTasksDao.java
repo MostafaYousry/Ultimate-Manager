@@ -19,7 +19,7 @@ import androidx.room.Query;
 @Dao
 public interface EmployeesTasksDao {
 
-    @Query("SELECT employees.employee_id , employees.department_id, employees.employee_name, employees.employee_salary, employees.employee_hire_date, employees.employee_image_uri,employees.employee_is_deleted FROM employees " +
+    @Query("SELECT employees.* FROM employees " +
             "INNER JOIN employees_tasks " +
             "ON employees.employee_id=employees_tasks.employee_id " +
             "WHERE employees_tasks.task_id=:taskId")

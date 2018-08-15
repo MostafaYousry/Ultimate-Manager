@@ -12,6 +12,7 @@ import android.widget.RatingBar;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
+import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.fragments.ColorPickerDialogFragment;
 import com.example.android.employeesmanagementapp.fragments.DatePickerDialogFragment;
 
@@ -33,7 +34,6 @@ public final class AppUtils {
         //create a bundle containing id of clicked text view (startDateTextView or dueDateTextView)
         Bundle bundle = new Bundle();
         bundle.putInt(DatePickerDialogFragment.KEY_DISPLAY_VIEW_ID, view.getId());
-        bundle.putBoolean(DatePickerDialogFragment.KEY_ALLOW_PAST_DATES, allowPastDates);
 
         //instantiate a DatePickerDialogFragment to show date picker dialog
         DialogFragment datePickerFragment = new DatePickerDialogFragment();
@@ -110,5 +110,7 @@ public final class AppUtils {
     }
 
 
-
+    public static String getFullEmployeeName(EmployeeEntry employeeEntry) {
+        return employeeEntry.getEmployeeFirstName() + " " + employeeEntry.getEmployeeMiddleName() + " " + employeeEntry.getEmployeeLastName();
+    }
 }

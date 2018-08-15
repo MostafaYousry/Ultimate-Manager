@@ -18,7 +18,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.example.android.employeesmanagementapp.GlideApp;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.TextDrawable;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
@@ -56,7 +55,12 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
     private int mEmployeeId;
 
-    private EditText mEmployeeName;
+    private EditText mEmployeeFirstName;
+    private EditText mEmployeeMiddleName;
+    private EditText mEmployeeLastName;
+    private EditText mEmployeeEmail;
+    private EditText mEmployeePhone;
+    private EditText mEmployeeNote;
     private EditText mEmployeeSalary;
     private TextView mEmployeeHireDate;
     private Spinner mEmployeeDepartment;
@@ -105,8 +109,13 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
 
         //get views
-        mEmployeeName = findViewById(R.id.employee_name);
+        mEmployeeFirstName = findViewById(R.id.employee_first_name);
+        mEmployeeMiddleName = findViewById(R.id.employee_middle_name);
+        mEmployeeLastName = findViewById(R.id.employee_last_name);
+        mEmployeeEmail = findViewById(R.id.employee_email);
+        mEmployeePhone = findViewById(R.id.employee_phone);
         mEmployeeSalary = findViewById(R.id.employee_salary);
+        mEmployeeNote = findViewById(R.id.employee_note);
         mEmployeeHireDate = findViewById(R.id.employee_hire_date);
         mEmployeeDepartment = findViewById(R.id.employee_department);
         mCollapsingToolbar = findViewById(R.id.collapsing_toolbar);
@@ -186,7 +195,7 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
 
     private void setUpNameET() {
-        mEmployeeName.addTextChangedListener(new TextWatcher() {
+        mEmployeeFirstName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 Log.d(TAG, "Name is changing");
@@ -208,15 +217,12 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
     }
 
     private void clearViews() {
-        mEmployeeName.setText("");
-        mEmployeeSalary.setText("");
-        mEmployeeHireDate.setText("");
+
         mCollapsingToolbar.setTitle(getString(R.string.add_new_employee));
         mEmployeeDepartment.setSelection(0);
         mEmployeeRating.setVisibility(View.GONE);
         mEmployeeCompletedTasks.setVisibility(View.GONE);
-        findViewById(R.id.textView3).setVisibility(View.GONE);
-        findViewById(R.id.textView4).setVisibility(View.GONE);
+        findViewById(R.id.imageView9).setVisibility(View.GONE);
 
         mEmployeeImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_camera_add));
         mEmployeeImage.setScaleType(ImageView.ScaleType.CENTER);
@@ -230,11 +236,17 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
         clickedEmployeeDepId = employeeWithExtras.employeeEntry.getDepartmentId();
 
-        mEmployeeName.setText(employeeWithExtras.employeeEntry.getEmployeeName());
+        mEmployeeFirstName.setText(employeeWithExtras.employeeEntry.getEmployeeFirstName());
+        mEmployeeMiddleName.setText(employeeWithExtras.employeeEntry.getEmployeeMiddleName());
+        mEmployeeLastName.setText(employeeWithExtras.employeeEntry.getEmployeeLastName());
+        mEmployeePhone.setText(employeeWithExtras.employeeEntry.getEmployeePhone());
+        mEmployeeNote.setText(employeeWithExtras.employeeEntry.getEmployeeNote());
+        mEmployeeEmail.setText(employeeWithExtras.employeeEntry.getEmployeeEmail());
         mEmployeeSalary.setText(String.valueOf(employeeWithExtras.employeeEntry.getEmployeeSalary()));
         mEmployeeHireDate.setText(AppUtils.getFriendlyDate(employeeWithExtras.employeeEntry.getEmployeeHireDate()));
         mEmployeeHireDate.setTag(employeeWithExtras.employeeEntry.getEmployeeHireDate());
-        mCollapsingToolbar.setTitle(employeeWithExtras.employeeEntry.getEmployeeName());
+
+        mCollapsingToolbar.setTitle(employeeWithExtras.employeeEntry.getEmployeeFirstName());
         if (departmentsLoaded)
             mEmployeeDepartment.setSelection(mArrayAdapter.getPositionForItemId(employeeWithExtras.employeeEntry.getDepartmentId()));
         mEmployeeRating.setRating(employeeWithExtras.employeeRating);
@@ -243,7 +255,7 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
             TextDrawable textDrawable = new TextDrawable(this, employeeWithExtras.employeeEntry, AppUtils.dpToPx(this, 70), AppUtils.dpToPx(this, 70), AppUtils.spToPx(this, 28));
             mEmployeeImage.setImageDrawable(textDrawable);
         } else {
-            GlideApp.with(this)
+            Glide.with(this)
                     .asBitmap()
                     .load(Uri.parse(employeeWithExtras.employeeEntry.getEmployeeImageUri()))
                     .into(mEmployeeImage);
@@ -298,12 +310,18 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
     private void saveEmployee() {
         if (isDataValid()) {
-            String employeeName = mEmployeeName.getText().toString();
+
+            String employeeFirstName = mEmployeeFirstName.getText().toString();
+            String employeeMiddleName = mEmployeeMiddleName.getText().toString();
+            String employeeLastName = mEmployeeLastName.getText().toString();
             int employeeSalary = Integer.parseInt(mEmployeeSalary.getText().toString());
+            String employeeEmail = mEmployeeEmail.getText().toString();
+            String employeePhone = mEmployeePhone.getText().toString();
+            String employeeNote = mEmployeeNote.getText().toString();
             Date employeeHireDate = (Date) mEmployeeHireDate.getTag();
             int departmentId = (int) mEmployeeDepartment.getSelectedView().getTag();
 
-            final EmployeeEntry newEmployee = new EmployeeEntry(departmentId, employeeName, employeeSalary, employeeHireDate, mEmployeePicturePath);
+            final EmployeeEntry newEmployee = new EmployeeEntry(departmentId, employeeFirstName, employeeMiddleName, employeeLastName, employeeSalary, employeeHireDate, mEmployeePicturePath, employeeEmail, employeePhone, employeeNote);
 
             AppExecutor.getInstance().diskIO().execute(new Runnable() {
                 @Override
@@ -326,7 +344,7 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
         if (true)
             return true;
 
-        if (TextUtils.isEmpty(mEmployeeName.getText())) {
+        if (TextUtils.isEmpty(mEmployeeFirstName.getText())) {
             showError("name");
             return false;
         }

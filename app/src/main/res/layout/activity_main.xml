@@ -27,10 +27,11 @@
             android:layout_height="56dp"
             android:background="?attr/colorPrimary"
             app:tabGravity="fill"
-            app:tabIndicatorColor="@android:color/white"
+            app:tabIndicatorColor="@color/secondaryColor"
+            app:tabRippleColor="@color/secondaryColor"
             app:tabMode="fixed"
-            app:tabSelectedTextColor="@android:color/white"
-            app:tabTextColor="@android:color/black" />
+            app:tabSelectedTextColor="@color/secondaryColor"
+            app:tabTextColor="@color/primaryTextColor" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -53,6 +54,7 @@
         android:src="@drawable/ic_add"
         app:layout_anchor="@id/bottom_navigation_view"
         app:layout_anchorGravity="top|end"
+        app:backgroundTint="@color/primaryLightColor"
         app:layout_behavior="com.example.android.employeesmanagementapp.BottomNavigationFabBehavior"
         app:useCompatPadding="true" />
 
@@ -62,10 +64,8 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_gravity="bottom"
+        app:labelVisibilityMode="unlabeled"
         android:background="?android:attr/windowBackground"
-        android:foreground="?attr/selectableItemBackground"
-        app:itemIconTint="@drawable/bottom_navigation_colors"
-        app:itemTextColor="@drawable/bottom_navigation_colors"
         app:layout_behavior="com.example.android.employeesmanagementapp.BottomNavigationBehavior"
         app:menu="@menu/menu_nav_view" />
 

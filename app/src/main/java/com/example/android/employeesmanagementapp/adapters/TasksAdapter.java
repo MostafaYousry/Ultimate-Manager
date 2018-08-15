@@ -86,16 +86,14 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
     class TasksViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         MaterialCardView mItemView;
         TextView mTaskTitle;
-        TextView mTaskStartDate;
-        TextView mTaskDueDate;
+        TextView mTaskDates;
         ImageButton mTaskOptions;
 
         TasksViewHolder(final View itemView) {
             super(itemView);
             mItemView = (MaterialCardView) itemView;
-            mTaskTitle = itemView.findViewById(R.id.item_task_title);
-            mTaskStartDate = itemView.findViewById(R.id.task_start_date);
-            mTaskDueDate = itemView.findViewById(R.id.task_due_date);
+            mTaskTitle = itemView.findViewById(R.id.task_title);
+            mTaskDates = itemView.findViewById(R.id.task_dates);
             mTaskOptions = itemView.findViewById(R.id.task_options_button);
             mTaskOptions.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -142,9 +140,10 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
         }
 
         void bind(int position) {
+
             mTaskTitle.setText(mData.get(position).getTaskTitle());
-            mTaskStartDate.setText(AppUtils.getFriendlyDate(mData.get(position).getTaskStartDate()));
-            mTaskDueDate.setText(AppUtils.getFriendlyDate(mData.get(position).getTaskDueDate()));
+
+            mTaskDates.setText(mContext.getString(R.string.task_list_item_name_dates, AppUtils.getFriendlyDate(mData.get(position).getTaskStartDate()), AppUtils.getFriendlyDate(mData.get(position).getTaskDueDate())));
 
             int taskColor = ResourcesCompat.getColor(itemView.getResources(), mData.get(position).getTaskColorResource(), mContext.getTheme());
 

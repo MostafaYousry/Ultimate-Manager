@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -27,6 +26,7 @@ import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.data.factories.TaskIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewTaskViewModel;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -132,21 +132,6 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         }
 
 
-        //allow scrolling of edit text content when it is inside a scroll view
-        mTaskDescription.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                v.getParent().requestDisallowInterceptTouchEvent(true);
-                switch (event.getAction() & MotionEvent.ACTION_MASK) {
-                    case MotionEvent.ACTION_UP:
-                        v.getParent().requestDisallowInterceptTouchEvent(false);
-                        break;
-                }
-                return false;
-            }
-        });
-
-
         setUpTaskEmployeesRV();
 
     }
@@ -232,7 +217,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
 
         String[] arr = new String[employeeEntries.size()];
         for (int i = 0; i < employeeEntries.size(); i++) {
-            arr[i] = employeeEntries.get(i).getEmployeeName();
+            arr[i] = AppUtils.getFullEmployeeName(employeeEntries.get(i));
         }
 
         return arr;
@@ -301,6 +286,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
 
         mTaskDepartment.setEnabled(false);
 
+        // TODO: 8/15/18
 //        mTaskDepartment.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
@@ -321,7 +307,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
 
     private void setUpToolBar() {
         if (mTaskId == DEFAULT_TASK_ID) {
-            getSupportActionBar().setTitle(getString(R.string.add_new_task));
+            getSupportActionBar().setTitle(getString(R.string.add_task));
         } else {
             getSupportActionBar().setTitle(getString(R.string.edit_task));
         }
@@ -412,72 +398,88 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
                     }
                 });
 
-
+            finish();
         }
-        finish();
+
     }
 
 
     private boolean isValidData() {
-        if (true)
-            return true;
+
+        boolean valid = true;
+
         if (TextUtils.isEmpty(mTaskTitle.getText())) {
-            showError("name");
-            return false;
-        }
-        if (TextUtils.isEmpty(mTaskDescription.getText())) {
-            showError("description");
-            return false;
-        }
-        if (mTaskStartDate.getTag() == null) {
-            showError("startDate");
-            return false;
-        }
-        if (mTaskDueDate.getTag() == null) {
-            showError("dueDate");
-            return false;
+            updateErrorVisibility("title", true);
+            valid = false;
+        } else {
+            updateErrorVisibility("title", false);
         }
 
+        if (mTaskTitle.getText().length() > 40) {
+            valid = false;
+        }
         Date startDate = (Date) mTaskStartDate.getTag();
         Date dueDate = (Date) mTaskDueDate.getTag();
 
-        if (!startDate.before(dueDate)) {
-            showError("dateError");
-            return false;
+
+        if (startDate == null) {
+            updateErrorVisibility("startDate", true);
+            valid = false;
+        } else {
+            updateErrorVisibility("startDate", false);
+        }
+
+        if (dueDate == null) {
+            updateErrorVisibility("dueDate", true);
+            valid = false;
+        } else {
+            updateErrorVisibility("dueDate", false);
         }
 
         if (mHorizontalEmployeeAdapter.getItemCount() == 0) {
-            showError("employees");
-            return false;
+            updateErrorVisibility("employees", true);
+            valid = false;
         }
 
-        return true;
+        return valid;
     }
 
-    private void showError(String error) {
-        switch (error) {
-            case "name":
-                break;
-            case "description":
-                break;
-            case "startDate":
-                break;
-            case "dueDate":
-                break;
-            case "dateError":
-                break;
-            case "employees":
-                AlertDialog.Builder builder = new AlertDialog.Builder(AddTaskActivity.this);
-                builder.setMessage("There must be at least one employee assigned to this task.");
-                builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                });
-                builder.show();
-                return;
-        }
+    private void updateErrorVisibility(String key, boolean show) {
+        if (show)
+            switch (key) {
+                case "title":
+                    ((TextInputLayout) findViewById(R.id.task_title_TIL)).setError(getString(R.string.required_field));
+                    break;
+                case "startDate":
+                    ((TextInputLayout) findViewById(R.id.task_start_date_TIL)).setError(getString(R.string.required_field));
+                    break;
+                case "dueDate":
+                    ((TextInputLayout) findViewById(R.id.task_due_date_TIL)).setError(getString(R.string.required_field));
+                    break;
+                case "employees":
+                    AlertDialog.Builder builder = new AlertDialog.Builder(AddTaskActivity.this);
+                    builder.setMessage("There must be at least one employee assigned to this task.");
+                    builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    });
+                    builder.show();
+            }
+        else
+            switch (key) {
+                case "title":
+                    ((TextInputLayout) findViewById(R.id.task_title_TIL)).setHelperText(getString(R.string.required_field));
+
+                    break;
+                case "startDate":
+                    ((TextInputLayout) findViewById(R.id.task_start_date_TIL)).setHelperText(getString(R.string.required_field));
+                    break;
+                case "dueDate":
+                    ((TextInputLayout) findViewById(R.id.task_due_date_TIL)).setHelperText(getString(R.string.required_field));
+                    break;
+            }
     }
 
 

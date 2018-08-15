@@ -1,18 +1,18 @@
 <resources>
 
-    <color name="primaryColor">#009688</color>
-    <color name="primaryLightColor">#52c7b8</color>
-    <color name="primaryDarkColor">#00675b</color>
-    <color name="secondaryColor">#ffab40</color>
-    <color name="secondaryLightColor">#ffdd71</color>
-    <color name="secondaryDarkColor">#c77c02</color>
+    <color name="primaryColor">#fafafa</color>
+    <color name="primaryLightColor">#ffffff</color>
+    <color name="primaryDarkColor">#c7c7c7</color>
+    <color name="secondaryColor">#00bfa5</color>
+    <color name="secondaryLightColor">#ffffff</color>
+    <color name="secondaryDarkColor">#c7c7c7</color>
     <color name="primaryTextColor">#000000</color>
-    <color name="secondaryTextColor">#000000</color>
+    <color name="secondaryTextColor">#fafafa</color>
 
 
     <!--Task background colors-->
     <color name="color_swatch_border">#bdbdbd</color>
-    <color name="task_color_1">#FAFAFA</color>
+    <color name="task_color_1">#ffffff</color>
     <color name="task_color_2">#FF8A80</color>
     <color name="task_color_3">#FFD180</color>
     <color name="task_color_4">#FFFF8D</color>

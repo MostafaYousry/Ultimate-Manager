@@ -9,25 +9,20 @@
 
     </style>
 
-    <style name="DepartmentMargin">
-        <item name="android:layout_marginRight">8dp</item>
-        <item name="android:layout_marginLeft">15dp</item>
-        <item name="android:layout_marginBottom">8dp</item>
-        <item name="android:layout_marginTop">50dp</item>
+    <style name="mainTextStyle">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/primaryTextColor</item>
+        <item name="android:fontFamily">@font/biryani</item>
     </style>
 
-    <style name="DepartmentMargin2">
-        <item name="android:layout_marginRight">8dp</item>
-        <item name="android:layout_marginLeft">15dp</item>
-        <item name="android:layout_marginBottom">8dp</item>
-        <item name="android:layout_marginTop">5dp</item>
+    <style name="secondaryTextStyle">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/primaryTextColor</item>
+        <item name="android:fontFamily">@font/open_sans_light</item>
     </style>
 
-    <style name="DepartmentMargin3">
-        <item name="android:layout_marginRight">8dp</item>
-        <item name="android:layout_marginLeft">70dp</item>
-        <item name="android:layout_marginBottom">8dp</item>
-        <item name="android:layout_marginTop">5dp</item>
+    <style name="detailActivitiesTextStyle" parent="secondaryTextStyle">
+        <item name="android:textSize">18sp</item>
     </style>
 
 

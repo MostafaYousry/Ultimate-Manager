@@ -1,12 +1,13 @@
-todo validate before insert and update
-todo solve rotation problems
+
 
 todo(7):choose an image for the employee and department(from phone or by taking a picture)
 todo hide fab when selecting multiple employees
 
-todo(2):note on employees
 
-todo discard changes dialog zy contacts app
+todo toolbar and spinner fonts------->
+
+
+todo discard changes dialog zy contacts app ------>
 
 
 todo hide fab with bottom nav on scroll
@@ -20,7 +21,9 @@ todo(8):notifications & background services for notifying a manager when a task 
 *pressing the notification opens the app in the state of rating a completed task
 *see background services and workmanager architecture component
 todo(9):use paging architecture component for loading lists in small chunks
-todo(11):change department and task items layout--
+
+todo(11):change department and task items layout  -------->
+
 todo(13):apply a theme for the app--
 *see (https://material.io/design/material-theming/overview.html#)
 *see (https://material.io/design/material-theming/implementing-your-theme.html)

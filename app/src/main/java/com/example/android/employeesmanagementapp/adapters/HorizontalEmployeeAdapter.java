@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.android.employeesmanagementapp.GlideApp;
+import com.bumptech.glide.Glide;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.TextDrawable;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
@@ -132,15 +132,15 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
             if (position >= mData.size()) {
                 position = position - mData.size();
 
-                employeeName.setText(mAddedEmployees.get(position).getEmployeeName());
+                employeeName.setText(mAddedEmployees.get(position).getEmployeeFirstName());
 
                 if (mAddedEmployees.get(position).getEmployeeImageUri() == null) {
-                    GlideApp.with(mContext).clear(employeeImage);
+                    Glide.with(mContext).clear(employeeImage);
 
                     TextDrawable textDrawable = new TextDrawable(mContext, mAddedEmployees.get(position), AppUtils.dpToPx(mContext, 70), AppUtils.dpToPx(mContext, 70), AppUtils.spToPx(mContext, 28));
                     employeeImage.setImageDrawable(textDrawable);
                 } else {
-                    GlideApp.with(mContext)
+                    Glide.with(mContext)
                             .load(Uri.parse(mAddedEmployees.get(position).getEmployeeImageUri()))
                             .into(employeeImage);
                 }
@@ -148,16 +148,16 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
                 itemView.setTag(mAddedEmployees.get(position).getEmployeeID());
 
             } else {
-                employeeName.setText(mData.get(position).getEmployeeName());
+                employeeName.setText(mData.get(position).getEmployeeFirstName());
 
                 if (mData.get(position).getEmployeeImageUri() == null) {
-                    GlideApp.with(mContext).clear(employeeImage);
+                    Glide.with(mContext).clear(employeeImage);
 
                     TextDrawable textDrawable = new TextDrawable(mContext, mData.get(position), AppUtils.dpToPx(mContext, 70), AppUtils.dpToPx(mContext, 70), AppUtils.spToPx(mContext, 28));
                     employeeImage.setImageDrawable(textDrawable);
 
                 } else {
-                    GlideApp.with(mContext)
+                    Glide.with(mContext)
                             .asBitmap()
                             .load(Uri.parse(mData.get(position).getEmployeeImageUri()))
                             .into(employeeImage);

@@ -187,6 +187,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         switch (item.getItemId()) {
             case R.id.nav_tasks:
+                item.setIcon(R.drawable.ic_tasks_filled);
+                mBottomNavigationView.setItemIconTintList(null);
                 loadFragment(tasksFragment);
                 mTabLayout.setVisibility(View.VISIBLE);
                 getSupportActionBar().setTitle(getString(R.string.tasks));
@@ -196,6 +198,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 else mFab.show();
                 break;
             case R.id.nav_employees:
+                item.setIcon(R.drawable.ic_employee_filled);
+                mBottomNavigationView.setItemIconTintList(null);
                 loadFragment(employeesFragment);
                 mTabLayout.setVisibility(View.GONE);
                 getSupportActionBar().setTitle(getString(R.string.employees));
@@ -203,6 +207,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 mFab.show();
                 break;
             case R.id.nav_departments:
+                item.setIcon(R.drawable.ic_departments_filled);
+                mBottomNavigationView.setItemIconTintList(null);
                 loadFragment(departmentsFragment);
                 mTabLayout.setVisibility(View.GONE);
                 getSupportActionBar().setTitle(getString(R.string.departments));
@@ -243,13 +249,14 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
 
         mFabClickListenerNoDeps = null;
         mFabClickListenerTasks = null;
         mFabClickListenerEmployees = null;
         mFabClickListenerDepartments = null;
     }
+
 }
 

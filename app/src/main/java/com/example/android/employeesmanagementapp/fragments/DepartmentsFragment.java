@@ -201,7 +201,6 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
                                             @Override
                                             public void run() {
                                                 for (EmployeeEntry employeeEntry : employeeEntries) {
-                                                    Log.i("test", employeeEntry.getEmployeeName());
                                                     mDb.employeesDao().deleteEmployeeFromDepartmentTask(employeeEntry.getEmployeeID());
                                                 }
                                             }

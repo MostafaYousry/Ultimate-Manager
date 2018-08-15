@@ -2,7 +2,6 @@ package com.example.android.employeesmanagementapp.fragments;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.DatePicker;
@@ -22,11 +21,9 @@ import androidx.fragment.app.DialogFragment;
  */
 public class DatePickerDialogFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
-    public static final String KEY_ALLOW_PAST_DATES = "allow_past_dates";
     public static final String KEY_DISPLAY_VIEW_ID = "date_view_id";
 
     private View mViewToShowDateIn;
-    private boolean mAllowPastDates;
 
 
     @NonNull
@@ -38,8 +35,6 @@ public class DatePickerDialogFragment extends DialogFragment implements DatePick
             if (bundle.containsKey(KEY_DISPLAY_VIEW_ID))
                 mViewToShowDateIn = getActivity().findViewById(bundle.getInt(KEY_DISPLAY_VIEW_ID));
 
-            if (bundle.containsKey(KEY_ALLOW_PAST_DATES))
-                mAllowPastDates = bundle.getBoolean(KEY_ALLOW_PAST_DATES);
         }
 
 
@@ -49,8 +44,8 @@ public class DatePickerDialogFragment extends DialogFragment implements DatePick
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        // Create a new instance of DatePickerDialog and return it
-        return new MyDatePickerDialog(getActivity(), this, year, month, day);
+        // Create a new instancMyDatePickerDialoge of DatePickerDialog and return it
+        return new DatePickerDialog(getActivity(), this, year, month, day);
     }
 
 
@@ -62,39 +57,6 @@ public class DatePickerDialogFragment extends DialogFragment implements DatePick
         Date currentDate = cal.getTime();
         textView.setText(AppUtils.getFriendlyDate(currentDate));
         textView.setTag(currentDate);
-    }
-
-
-    public class MyDatePickerDialog extends DatePickerDialog {
-
-        private Date minDate;
-
-        MyDatePickerDialog(Context context, OnDateSetListener callBack, int year, int monthOfYear, int dayOfMonth) {
-            super(context, callBack, year, monthOfYear, dayOfMonth);
-            Calendar cal = Calendar.getInstance();
-            minDate = cal.getTime();
-        }
-
-
-        public void onDateChanged(final DatePicker view, int year, int month, int day) {
-
-            if (mAllowPastDates)
-                return;
-
-            Calendar cal = Calendar.getInstance();
-            cal.set(year, month, day);
-            Date currentDate = cal.getTime();
-
-            //prevent user from entering past date
-            if (!minDate.before(currentDate)) {
-                cal.setTime(minDate);
-                view.updateDate(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
-            }
-
-
-        }
-
-
     }
 
 }

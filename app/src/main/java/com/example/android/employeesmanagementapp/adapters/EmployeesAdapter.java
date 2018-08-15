@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.example.android.employeesmanagementapp.GlideApp;
+import com.bumptech.glide.Glide;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.TextDrawable;
 import com.example.android.employeesmanagementapp.data.EmployeeWithExtras;
@@ -71,9 +71,6 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
         return mData.size();
     }
 
-    public EmployeeEntry getItem(int position) {
-        return mData.get(position).employeeEntry;
-    }
 
     /**
      * used by employees fragment to start or finish a multi selection operation
@@ -125,6 +122,8 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
     public class EmployeesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
         //create object for each view in the item view
+
+
         TextView mEmployeeName;
         ImageView mEmployeeImage;
         ImageView mCheckIcon;
@@ -159,7 +158,7 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
             EmployeeWithExtras employeeWithExtras = mData.get(position);
 
 
-            mEmployeeName.setText(employeeWithExtras.employeeEntry.getEmployeeName());
+            mEmployeeName.setText(mContext.getString(R.string.employee_list_item_name, employeeWithExtras.employeeEntry.getEmployeeFirstName(), employeeWithExtras.employeeEntry.getEmployeeMiddleName()));
 
             mEmployeeRating.setRating(employeeWithExtras.employeeRating);
 
@@ -170,12 +169,12 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
             if (employeeWithExtras.employeeEntry.getEmployeeImageUri() == null) {
                 Context context = mContext;
 
-                GlideApp.with(context).clear(mEmployeeImage);
+                Glide.with(context).clear(mEmployeeImage);
 
                 TextDrawable textDrawable = new TextDrawable(context, employeeWithExtras.employeeEntry, AppUtils.dpToPx(context, 70), AppUtils.dpToPx(context, 70), AppUtils.spToPx(context, 28));
                 mEmployeeImage.setImageDrawable(textDrawable);
             } else {
-                GlideApp.with(mContext)
+                Glide.with(mContext)
                         .asBitmap()
                         .load(Uri.parse(employeeWithExtras.employeeEntry.getEmployeeImageUri()))
                         .into(mEmployeeImage);

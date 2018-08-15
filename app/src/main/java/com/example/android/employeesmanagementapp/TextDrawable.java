@@ -30,7 +30,7 @@ public class TextDrawable extends ShapeDrawable {
         this.height = height;
         this.fontSize = fontSize;
 
-        mLetter = Character.toUpperCase(mEmployee.getEmployeeName().charAt(0));
+        mLetter = Character.toUpperCase(mEmployee.getEmployeeFirstName().charAt(0));
 
 
         int a700Color = ResourcesCompat.getColor(context.getResources(), ColorUtils.getLetterColor(mEmployee), context.getTheme());

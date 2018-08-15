@@ -18,12 +18,6 @@ allprojects {
     repositories {
         google()
         jcenter()
-
-        /*glide snapshot repo*/
-        maven {
-            name 'glide-snapshot'
-            url 'http://oss.sonatype.org/content/repositories/snapshots'
-        }
     }
 }
 
