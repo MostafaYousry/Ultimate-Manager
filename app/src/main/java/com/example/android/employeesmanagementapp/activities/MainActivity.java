@@ -202,6 +202,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         switch (item.getItemId()) {
             case R.id.nav_tasks:
                 item.setIcon(R.drawable.ic_tasks_filled);
+                mBottomNavigationView.getMenu().findItem(R.id.nav_employees).setIcon(R.drawable.ic_employees);
+                mBottomNavigationView.getMenu().findItem(R.id.nav_departments).setIcon(R.drawable.ic_departments);
                 mBottomNavigationView.setItemIconTintList(null);
                 loadFragment(tasksFragment);
                 mTabLayout.setVisibility(View.VISIBLE);
@@ -213,6 +215,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 break;
             case R.id.nav_employees:
                 item.setIcon(R.drawable.ic_employee_filled);
+                mBottomNavigationView.getMenu().findItem(R.id.nav_tasks).setIcon(R.drawable.ic_tasks);
+                mBottomNavigationView.getMenu().findItem(R.id.nav_departments).setIcon(R.drawable.ic_departments);
                 mBottomNavigationView.setItemIconTintList(null);
                 loadFragment(employeesFragment);
                 mTabLayout.setVisibility(View.GONE);
@@ -222,6 +226,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 break;
             case R.id.nav_departments:
                 item.setIcon(R.drawable.ic_departments_filled);
+                mBottomNavigationView.getMenu().findItem(R.id.nav_tasks).setIcon(R.drawable.ic_tasks);
+                mBottomNavigationView.getMenu().findItem(R.id.nav_employees).setIcon(R.drawable.ic_employees);
                 mBottomNavigationView.setItemIconTintList(null);
                 loadFragment(departmentsFragment);
                 mTabLayout.setVisibility(View.GONE);
