@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">EmployeesManagementApp</string>
-
+    <string name="default_notification_channel_id">Channel ID</string>
     <!-- strings defining navigation menu items -->
     <string name="tasks">Tasks</string>
     <string name="employees">Employees</string>
@@ -88,5 +88,7 @@
     <string name="delete_employees">Delete</string>
     <string name="title_dialog_delete_employees">Delete Employee(s)</string>
     <string name="message_dialog_delete_employees">Note:  deleted employee(s) will be removed from running tasks and will be visible only from completed tasks</string>
+    <string name="channel_name">Due Soon</string>
+    <string name="channel_description">Upcoming due dates on your cards</string>
 
 </resources>

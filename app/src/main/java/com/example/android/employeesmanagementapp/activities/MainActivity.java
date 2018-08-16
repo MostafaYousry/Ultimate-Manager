@@ -1,5 +1,7 @@
 package com.example.android.employeesmanagementapp.activities;
 
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -24,6 +26,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -49,14 +52,14 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private View.OnClickListener mFabClickListenerDepartments;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        NotificationService.setBadge(getApplicationContext(),0);
+        NotificationService.setBadge(getApplicationContext(), 0);
         NotificationService.setTasksCount(0);
-
+        if (activeFragment instanceof TasksFragment)
+            cancelNotification(getApplicationContext(), 22327);
 
         //set toolbar as actionbar
         mToolbar = findViewById(R.id.toolbar);
@@ -113,7 +116,12 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
             mBottomNavigationView.setSelectedItemId(savedInstanceState.getInt("selected_fragment_id"));
         }
+    }
 
+    private void cancelNotification(Context applicationContext, int notificationId) {
+        String ns = Context.NOTIFICATION_SERVICE;
+        NotificationManager nMgr = (NotificationManager) applicationContext.getSystemService(ns);
+        nMgr.cancel(notificationId);
     }
 
     private void setUpFabClickListeners() {
@@ -172,12 +180,15 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        NotificationService.setBadge(getApplicationContext(),0);
-        NotificationService.setTasksCount(0);
+        if (activeFragment instanceof TasksFragment) {
+            NotificationService.setBadge(getApplicationContext(), 0);
+            NotificationService.setTasksCount(0);
+        }
         mFabClickListenerNoDeps = null;
         mFabClickListenerTasks = null;
         mFabClickListenerEmployees = null;
         mFabClickListenerDepartments = null;
+
     }
 
     void loadFragment(Fragment fragment) {
@@ -201,6 +212,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         switch (item.getItemId()) {
             case R.id.nav_tasks:
                 item.setIcon(R.drawable.ic_tasks_filled);
+                mBottomNavigationView.getMenu().findItem(R.id.nav_employees).setIcon(R.drawable.ic_employees);
+                mBottomNavigationView.getMenu().findItem(R.id.nav_departments).setIcon(R.drawable.ic_departments);
                 mBottomNavigationView.setItemIconTintList(null);
                 loadFragment(tasksFragment);
                 mTabLayout.setVisibility(View.VISIBLE);
@@ -209,9 +222,12 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 if (mTabLayout.getSelectedTabPosition() == 1)
                     mFab.hide();
                 else mFab.show();
+                cancelNotification(getApplicationContext(), 22327);
                 break;
             case R.id.nav_employees:
                 item.setIcon(R.drawable.ic_employee_filled);
+                mBottomNavigationView.getMenu().findItem(R.id.nav_tasks).setIcon(R.drawable.ic_tasks);
+                mBottomNavigationView.getMenu().findItem(R.id.nav_departments).setIcon(R.drawable.ic_departments);
                 mBottomNavigationView.setItemIconTintList(null);
                 loadFragment(employeesFragment);
                 mTabLayout.setVisibility(View.GONE);
@@ -221,6 +237,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 break;
             case R.id.nav_departments:
                 item.setIcon(R.drawable.ic_departments_filled);
+                mBottomNavigationView.getMenu().findItem(R.id.nav_tasks).setIcon(R.drawable.ic_tasks);
+                mBottomNavigationView.getMenu().findItem(R.id.nav_employees).setIcon(R.drawable.ic_employees);
                 mBottomNavigationView.setItemIconTintList(null);
                 loadFragment(departmentsFragment);
                 mTabLayout.setVisibility(View.GONE);

@@ -8,7 +8,10 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.example.android.employeesmanagementapp.utils.AppUtils;
+
 import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -36,41 +39,10 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
         // Do something with the time chosen by the user
         TextView textView = (TextView) viewToShowTimeIn;
         Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.HOUR, hourOfDay);
+        cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
         cal.set(Calendar.MINUTE, minute);
         Date currentTime = cal.getTime();
-        StringBuilder timeFormat = new StringBuilder();
-        String midnight;
-        if (hourOfDay == 0) {
-            timeFormat.append(12);
-            midnight = "AM";
-        } else if (hourOfDay < 10) {
-            timeFormat.append("0" + hourOfDay);
-            midnight = "AM";
-        } else if (hourOfDay >= 10 && hourOfDay < 12) {
-            timeFormat.append(hourOfDay);
-            midnight = "AM";
-        }
-        else if(hourOfDay == 12){
-            timeFormat.append(hourOfDay);
-            midnight = "PM";
-        }
-        else if (hourOfDay > 12 && hourOfDay < 22) {
-            timeFormat.append("0" + (hourOfDay - 12));
-            midnight = "PM";
-        } else {
-            timeFormat.append(hourOfDay - 12);
-            midnight = "PM";
-        }
-        timeFormat.append(" : ");
-
-        if (minute < 10)
-            timeFormat.append("0" + minute);
-        else
-            timeFormat.append(minute);
-        timeFormat.append(" " + midnight);
-
-        textView.setText(timeFormat);
+        textView.setText(AppUtils.getFriendlyTime(currentTime));
         textView.setTag(currentTime);
     }
 }

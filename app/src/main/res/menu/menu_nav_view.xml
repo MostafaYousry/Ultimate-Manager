@@ -3,7 +3,7 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_tasks"
-            android:icon="@drawable/ic_tasks"
+            android:icon="@drawable/ic_tasks_filled"
             android:title="" />
 
         <item
