@@ -1,13 +1,27 @@
 package com.example.android.employeesmanagementapp.utils;
 
-import com.example.android.employeesmanagementapp.R;
-import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
-import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
-import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.res.Resources;
+import android.os.Bundle;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.RatingBar;
 
-import java.util.ArrayList;
+import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.data.AppDatabase;
+import com.example.android.employeesmanagementapp.data.AppExecutor;
+import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
+import com.example.android.employeesmanagementapp.fragments.ColorPickerDialogFragment;
+import com.example.android.employeesmanagementapp.fragments.DatePickerDialogFragment;
+
+import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
 
 
 /**
@@ -15,105 +29,88 @@ import java.util.List;
  */
 public final class AppUtils {
 
-    public static List<Integer> employeeImages = new ArrayList<>();
 
-    static {
-        employeeImages.add(R.drawable.griezmann);
-        employeeImages.add(R.drawable.salah);
-        employeeImages.add(R.drawable.pogba);
-        employeeImages.add(R.drawable.hazard);
-        employeeImages.add(R.drawable.ronaldo);
-        employeeImages.add(R.drawable.messi);
-        employeeImages.add(R.drawable.dybala);
-        employeeImages.add(R.drawable.kroos);
-        employeeImages.add(R.drawable.mbappe);
+    public static void showDatePicker(Context context, View view, boolean allowPastDates) {
+        //create a bundle containing id of clicked text view (startDateTextView or dueDateTextView)
+        Bundle bundle = new Bundle();
+        bundle.putInt(DatePickerDialogFragment.KEY_DISPLAY_VIEW_ID, view.getId());
+
+        //instantiate a DatePickerDialogFragment to show date picker dialog
+        DialogFragment datePickerFragment = new DatePickerDialogFragment();
+        datePickerFragment.setArguments(bundle);
+
+        //show th dialog
+        datePickerFragment.show(((AppCompatActivity) context).getSupportFragmentManager(), "datePicker");
     }
 
-    public static int getRandomEmployeeImage() {
+    public static void showColorPicker(Context context, int taskId) {
+        //create a bundle containing id of task
+        Bundle bundle = new Bundle();
+        bundle.putInt(ColorPickerDialogFragment.KEY_TASK_ID, taskId);
 
-        return employeeImages.get((int) (Math.random() * employeeImages.size()));
+        //instantiate a ColorPickerDialogFragment
+        DialogFragment colorPickerDialogFragment = new ColorPickerDialogFragment();
+        colorPickerDialogFragment.setArguments(bundle);
+
+        //show th dialog
+        colorPickerDialogFragment.show(((AppCompatActivity) context).getSupportFragmentManager(), "colorPicker");
+    }
+
+    public static void showRateTaskDialog(final Context context, final int taskID) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Task done");
+        builder.setMessage("Please rate task");
+
+        View rateDialogView = LayoutInflater.from(context).inflate(R.layout.rating_bar, null, false);
+        final RatingBar ratingBar = rateDialogView.findViewById(R.id.rating_bar);
+//        ratingBar.setPaddingRelative(dpToPx(context ,16), 0, dpToPx(context,16), 0);
+        builder.setView(rateDialogView);
+
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(final DialogInterface dialog, int which) {
+                AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        AppDatabase.getInstance(context).tasksDao().rateTask(ratingBar.getRating(), taskID);
+                        dialog.dismiss();
+                    }
+                });
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.show();
+    }
+
+
+    /**
+     * Converts dp to pixel
+     */
+    public static int dpToPx(Context context, int dp) {
+        Resources r = context.getResources();
+        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
     }
 
     /**
-     * Temporary method for inserting fake data to RecyclerView's adapter.
-     * tobe replaced with data from database
+     * Converts sp to pixel
      */
-    public static List<EmployeeEntry> getEmployeesFakeData() {
-        List<EmployeeEntry> list = new ArrayList<>();
-
-        EmployeeEntry employeeEntry1 = new EmployeeEntry(2, "Antoine Griezmann", 200, new Date(),false);
-        EmployeeEntry employeeEntry2 = new EmployeeEntry(1, "Mohamed Salah", 200, new Date(),false);
-        EmployeeEntry employeeEntry3 = new EmployeeEntry(2, "Paul Pogba", 200, new Date(),false);
-        EmployeeEntry employeeEntry4 = new EmployeeEntry(3, "Eden Hazard", 200, new Date(),false);
-        EmployeeEntry employeeEntry5 = new EmployeeEntry(0, "Cristiano Ronaldo", 200, new Date(),false);
-        EmployeeEntry employeeEntry6 = new EmployeeEntry(2, "Lionel Messi", 200, new Date(),false);
-        EmployeeEntry employeeEntry9 = new EmployeeEntry(2, "Paulo Dybala", 200, new Date(),false);
-        EmployeeEntry employeeEntry7 = new EmployeeEntry(1, "Tony Kroos", 200, new Date(),false);
-        EmployeeEntry employeeEntry8 = new EmployeeEntry(1, "Kylian Mbappe", 200, new Date(),false);
-
-        list.add(employeeEntry1);
-        list.add(employeeEntry2);
-        list.add(employeeEntry3);
-        list.add(employeeEntry4);
-        list.add(employeeEntry5);
-        list.add(employeeEntry6);
-        list.add(employeeEntry7);
-        list.add(employeeEntry8);
-        list.add(employeeEntry9);
-        list.add(employeeEntry1);
-        list.add(employeeEntry2);
-        list.add(employeeEntry3);
-        list.add(employeeEntry4);
-        list.add(employeeEntry1);
-        list.add(employeeEntry2);
-        list.add(employeeEntry3);
-        list.add(employeeEntry4);
-        return list;
+    public static int spToPx(Context context, int sp) {
+        Resources r = context.getResources();
+        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, r.getDisplayMetrics()));
     }
 
-    /**
-     * Temporary method for inserting fake data to RecyclerView's adapter.
-     * tobe replaced with data from database
-     */
-    public static List<TaskEntry> getTasksFakeData() {
-        TaskEntry taskEntry1 = new TaskEntry(2, "App code refactor", "wfjjwnfiwnfiwenf", new Date(), new Date());
-        TaskEntry taskEntry2 = new TaskEntry(0, "Add new Feature", "wfjjwnfiwnfiwenfasdasd", new Date(), new Date());
-        TaskEntry taskEntry3 = new TaskEntry(3, "rererererererererererer", "wfjjwnfiwnfiwenfsdasdasdadsad", new Date(), new Date());
-        TaskEntry taskEntry4 = new TaskEntry(3, "el3ab baleee", "wfjjwnfiwnfiwenfasdasd", new Date(), new Date());
-        TaskEntry taskEntry5 = new TaskEntry(1, "skalob baneee", "asdasdsdasdadsad", new Date(), new Date());
-        TaskEntry taskEntry6 = new TaskEntry(4, "eboo msh baskoota", "wfjjwnfiwnfiwenfasdasdasdsadasdasdsadasdsads", new Date(), new Date());
-
-        List<TaskEntry> list = new ArrayList<>();
-        list.add(taskEntry1);
-        list.add(taskEntry2);
-        list.add(taskEntry3);
-        list.add(taskEntry4);
-        list.add(taskEntry5);
-        list.add(taskEntry6);
-
-        return list;
+    public static String getFriendlyDate(Date date) {
+        return SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM).format(date);
     }
 
-    /**
-     * Temporary method for inserting fake data to RecyclerView's adapter.
-     * tobe replaced with data from database
-     */
-    public static List<DepartmentEntry> getDepartmentsFakeData() {
-        DepartmentEntry departmentEntry1 = new DepartmentEntry("Production",false);
-        DepartmentEntry departmentEntry2 = new DepartmentEntry("Research and Development",false);
-        DepartmentEntry departmentEntry3 = new DepartmentEntry("Purchasing",false);
-        DepartmentEntry departmentEntry4 = new DepartmentEntry("Marketing",false);
-        DepartmentEntry departmentEntry5 = new DepartmentEntry("Human Resource Management",false);
-        DepartmentEntry departmentEntry6 = new DepartmentEntry("Accounting and Finance",false);
 
-        List<DepartmentEntry> list = new ArrayList<>();
-        list.add(departmentEntry1);
-        list.add(departmentEntry2);
-        list.add(departmentEntry3);
-        list.add(departmentEntry4);
-        list.add(departmentEntry5);
-        list.add(departmentEntry6);
-
-        return list;
+    public static String getFullEmployeeName(EmployeeEntry employeeEntry) {
+        return employeeEntry.getEmployeeFirstName() + " " + employeeEntry.getEmployeeMiddleName() + " " + employeeEntry.getEmployeeLastName();
     }
 }

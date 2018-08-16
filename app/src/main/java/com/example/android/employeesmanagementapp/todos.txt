@@ -1,17 +1,29 @@
-todo(1):rate a task--
-todo(2):note on employees
-todo(3):fix task start and due date issue
-todo(4):use xliff tag and and plurals (1 running task / 5 running tasks)
-todo(5):enhance empty views (Add images and actions)
-todo(6):filter running tasks to show tasks specific to a department
+
+
 todo(7):choose an image for the employee and department(from phone or by taking a picture)
+todo hide fab when selecting multiple employees
+
+
+todo toolbar and spinner fonts------->
+
+
+todo discard changes dialog zy contacts app ------>
+
+
+todo hide fab with bottom nav on scroll
+
+
+todo keep track of time ex: 2 months and 10 days remaining
+
+
+todo(5):enhance empty views (Add images and actions)
 todo(8):notifications & background services for notifying a manager when a task due date is met
 *pressing the notification opens the app in the state of rating a completed task
 *see background services and workmanager architecture component
 todo(9):use paging architecture component for loading lists in small chunks
-todo(10):use butter Knife for binding views instead of find view by id
-todo(11):change department and task items layout--
-todo(12):add option to color a task item--
+
+todo(11):change department and task items layout  -------->
+
 todo(13):apply a theme for the app--
 *see (https://material.io/design/material-theming/overview.html#)
 *see (https://material.io/design/material-theming/implementing-your-theme.html)

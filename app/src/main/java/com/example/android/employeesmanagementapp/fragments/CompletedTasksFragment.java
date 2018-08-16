@@ -12,14 +12,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.R;
-import com.example.android.employeesmanagementapp.UndoDeleteAction;
 import com.example.android.employeesmanagementapp.activities.AddTaskActivity;
 import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
-import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
@@ -28,13 +25,12 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class CompletedTasksFragment extends Fragment implements TasksAdapter.TasksItemClickListener {
 
-    private final String TAG = RunningTasksFragment.class.getSimpleName();
+    private final String TAG = CompletedTasksFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private TasksAdapter mAdapter;
     private AppDatabase mDb;
@@ -71,7 +67,7 @@ public class CompletedTasksFragment extends Fragment implements TasksAdapter.Tas
         mRecyclerView.setLayoutManager(layoutManager);
 
         // specify an adapter
-        mAdapter = new TasksAdapter(this);
+        mAdapter = new TasksAdapter(getContext(), this, true);
 
         LiveData<List<TaskEntry>> tasksList = ViewModelProviders.of(getActivity()).get(MainViewModel.class).getCompletedTasksList();
         tasksList.observe(this, new Observer<List<TaskEntry>>() {
@@ -90,42 +86,8 @@ public class CompletedTasksFragment extends Fragment implements TasksAdapter.Tas
 
         mRecyclerView.setAdapter(mAdapter);
 
-        //setUpOnSwipe();
-
         return view;
     }
-
-//    private void setUpOnSwipe() {
-//        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-//            @Override
-//            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-//                return false;
-//            }
-//
-//            // Called when a user swipes left or right on a ViewHolder
-//            @Override
-//            public void onSwiped(final RecyclerView.ViewHolder viewHolder, int swipeDir) {
-//                // Here is where you'll implement swipe to delete
-//
-//                int taskPosition = viewHolder.getAdapterPosition();
-//                TaskEntry taskEntry = mAdapter.getItem(taskPosition);
-//                UndoDeleteAction mUndoDeleteAction = new UndoDeleteAction(taskEntry, mDb);
-//                Snackbar.make(getActivity().findViewById(android.R.id.content), taskEntry.getTaskTitle() + " will be deleted", Snackbar.LENGTH_LONG).setAction("Undo", mUndoDeleteAction).show();
-//
-//                System.out.println("deleting");
-//                AppExecutor.getInstance().diskIO().execute(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        int position = viewHolder.getAdapterPosition();
-//                        mDb.tasksDao().deleteTask(mAdapter.getItem(position));
-//                    }
-//                });
-//
-//            }
-//        }).attachToRecyclerView(mRecyclerView);
-//
-//
-//    }
 
 
     private void showEmptyView() {
@@ -145,7 +107,6 @@ public class CompletedTasksFragment extends Fragment implements TasksAdapter.Tas
     public void onTaskClick(int taskRowID, int taskPosition) {
         Intent intent = new Intent(getActivity(), AddTaskActivity.class);
         intent.putExtra(AddTaskActivity.TASK_ID_KEY, taskRowID);
-        intent.putExtra(AddTaskActivity.TASK_ENABLE_VIEWS_KEY,false);
         startActivity(intent);
     }
 }

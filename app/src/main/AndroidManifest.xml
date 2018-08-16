@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.android.employeesmanagementapp">
+
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
 
     <application
         android:allowBackup="true"
@@ -8,7 +18,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".activities.MainActivity">
 
             <intent-filter>
@@ -18,24 +29,32 @@
             </intent-filter>
 
         </activity>
+
         <activity
             android:name=".activities.AddTaskActivity"
-            android:parentActivityName=".activities.MainActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.MainActivity" />
-
-
-        </activity>
+            android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <activity android:name=".activities.AddEmployeeActivity" />
 
         <activity android:name=".activities.AddDepartmentActivity" />
 
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.example.android.employeesmanagementapp.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
         <service
             android:name=".NotificationService"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:stopWithTask="false"
+            android:exported="false"
+            android:enabled="true">
             <intent-filter>
                 <action android:name="your.app.domain.NotificationService" />
 
@@ -46,6 +65,11 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
+        <!--<service-->
+            <!--android:name=".TimedNotificationService"-->
+            <!--android:enabled="true"-->
+            <!--android:exported="false"-->
+            <!--android:stopWithTask="false"/>-->
     </application>
 
 

@@ -2,7 +2,6 @@ package com.example.android.employeesmanagementapp.data.daos;
 
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.entries.EmployeesTasksEntry;
-import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 
 import java.util.List;
 
@@ -20,19 +19,11 @@ import androidx.room.Query;
 @Dao
 public interface EmployeesTasksDao {
 
-
-    @Query("SELECT * FROM employees " +
+    @Query("SELECT employees.* FROM employees " +
             "INNER JOIN employees_tasks " +
             "ON employees.employee_id=employees_tasks.employee_id " +
             "WHERE employees_tasks.task_id=:taskId")
-    LiveData<List<EmployeeEntry>> getEmployeesForTask(final int taskId);
-
-    @Query("SELECT * FROM tasks " +
-            "INNER JOIN employees_tasks " +
-            "ON tasks.task_id=employees_tasks.task_id " +
-            "WHERE employees_tasks.employee_id=:empId")
-    List<TaskEntry> getTasksForEmployee(final int empId);
-
+    LiveData<List<EmployeeEntry>> getEmployeesForTask(int taskId);
 
     @Query("SELECT COUNT(*) FROM tasks " +
             "INNER JOIN employees_tasks " +
@@ -56,8 +47,6 @@ public interface EmployeesTasksDao {
     @Delete
     void deleteEmployeeTask(EmployeesTasksEntry employeesTasksEntry);
 
-    @Query("DELETE FROM employees_tasks WHERE employee_id = :empID")
-    void deleteEmployeeFromAllTasks(int empID);
 
     @Query("delete from employees_tasks where task_id in(" +
             "select employees_tasks.task_id from employees_tasks" +
@@ -65,7 +54,10 @@ public interface EmployeesTasksDao {
             " employees_tasks.employee_id = :empID )and employee_id  = :empID")
     void deleteEmployeeFromRunningTasks(int empID);
 
+    @Query("DELETE FROM employees_tasks WHERE employee_id = :empID")
+    void deleteEmployeeJoinRecords(int empID);
+
     @Query("delete from employees_tasks where task_id = :taskId")
-    void deleteDepartmentRunningTasks(int taskId);
+    void deleteTaskJoinRecords(int taskId);
 
 }

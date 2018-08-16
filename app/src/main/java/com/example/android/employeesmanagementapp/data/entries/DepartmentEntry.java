@@ -28,28 +28,21 @@ public class DepartmentEntry {
 
     //used when creating new DepartmentEntry object
     @Ignore
-    public DepartmentEntry(@NonNull String departmentName, boolean departmentIsDeleted) {
+    public DepartmentEntry(@NonNull String departmentName) {
         this.departmentName = departmentName;
-        this.departmentIsDeleted = departmentIsDeleted ;
     }
+
+    //used with index of for department spinner
     @Ignore
     public DepartmentEntry(@NonNull int departmentId) {
         this.departmentId = departmentId;
     }
 
-    public boolean isDepartmentIsDeleted() {
-        return departmentIsDeleted;
-    }
-
-    public void setDepartmentIsDeleted(boolean departmentIsDeleted) {
-        this.departmentIsDeleted = departmentIsDeleted;
-    }
-
     //used by room when reading from database
-    public DepartmentEntry(int departmentId, @NonNull String departmentName,boolean departmentIsDeleted) {
+    public DepartmentEntry(int departmentId, @NonNull String departmentName, boolean departmentIsDeleted) {
         this.departmentId = departmentId;
         this.departmentName = departmentName;
-        this.departmentIsDeleted = departmentIsDeleted ;
+        this.departmentIsDeleted = departmentIsDeleted;
 
     }
 
@@ -70,6 +63,14 @@ public class DepartmentEntry {
         this.departmentName = departmentName;
     }
 
+    public boolean isDepartmentIsDeleted() {
+        return departmentIsDeleted;
+    }
+
+    public void setDepartmentIsDeleted(boolean departmentIsDeleted) {
+        this.departmentIsDeleted = departmentIsDeleted;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -79,9 +80,8 @@ public class DepartmentEntry {
         if (getClass() != obj.getClass())
             return false;
         DepartmentEntry other = (DepartmentEntry) obj;
-        if (departmentId == other.getDepartmentId())
-            return true;
-        return false;
+
+        return departmentId == other.getDepartmentId();
 
     }
 }

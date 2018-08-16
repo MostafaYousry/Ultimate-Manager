@@ -1,15 +1,23 @@
 package com.example.android.employeesmanagementapp;
 
+import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.example.android.employeesmanagementapp.activities.AddDepartmentActivity;
-import com.example.android.employeesmanagementapp.activities.AddTaskActivity;
+import com.example.android.employeesmanagementapp.activities.MainActivity;
+import com.example.android.employeesmanagementapp.data.AppDatabase;
+import com.example.android.employeesmanagementapp.data.AppExecutor;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -17,14 +25,24 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 public class NotificationService extends Service {
-    //we are going to use a handler to be able to run in our TimerTask
-    final Handler handler = new Handler();
-    Timer timer;
-    TimerTask timerTask;
-    String TAG = "Timers";
-    int taskId;
-    //int taskId;
-    Long taskDueDate;
+    //we are going to use a mHandler to be able to run in our TimerTask
+    private final Handler mHandler = new Handler();
+    private Timer mTimer;
+    private TimerTask mTimerTask;
+    private String TAG = "Timers";
+    private static int mTasksCount = 0;
+    private int mTaskId;
+    private Long mTaskDueDate;
+    private boolean appIsDestroyed = true;
+    private static HashMap<Integer, Timer> mTaskTimer = new HashMap<>();
+
+
+    public NotificationService() {
+    }
+
+    public static void setTasksCount(int tasksCount) {
+        NotificationService.mTasksCount = tasksCount;
+    }
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -35,84 +53,131 @@ public class NotificationService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.e(TAG, "onStartCommand");
         super.onStartCommand(intent, flags, startId);
-
-        taskId = intent.getExtras().getInt("task id");
-        taskDueDate = intent.getExtras().getLong("task due date");
+        if (intent != null) {
+            mTaskId = intent.getExtras().getInt("task id");
+            mTaskDueDate = intent.getExtras().getLong("task due date");
+            appIsDestroyed = intent.getExtras().getBoolean("app is destroyed");
+        }
         startTimer();
         return START_STICKY;
     }
 
     @Override
     public void onCreate() {
-        Log.e(TAG, "onCreate");
-
-
+        super.onCreate();
     }
 
     @Override
     public void onDestroy() {
-        Log.e(TAG, "onDestroy");
-        stopTimerTask();
         super.onDestroy();
     }
 
     public void startTimer() {
-        //set a new Timer
-        timer = new Timer();
+        if (!appIsDestroyed) {
+            if (mTaskTimer.containsKey(mTaskId)) {
+                mTimer = mTaskTimer.get(mTaskId);
+                stopTimerTask();
+                mTaskTimer.remove(mTaskId);
+            }
+            mTimer = new Timer();
+            mTaskTimer.put(mTaskId, mTimer);
+            initializeTimerTask();
+            //mTimer.schedule(mTimerTask, 10000);
+            mTimer.schedule(mTimerTask,mTaskDueDate);
+        } else {
+            AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    List<Date> allTasksDueDate = AppDatabase.getInstance(getApplicationContext()).tasksDao().getAllTasksDueDate();
+                    List<Integer> allTasksId = AppDatabase.getInstance(getApplicationContext()).tasksDao().getAllTasksId();
+                    for (int i = 0; i < allTasksDueDate.size() && allTasksDueDate.get(i).compareTo(new Date()) >= 0; i++) {
+                        mTimer = new Timer();
+                        mTaskTimer.put(allTasksId.get(i), mTimer);
+                        initializeTimerTask();
+                        //mTimer.schedule(mTimerTask, 10000 + i * 1000);
+                        Log.i("tasks due date", " task number = " + (i + 1));
+                        mTimer.schedule(mTimerTask,allTasksDueDate.get(i));
+                    }
+                }
+            });
 
-        //initialize the TimerTask's job
-        initializeTimerTask();
+        }
 
-        System.out.println("start timer");
-        //schedule the timer, after the first 5000ms
-        Log.d("intent output","task Id = " + taskId);
-        Log.d("intent output","task due date = " + taskDueDate);
-
-        timer.schedule(timerTask, taskDueDate);
-        //timer.schedule(timerTask, 5000,1000); //
+        System.out.println("start mTimer");
     }
 
     public void stopTimerTask() {
-        //stop the timer, if it's not already null
-        if (timer != null) {
-            timer.cancel();
-            timer = null;
+        //stop the mTimer, if it's not already null
+        if (mTimer != null) {
+            mTimer.cancel();
+            mTimer = null;
         }
     }
 
     public void initializeTimerTask() {
 
-        timerTask = new TimerTask() {
+        mTimerTask = new TimerTask() {
             public void run() {
 
-                //use a handler to run a toast that shows the current timestamp
-                final boolean notification = handler.post(new Runnable() {
+                //use a mHandler to run a toast that shows the current timestamp
+                final boolean notification = mHandler.post(new Runnable() {
                     public void run() {
 
-                        Intent intent = new Intent(getApplicationContext(), AddTaskActivity.class);
-                        intent.putExtra(AddTaskActivity.TASK_ID_KEY, taskId);
-                        intent.putExtra(AddTaskActivity.TASK_ENABLE_VIEWS_KEY,true);
-
-                        //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
 
                         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext())
-                                .setSmallIcon(R.drawable.ic_tasks)
-                                .setContentTitle("Tasks notification")
-                                .setContentText("This task period is end")
+                                .setSmallIcon(R.mipmap.ic_launcher)
+                                .setContentTitle(getResources().getText(R.string.app_name))
+                                .setContentText(++mTasksCount + " tasks due date are met")
                                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                                 // Set the intent that will fire when the user taps the notification
                                 .setContentIntent(pendingIntent)
                                 .setAutoCancel(true)
-                                .setVisibility(1); //To control the level of detail visible in the notification from the lock screen
-                        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
+                                .setVisibility(1)
+                                .setDefaults(Notification.DEFAULT_ALL); //To control the level of detail visible in the notification from the lock screen
+                        if (mTasksCount == 1)
+                            mBuilder.setContentText(mTasksCount + " task due date is met");
 
+                        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
                         // notificationId is a unique int for each notification that you must define
-                        notificationManager.notify(5, mBuilder.build());
+                        notificationManager.notify(0, mBuilder.build());
+                        setBadge(getApplicationContext(), mTasksCount);
 
                     }
                 });
             }
         };
+    }
+
+    public static void setBadge(Context context, int count) {
+        String launcherClassName = getLauncherClassName(context);
+        if (launcherClassName == null) {
+            return;
+        }
+        Intent intent = new Intent("android.intent.action.BADGE_COUNT_UPDATE");
+        intent.putExtra("badge_count", count);
+        intent.putExtra("badge_count_package_name", context.getPackageName());
+        intent.putExtra("badge_count_class_name", launcherClassName);
+        context.sendBroadcast(intent);
+    }
+
+    public static String getLauncherClassName(Context context) {
+
+        PackageManager pm = context.getPackageManager();
+
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+
+        List<ResolveInfo> resolveInfos = pm.queryIntentActivities(intent, 0);
+        for (ResolveInfo resolveInfo : resolveInfos) {
+            String pkgName = resolveInfo.activityInfo.applicationInfo.packageName;
+            if (pkgName.equalsIgnoreCase(context.getPackageName())) {
+                String className = resolveInfo.activityInfo.name;
+                return className;
+            }
+        }
+        return null;
     }
 }

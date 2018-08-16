@@ -1,6 +1,10 @@
 package com.example.android.employeesmanagementapp.adapters;
 
+import android.content.Context;
+import android.net.Uri;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -8,6 +12,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.TextDrawable;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 
@@ -15,35 +20,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEmployeeAdapter.EmployeesViewHolder> {
-    private List<EmployeeEntry> mData = new ArrayList<>();
-    private List<EmployeeEntry> mDataCopy;
-    private List<EmployeeEntry> mAddedEmployees = new ArrayList<>();
+    private Context mContext;
+    private List<EmployeeEntry> mData;
+    private List<EmployeeEntry> mAddedEmployees;
+    private List<EmployeeEntry> mRemovedEmployees;
+
     private EmployeesAdapter.EmployeeItemClickListener mClickListener;
-    private View.OnLongClickListener mOnEmployeeLongClicked;
-    private EmployeeEntry mDeletedEmployee;
-    private List<EmployeeEntry> mRemovedEmployees = new ArrayList<>();
-    private int deletePosition;
+    private boolean mLongClickEnabled;
 
-    public HorizontalEmployeeAdapter(EmployeesAdapter.EmployeeItemClickListener clickListener) {
+    public HorizontalEmployeeAdapter(Context context, EmployeesAdapter.EmployeeItemClickListener clickListener, boolean longClickEnabled) {
+        mContext = context;
         mClickListener = clickListener;
+        mLongClickEnabled = longClickEnabled;
     }
 
-    public List<EmployeeEntry> getAddedEmployees() {
-        mAddedEmployees.removeAll(mDataCopy);
-        return mAddedEmployees;
-    }
-
-    public List<EmployeeEntry> getRemovedEmployees() {
-        return mRemovedEmployees;
-    }
-
-    public HorizontalEmployeeAdapter(EmployeesAdapter.EmployeeItemClickListener clickListener, View.OnLongClickListener onEmployeeLongClicked) {
-        this(clickListener);
-        mOnEmployeeLongClicked = onEmployeeLongClicked;
-    }
 
     @NonNull
     @Override
@@ -58,40 +52,59 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
         holder.bind(position);
     }
 
-    public List<EmployeeEntry> getData(){
-        return mData;
-    }
-
     @Override
     public int getItemCount() {
-        return mData.size() + mAddedEmployees.size();
+        int dataSize = 0, addedSize = 0;
+        if (mData != null)
+            dataSize = mData.size();
+        if (mAddedEmployees != null)
+            addedSize = mAddedEmployees.size();
+
+
+        return dataSize + addedSize;
+    }
+
+    public List<EmployeeEntry> getData() {
+        return mData;
     }
 
     public void setData(List<EmployeeEntry> data) {
         mData = data;
-        mDataCopy = new ArrayList<>(mData);
         notifyDataSetChanged();
     }
 
-    public void mergeToAddedEmployees(List<EmployeeEntry> chosenEmployees) {
-        mAddedEmployees.addAll(chosenEmployees);
-        mRemovedEmployees.removeAll(chosenEmployees);
-        notifyDataSetChanged();
+    public List<EmployeeEntry> getAddedEmployees() {
+        return mAddedEmployees;
     }
 
-    public EmployeeEntry removeEmployee() {
-        mRemovedEmployees.add(mDeletedEmployee);
-        if (deletePosition < mData.size())
-            mData.remove(mDeletedEmployee);
+    public void setAddedEmployees(List<EmployeeEntry> chosenEmployees) {
+        if (mAddedEmployees == null)
+            mAddedEmployees = chosenEmployees;
         else
-            mAddedEmployees.remove(mDeletedEmployee);
-
+            mAddedEmployees.addAll(chosenEmployees);
         notifyDataSetChanged();
-        return mDeletedEmployee;
+//        notifyItemRangeInserted(mData.size() , chosenEmployees.size());
     }
 
-    public void clearAddedEmployees() {
-        mAddedEmployees.clear();
+    public void clearAdapter() {
+        if (mData != null)
+            mData.clear();
+        if (mAddedEmployees != null)
+            mAddedEmployees.clear();
+    }
+
+    public List<EmployeeEntry> getAllEmployees() {
+        List<EmployeeEntry> employees = new ArrayList<>();
+        if (mData != null)
+            employees.addAll(mData);
+        if (mAddedEmployees != null)
+            employees.addAll(mAddedEmployees);
+
+        return employees;
+    }
+
+    public List<EmployeeEntry> getRemovedEmployees() {
+        return mRemovedEmployees;
     }
 
 
@@ -100,29 +113,55 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
         TextView employeeName;
         View mItemView;
 
-        public EmployeesViewHolder(@NonNull View itemView) {
+        EmployeesViewHolder(@NonNull View itemView) {
             super(itemView);
             mItemView = itemView;
+
             employeeImage = itemView.findViewById(R.id.employee_image);
             employeeName = itemView.findViewById(R.id.employee_name);
 
-            //todo move this to bind when loading different images
-            Glide.with(itemView.getContext()).load(AppUtils.getRandomEmployeeImage())
-                    .into(employeeImage);
 
             itemView.setOnClickListener(this);
-            if (mOnEmployeeLongClicked != null)
+
+            if (mLongClickEnabled)
                 itemView.setOnLongClickListener(this);
 
         }
 
-        public void bind(int position) {
+        void bind(int position) {
             if (position >= mData.size()) {
-                employeeName.setText(mAddedEmployees.get(position - mData.size()).getEmployeeName());
+                position = position - mData.size();
 
-                itemView.setTag(mAddedEmployees.get(position - mData.size()).getEmployeeID());
+                employeeName.setText(mAddedEmployees.get(position).getEmployeeFirstName());
+
+                if (mAddedEmployees.get(position).getEmployeeImageUri() == null) {
+                    Glide.with(mContext).clear(employeeImage);
+
+                    TextDrawable textDrawable = new TextDrawable(mContext, mAddedEmployees.get(position), AppUtils.dpToPx(mContext, 70), AppUtils.dpToPx(mContext, 70), AppUtils.spToPx(mContext, 28));
+                    employeeImage.setImageDrawable(textDrawable);
+                } else {
+                    Glide.with(mContext)
+                            .load(Uri.parse(mAddedEmployees.get(position).getEmployeeImageUri()))
+                            .into(employeeImage);
+                }
+
+                itemView.setTag(mAddedEmployees.get(position).getEmployeeID());
+
             } else {
-                employeeName.setText(mData.get(position).getEmployeeName());
+                employeeName.setText(mData.get(position).getEmployeeFirstName());
+
+                if (mData.get(position).getEmployeeImageUri() == null) {
+                    Glide.with(mContext).clear(employeeImage);
+
+                    TextDrawable textDrawable = new TextDrawable(mContext, mData.get(position), AppUtils.dpToPx(mContext, 70), AppUtils.dpToPx(mContext, 70), AppUtils.spToPx(mContext, 28));
+                    employeeImage.setImageDrawable(textDrawable);
+
+                } else {
+                    Glide.with(mContext)
+                            .asBitmap()
+                            .load(Uri.parse(mData.get(position).getEmployeeImageUri()))
+                            .into(employeeImage);
+                }
 
                 itemView.setTag(mData.get(position).getEmployeeID());
             }
@@ -135,12 +174,33 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
 
         @Override
         public boolean onLongClick(View view) {
-            deletePosition = getAdapterPosition();
-            if (deletePosition < mData.size())
-                mDeletedEmployee = mData.get(deletePosition);
-            else
-                mDeletedEmployee = mAddedEmployees.get(deletePosition-mData.size());
-            mOnEmployeeLongClicked.onLongClick(view);
+            PopupMenu popup = new PopupMenu(view.getContext(), view);
+            popup.setGravity(Gravity.TOP);
+            popup.inflate(R.menu.menu_task_employee_options);
+            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    switch (item.getItemId()) {
+                        case R.id.action_remove_employee:
+                            int deletePosition = getAdapterPosition();
+                            if (deletePosition < mData.size()) {
+                                if (mRemovedEmployees == null)
+                                    mRemovedEmployees = new ArrayList<>();
+                                mRemovedEmployees.add(mData.remove(deletePosition));
+//                                notifyItemRemoved(deletePosition);
+                                notifyDataSetChanged();
+                            } else {
+                                mAddedEmployees.remove(deletePosition - mData.size());
+//                                notifyItemRemoved(deletePosition - mData.size());
+                                notifyDataSetChanged();
+                            }
+                            return true;
+                        default:
+                            return false;
+                    }
+                }
+            });
+            popup.show();
             return true;
         }
     }

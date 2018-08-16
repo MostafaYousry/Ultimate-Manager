@@ -28,15 +28,15 @@ public class MainViewModel extends AndroidViewModel {
     private LiveData<List<EmployeeWithExtras>> employeesWithExtrasList;
 
 
-    public MainViewModel(Application application) {
+    public MainViewModel(final Application application) {
         super(application);
 
-        allDepartmentsList = AppDatabase.getInstance(application.getApplicationContext()).departmentsDao().loadNonDeletedDepartments();
+        allDepartmentsList = AppDatabase.getInstance(application.getApplicationContext()).departmentsDao().loadDepartments();
         runningTasksList = AppDatabase.getInstance(application.getApplicationContext()).tasksDao().loadRunningTasks();
         completedTasksList = AppDatabase.getInstance(application.getApplicationContext()).tasksDao().loadCompletedTasks();
         employeesWithExtrasList = AppDatabase.getInstance(application.getApplicationContext()).employeesDao().loadEmployees();
-    }
 
+    }
 
     public LiveData<List<DepartmentEntry>> getAllDepartmentsList() {
         return allDepartmentsList;

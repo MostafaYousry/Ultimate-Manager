@@ -46,7 +46,7 @@ public interface EmployeesDao {
             "            WHERE tasks.task_is_completed = 0\n" +
             "            GROUP BY employees.employee_id\n" +
             "    )\n" +
-            "    SELECT employees.employee_id,employees.department_id,employees.employee_name , employees.employee_salary,employees.employee_hire_date,employees.employee_is_deleted,\n" +
+            "    SELECT employees.* , \n" +
             "        CASE WHEN atr IS NOT NULL THEN atr ELSE 0 END AS average_completed_task_rating,\n" +
             "        CASE WHEN itc IS NOT NULL THEN itc ELSE 0 END AS incomplete_task_count\n" +
             "        FROM employees \n" +
@@ -59,18 +59,20 @@ public interface EmployeesDao {
      * load all employees in an existing department
      *
      * @param departmentId : the department's record id to get the employees for
-     * @return list of EmployeeWithExtras objects wrapped with LiveData
+     * @return list of EmployeeEntry objects wrapped with LiveData
      */
     @Query("Select * from employees where department_id = :departmentId AND employee_is_deleted = 0")
-    LiveData<List<EmployeeEntry>> loadEmployees(int departmentId);
+    LiveData<List<EmployeeEntry>> loadEmployeesInDep(int departmentId);
 
     /**
-     * load all employees not in this department
+     * load all employees in this department except certain employees
+     * <p>
+     * used in add employees to tasks dialog
      *
      * @return list of EmployeeWithExtras objects wrapped with LiveData
      */
-    @Query(" SELECT * from employees where department_id = :departmentId Except SELECT DISTINCT employees.* from employees  INNER JOIN employees_tasks ON employees.employee_id = employees_tasks.employee_id where employees_tasks.task_id = :taskId and employees.department_id = :departmentId AND employee_is_deleted = 0")
-    LiveData<List<EmployeeEntry>> loadEmployeesNotInDep(int departmentId, int taskId);
+    @Query(" SELECT * from employees where department_id = :departmentId AND employee_is_deleted = 0 AND employee_id NOT IN (:exceptThese)")
+    LiveData<List<EmployeeEntry>> loadEmployeesInDep(int departmentId, List<Integer> exceptThese);
 
     /**
      * load an existing employee record by it's id
@@ -97,7 +99,7 @@ public interface EmployeesDao {
             "            WHERE tasks.task_is_completed = 0\n" +
             "            GROUP BY employees.employee_id\n" +
             "    )\n" +
-            "    SELECT employees.employee_id,employees.department_id,employees.employee_name , employees.employee_salary,employees.employee_hire_date,employees.employee_is_deleted,\n" +
+            "    SELECT employees.*,\n" +
             "        CASE WHEN atr IS NOT NULL THEN atr ELSE 0 END AS average_completed_task_rating,\n" +
             "        CASE WHEN itc IS NOT NULL THEN itc ELSE 0 END AS incomplete_task_count\n" +
             "        FROM employees \n" +

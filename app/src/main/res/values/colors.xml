@@ -1,11 +1,68 @@
 <resources>
-    <color name="primaryColor">#009688</color>
-    <color name="primaryLightColor">#52c7b8</color>
-    <color name="primaryDarkColor">#00675b</color>
-    <color name="secondaryColor">#ffab40</color>
-    <color name="secondaryLightColor">#ffdd71</color>
-    <color name="secondaryDarkColor">#c77c02</color>
+
+    <color name="primaryColor">#fafafa</color>
+    <color name="primaryLightColor">#ffffff</color>
+    <color name="primaryDarkColor">#c7c7c7</color>
+    <color name="secondaryColor">#00bfa5</color>
+    <color name="secondaryLightColor">#ffffff</color>
+    <color name="secondaryDarkColor">#c7c7c7</color>
     <color name="primaryTextColor">#000000</color>
-    <color name="secondaryTextColor">#000000</color>
+    <color name="secondaryTextColor">#fafafa</color>
+
+
+    <!--Task background colors-->
+    <color name="color_swatch_border">#bdbdbd</color>
+    <color name="task_color_1">#ffffff</color>
+    <color name="task_color_2">#FF8A80</color>
+    <color name="task_color_3">#FFD180</color>
+    <color name="task_color_4">#FFFF8D</color>
+    <color name="task_color_5">#CCFF90</color>
+    <color name="task_color_6">#A7FFEB</color>
+    <color name="task_color_7">#80D8FF</color>
+    <color name="task_color_8">#82B1FF</color>
+    <color name="task_color_9">#B388FF</color>
+    <color name="task_color_10">#F8BBD0</color>
+    <color name="task_color_11">#D7CCC8</color>
+    <color name="task_color_12">#CFD8DC</color>
+
+
+    <!--Employee avatar background colors-->
+    <color name="A100_1">#ff8a80</color>
+    <color name="A100_2">#FF80AB</color>
+    <color name="A100_3">#EA80FC</color>
+    <color name="A100_4">#B388FF</color>
+    <color name="A100_5">#8C9EFF</color>
+    <color name="A100_6">#82B1FF</color>
+    <color name="A100_7">#80D8FF</color>
+    <color name="A100_8">#84FFFF</color>
+    <color name="A100_9">#A7FFEB</color>
+    <color name="A100_10">#B9F6CA</color>
+    <color name="A100_11">#CCFF90</color>
+    <color name="A100_12">#F4FF81</color>
+    <color name="A100_13">#FFFF8D</color>
+    <color name="A100_14">#FFE57F</color>
+    <color name="A100_15">#FFD180</color>
+    <color name="A100_16">#FF9E80</color>
+
+    <!--Employee avatar letter colors-->
+    <color name="A700_1">#d50000</color>
+    <color name="A700_2">#C51162</color>
+    <color name="A700_3">#AA00FF</color>
+    <color name="A700_4">#6200EA</color>
+    <color name="A700_5">#304FFE</color>
+    <color name="A700_6">#2962FF</color>
+    <color name="A700_7">#0091EA</color>
+    <color name="A700_8">#00B8D4</color>
+    <color name="A700_9">#00BFA5</color>
+    <color name="A700_10">#00C853</color>
+    <color name="A700_11">#64DD17</color>
+    <color name="A700_12">#AEEA00</color>
+    <color name="A700_13">#FFD600</color>
+    <color name="A700_14">#FFAB00</color>
+    <color name="A700_15">#FF6D00</color>
+    <color name="A700_16">#DD2C00</color>
+
+    <color name="camera_add_background_color">#42a5f5</color>
+
 
 </resources>

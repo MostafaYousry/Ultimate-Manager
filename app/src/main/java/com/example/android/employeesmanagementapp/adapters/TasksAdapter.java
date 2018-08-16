@@ -1,27 +1,42 @@
 package com.example.android.employeesmanagementapp.adapters;
 
 
+import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.data.AppDatabase;
+import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
+import com.example.android.employeesmanagementapp.utils.AppUtils;
+import com.google.android.material.card.MaterialCardView;
 
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHolder> {
 
+    private Context mContext;
+
     private List<TaskEntry> mData;
     private TasksItemClickListener mTaskClickListener;
+    private boolean mTasksAreCompleted;
 
 
-    public TasksAdapter(TasksItemClickListener clickListener) {
+    public TasksAdapter(Context context, TasksItemClickListener clickListener, boolean tasksAreCompleted) {
+        mContext = context;
         mTaskClickListener = clickListener;
+        mTasksAreCompleted = tasksAreCompleted;
     }
 
     @NonNull
@@ -69,18 +84,71 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
     }
 
     class TasksViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        View mItemView;
-        TextView mTextView;
+        MaterialCardView mItemView;
+        TextView mTaskTitle;
+        TextView mTaskDates;
+        ImageButton mTaskOptions;
 
-        TasksViewHolder(View itemView) {
+        TasksViewHolder(final View itemView) {
             super(itemView);
-            mItemView = itemView;
-            mTextView = itemView.findViewById(R.id.item_task_title);
+            mItemView = (MaterialCardView) itemView;
+            mTaskTitle = itemView.findViewById(R.id.task_title);
+            mTaskDates = itemView.findViewById(R.id.task_dates);
+            mTaskOptions = itemView.findViewById(R.id.task_options_button);
+            mTaskOptions.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    PopupMenu popup = new PopupMenu(view.getContext(), mTaskOptions);
+                    popup.inflate(R.menu.menu_task_options);
+
+                    if (mTasksAreCompleted) {
+                        Menu menu = popup.getMenu();
+                        menu.removeItem(R.id.action_mark_as_done);
+                        menu.removeItem(R.id.action_delete_task);
+                    }
+
+                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(final MenuItem item) {
+                            switch (item.getItemId()) {
+                                case R.id.action_mark_as_done:
+                                    AppUtils.showRateTaskDialog(mContext, (int) itemView.getTag());
+                                    return true;
+                                case R.id.action_delete_task:
+
+                                    AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            AppDatabase.getInstance(mContext).employeesTasksDao().deleteTaskJoinRecords(mData.get(getAdapterPosition()).getTaskId());
+                                            AppDatabase.getInstance(mContext).tasksDao().deleteTask(mData.get(getAdapterPosition()));
+                                        }
+                                    });
+
+                                    return true;
+                                case R.id.action_color_task:
+                                    AppUtils.showColorPicker(mContext, (int) itemView.getTag());
+                                    return true;
+                                default:
+                                    return false;
+                            }
+                        }
+                    });
+                    popup.show();
+                }
+            });
             itemView.setOnClickListener(this);
         }
 
         void bind(int position) {
-            mTextView.setText(mData.get(position).getTaskTitle());
+
+            mTaskTitle.setText(mData.get(position).getTaskTitle());
+
+            mTaskDates.setText(mContext.getString(R.string.task_list_item_name_dates, AppUtils.getFriendlyDate(mData.get(position).getTaskStartDate()), AppUtils.getFriendlyDate(mData.get(position).getTaskDueDate())));
+
+            int taskColor = ResourcesCompat.getColor(itemView.getResources(), mData.get(position).getTaskColorResource(), mContext.getTheme());
+
+            mItemView.setCardBackgroundColor(taskColor);
+
             mItemView.setTag(mData.get(position).getTaskId());
         }
 

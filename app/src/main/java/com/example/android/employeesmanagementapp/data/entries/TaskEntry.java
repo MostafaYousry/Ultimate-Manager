@@ -1,5 +1,7 @@
 package com.example.android.employeesmanagementapp.data.entries;
 
+import com.example.android.employeesmanagementapp.R;
+
 import java.util.Date;
 
 import androidx.annotation.NonNull;
@@ -7,6 +9,7 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Ignore;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 /**
@@ -15,6 +18,7 @@ import androidx.room.PrimaryKey;
  * and constructors for RoomDatabase
  */
 @Entity(tableName = "tasks",
+        indices = {@Index(value = {"department_id"})},
         foreignKeys = @ForeignKey(entity = DepartmentEntry.class, parentColumns = "department_id", childColumns = "department_id"))
 public class TaskEntry {
 
@@ -44,6 +48,9 @@ public class TaskEntry {
     @ColumnInfo(name = "task_is_completed")
     private boolean taskIsCompleted;
 
+    @ColumnInfo(name = "task_color_resource")
+    private int taskColorResource;
+
 
     //used when creating new TaskEntry object
     @Ignore
@@ -54,13 +61,12 @@ public class TaskEntry {
         this.taskStartDate = taskStartDate;
         this.taskDueDate = taskDueDate;
 
-        taskRating = 0; //rating defaults to false
-        taskIsCompleted = false; //new tasks are not yet completed
+        taskColorResource = R.color.task_color_1;
     }
 
 
     //used by room when reading from database
-    public TaskEntry(int taskId, int departmentID, String taskTitle, String taskDescription, Date taskStartDate, Date taskDueDate, float taskRating, boolean taskIsCompleted) {
+    public TaskEntry(int taskId, int departmentID, String taskTitle, String taskDescription, Date taskStartDate, Date taskDueDate, float taskRating, boolean taskIsCompleted, int taskColorResource) {
         this.taskId = taskId;
         this.departmentID = departmentID;
         this.taskTitle = taskTitle;
@@ -69,6 +75,7 @@ public class TaskEntry {
         this.taskDueDate = taskDueDate;
         this.taskRating = taskRating;
         this.taskIsCompleted = taskIsCompleted;
+        this.taskColorResource = taskColorResource;
     }
 
     public int getTaskId() {
@@ -133,5 +140,13 @@ public class TaskEntry {
 
     public void setTaskIsCompleted(boolean taskIsCompleted) {
         this.taskIsCompleted = taskIsCompleted;
+    }
+
+    public int getTaskColorResource() {
+        return taskColorResource;
+    }
+
+    public void setTaskColorResource(int taskColorResource) {
+        this.taskColorResource = taskColorResource;
     }
 }

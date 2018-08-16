@@ -4,24 +4,17 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
-import com.example.android.employeesmanagementapp.adapters.ChooseEmployeesAdapter;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
 import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
 import com.example.android.employeesmanagementapp.adapters.HorizontalEmployeeAdapter;
@@ -33,10 +26,10 @@ import com.example.android.employeesmanagementapp.data.entries.EmployeesTasksEnt
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.data.factories.TaskIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewTaskViewModel;
-import com.example.android.employeesmanagementapp.fragments.DatePickerFragment;
+import com.example.android.employeesmanagementapp.fragments.TimePickerFragment;
+import com.example.android.employeesmanagementapp.utils.AppUtils;
+import com.google.android.material.textfield.TextInputLayout;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -44,7 +37,6 @@ import java.util.List;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.LiveData;
@@ -53,48 +45,26 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapter.EmployeeItemClickListener, PopupMenu.OnMenuItemClickListener {
-    public static final String TASK_VIEW_ONLY = "task_view_only";
-
+public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapter.EmployeeItemClickListener {
 
     public static final String TASK_ID_KEY = "task_id";
-    public static final String TASK_ENABLE_VIEWS_KEY = "enable_views";
     private static final String TAG = AddTaskActivity.class.getSimpleName();
-    private static final boolean DEFAULT_TASK_VIEW_ONLY = false;
     private static final int DEFAULT_TASK_ID = -1;
-    private static int tempTaskDepId = -1;
-    private int mTaskId;
-    private boolean addNewTask = false;
-
-    private static final SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy");
-
-    private EmployeesAdapter mEmplyeesAdapter;
-
+    boolean departmentsLoaded = false;
     private EditText mTaskTitle;
     private EditText mTaskDescription;
-
-    public HorizontalEmployeeAdapter getHorizontalEmployeeAdapter() {
-        return mHorizontalEmployeeAdapter;
-    }
-
     private TextView mTaskStartDate;
     private TextView mTaskDueDate;
     private Spinner mTaskDepartment;
     private Toolbar mToolbar;
-    private ImageButton addEmployeesToTaskButton;
-
+    private RecyclerView mTaskEmployeesRV;
+    private int mTaskId;
     private HorizontalEmployeeAdapter mHorizontalEmployeeAdapter;
-    private ChooseEmployeesAdapter mChooseEmployeesAdapter;
+    private DepartmentsArrayAdapter mDepartmentsArrayAdapter;
     private AppDatabase mDb;
     private AddNewTaskViewModel mViewModel;
-
-    boolean departmentsLoaded = false;
     private int clickedTaskDepId = -1;
-    private boolean textIsChanged = false;
-    private boolean mEnableViews = true;
 
-    private DepartmentsArrayAdapter mDepartmentsArrayAdapter;
-    private RecyclerView mRecyclerView;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -102,66 +72,32 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
 
+        //bind views
+        mTaskTitle = findViewById(R.id.task_title);
+        mTaskDescription = findViewById(R.id.task_description);
+        mTaskStartDate = findViewById(R.id.task_start_date);
+        mTaskDueDate = findViewById(R.id.task_due_date);
+        mTaskDepartment = findViewById(R.id.task_department);
+        mToolbar = findViewById(R.id.toolbar);
+        mTaskEmployeesRV = findViewById(R.id.task_employees_rv);
+
         mDb = AppDatabase.getInstance(this);
 
         //check if activity was opened from a click on rv item or from the fab
         Intent intent = getIntent();
         if (intent != null) {
             mTaskId = intent.getIntExtra(TASK_ID_KEY, DEFAULT_TASK_ID);
-            mEnableViews = intent.getBooleanExtra(TASK_ENABLE_VIEWS_KEY, DEFAULT_TASK_VIEW_ONLY);
         }
-        if (mTaskId == DEFAULT_TASK_ID)
-            addNewTask = true;
 
         mViewModel = ViewModelProviders.of(this, new TaskIdFact(mDb, mTaskId)).get(AddNewTaskViewModel.class);
 
 
         //set toolbar as actionbar
-        mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
 
         //set toolbar home icon
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
-
-
-        //get views
-        mTaskTitle = findViewById(R.id.task_title);
-
-
-        TextWatcher textWatcher = new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                textIsChanged = true;
-            }
-        };
-        mTaskTitle.addTextChangedListener(textWatcher);
-        mTaskDescription.addTextChangedListener(textWatcher);
-        mTaskDueDate.addTextChangedListener(textWatcher);
-        mTaskStartDate.addTextChangedListener(textWatcher);
-
-
-        mTaskDescription = findViewById(R.id.task_description);
-        mTaskStartDate = findViewById(R.id.task_start_date);
-        mTaskDueDate = findViewById(R.id.task_due_date);
-        mTaskDepartment = findViewById(R.id.task_department);
-        addEmployeesToTaskButton = findViewById(R.id.add_employees_to_task_button);
-        addEmployeesToTaskButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showChooseTaskEmployeesDialog();
-            }
-        });
 
 
         mDepartmentsArrayAdapter = new DepartmentsArrayAdapter(this);
@@ -199,110 +135,108 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         }
 
 
-        //allow scrolling of edit text content when it is inside a scroll view
-        mTaskDescription.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                v.getParent().requestDisallowInterceptTouchEvent(true);
-                switch (event.getAction() & MotionEvent.ACTION_MASK) {
-                    case MotionEvent.ACTION_UP:
-                        v.getParent().requestDisallowInterceptTouchEvent(false);
-                        break;
-                }
-                return false;
-            }
-        });
+        setUpTaskEmployeesRV();
 
-        mTaskDepartment.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                if (tempTaskDepId != (int) view.getTag()) {
-                    System.out.println("clear horizontal adapter");
-                    setUpEmployeesRV();
-                    // or -->
-                    // mHorizontalEmployeeAdapter.clearAddedEmployees();
-                    AddTaskActivity.tempTaskDepId = (int) view.getTag();
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
-        setUpEmployeesRV();
-
-        mTaskDueDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                pickDate(view);
-            }
-        });
     }
 
-    private void showChooseTaskEmployeesDialog() {
+    public void showChooseTaskEmployeesDialog(View view) {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Choose employees");
-
-        RecyclerView chooseEmployeesRV = new RecyclerView(this);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        chooseEmployeesRV.setLayoutManager(linearLayoutManager);
-        chooseEmployeesRV.setHasFixedSize(true);
-
-        int depId;
+        final int depId;
+        List<EmployeeEntry> exceptThese;
         if (mTaskId == DEFAULT_TASK_ID) {
             depId = (int) mTaskDepartment.getSelectedView().getTag();
+            if (mHorizontalEmployeeAdapter.getItemCount() == 0)
+                exceptThese = null;
+            else
+                exceptThese = mHorizontalEmployeeAdapter.getAddedEmployees();
         } else {
             depId = mViewModel.getTask().getValue().getDepartmentID();
+            exceptThese = mHorizontalEmployeeAdapter.getAllEmployees();
         }
 
-        mChooseEmployeesAdapter = ChooseEmployeesAdapter.getInstance(mViewModel, depId, mTaskId, this);
-        chooseEmployeesRV.setAdapter(mChooseEmployeesAdapter);
 
-        builder.setView(chooseEmployeesRV);
-
-        builder.setPositiveButton(getString(R.string.choose_department_dialog_positive_button), new DialogInterface.OnClickListener() {
+        final LiveData<List<EmployeeEntry>> restOfEmployees = mViewModel.getRestOfEmployeesInDep(depId, exceptThese);
+        restOfEmployees.observe(this, new Observer<List<EmployeeEntry>>() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mHorizontalEmployeeAdapter.mergeToAddedEmployees(mChooseEmployeesAdapter.getChosenEmployees());
-                mChooseEmployeesAdapter.removeAndClearChosenEmployees();
+            public void onChanged(final List<EmployeeEntry> employeeEntries) {
+                restOfEmployees.removeObservers(AddTaskActivity.this);
+                if (employeeEntries != null) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(AddTaskActivity.this);
+                    if (employeeEntries.isEmpty()) {
+                        builder.setTitle("Empty department");
+                        builder.setMessage("No employees in department please choose another one");
+                        builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        });
+                        builder.show();
+
+                    } else {
+                        builder.setTitle("Employees available");
+                        builder.setCancelable(false);
+                        final List<EmployeeEntry> chosenOnes = new ArrayList<>();
+
+                        final boolean[] isChecked = new boolean[employeeEntries.size()];
+
+                        builder.setMultiChoiceItems(getEmployeeNames(employeeEntries), isChecked, new DialogInterface.OnMultiChoiceClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i, boolean checked) {
+                                isChecked[i] = checked;
+
+                                if (checked) {
+                                    chosenOnes.add(employeeEntries.get(i));
+                                } else {
+                                    chosenOnes.remove(employeeEntries.get(i));
+                                }
+                            }
+                        });
+
+                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mHorizontalEmployeeAdapter.setAddedEmployees(chosenOnes);
+                            }
+                        });
+                        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+
+                        builder.show();
+                    }
+
+                }
+
             }
         });
-        builder.setNegativeButton(getString(R.string.choose_department_dialog_cancel_button), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
 
-        builder.show();
     }
 
-    private void setUpEmployeesRV() {
-        mRecyclerView = findViewById(R.id.task_employees_rv);
+    private String[] getEmployeeNames(List<EmployeeEntry> employeeEntries) {
 
-        mRecyclerView.setHasFixedSize(true);
+        String[] arr = new String[employeeEntries.size()];
+        for (int i = 0; i < employeeEntries.size(); i++) {
+            arr[i] = AppUtils.getFullEmployeeName(employeeEntries.get(i));
+        }
 
+        return arr;
+    }
+
+
+    private void setUpTaskEmployeesRV() {
+
+        mTaskEmployeesRV.setHasFixedSize(true);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(RecyclerView.HORIZONTAL);
-        mRecyclerView.setLayoutManager(layoutManager);
+        mTaskEmployeesRV.setLayoutManager(layoutManager);
 
-        View.OnLongClickListener longClickListener = new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                PopupMenu popupMenu = new PopupMenu(AddTaskActivity.this, view, Gravity.TOP);
-                popupMenu.inflate(R.menu.menu_task_employee_options);
-                popupMenu.setOnMenuItemClickListener(AddTaskActivity.this);
-                popupMenu.show();
-                return true;
+        mHorizontalEmployeeAdapter = new HorizontalEmployeeAdapter(this, this, true);
+        mTaskEmployeesRV.setAdapter(mHorizontalEmployeeAdapter);
 
-            }
-        };
-
-        mHorizontalEmployeeAdapter = new HorizontalEmployeeAdapter(this, longClickListener);
         if (mTaskId == DEFAULT_TASK_ID) {
             mHorizontalEmployeeAdapter.setData(new ArrayList<EmployeeEntry>());
         } else {
@@ -310,12 +244,11 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
             taskEmployees.observe(this, new Observer<List<EmployeeEntry>>() {
                 @Override
                 public void onChanged(List<EmployeeEntry> employeeEntries) {
-                    taskEmployees.removeObserver(this);
+                    taskEmployees.removeObservers(AddTaskActivity.this);
                     mHorizontalEmployeeAdapter.setData(employeeEntries);
                 }
             });
         }
-        mRecyclerView.setAdapter(mHorizontalEmployeeAdapter);
     }
 
     private void clearViews() {
@@ -324,6 +257,18 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         mTaskStartDate.setText("");
         mTaskDueDate.setText("");
         mTaskDepartment.setSelection(0);
+
+        mTaskDepartment.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                mHorizontalEmployeeAdapter.clearAdapter();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
 
     }
 
@@ -334,29 +279,38 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         clickedTaskDepId = taskEntry.getDepartmentID();
         mTaskTitle.setText(taskEntry.getTaskTitle());
         mTaskDescription.setText(taskEntry.getTaskDescription());
-        mTaskStartDate.setText(taskEntry.getTaskStartDate().toString());
-        mTaskDueDate.setText(taskEntry.getTaskDueDate().toString());
+        mTaskStartDate.setText(AppUtils.getFriendlyDate(taskEntry.getTaskStartDate()));
+        mTaskStartDate.setTag(taskEntry.getTaskStartDate());
+        mTaskDueDate.setText(AppUtils.getFriendlyDate(taskEntry.getTaskDueDate()));
+        mTaskDueDate.setTag(taskEntry.getTaskDueDate());
+
         if (departmentsLoaded)
             mTaskDepartment.setSelection(mDepartmentsArrayAdapter.getPositionForItemId(taskEntry.getDepartmentID()));
 
         mTaskDepartment.setEnabled(false);
 
-        enableViews();
+        // TODO: 8/15/18
+//        mTaskDepartment.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                AlertDialog.Builder builder = new AlertDialog.Builder(AddTaskActivity.this);
+//                builder.setMessage("Can't change department of an already running task.If you want you can delete this task and create a new one.");
+//                builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        dialogInterface.dismiss();
+//                    }
+//                });
+//                builder.show();
+//            }
+//        });
+
 
     }
-
-    private void enableViews() {
-        mTaskTitle.setEnabled(mEnableViews);
-        mTaskDescription.setEnabled(mEnableViews);
-        mTaskStartDate.setEnabled(mEnableViews);
-        mTaskDueDate.setEnabled(mEnableViews);
-        addEmployeesToTaskButton.setEnabled(mEnableViews);
-    }
-
 
     private void setUpToolBar() {
         if (mTaskId == DEFAULT_TASK_ID) {
-            getSupportActionBar().setTitle(getString(R.string.add_new_task));
+            getSupportActionBar().setTitle(getString(R.string.add_task));
         } else {
             getSupportActionBar().setTitle(getString(R.string.edit_task));
         }
@@ -366,22 +320,18 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
     @Override
     protected void onStop() {
         super.onStop();
-//        Intent intent = new Intent(this, NotificationService.class);
-//        // send the due date and the id of the task within the intent
-//        Bundle bundle = new Bundle();
-//        bundle.putInt("task id",mTaskId);
-//        try {
-//            bundle.putLong("task due date",FORMAT.parse(mTaskDueDate.toString()).getTime() - new Date().getTime());
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-//        intent.putExtras(bundle);
-//        startService(intent);
+
+        Intent intent = new Intent(this, NotificationService.class);
+        intent.putExtra("task id", mTaskId);
+        intent.putExtra("task due date", ((Date) mTaskDueDate.getTag()).getTime() - new Date().getTime());
+        intent.putExtra("app is destroyed", false);
+        startService(intent);
+
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        getMenuInflater().inflate(R.menu.menu_toolbar, menu);
         return true;
     }
 
@@ -393,7 +343,6 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
                 saveTask();
                 break;
             case android.R.id.home:
-                mChooseEmployeesAdapter.mChosenEmployeesAdapterExecution();
                 finish();
                 break;
         }
@@ -402,25 +351,12 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
 
 
     private void saveTask() {
-        if (valideData()) {
+        if (isValidData()) {
             int departmentId = (int) mTaskDepartment.getSelectedView().getTag();
             String taskTitle = mTaskTitle.getText().toString();
             String taskDescription = mTaskDescription.getText().toString();
-            //todo:change string date to java object date
-            Date taskStartDate = new Date();
-            Date taskDueDate = new Date();
-
-
-//            try {
-//                taskStartDate = FORMAT.parse(mTaskStartDate.toString());
-//                taskDueDate = FORMAT.parse(mTaskDueDate.toString());
-//                Log.v("date", "start date " + taskStartDate);
-//                Log.v("date", "due date " + taskDueDate);
-//                System.out.println("**********************************************************");
-//            } catch (ParseException e) {
-//                e.printStackTrace();
-//            }
-
+            Date taskStartDate = (Date) mTaskStartDate.getTag();
+            Date taskDueDate = (Date) mTaskDueDate.getTag();
 
             final TaskEntry newTask = new TaskEntry(departmentId, taskTitle, taskDescription, taskStartDate, taskDueDate);
 
@@ -435,78 +371,138 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
                     }
                 }
             });
-            final List<EmployeeEntry> addedEmployees = mHorizontalEmployeeAdapter.getAddedEmployees();
 
-            AppExecutor.getInstance().diskIO().execute(new Runnable() {
-                @Override
-                public void run() {
-                    for (int i = 0; addedEmployees != null && i < addedEmployees.size(); i++) {
-                        final EmployeesTasksEntry newEmployeeTask = new EmployeesTasksEntry(addedEmployees.get(i).getEmployeeID(), mTaskId);
-                        mDb.employeesTasksDao().addEmployeeTask(newEmployeeTask);
-                    }
-                }
-            });
-
-            if (!addNewTask) {
-                final List<EmployeeEntry> removedEmployees = mHorizontalEmployeeAdapter.getRemovedEmployees();
-
+            final List<EmployeeEntry> removedEmployees = mHorizontalEmployeeAdapter.getRemovedEmployees();
+            if (removedEmployees != null && !removedEmployees.isEmpty())
                 AppExecutor.getInstance().diskIO().execute(new Runnable() {
                     @Override
                     public void run() {
-                        for (int i = 0; removedEmployees != null && i < removedEmployees.size(); i++) {
-                            final EmployeesTasksEntry deletedEmployeeTask = new EmployeesTasksEntry(removedEmployees.get(i).getEmployeeID(), mTaskId);
+                        for (int i = 0; i < removedEmployees.size(); i++) {
+                            EmployeesTasksEntry deletedEmployeeTask = new EmployeesTasksEntry(removedEmployees.get(i).getEmployeeID(), mTaskId);
                             mDb.employeesTasksDao().deleteEmployeeTask(deletedEmployeeTask);
                         }
                     }
                 });
-            }
 
+
+            final List<EmployeeEntry> addedEmployees = mHorizontalEmployeeAdapter.getAddedEmployees();
+            if (addedEmployees != null && !addedEmployees.isEmpty())
+                AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (int i = 0; i < addedEmployees.size(); i++) {
+                            EmployeesTasksEntry newEmployeeTask = new EmployeesTasksEntry(addedEmployees.get(i).getEmployeeID(), mTaskId);
+                            mDb.employeesTasksDao().addEmployeeTask(newEmployeeTask);
+                        }
+                    }
+                });
+
+            finish();
         }
-        finish();
+
     }
 
-    private boolean valideData() {
-        return true;
+
+    private boolean isValidData() {
+
+        boolean valid = true;
+
+        if (TextUtils.isEmpty(mTaskTitle.getText())) {
+            updateErrorVisibility("title", true);
+            valid = false;
+        } else {
+            updateErrorVisibility("title", false);
+        }
+
+        if (mTaskTitle.getText().length() > 40) {
+            valid = false;
+        }
+        Date startDate = (Date) mTaskStartDate.getTag();
+        Date dueDate = (Date) mTaskDueDate.getTag();
+
+
+        if (startDate == null) {
+            updateErrorVisibility("startDate", true);
+            valid = false;
+        } else {
+            updateErrorVisibility("startDate", false);
+        }
+
+        if (dueDate == null) {
+            updateErrorVisibility("dueDate", true);
+            valid = false;
+        } else {
+            updateErrorVisibility("dueDate", false);
+        }
+
+        if (mHorizontalEmployeeAdapter.getItemCount() == 0) {
+            updateErrorVisibility("employees", true);
+            valid = false;
+        }
+
+        return valid;
+    }
+
+    public void pickTime(View view) {
+        //create a bundle containing id of clicked text view (startDateTextView or dueDateTextView)
+        Bundle bundle = new Bundle();
+        bundle.putInt("time_view_id", view.getId());
+
+        //instantiate a DatePickerFragment to show date picker dialog
+        DialogFragment timePickerFragment = new TimePickerFragment();
+        timePickerFragment.setArguments(bundle);
+
+        //show th dialog
+        timePickerFragment.show(getSupportFragmentManager(), "timePicker");
+    }
+
+    private void updateErrorVisibility(String key, boolean show) {
+        if (show)
+            switch (key) {
+                case "title":
+                    ((TextInputLayout) findViewById(R.id.task_title_TIL)).setError(getString(R.string.required_field));
+                    break;
+                case "startDate":
+                    ((TextInputLayout) findViewById(R.id.task_start_date_TIL)).setError(getString(R.string.required_field));
+                    break;
+                case "dueDate":
+                    ((TextInputLayout) findViewById(R.id.task_due_date_TIL)).setError(getString(R.string.required_field));
+                    break;
+                case "employees":
+                    AlertDialog.Builder builder = new AlertDialog.Builder(AddTaskActivity.this);
+                    builder.setMessage("There must be at least one employee assigned to this task.");
+                    builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    });
+                    builder.show();
+            }
+        else
+            switch (key) {
+                case "title":
+                    ((TextInputLayout) findViewById(R.id.task_title_TIL)).setHelperText(getString(R.string.required_field));
+
+                    break;
+                case "startDate":
+                    ((TextInputLayout) findViewById(R.id.task_start_date_TIL)).setHelperText(getString(R.string.required_field));
+                    break;
+                case "dueDate":
+                    ((TextInputLayout) findViewById(R.id.task_due_date_TIL)).setHelperText(getString(R.string.required_field));
+                    break;
+            }
     }
 
 
     public void pickDate(View view) {
-        //create a bundle containing id of clicked text view (startDateTextView or dueDateTextView)
-        Bundle bundle = new Bundle();
-        bundle.putInt("date_view_id", view.getId());
-
-        //instantiate a DatePickerFragment to show date picker dialog
-        DialogFragment datePickerFragment = new DatePickerFragment();
-        datePickerFragment.setArguments(bundle);
-
-        //show th dialog
-        datePickerFragment.show(getSupportFragmentManager(), "datePicker");
+        AppUtils.showDatePicker(this, view, false);
     }
 
-    @Override
-    public void onBackPressed() {
-
-        super.onBackPressed();
-    }
-
-    @Override
-    public boolean onMenuItemClick(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_remove_employee:
-                if (mChooseEmployeesAdapter == null)
-                    mChooseEmployeesAdapter = ChooseEmployeesAdapter.getInstance(mViewModel, mViewModel.getTask().getValue().getDepartmentID(), mTaskId, this);
-                mChooseEmployeesAdapter.mergeToEmployeeInDepNotTask(mHorizontalEmployeeAdapter.removeEmployee());
-                return true;
-            default:
-                return false;
-        }
-
-    }
 
     @Override
     public void onEmployeeClick(int employeeRowID, int employeePosition) {
         Intent intent = new Intent(this, AddEmployeeActivity.class);
-        intent.putExtra(AddEmployeeActivity.EMPLOYEE_VIEW_ONLY, true);
         intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY, employeeRowID);
         startActivity(intent);
     }

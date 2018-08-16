@@ -3,6 +3,7 @@ package com.example.android.employeesmanagementapp.data.entries;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Index;
 
 /**
  * EmployeesTasks Entry POJO
@@ -11,6 +12,7 @@ import androidx.room.ForeignKey;
  */
 @Entity(tableName = "employees_tasks",
         primaryKeys = {"employee_id", "task_id"},
+        indices = {@Index(value = {"task_id"})},
         foreignKeys = {@ForeignKey(entity = EmployeeEntry.class, parentColumns = "employee_id", childColumns = "employee_id"),
                 @ForeignKey(entity = TaskEntry.class, parentColumns = "task_id", childColumns = "task_id")})
 public class EmployeesTasksEntry {

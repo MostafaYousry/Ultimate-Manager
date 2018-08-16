@@ -81,7 +81,6 @@ public class DepartmentsArrayAdapter extends ArrayAdapter<String> {
         if (mDepartmentEntryList == null)
             return 0;
 
-
         return mDepartmentEntryList.indexOf(new DepartmentEntry(depId));
 
     }
@@ -90,4 +89,6 @@ public class DepartmentsArrayAdapter extends ArrayAdapter<String> {
         mDepartmentEntryList = departmentEntryList;
         notifyDataSetChanged();
     }
+
+
 }
