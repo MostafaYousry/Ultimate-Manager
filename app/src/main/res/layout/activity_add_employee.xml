@@ -180,7 +180,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_employee_email"
-                    android:inputType="text"
+                    android:inputType="textEmailAddress"
                     android:maxLines="1" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -197,13 +197,14 @@
                 app:layout_constraintTop_toBottomOf="@+id/employee_email_TIL" />
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/textInputLayout6"
+                android:id="@+id/employee_phone_TIL"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="8dp"
+                app:helperText="@string/required_field"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/imageView5"
                 app:layout_constraintTop_toBottomOf="@+id/employee_email_TIL">
@@ -214,7 +215,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_employee_phone"
-                    android:inputType="text"
+                    android:inputType="phone"
                     android:maxLines="1" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -227,7 +228,7 @@
                 android:layout_marginTop="20dp"
                 android:src="@drawable/ic_salary"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textInputLayout6" />
+                app:layout_constraintTop_toBottomOf="@+id/employee_phone_TIL" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/employee_salary_TIL"
@@ -240,7 +241,7 @@
                 app:helperText="@string/required_field"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/imageView6"
-                app:layout_constraintTop_toBottomOf="@+id/textInputLayout6">
+                app:layout_constraintTop_toBottomOf="@+id/employee_phone_TIL">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/employee_salary"
@@ -248,7 +249,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_employee_salary"
-                    android:inputType="text"
+                    android:inputType="number|numberDecimal"
                     android:maxLines="1" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -272,7 +273,8 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="8dp"
                 android:foreground="@drawable/round_rect_shape"
-                android:paddingStart="5dp"
+                android:dropDownWidth="match_parent"
+                android:spinnerMode="dropdown"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/imageView7"
                 app:layout_constraintTop_toBottomOf="@+id/employee_salary_TIL" />
@@ -309,6 +311,7 @@
                     android:focusable="false"
                     android:hint="@string/hint_employee_hire_date"
                     android:inputType="text"
+                    android:onClick="pickDate"
                     android:maxLines="1" />
 
             </com.google.android.material.textfield.TextInputLayout>

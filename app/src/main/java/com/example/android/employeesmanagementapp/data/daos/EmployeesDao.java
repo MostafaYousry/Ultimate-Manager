@@ -145,9 +145,7 @@ public interface EmployeesDao {
      * @param empID
      */
     @Query("UPDATE employees SET employee_is_deleted = 1 WHERE employee_id=:empID")
-    void deleteEmployeeFromCompletedTask(int empID);
+    void deleteEmployee(int empID);
 
-    @Query("UPDATE employees SET employee_is_deleted = 1 WHERE employee_id=:empId")
-    void deleteEmployeeFromDepartmentTask(int empId);
 
 }

@@ -32,7 +32,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-
     private Toolbar mToolbar;
     private BottomNavigationView mBottomNavigationView;
     private TabLayout mTabLayout;

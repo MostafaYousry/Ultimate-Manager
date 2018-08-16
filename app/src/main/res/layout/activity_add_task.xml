@@ -155,6 +155,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:cursorVisible="false"
+                    android:onClick="pickTime"
                     android:focusable="false"
                     android:hint="@string/hint_task_start_date_time"
                     android:maxLines="1" />
@@ -209,6 +210,7 @@
                     android:layout_height="wrap_content"
                     android:cursorVisible="false"
                     android:focusable="false"
+                    android:onClick="pickTime"
                     android:hint="@string/hint_task_due_date_time"
                     android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -233,7 +235,8 @@
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
                 android:foreground="@drawable/round_rect_shape"
-                android:paddingStart="5dp"
+                android:dropDownWidth="wrap_content"
+                android:spinnerMode="dropdown"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/imageView2"

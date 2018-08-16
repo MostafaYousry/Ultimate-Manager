@@ -29,7 +29,7 @@
     <string name="label_employee_department">Department :</string>
     <string name="hint_employee_name">Employee Name</string>
     <string name="hint_employee_salary">Employee Salary</string>
-    <string name="hint_employee_hire_date">Choose Date Hired</string>
+    <string name="hint_employee_hire_date">Date Hired</string>
     <string name="hint_employee_department">Choose a Department</string>
 
 
@@ -84,5 +84,9 @@
     <string name="employee_list_item_name">%s %s</string>
 
     <string name="task_list_item_name_dates">%s to %s</string>
+    <string name="error_invalid_email">invalid email</string>
+    <string name="delete_employees">Delete</string>
+    <string name="title_dialog_delete_employees">Delete Employee(s)</string>
+    <string name="message_dialog_delete_employees">Note:  deleted employee(s) will be removed from running tasks and will be visible only from completed tasks</string>
 
 </resources>
