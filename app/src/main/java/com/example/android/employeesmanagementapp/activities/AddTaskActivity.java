@@ -55,6 +55,8 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
     private EditText mTaskDescription;
     private TextView mTaskStartDate;
     private TextView mTaskDueDate;
+    private TextView mTaskStartTime;
+    private TextView mTaskDueTime;
     private Spinner mTaskDepartment;
     private Toolbar mToolbar;
     private RecyclerView mTaskEmployeesRV;
@@ -77,6 +79,8 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         mTaskDescription = findViewById(R.id.task_description);
         mTaskStartDate = findViewById(R.id.task_start_date);
         mTaskDueDate = findViewById(R.id.task_due_date);
+        mTaskStartTime = findViewById(R.id.task_start_date_time);
+        mTaskDueTime = findViewById(R.id.task_due_date_time);
         mTaskDepartment = findViewById(R.id.task_department);
         mToolbar = findViewById(R.id.toolbar);
         mTaskEmployeesRV = findViewById(R.id.task_employees_rv);
@@ -136,6 +140,34 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
 
 
         setUpTaskEmployeesRV();
+
+        mTaskDueDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pickDate(view);
+            }
+        });
+
+        mTaskStartDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pickDate(view);
+            }
+        });
+
+        mTaskStartTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pickTime(view);
+            }
+        });
+
+        mTaskDueTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pickTime(view);
+            }
+        });
 
     }
 
@@ -256,6 +288,8 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         mTaskDescription.setText("");
         mTaskStartDate.setText("");
         mTaskDueDate.setText("");
+        mTaskStartTime.setText("");
+        mTaskDueTime.setText("");
         mTaskDepartment.setSelection(0);
 
         mTaskDepartment.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -279,10 +313,18 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         clickedTaskDepId = taskEntry.getDepartmentID();
         mTaskTitle.setText(taskEntry.getTaskTitle());
         mTaskDescription.setText(taskEntry.getTaskDescription());
+
         mTaskStartDate.setText(AppUtils.getFriendlyDate(taskEntry.getTaskStartDate()));
         mTaskStartDate.setTag(taskEntry.getTaskStartDate());
+
         mTaskDueDate.setText(AppUtils.getFriendlyDate(taskEntry.getTaskDueDate()));
         mTaskDueDate.setTag(taskEntry.getTaskDueDate());
+
+        mTaskStartTime.setText(AppUtils.getFriendlyTime(taskEntry.getTaskStartDate()));
+        mTaskStartTime.setTag(taskEntry.getTaskStartDate());
+
+        mTaskDueTime.setText(AppUtils.getFriendlyTime(taskEntry.getTaskDueDate()));
+        mTaskDueTime.setTag(taskEntry.getTaskDueDate());
 
         if (departmentsLoaded)
             mTaskDepartment.setSelection(mDepartmentsArrayAdapter.getPositionForItemId(taskEntry.getDepartmentID()));
@@ -320,10 +362,9 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
     @Override
     protected void onStop() {
         super.onStop();
-
         Intent intent = new Intent(this, NotificationService.class);
         intent.putExtra("task id", mTaskId);
-        intent.putExtra("task due date", ((Date) mTaskDueDate.getTag()).getTime() - new Date().getTime());
+        intent.putExtra("task due date", AppUtils.getChosenDateAndTime(((Date) mTaskDueDate.getTag()), ((Date) mTaskDueTime.getTag())).getTime() - new Date().getTime());
         intent.putExtra("app is destroyed", false);
         startService(intent);
 
@@ -355,8 +396,8 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
             int departmentId = (int) mTaskDepartment.getSelectedView().getTag();
             String taskTitle = mTaskTitle.getText().toString();
             String taskDescription = mTaskDescription.getText().toString();
-            Date taskStartDate = (Date) mTaskStartDate.getTag();
-            Date taskDueDate = (Date) mTaskDueDate.getTag();
+            Date taskDueDate = AppUtils.getChosenDateAndTime(((Date) mTaskDueDate.getTag()), ((Date) mTaskDueTime.getTag()));
+            Date taskStartDate = AppUtils.getChosenDateAndTime(((Date) mTaskStartDate.getTag()), ((Date) mTaskStartTime.getTag()));
 
             final TaskEntry newTask = new TaskEntry(departmentId, taskTitle, taskDescription, taskStartDate, taskDueDate);
 

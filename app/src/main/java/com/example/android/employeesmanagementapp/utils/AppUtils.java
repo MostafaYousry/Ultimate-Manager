@@ -17,6 +17,7 @@ import com.example.android.employeesmanagementapp.fragments.ColorPickerDialogFra
 import com.example.android.employeesmanagementapp.fragments.DatePickerDialogFragment;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import androidx.appcompat.app.AlertDialog;
@@ -109,6 +110,24 @@ public final class AppUtils {
         return SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM).format(date);
     }
 
+    public static String getFriendlyTime(Date date) {
+        return SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT).format(date);
+    }
+
+    public static Date getChosenDateAndTime(Date chosenDate, Date chosenTime) {
+        Calendar dateCalendar = Calendar.getInstance();
+        dateCalendar.setTime(chosenDate);
+        Calendar timeCalendar = Calendar.getInstance();
+        timeCalendar.setTime(chosenTime);
+
+        Calendar dateAndTimeCalender = Calendar.getInstance();
+        dateAndTimeCalender.set(Calendar.HOUR_OF_DAY, timeCalendar.get(Calendar.HOUR_OF_DAY));
+        dateAndTimeCalender.set(Calendar.MINUTE, timeCalendar.get(Calendar.MINUTE));
+        dateAndTimeCalender.set(Calendar.YEAR, dateCalendar.get(Calendar.YEAR));
+        dateAndTimeCalender.set(Calendar.MONTH, dateCalendar.get(Calendar.MONTH));
+        dateAndTimeCalender.set(Calendar.DAY_OF_MONTH, dateCalendar.get(Calendar.DAY_OF_MONTH));
+        return dateAndTimeCalender.getTime();
+    }
 
     public static String getFullEmployeeName(EmployeeEntry employeeEntry) {
         return employeeEntry.getEmployeeFirstName() + " " + employeeEntry.getEmployeeMiddleName() + " " + employeeEntry.getEmployeeLastName();
