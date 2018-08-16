@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -88,6 +90,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
 
     boolean departmentsLoaded = false;
     private int clickedTaskDepId = -1;
+    private boolean textIsChanged = false;
     private boolean mEnableViews = true;
 
     private DepartmentsArrayAdapter mDepartmentsArrayAdapter;
@@ -124,6 +127,30 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
 
         //get views
         mTaskTitle = findViewById(R.id.task_title);
+
+
+        TextWatcher textWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                textIsChanged = true;
+            }
+        };
+        mTaskTitle.addTextChangedListener(textWatcher);
+        mTaskDescription.addTextChangedListener(textWatcher);
+        mTaskDueDate.addTextChangedListener(textWatcher);
+        mTaskStartDate.addTextChangedListener(textWatcher);
+
+
         mTaskDescription = findViewById(R.id.task_description);
         mTaskStartDate = findViewById(R.id.task_start_date);
         mTaskDueDate = findViewById(R.id.task_due_date);
@@ -438,7 +465,6 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         finish();
     }
 
-
     private boolean valideData() {
         return true;
     }
@@ -457,6 +483,11 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         datePickerFragment.show(getSupportFragmentManager(), "datePicker");
     }
 
+    @Override
+    public void onBackPressed() {
+
+        super.onBackPressed();
+    }
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {

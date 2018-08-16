@@ -61,7 +61,8 @@
                 android:layout_marginLeft="16dp"
                 android:text="@string/label_employee_name"
                 android:textColor="@android:color/black"
-                android:textSize="18sp"
+                android:textSize="16sp"
+                android:fontFamily="@font/open_sans_light"
                 app:layout_constraintBaseline_toBaselineOf="@+id/employee_name"
                 app:layout_constraintStart_toStartOf="parent" />
 
@@ -74,6 +75,8 @@
                 android:layout_marginRight="16dp"
                 android:ems="10"
                 android:hint="@string/hint_employee_name"
+                android:textSize="16sp"
+                android:fontFamily="@font/open_sans_light"
                 android:inputType="textPersonName"
                 app:layout_constraintBottom_toTopOf="@+id/employee_salary"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -88,7 +91,8 @@
                 android:layout_marginLeft="16dp"
                 android:text="@string/label_employee_salary"
                 android:textColor="@android:color/black"
-                android:textSize="18sp"
+                android:textSize="16sp"
+                android:fontFamily="@font/open_sans_light"
                 app:layout_constraintBaseline_toBaselineOf="@+id/employee_salary"
                 app:layout_constraintStart_toStartOf="parent" />
 
@@ -101,6 +105,8 @@
                 android:layout_marginRight="16dp"
                 android:ems="10"
                 android:hint="@string/hint_employee_salary"
+                android:textSize="16sp"
+                android:fontFamily="@font/open_sans_light"
                 android:inputType="number|numberDecimal"
                 app:layout_constraintBottom_toTopOf="@+id/employee_hire_date"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -114,7 +120,8 @@
                 android:layout_marginLeft="16dp"
                 android:text="@string/label_employee_hire_date"
                 android:textColor="@android:color/black"
-                android:textSize="18sp"
+                android:textSize="16sp"
+                android:fontFamily="@font/open_sans_light"
                 app:layout_constraintBaseline_toBaselineOf="@+id/employee_hire_date"
                 app:layout_constraintStart_toStartOf="parent" />
 
@@ -128,7 +135,8 @@
                 android:hint="@string/hint_employee_hire_date"
                 android:onClick="pickDate"
                 android:textColor="@android:color/black"
-                android:textSize="18sp"
+                android:textSize="16sp"
+                android:fontFamily="@font/open_sans_light"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/employee_salary"
                 app:layout_constraintTop_toBottomOf="@+id/employee_salary" />
@@ -140,7 +148,8 @@
                 android:layout_marginStart="16dp"
                 android:text="@string/label_employee_department"
                 android:textColor="@android:color/black"
-                android:textSize="18sp"
+                android:textSize="16sp"
+                android:fontFamily="@font/open_sans_light"
                 app:layout_constraintBottom_toBottomOf="@+id/employee_department"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/employee_department" />
@@ -153,7 +162,8 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
                 android:textColor="@android:color/black"
-                android:textSize="18sp"
+                android:textSize="16sp"
+                android:fontFamily="@font/open_sans_light"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/employee_hire_date"
                 app:layout_constraintTop_toBottomOf="@+id/employee_hire_date" />
@@ -165,7 +175,8 @@
                 android:layout_marginStart="16dp"
                 android:text="Rating:"
                 android:textColor="@android:color/black"
-                android:textSize="18sp"
+                android:textSize="16sp"
+                android:fontFamily="@font/open_sans_light"
                 app:layout_constraintBottom_toBottomOf="@+id/employee_rating"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/employee_rating" />
@@ -198,7 +209,8 @@
                 android:layout_marginTop="16dp"
                 android:text="Completed tasks"
                 android:textColor="@android:color/black"
-                android:textSize="18sp"
+                android:textSize="16sp"
+                android:fontFamily="@font/open_sans_light"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/employee_rating" />
 

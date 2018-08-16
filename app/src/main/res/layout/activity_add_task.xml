@@ -67,6 +67,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_task_title"
+                    android:fontFamily="@font/open_sans_light"
                     android:inputType="text"
                     android:maxLines="1" />
 
@@ -90,6 +91,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="top|start"
                     android:hint="@string/hint_task_description"
+                    android:fontFamily="@font/open_sans_light"
                     android:inputType="text|textMultiLine"
                     android:lines="10"
                     android:overScrollMode="always"
@@ -124,6 +126,7 @@
                     android:drawablePadding="4dp"
                     android:focusable="false"
                     android:hint="@string/hint_task_start_date"
+                    android:fontFamily="@font/open_sans_light"
                     android:maxLines="1"
                     android:onClick="pickDate"
                     tools:text="@tools:sample/date/ddmmyy" />
@@ -154,6 +157,7 @@
                     android:drawablePadding="4dp"
                     android:focusable="false"
                     android:hint="@string/hint_task_due_date"
+                    android:fontFamily="@font/open_sans_light"
                     android:inputType="date"
                     android:maxLines="1"
                     android:onClick="pickDate"
@@ -187,7 +191,8 @@
                 android:layout_marginTop="16dp"
                 android:text="Task Employees "
                 android:textColor="@color/primaryTextColor"
-                android:textSize="18sp"
+                android:textSize="16sp"
+                android:fontFamily="@font/open_sans_light"
                 app:layout_constraintBottom_toTopOf="@+id/task_employees_rv"
                 app:layout_constraintEnd_toStartOf="@+id/add_employees_to_task_button"
                 app:layout_constraintHorizontal_bias="0.5"

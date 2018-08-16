@@ -18,9 +18,10 @@
             android:id="@+id/item_task_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/biryani"
             android:gravity="center_vertical"
             android:textColor="@color/secondaryTextColor"
-            android:textSize="18sp"
+            android:textSize="20sp"
             card_view:layout_constraintStart_toStartOf="parent"
             card_view:layout_constraintTop_toTopOf="parent"
             tools:text="Prepare meeting papers" />
@@ -28,6 +29,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/open_sans_light"
             android:gravity="center_vertical"
             android:textColor="@color/secondaryTextColor"
             android:textSize="18sp"

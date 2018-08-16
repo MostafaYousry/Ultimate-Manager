@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.fragments.DepartmentsFragment;
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     private int mSelectedFragmentId;
     private Toolbar mToolbar;
+    private TextView mToolbarText;
     private BottomNavigationView mBottomNavigationView;
 
 
@@ -40,7 +42,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         //set toolbar as actionbar
         mToolbar = findViewById(R.id.toolbar);
+        mToolbarText = findViewById(R.id.custom_title);
         setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 
         //setup navigation view
@@ -52,7 +56,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         if (savedInstanceState == null) {
             mBottomNavigationView.setSelectedItemId(R.id.nav_tasks);
             loadFragment(new TasksScreenSlidePagerFragment());
-            getSupportActionBar().setTitle(getString(R.string.tasks));
             mSelectedFragmentId = R.id.nav_tasks;
         }
 
@@ -108,15 +111,15 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         switch (mSelectedFragmentId) {
             case R.id.nav_tasks:
                 loadFragment(new TasksScreenSlidePagerFragment());
-                mToolbar.setTitle(getString(R.string.tasks));
+                mToolbarText.setText(getString(R.string.tasks));
                 break;
             case R.id.nav_employees:
                 loadFragment(new EmployeesFragment());
-                mToolbar.setTitle(getString(R.string.employees));
+                mToolbarText.setText(getString(R.string.employees));
                 break;
             case R.id.nav_departments:
                 loadFragment(new DepartmentsFragment());
-                mToolbar.setTitle(getString(R.string.departments));
+                mToolbarText.setText(getString(R.string.departments));
                 break;
 
         }

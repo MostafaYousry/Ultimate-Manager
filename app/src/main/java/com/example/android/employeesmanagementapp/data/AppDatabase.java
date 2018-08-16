@@ -116,7 +116,7 @@ public abstract class AppDatabase extends RoomDatabase {
                                         db.tasksDao().addTask(new TaskEntry(9, 1, "task9", "askasmas", new Date(), new Date(), 0, false));
                                         db.tasksDao().addTask(new TaskEntry(10, 1, "task10", "askasmas", new Date(), new Date(), 0, false));
                                     }
-                                });
+                               });
                             }
                         })
                         .build();
