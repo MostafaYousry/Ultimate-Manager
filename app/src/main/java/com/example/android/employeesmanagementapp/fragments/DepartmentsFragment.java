@@ -138,7 +138,7 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
     private void showEmptyView() {
         mRecyclerView.setVisibility(View.GONE);
         mEmptyViewTextView.setText(R.string.department_empty_view_message);
-        mEmptyViewImageView.setImageResource(R.drawable.ic_no_dep1);
+        mEmptyViewImageView.setImageResource(R.drawable.ic_no_dep);
         mEmptyView.setVisibility(View.VISIBLE);
     }
 
