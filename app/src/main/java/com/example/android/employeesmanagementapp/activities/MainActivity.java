@@ -209,35 +209,35 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 mBottomNavigationView.setItemIconTintList(null);
                 loadFragment(tasksFragment);
                 mTabLayout.setVisibility(View.VISIBLE);
-                getSupportActionBar().setTitle(getString(R.string.tasks));
+                mToolbarText.setText(getString(R.string.tasks));
                 mFab.setOnClickListener(mFabClickListenerTasks);
                 if (mTabLayout.getSelectedTabPosition() == 1)
                     mFab.hide();
                 else mFab.show();
 
-                mToolbarText.setText(getString(R.string.tasks));
+
                 break;
             case R.id.nav_employees:
                 item.setIcon(R.drawable.ic_employee_filled);
                 mBottomNavigationView.setItemIconTintList(null);
                 loadFragment(employeesFragment);
                 mTabLayout.setVisibility(View.GONE);
-                getSupportActionBar().setTitle(getString(R.string.employees));
+                mToolbarText.setText(getString(R.string.employees));
                 mFab.setOnClickListener(mFabClickListenerEmployees);
                 mFab.show();
 
-                                mToolbarText.setText(getString(R.string.employees));
+
                 break;
             case R.id.nav_departments:
                 item.setIcon(R.drawable.ic_departments_filled);
                 mBottomNavigationView.setItemIconTintList(null);
                 loadFragment(departmentsFragment);
                 mTabLayout.setVisibility(View.GONE);
-                getSupportActionBar().setTitle(getString(R.string.departments));
+                mToolbarText.setText(getString(R.string.departments));
                 mFab.setOnClickListener(mFabClickListenerDepartments);
                 mFab.show();
 
-                mToolbarText.setText(getString(R.string.departments));
+
                 break;
 
         }
