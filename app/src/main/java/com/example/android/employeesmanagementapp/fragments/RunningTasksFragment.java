@@ -2,10 +2,12 @@ package com.example.android.employeesmanagementapp.fragments;
 
 
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -38,6 +40,8 @@ public class RunningTasksFragment extends Fragment implements TasksAdapter.Tasks
     private LinearLayout emptyView;
     private TextView emptyViewTextView;
 
+    private ImageView emptyViewImageView;
+
 
     public RunningTasksFragment() {
         // Required empty public constructor
@@ -61,6 +65,7 @@ public class RunningTasksFragment extends Fragment implements TasksAdapter.Tasks
 
         emptyView = view.findViewById(R.id.empty_view);
         emptyViewTextView = view.findViewById(R.id.empty_view_message_text_view);
+        emptyViewImageView = view.findViewById(R.id.empty_view_message_image_view);
 
         // Inflate the layout for this fragment
         mRecyclerView = view.findViewById(R.id.rv_fragment);
@@ -99,6 +104,7 @@ public class RunningTasksFragment extends Fragment implements TasksAdapter.Tasks
     private void showEmptyView() {
         mRecyclerView.setVisibility(View.GONE);
         emptyViewTextView.setText(R.string.task_empty_view_message);
+        emptyViewImageView.setImageResource(R.drawable.ic_no_task);
         emptyView.setVisibility(View.VISIBLE);
     }
 

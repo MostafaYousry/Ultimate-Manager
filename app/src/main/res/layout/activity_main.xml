@@ -18,8 +18,18 @@
             android:background="?attr/colorPrimary"
             android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
             app:layout_scrollFlags="scroll|enterAlways"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            tools:title="Tasks" />
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+
+        <TextView
+            android:id="@+id/custom_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tasks"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:fontFamily="@font/open_sans_light" />
+        </androidx.appcompat.widget.Toolbar>
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout"

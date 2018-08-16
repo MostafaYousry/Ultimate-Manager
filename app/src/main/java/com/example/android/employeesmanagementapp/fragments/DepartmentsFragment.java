@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -47,6 +48,7 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
     private AppDatabase mDb;
     private LinearLayout mEmptyView;
     private TextView mEmptyViewTextView;
+    private ImageView mEmptyViewImageView;
     private List<DepartmentEntry> mSelectedDepartments = new ArrayList<>();
     private AddNewDepViewModel mAddNewDepViewModel;
 
@@ -78,6 +80,7 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
         mRecyclerView = rootView.findViewById(R.id.rv_fragment);
         mEmptyView = rootView.findViewById(R.id.empty_view);
         mEmptyViewTextView = rootView.findViewById(R.id.empty_view_message_text_view);
+        mEmptyViewImageView = rootView.findViewById(R.id.empty_view_message_image_view);
         // this setting to improves performance if you know that changes
         // in content do not change the layout size of the RecyclerView
         mRecyclerView.setHasFixedSize(true);
@@ -135,6 +138,7 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
     private void showEmptyView() {
         mRecyclerView.setVisibility(View.GONE);
         mEmptyViewTextView.setText(R.string.department_empty_view_message);
+        mEmptyViewImageView.setImageResource(R.drawable.ic_no_dep1);
         mEmptyView.setVisibility(View.VISIBLE);
     }
 

@@ -6,11 +6,18 @@
     android:gravity="center"
     android:orientation="vertical">
 
+    <ImageView
+        android:id="@+id/empty_view_message_image_view"
+        android:layout_width="175dp"
+        android:layout_height="162dp"
+        android:src="@drawable/ic_no_task" />
+
     <TextView
         android:id="@+id/empty_view_message_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/black"
-        android:textSize="18sp" />
+        android:layout_width="310dp"
+        android:layout_height="70dp"
+        android:fontFamily="@font/open_sans_light"
+        android:gravity="center"
+        android:textSize="22sp" />
 
 </LinearLayout>

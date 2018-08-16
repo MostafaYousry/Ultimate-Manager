@@ -10,6 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -51,6 +52,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
 
     private LinearLayout emptyView;
     private TextView emptyViewTextView;
+    private ImageView emptyViewImageView;
 
     private boolean mIsInMultiSelectMode;
 
@@ -98,6 +100,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
 
         emptyView = rootView.findViewById(R.id.empty_view);
         emptyViewTextView = rootView.findViewById(R.id.empty_view_message_text_view);
+        emptyViewImageView = rootView.findViewById(R.id.empty_view_message_image_view);
 
         return rootView;
     }
@@ -149,6 +152,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
     private void showEmptyView() {
         mRecyclerView.setVisibility(View.GONE);
         emptyViewTextView.setText(R.string.employee_empty_view_message);
+        emptyViewImageView.setImageResource(R.drawable.ic_no_employee);
         emptyView.setVisibility(View.VISIBLE);
     }
 
