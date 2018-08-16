@@ -1,12 +1,15 @@
 package com.example.android.employeesmanagementapp;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -73,30 +76,35 @@ public class NotificationService extends Service {
     }
 
     public void startTimer() {
+
         if (!appIsDestroyed) {
             if (mTaskTimer.containsKey(mTaskId)) {
                 mTimer = mTaskTimer.get(mTaskId);
                 stopTimerTask();
                 mTaskTimer.remove(mTaskId);
             }
-            mTimer = new Timer();
-            mTaskTimer.put(mTaskId, mTimer);
-            initializeTimerTask();
-            //mTimer.schedule(mTimerTask, 10000);
-            mTimer.schedule(mTimerTask,mTaskDueDate);
+            if (mTaskDueDate >= 0) {
+                mTimer = new Timer();
+                mTaskTimer.put(mTaskId, mTimer);
+                initializeTimerTask();
+                //mTimer.schedule(mTimerTask, 10000);
+                mTimer.schedule(mTimerTask, mTaskDueDate);
+            }
         } else {
             AppExecutor.getInstance().diskIO().execute(new Runnable() {
                 @Override
                 public void run() {
                     List<Date> allTasksDueDate = AppDatabase.getInstance(getApplicationContext()).tasksDao().getAllTasksDueDate();
                     List<Integer> allTasksId = AppDatabase.getInstance(getApplicationContext()).tasksDao().getAllTasksId();
-                    for (int i = 0; i < allTasksDueDate.size() && allTasksDueDate.get(i).compareTo(new Date()) >= 0; i++) {
-                        mTimer = new Timer();
-                        mTaskTimer.put(allTasksId.get(i), mTimer);
-                        initializeTimerTask();
-                        //mTimer.schedule(mTimerTask, 10000 + i * 1000);
-                        Log.i("tasks due date", " task number = " + (i + 1));
-                        mTimer.schedule(mTimerTask,allTasksDueDate.get(i));
+                    for (int i = 0; i < allTasksDueDate.size(); i++) {
+                        if (allTasksDueDate.get(i).compareTo(new Date()) >= 0) {
+                            mTimer = new Timer();
+                            mTaskTimer.put(allTasksId.get(i), mTimer);
+                            initializeTimerTask();
+                            //mTimer.schedule(mTimerTask, 10000 + i * 1000);
+                            Log.i("tasks due date", " task number = " + allTasksId.get(i));
+                            mTimer.schedule(mTimerTask, allTasksDueDate.get(i));
+                        }
                     }
                 }
             });
@@ -123,12 +131,13 @@ public class NotificationService extends Service {
                 final boolean notification = mHandler.post(new Runnable() {
                     public void run() {
 
+                        createNotificationChannel("22327");
                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
 
-                        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext())
-                                .setSmallIcon(R.mipmap.ic_launcher)
+                        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext(),"22327")
+                                .setSmallIcon(R.drawable.ic_task_notification)
                                 .setContentTitle(getResources().getText(R.string.app_name))
                                 .setContentText(++mTasksCount + " tasks due date are met")
                                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -142,13 +151,29 @@ public class NotificationService extends Service {
 
                         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
                         // notificationId is a unique int for each notification that you must define
-                        notificationManager.notify(0, mBuilder.build());
+                        notificationManager.notify(22327, mBuilder.build());
                         setBadge(getApplicationContext(), mTasksCount);
 
                     }
                 });
             }
         };
+    }
+
+    private void createNotificationChannel(String CHANNEL_ID) {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.channel_name);
+            String description = getString(R.string.channel_description);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
     public static void setBadge(Context context, int count) {
