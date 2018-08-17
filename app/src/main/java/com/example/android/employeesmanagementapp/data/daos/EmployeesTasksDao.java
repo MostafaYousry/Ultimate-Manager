@@ -25,6 +25,12 @@ public interface EmployeesTasksDao {
             "WHERE employees_tasks.task_id=:taskId")
     LiveData<List<EmployeeEntry>> getEmployeesForTask(int taskId);
 
+    @Query("SELECT COUNT(*) FROM employees " +
+            "INNER JOIN employees_tasks " +
+            "ON employees.employee_id=employees_tasks.employee_id " +
+            "WHERE employees_tasks.task_id=:taskId ")
+    int getNumEmployeesForRunningTask(int taskId);
+
     @Query("SELECT COUNT(*) FROM tasks " +
             "INNER JOIN employees_tasks " +
             "ON tasks.task_id=employees_tasks.task_id " +

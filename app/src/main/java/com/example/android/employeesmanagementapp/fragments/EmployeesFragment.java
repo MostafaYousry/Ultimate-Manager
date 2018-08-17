@@ -252,6 +252,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
                                 abortMultiSelection();
                             }
                         });
+                            mDb.tasksDao().deleteEmptyTasks();
 
                     }
 
