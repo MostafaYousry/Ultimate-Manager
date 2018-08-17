@@ -81,6 +81,18 @@
         <item quantity="other">%d running tasks</item>
     </plurals>
 
+    <plurals name="numberOfCompletedTasks">
+        <item quantity="one">%d completed task</item>
+        <item quantity="other">%d completed tasks</item>
+    </plurals>
+
+    <string name="department_summary">%s\n%s\n%s</string>
+
+    <plurals name="numberOfEmployees">
+        <item quantity="one">%d employee</item>
+        <item quantity="other">%d employees</item>
+    </plurals>
+
     <string name="employee_list_item_name">%s %s</string>
 
     <string name="task_list_item_name_dates">%s to %s</string>

@@ -1,5 +1,6 @@
 package com.example.android.employeesmanagementapp.data.daos;
 
+import com.example.android.employeesmanagementapp.data.DepartmentWithExtras;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 
 import java.util.List;
@@ -22,11 +23,24 @@ import androidx.room.Update;
 public interface DepartmentsDao {
 
     /**
+     * load all departments with their extras
+     *
+     * @return list of DepartmentWithExtras objects wrapped with LiveData
+     */
+    @Query("Select * ,\n" +
+            "(select count(tasks.task_title) from tasks where tasks.task_is_completed = 0 And tasks.department_id = departments.department_id) as num_running_tasks,\n" +
+            "(select count(tasks.task_title) from tasks where tasks.task_is_completed = 1 And tasks.department_id = departments.department_id) as num_completed_tasks,\n" +
+            "(select count(employees.employee_first_name) from employees where employees.employee_is_deleted = 0 And employees.department_id = departments.department_id) as num_of_employees \n" +
+            "From departments where department_is_deleted = 0;")
+    LiveData<List<DepartmentWithExtras>> loadDepartmentsWithExtras();
+
+
+    /**
      * load all departments
      *
      * @return list of DepartmentEntry objects wrapped with LiveData
      */
-    @Query("Select * From departments where department_is_deleted = 0")
+    @Query("Select * from departments where department_is_deleted = 0")
     LiveData<List<DepartmentEntry>> loadDepartments();
 
     /**
