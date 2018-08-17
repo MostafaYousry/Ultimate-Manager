@@ -104,7 +104,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
 
 
-        mDepartmentsArrayAdapter = new DepartmentsArrayAdapter(this);
+        mDepartmentsArrayAdapter = new DepartmentsArrayAdapter(this, AppUtils.dpToPx(this, 12), AppUtils.dpToPx(this, 8), AppUtils.dpToPx(this, 0), AppUtils.dpToPx(this, 8), R.style.detailActivitiesTextStyle);
         LiveData<List<DepartmentEntry>> departments = mViewModel.getAllDepartments();
 
 

@@ -36,7 +36,7 @@ public class EmployeeEntry {
     private String employeeLastName;
 
     @ColumnInfo(name = "employee_salary")
-    private int employeeSalary;
+    private float employeeSalary;
 
     @ColumnInfo(name = "employee_hire_date")
     private Date employeeHireDate;
@@ -62,7 +62,7 @@ public class EmployeeEntry {
 
     //used when creating new EmployeeWithExtras object
     @Ignore
-    public EmployeeEntry(int departmentId, String employeeFirstName, String employeeMiddleName, String employeeLastName, int employeeSalary, Date employeeHireDate, String employeeEmail, String employeePhone, String employeeNote, String employeeImageUri) {
+    public EmployeeEntry(int departmentId, String employeeFirstName, String employeeMiddleName, String employeeLastName, float employeeSalary, Date employeeHireDate, String employeeEmail, String employeePhone, String employeeNote, String employeeImageUri) {
         this.departmentId = departmentId;
         this.employeeFirstName = employeeFirstName;
         this.employeeMiddleName = employeeMiddleName;
@@ -76,7 +76,7 @@ public class EmployeeEntry {
     }
 
     //used by room when reading from database
-    public EmployeeEntry(int employeeID, int departmentId, String employeeFirstName, String employeeMiddleName, String employeeLastName, int employeeSalary, Date employeeHireDate, String employeeEmail, String employeePhone, String employeeNote, String employeeImageUri, boolean employeeIsDeleted) {
+    public EmployeeEntry(int employeeID, int departmentId, String employeeFirstName, String employeeMiddleName, String employeeLastName, float employeeSalary, Date employeeHireDate, String employeeEmail, String employeePhone, String employeeNote, String employeeImageUri, boolean employeeIsDeleted) {
         this.employeeID = employeeID;
         this.departmentId = departmentId;
         this.employeeFirstName = employeeFirstName;
@@ -131,11 +131,11 @@ public class EmployeeEntry {
         this.employeeLastName = employeeLastName;
     }
 
-    public int getEmployeeSalary() {
+    public float getEmployeeSalary() {
         return employeeSalary;
     }
 
-    public void setEmployeeSalary(int employeeSalary) {
+    public void setEmployeeSalary(float employeeSalary) {
         this.employeeSalary = employeeSalary;
     }
 
@@ -198,6 +198,14 @@ public class EmployeeEntry {
 
     @Override
     public int hashCode() {
-        return employeeFirstName.hashCode();
+        if (employeeMiddleName == null && employeeLastName == null)
+            return employeeFirstName.hashCode();
+        else if (employeeMiddleName == null && employeeLastName != null)
+            return employeeFirstName.hashCode() + employeeLastName.hashCode();
+        else if (employeeMiddleName != null && employeeLastName == null)
+            return employeeFirstName.hashCode() + employeeMiddleName.hashCode();
+        else
+            return employeeFirstName.hashCode() + employeeMiddleName.hashCode() + employeeLastName.hashCode();
+
     }
 }

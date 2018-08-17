@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
@@ -35,8 +36,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-
     private Toolbar mToolbar;
+    private TextView mToolbarText;
     private BottomNavigationView mBottomNavigationView;
     private TabLayout mTabLayout;
     private FloatingActionButton mFab;
@@ -64,7 +65,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         //set toolbar as actionbar
         mToolbar = findViewById(R.id.toolbar);
+        mToolbarText = findViewById(R.id.custom_title);
         setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 
         //setup navigation view
@@ -218,7 +221,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 mBottomNavigationView.setItemIconTintList(null);
                 loadFragment(tasksFragment);
                 mTabLayout.setVisibility(View.VISIBLE);
-                getSupportActionBar().setTitle(getString(R.string.tasks));
+                mToolbarText.setText(getString(R.string.tasks));
                 mFab.setOnClickListener(mFabClickListenerTasks);
                 if (mTabLayout.getSelectedTabPosition() == 1)
                     mFab.hide();
@@ -232,9 +235,11 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 mBottomNavigationView.setItemIconTintList(null);
                 loadFragment(employeesFragment);
                 mTabLayout.setVisibility(View.GONE);
-                getSupportActionBar().setTitle(getString(R.string.employees));
+                mToolbarText.setText(getString(R.string.employees));
                 mFab.setOnClickListener(mFabClickListenerEmployees);
                 mFab.show();
+
+
                 break;
             case R.id.nav_departments:
                 item.setIcon(R.drawable.ic_departments_filled);
@@ -243,9 +248,11 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 mBottomNavigationView.setItemIconTintList(null);
                 loadFragment(departmentsFragment);
                 mTabLayout.setVisibility(View.GONE);
-                getSupportActionBar().setTitle(getString(R.string.departments));
+                mToolbarText.setText(getString(R.string.departments));
                 mFab.setOnClickListener(mFabClickListenerDepartments);
                 mFab.show();
+
+
                 break;
 
         }
@@ -264,6 +271,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         getSupportFragmentManager().putFragment(outState, "departments_fragment", departmentsFragment);
         outState.putInt("selected_fragment_id", mBottomNavigationView.getSelectedItemId());
     }
+
 
 
     @Override

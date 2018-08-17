@@ -1,7 +1,7 @@
 package com.example.android.employeesmanagementapp.adapters;
 
 import android.content.Context;
-import android.view.LayoutInflater;
+import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -20,11 +20,15 @@ import androidx.annotation.Nullable;
 public class DepartmentsArrayAdapter extends ArrayAdapter<String> {
 
     private List<DepartmentEntry> mDepartmentEntryList;
+    private int mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom, mStyle;
 
-
-    public DepartmentsArrayAdapter(Context context) {
-
+    public DepartmentsArrayAdapter(Context context, int paddingLeft, int paddingTop, int paddingRight, int paddingBottom, int style) {
         super(context, 0);
+        mPaddingLeft = paddingLeft;
+        mPaddingTop = paddingTop;
+        mPaddingRight = paddingRight;
+        mPaddingBottom = paddingBottom;
+        mStyle = style;
     }
 
 
@@ -44,12 +48,20 @@ public class DepartmentsArrayAdapter extends ArrayAdapter<String> {
 
     private View createView(int position, @Nullable View convertView,
                             @NonNull ViewGroup parent) {
-        if (convertView == null)
-            convertView = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
+        if (convertView == null) {
+            TextView textView = new TextView(getContext());
+            if (Build.VERSION.SDK_INT < 23) {
+                textView.setTextAppearance(getContext(), mStyle);
+            } else {
+                textView.setTextAppearance(mStyle);
+            }
+            textView.setPadding(mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom);
+            convertView = textView;
+        }
 
-        TextView departmentName = (TextView) convertView;
+
         convertView.setTag(mDepartmentEntryList.get(position).getDepartmentId());
-        departmentName.setText(mDepartmentEntryList.get(position).getDepartmentName());
+        ((TextView) convertView).setText(mDepartmentEntryList.get(position).getDepartmentName());
 
         return convertView;
     }
@@ -91,4 +103,7 @@ public class DepartmentsArrayAdapter extends ArrayAdapter<String> {
     }
 
 
+    public int getDepId(int position) {
+        return mDepartmentEntryList.get(position).getDepartmentId();
+    }
 }

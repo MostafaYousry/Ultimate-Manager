@@ -102,6 +102,10 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
         notifyDataSetChanged();
     }
 
+    public List<EmployeeWithExtras> getSelectedOnes() {
+        return mSelectedOnes;
+    }
+
     /**
      * interface to handle click events done on a recycler view item
      */
@@ -158,7 +162,7 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
             EmployeeWithExtras employeeWithExtras = mData.get(position);
 
 
-            mEmployeeName.setText(mContext.getString(R.string.employee_list_item_name, employeeWithExtras.employeeEntry.getEmployeeFirstName(), employeeWithExtras.employeeEntry.getEmployeeMiddleName()));
+            mEmployeeName.setText(mContext.getString(R.string.employee_list_item_name, employeeWithExtras.employeeEntry.getEmployeeFirstName(), employeeWithExtras.employeeEntry.getEmployeeMiddleName() != null ? employeeWithExtras.employeeEntry.getEmployeeMiddleName() : ""));
 
             mEmployeeRating.setRating(employeeWithExtras.employeeRating);
 

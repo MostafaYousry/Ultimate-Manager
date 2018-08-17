@@ -33,6 +33,7 @@ import com.example.android.employeesmanagementapp.data.viewmodels.AddNewEmployee
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 import com.example.android.employeesmanagementapp.utils.ImageUtils;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -119,6 +120,7 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
         mEmployeeHireDate = findViewById(R.id.employee_hire_date);
         mEmployeeDepartment = findViewById(R.id.employee_department);
         mCollapsingToolbar = findViewById(R.id.collapsing_toolbar);
+
         mEmployeeImage = findViewById(R.id.employee_image);
         mEmployeeImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,7 +131,8 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
         mEmployeeRating = findViewById(R.id.employee_rating);
 
 
-        mArrayAdapter = new DepartmentsArrayAdapter(this);
+        mArrayAdapter = new DepartmentsArrayAdapter(this, AppUtils.dpToPx(this, 12), AppUtils.dpToPx(this, 8), 0, AppUtils.dpToPx(this, 8), R.style.detailActivitiesTextStyle);
+
         LiveData<List<DepartmentEntry>> departments = mViewModel.getAllDepartments();
         departments.observe(this, new Observer<List<DepartmentEntry>>() {
             @Override
@@ -226,7 +229,7 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
         mEmployeeImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_camera_add));
         mEmployeeImage.setScaleType(ImageView.ScaleType.CENTER);
-        mEmployeeImage.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.camera_add_background_color, getTheme()));
+        mEmployeeImage.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.secondaryColor, getTheme()));
 
     }
 
@@ -297,7 +300,6 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
             mEmployeePicturePath = ImageUtils.sImageURI;
 
 
-
         } else if (requestCode == ImageUtils.REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             mEmployeePicturePath = ImageUtils.sImageURI;
             Glide.with(this)
@@ -314,14 +316,14 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
             String employeeFirstName = mEmployeeFirstName.getText().toString();
             String employeeMiddleName = mEmployeeMiddleName.getText().toString();
             String employeeLastName = mEmployeeLastName.getText().toString();
-            int employeeSalary = Integer.parseInt(mEmployeeSalary.getText().toString());
+            float employeeSalary = Float.parseFloat(mEmployeeSalary.getText().toString());
             String employeeEmail = mEmployeeEmail.getText().toString();
             String employeePhone = mEmployeePhone.getText().toString();
             String employeeNote = mEmployeeNote.getText().toString();
             Date employeeHireDate = (Date) mEmployeeHireDate.getTag();
             int departmentId = (int) mEmployeeDepartment.getSelectedView().getTag();
 
-            final EmployeeEntry newEmployee = new EmployeeEntry(departmentId, employeeFirstName, employeeMiddleName, employeeLastName, employeeSalary, employeeHireDate, mEmployeePicturePath, employeeEmail, employeePhone, employeeNote);
+            final EmployeeEntry newEmployee = new EmployeeEntry(departmentId, employeeFirstName, employeeMiddleName, employeeLastName, employeeSalary, employeeHireDate, employeeEmail, employeePhone, employeeNote, mEmployeePicturePath);
 
             AppExecutor.getInstance().diskIO().execute(new Runnable() {
                 @Override
@@ -341,36 +343,92 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
     private boolean isDataValid() {
 
-        if (true)
-            return true;
+        boolean valid = true;
 
         if (TextUtils.isEmpty(mEmployeeFirstName.getText())) {
-            showError("name");
-            return false;
-        }
-        if (!TextUtils.isDigitsOnly(mEmployeeSalary.getText())) {
-            showError("salary");
-            return false;
-        }
-        if (mEmployeeHireDate.getTag() == null) {
-            showError("hireDate");
-            return false;
+            updateErrorVisibility("firstName", true);
+            valid = false;
+        } else {
+            updateErrorVisibility("firstName", false);
         }
 
-        return true;
+        if (TextUtils.isEmpty(mEmployeeEmail.getText())) {
+            updateErrorVisibility("email", true);
+            valid = false;
+        } else {
+            if (!mEmployeeEmail.getText().toString().matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$")) {
+                updateErrorVisibility("emailValid", true);
+                valid = false;
+            } else
+                updateErrorVisibility("emailValid", false);
+        }
+
+        if (TextUtils.isEmpty(mEmployeePhone.getText())) {
+            updateErrorVisibility("phone", true);
+            valid = false;
+        } else {
+            updateErrorVisibility("phone", false);
+        }
+
+        if (TextUtils.isEmpty(mEmployeeSalary.getText())) {
+            updateErrorVisibility("salary", true);
+            valid = false;
+        } else {
+            updateErrorVisibility("salary", false);
+        }
+
+        if (mEmployeeHireDate.getTag() == null) {
+            updateErrorVisibility("hireDate", true);
+            valid = false;
+        } else {
+            updateErrorVisibility("hireDate", false);
+        }
+
+        return valid;
 
 
     }
 
-    private void showError(String error) {
-        switch (error) {
-            case "name":
-                break;
-            case "salary":
-                break;
-            case "hireDate":
-                break;
-        }
+    private void updateErrorVisibility(String key, boolean show) {
+        if (show)
+            switch (key) {
+                case "firstName":
+                    ((TextInputLayout) findViewById(R.id.employee_first_name_TIL)).setError(getString(R.string.required_field));
+                    break;
+                case "email":
+                    ((TextInputLayout) findViewById(R.id.employee_email_TIL)).setError(getString(R.string.required_field));
+                    break;
+                case "emailValid":
+                    ((TextInputLayout) findViewById(R.id.employee_email_TIL)).setError(getString(R.string.error_invalid_email));
+                    break;
+                case "phone":
+                    ((TextInputLayout) findViewById(R.id.employee_phone_TIL)).setError(getString(R.string.required_field));
+                    break;
+                case "salary":
+                    ((TextInputLayout) findViewById(R.id.employee_salary_TIL)).setError(getString(R.string.required_field));
+                    break;
+                case "hireDate":
+                    ((TextInputLayout) findViewById(R.id.employee_hire_date_TIL)).setError(getString(R.string.required_field));
+                    break;
+            }
+        else
+            switch (key) {
+                case "firstName":
+                    ((TextInputLayout) findViewById(R.id.employee_first_name_TIL)).setHelperText(getString(R.string.required_field));
+                    break;
+                case "emailValid":
+                    ((TextInputLayout) findViewById(R.id.employee_email_TIL)).setHelperText(getString(R.string.required_field));
+                    break;
+                case "phone":
+                    ((TextInputLayout) findViewById(R.id.employee_phone_TIL)).setHelperText(getString(R.string.required_field));
+                    break;
+                case "salary":
+                    ((TextInputLayout) findViewById(R.id.employee_salary_TIL)).setHelperText(getString(R.string.required_field));
+                    break;
+                case "hireDate":
+                    ((TextInputLayout) findViewById(R.id.employee_hire_date_TIL)).setHelperText(getString(R.string.required_field));
+                    break;
+            }
     }
 
     @Override
@@ -379,4 +437,5 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
         intent.putExtra(AddTaskActivity.TASK_ID_KEY, taskRowID);
         startActivity(intent);
     }
+
 }

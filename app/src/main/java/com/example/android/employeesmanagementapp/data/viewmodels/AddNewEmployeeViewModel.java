@@ -44,14 +44,6 @@ public class AddNewEmployeeViewModel extends ViewModel {
     }
 
 
-    public void deleteEmployeeFromAllTasks(int empID) {
-        mAppDatabase.employeesTasksDao().deleteEmployeeJoinRecords(empID);
-    }
-
-    public void deleteEmployeeFromRunningTasks(int empID) {
-        mAppDatabase.employeesTasksDao().deleteEmployeeFromRunningTasks(empID);
-    }
-
     public LiveData<List<TaskEntry>> getEmployeeCompletedTasks() {
         return employeeCompletedTasks;
     }

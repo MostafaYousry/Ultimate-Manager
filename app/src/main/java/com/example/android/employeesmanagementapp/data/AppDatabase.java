@@ -56,17 +56,17 @@ public abstract class AppDatabase extends RoomDatabase {
                                         db.departmentsDao().addDepartment(new DepartmentEntry(8, "dep8", false));
                                         db.departmentsDao().addDepartment(new DepartmentEntry(9, "dep9", false));
 
-                                        db.employeesDao().addEmployee(new EmployeeEntry(1, 1, "mostafa", "yousry", "nasr", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(1, 1, "mostafa", "yousry", null, 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
                                         db.employeesDao().addEmployee(new EmployeeEntry(2, 2, "karim", "hamdy", "abdel azziz", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
                                         db.employeesDao().addEmployee(new EmployeeEntry(3, 3, "ammar", "yasser", "ismaeil", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
                                         db.employeesDao().addEmployee(new EmployeeEntry(4, 2, "omar", "swidan", "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
                                         db.employeesDao().addEmployee(new EmployeeEntry(5, 2, "omar", "zawawi", "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
-                                        db.employeesDao().addEmployee(new EmployeeEntry(6, 3, "mohamed", "maessamom", "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(6, 3, "mohamed", null, "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
                                         db.employeesDao().addEmployee(new EmployeeEntry(7, 4, "abdelrahman", "wael", "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
                                         db.employeesDao().addEmployee(new EmployeeEntry(8, 5, "amr", "saleh", "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
-                                        db.employeesDao().addEmployee(new EmployeeEntry(9, 6, "hussein", "zayed", "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(9, 6, "hussein", null, "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
                                         db.employeesDao().addEmployee(new EmployeeEntry(10, 6, "mohamed", "fakhr", "el din", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
-                                        db.employeesDao().addEmployee(new EmployeeEntry(11, 7, "omar", "wagdy", "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(11, 7, "omar", null, null, 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
                                         db.employeesDao().addEmployee(new EmployeeEntry(12, 8, "ziad", "ashraf", "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
                                         db.employeesDao().addEmployee(new EmployeeEntry(13, 9, "omar", "essam", "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
                                         db.employeesDao().addEmployee(new EmployeeEntry(14, 2, "mostafa", "zanaty", "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
@@ -112,7 +112,7 @@ public abstract class AppDatabase extends RoomDatabase {
                                         db.tasksDao().addTask(new TaskEntry(10, 6, "task10", "askasmas", new Date(), new Date(), 0, false, R.color.task_color_1));
                                         db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(9, 10));
                                     }
-                                });
+                               });
                             }
                         })
                         .build();

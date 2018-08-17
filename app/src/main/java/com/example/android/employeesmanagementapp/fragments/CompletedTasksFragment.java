@@ -1,10 +1,13 @@
 package com.example.android.employeesmanagementapp.fragments;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -17,6 +20,7 @@ import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
 
 import java.util.List;
 
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
@@ -32,6 +36,7 @@ public class CompletedTasksFragment extends Fragment implements TasksAdapter.Tas
     private AppDatabase mDb;
     private LinearLayout emptyView;
     private TextView emptyViewTextView;
+    private ImageView emptyViewImageView;
 
     public CompletedTasksFragment() {
         // Required empty public constructor
@@ -48,6 +53,7 @@ public class CompletedTasksFragment extends Fragment implements TasksAdapter.Tas
 
         emptyView = view.findViewById(R.id.empty_view);
         emptyViewTextView = view.findViewById(R.id.empty_view_message_text_view);
+        emptyViewImageView = view.findViewById(R.id.empty_view_message_image_view);
 
         // Inflate the layout for this fragment
         mRecyclerView = view.findViewById(R.id.rv_fragment);
@@ -87,6 +93,7 @@ public class CompletedTasksFragment extends Fragment implements TasksAdapter.Tas
     private void showEmptyView() {
         mRecyclerView.setVisibility(View.GONE);
         emptyViewTextView.setText(R.string.task_empty_view_message);
+        emptyViewImageView.setImageResource(R.drawable.ic_no_task);
         emptyView.setVisibility(View.VISIBLE);
     }
 
