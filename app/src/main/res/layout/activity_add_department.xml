@@ -19,9 +19,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
+            app:contentScrim="?attr/colorPrimary"
             app:expandedTitleMarginEnd="64dp"
             app:expandedTitleMarginStart="48dp"
-            app:contentScrim="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <ImageView
@@ -89,7 +89,7 @@
                     style="@style/detailActivitiesTextStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/hint_employee_first_name"
+                    android:hint="@string/hint_department_name"
                     android:inputType="text"
                     android:maxLines="1" />
 
@@ -125,7 +125,7 @@
                     android:layout_height="wrap_content"
                     android:cursorVisible="false"
                     android:focusable="false"
-                    android:hint="@string/hint_employee_hire_date"
+                    android:hint="@string/hint_department_date_created"
                     android:inputType="text"
                     android:maxLines="1"
                     android:onClick="pickDate" />
@@ -142,6 +142,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/department_date_created_TIL" />
 
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/department_employees_rv"
                 android:layout_width="0dp"
@@ -153,6 +154,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/imageView9"
                 app:layout_constraintTop_toBottomOf="@+id/department_date_created_TIL"
+
                 tools:itemCount="3"
                 tools:listitem="@layout/item_tasks_rv" />
 

@@ -31,7 +31,7 @@ import androidx.fragment.app.DialogFragment;
 public final class AppUtils {
 
 
-    public static void showDatePicker(Context context, View view, boolean allowPastDates) {
+    public static void showDatePicker(Context context, View view) {
         //create a bundle containing id of clicked text view (startDateTextView or dueDateTextView)
         Bundle bundle = new Bundle();
         bundle.putInt(DatePickerDialogFragment.KEY_DISPLAY_VIEW_ID, view.getId());

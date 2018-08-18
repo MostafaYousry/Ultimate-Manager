@@ -83,6 +83,8 @@
     <color name="A200_18">#EEEEEE</color>
     <color name="A200_19">#B0BEC5</color>
 
+    <color name="department_fallback_color">#7f7d89</color>
+
     <color name="camera_add_background_color">#42a5f5</color>
 
 

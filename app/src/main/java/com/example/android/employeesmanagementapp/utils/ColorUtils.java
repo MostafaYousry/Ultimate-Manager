@@ -95,4 +95,5 @@ public final class ColorUtils {
     public static int getDepartmentBackgroundColor(Object object) {
         return accent200Values[Math.abs(object.hashCode()) % accent200Values.length];
     }
+
 }

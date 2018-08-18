@@ -1,43 +1,20 @@
+todo fix title when multi select in employees
 
-
-todo(7):choose an image for the employee and department(from phone or by taking a picture)
-todo hide fab when selecting multiple employees
-
-
-todo toolbar and spinner fonts------->
-
-
-todo discard changes dialog zy contacts app ------>
-
+todo discard changes dialog zy contacts app
 
 todo hide fab with bottom nav on scroll
 
+todo keep track of time ex: 2 months and 10 days remaining (display in item task rv instead of start date - due date)
 
-todo keep track of time ex: 2 months and 10 days remaining
+todo use paging architecture component for loading lists in small chunks
+
+todo glide place holders
+
+todo different icon for each fab location ie(tasks , departments , employees)
+
+todo handle text running out of space ex(very long department name)
+
+todo open datepicker/timepicker dialog with the last chosen date/time if they exist
 
 
-todo(5):enhance empty views (Add images and actions)
-todo(8):notifications & background services for notifying a manager when a task due date is met
-*pressing the notification opens the app in the state of rating a completed task
-*see background services and workmanager architecture component
-todo(9):use paging architecture component for loading lists in small chunks
-
-todo(11):change department and task items layout  -------->
-
-todo(13):apply a theme for the app--
-*see (https://material.io/design/material-theming/overview.html#)
-*see (https://material.io/design/material-theming/implementing-your-theme.html)
-todo(14):choose colors for the app
-*see (https://material.io/design/color/the-color-system.html)
-*see (https://material.io/design/color/applying-color-to-ui.html)
-*see (https://material.io/design/color/color-usage.html)
-*see (https://material.io/design/color/text-legibility.html)
-todo(15):choose fonts for the app
-*see (https://material.io/design/typography/the-type-system.html)
-*see (https://material.io/design/typography/understanding-typography.html)
-*see (https://material.io/design/typography/language-support.html)
-todo(16):apply every widget guideline(elevation,padding,margins...)
-*see components tab on material.io
-todo(17):apply transitions,animations,statelist animator, .....
-*see motion tab on material.io
-todo(18):use image color palette to pick background color for department name item card
+todo -----------------T E S T-----------------------------

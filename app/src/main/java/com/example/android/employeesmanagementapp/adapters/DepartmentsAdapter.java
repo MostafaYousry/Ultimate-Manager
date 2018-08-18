@@ -1,6 +1,8 @@
 package com.example.android.employeesmanagementapp.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -11,15 +13,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.data.DepartmentWithExtras;
 import com.example.android.employeesmanagementapp.utils.ColorUtils;
+import com.google.android.material.card.MaterialCardView;
 
 import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.palette.graphics.Palette;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.DepartmentsViewHolder> {
@@ -75,14 +83,22 @@ public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.
     }
 
     public class DepartmentsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        View mItemView;
+        MaterialCardView mItemView;
         TextView mDepartmentName;
         TextView mDepartmentSummary;
         ImageView mDepartmentImage;
+        Palette.Filter paletteFilter = new Palette.Filter() {
+            @Override
+            public boolean isAllowed(int rgb, float[] hsl) {
+                if (rgb == Color.WHITE)
+                    return false;
+                return true;
+            }
+        };
 
         DepartmentsViewHolder(View itemView) {
             super(itemView);
-            mItemView = itemView;
+            mItemView = (MaterialCardView) itemView;
             mDepartmentName = itemView.findViewById(R.id.department_name);
             mDepartmentImage = itemView.findViewById(R.id.department_image);
             mDepartmentSummary = itemView.findViewById(R.id.department_summary);
@@ -99,13 +115,9 @@ public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.
                             switch (item.getItemId()) {
                                 case R.id.action_delete_department:
 
-//                                    getActivity().runOnUiThread(new Runnable() {
-//                                        @Override
-//                                        public void run() {
-//                                            AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
+//                                            AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
 //                                            alertDialog.setTitle("Alert");
 //                                            alertDialog.setMessage("if you deleted this Department all its employees and tasks will be deleted");
-//                                            Log.i("test", "yes");
 //                                            alertDialog.setPositiveButton("ok", new DialogInterface.OnClickListener() {
 //                                                @Override
 //                                                public void onClick(DialogInterface dialogInterface, int i) {
@@ -160,8 +172,7 @@ public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.
 //                                    //hasEmployees=  mDb.employeesDao().loadEmployees(mSelectedDepartments.get(i).getDepartmentId());
 //                                    //if(mhasEmployees != null)
 //                                    // Toast.makeText(getContext(),"Can't delete this department because it has employees please move them or delete them first", Toast.LENGTH_LONG).show();
-//
-                                    return true;
+//                                    return true;
                                 default:
                                     return false;
                             }
@@ -184,17 +195,32 @@ public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.
             String completedTasksSummary = mContext.getResources().getQuantityString(R.plurals.numberOfCompletedTasks, mDepartments.get(position).numCompletedTasks, mDepartments.get(position).numCompletedTasks);
             String numberOfEmployees = mContext.getResources().getQuantityString(R.plurals.numberOfEmployees, mDepartments.get(position).numOfEmployees, mDepartments.get(position).numOfEmployees);
 
-            mDepartmentSummary.setText(mContext.getString(R.string.department_summary, runningTasksSummary, completedTasksSummary, numberOfEmployees));
+            mDepartmentSummary.setText(mContext.getString(R.string.department_summary, numberOfEmployees, runningTasksSummary, completedTasksSummary));
 
 
             if (mDepartments.get(position).departmentEntry.getDepartmentImageUri() == null) {
                 mDepartmentImage.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_departments));
                 mDepartmentImage.setScaleType(ImageView.ScaleType.CENTER);
+
                 mDepartmentImage.setBackgroundColor(ResourcesCompat.getColor(mContext.getResources(), ColorUtils.getDepartmentBackgroundColor(mDepartments.get(position).departmentEntry), mContext.getTheme()));
+
+                mItemView.setCardBackgroundColor(ResourcesCompat.getColor(mContext.getResources(), R.color.department_fallback_color, mContext.getTheme()));
             } else {
                 Glide.with(mContext)
                         .asBitmap()
                         .load(Uri.parse(mDepartments.get(position).departmentEntry.getDepartmentImageUri()))
+                        .listener(new RequestListener<Bitmap>() {
+                            @Override
+                            public boolean onLoadFailed(GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                                createPaletteAsync(resource);
+                                return false;
+                            }
+                        })
                         .into(mDepartmentImage);
             }
 
@@ -204,6 +230,25 @@ public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.
         @Override
         public void onClick(View v) {
             mDepartmentItemClickListener.onDepartmentClick((int) mItemView.getTag(), getAdapterPosition());
+        }
+
+        void createPaletteAsync(Bitmap bitmap) {
+            Palette.Builder builder = new Palette.Builder(bitmap);
+            builder.addFilter(paletteFilter);
+            builder.generate(new Palette.PaletteAsyncListener() {
+                public void onGenerated(Palette palette) {
+
+                    int fallbackColor = palette.getDominantColor(0);
+
+                    Palette.Swatch vibrantColorSwatch = palette.getVibrantSwatch();
+                    if (vibrantColorSwatch != null) {
+                        int vibrantColor = vibrantColorSwatch.getRgb();
+                        mItemView.setCardBackgroundColor(vibrantColor);
+                    } else {
+                        mItemView.setCardBackgroundColor(fallbackColor);
+                    }
+                }
+            });
         }
 
     }

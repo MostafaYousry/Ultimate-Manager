@@ -9,7 +9,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.android.employeesmanagementapp.R;
@@ -27,6 +26,7 @@ import com.example.android.employeesmanagementapp.utils.AppUtils;
 import com.example.android.employeesmanagementapp.utils.ColorUtils;
 import com.example.android.employeesmanagementapp.utils.ImageUtils;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.Date;
 import java.util.List;
@@ -34,6 +34,7 @@ import java.util.List;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.core.view.ViewCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -59,9 +60,6 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
 
     private Toolbar mToolbar;
     private CollapsingToolbarLayout mCollapsingToolbar;
-
-
-    private Toast mToast;
 
     private AppDatabase mDb;
     private AddNewDepViewModel mViewModel;
@@ -123,6 +121,11 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
             setUpEmployeesRV();
             setUpDepRunningTasksRV();
             setUpDepCompletedTasksRV();
+
+            ViewCompat.setNestedScrollingEnabled(mDepEmployeesRV, false);
+            ViewCompat.setNestedScrollingEnabled(mDepCompletedTasksRV, false);
+            ViewCompat.setNestedScrollingEnabled(mDepRunningTasksRV, false);
+
         }
 
     }
@@ -290,6 +293,10 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
         return true;
     }
 
+    public void pickDate(View view) {
+        AppUtils.showDatePicker(this, view);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -305,7 +312,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
 
 
     private void saveDepartment() {
-        if (isValidData()) {
+        if (isDataValid()) {
             String departmentName = mDepartmentName.getText().toString();
             Date departmentCreatedDate = (Date) mDepartmentDateCreated.getTag();
 
@@ -329,18 +336,49 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
 
     }
 
-    private boolean isValidData() {
+    private boolean isDataValid() {
+
+        boolean valid = true;
+
         if (TextUtils.isEmpty(mDepartmentName.getText())) {
-            if (mToast != null) {
-                mToast.cancel();
-                mToast.show();
-            }
-            mToast = Toast.makeText(this, "Please enter a valid data", Toast.LENGTH_LONG);
-            mToast.show();
-            return false;
+            updateErrorVisibility("departmentName", true);
+            valid = false;
+        } else {
+            updateErrorVisibility("departmentName", false);
         }
 
-        return true;
+
+        if (mDepartmentDateCreated.getTag() == null) {
+            updateErrorVisibility("departmentDateCreated", true);
+            valid = false;
+        } else {
+            updateErrorVisibility("departmentDateCreated", false);
+        }
+
+        return valid;
+
+
+    }
+
+    private void updateErrorVisibility(String key, boolean show) {
+        if (show)
+            switch (key) {
+                case "departmentName":
+                    ((TextInputLayout) findViewById(R.id.department_name_TIL)).setError(getString(R.string.required_field));
+                    break;
+                case "departmentDateCreated":
+                    ((TextInputLayout) findViewById(R.id.department_date_created_TIL)).setError(getString(R.string.required_field));
+                    break;
+            }
+        else
+            switch (key) {
+                case "departmentName":
+                    ((TextInputLayout) findViewById(R.id.department_name_TIL)).setHelperText(getString(R.string.required_field));
+                    break;
+                case "departmentDateCreated":
+                    ((TextInputLayout) findViewById(R.id.department_date_created_TIL)).setHelperText(getString(R.string.required_field));
+                    break;
+            }
     }
 
 

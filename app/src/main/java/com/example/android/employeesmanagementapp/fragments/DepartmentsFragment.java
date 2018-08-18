@@ -117,7 +117,6 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
         mEmptyView.setVisibility(View.GONE);
     }
 
-
     @Override
     public void onDepartmentClick(int departmentRowID, int departmentPosition) {
         Intent intent = new Intent(getActivity(), AddDepartmentActivity.class);
