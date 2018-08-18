@@ -6,6 +6,7 @@ import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import java.util.List;
 
 import androidx.lifecycle.LiveData;
+import androidx.paging.DataSource;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -31,8 +32,8 @@ public interface DepartmentsDao {
             "(select count(tasks.task_title) from tasks where tasks.task_is_completed = 0 And tasks.department_id = departments.department_id) as num_running_tasks,\n" +
             "(select count(tasks.task_title) from tasks where tasks.task_is_completed = 1 And tasks.department_id = departments.department_id) as num_completed_tasks,\n" +
             "(select count(employees.employee_first_name) from employees where employees.employee_is_deleted = 0 And employees.department_id = departments.department_id) as num_of_employees \n" +
-            "From departments where department_is_deleted = 0;")
-    LiveData<List<DepartmentWithExtras>> loadDepartmentsWithExtras();
+            "From departments where department_is_deleted = 0")
+    DataSource.Factory<Integer, DepartmentWithExtras> loadDepartmentsWithExtras();
 
 
     /**
@@ -42,6 +43,9 @@ public interface DepartmentsDao {
      */
     @Query("Select * from departments where department_is_deleted = 0")
     LiveData<List<DepartmentEntry>> loadDepartments();
+
+    @Query("select count(*) from tasks where tasks.task_is_completed = 1 And tasks.department_id = :depID")
+    int getNumCompletedTasksDepartment(int depID);
 
     /**
      * load a department record by it's id

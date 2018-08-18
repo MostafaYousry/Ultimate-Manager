@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         setUpFabClickListeners();
 
-        ViewModelProviders.of(this).get(MainViewModel.class).getAllDepartmentsList().observe(this, new Observer<List<DepartmentEntry>>() {
+        ViewModelProviders.of(this).get(MainViewModel.class).allDepartmentsList.observe(this, new Observer<List<DepartmentEntry>>() {
             @Override
             public void onChanged(List<DepartmentEntry> departmentEntries) {
                 if (departmentEntries != null) {

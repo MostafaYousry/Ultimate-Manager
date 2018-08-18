@@ -13,7 +13,10 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.TextDrawable;
+import com.example.android.employeesmanagementapp.data.AppDatabase;
+import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
+import com.example.android.employeesmanagementapp.data.entries.EmployeesTasksEntry;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 
 import java.util.ArrayList;
@@ -21,23 +24,48 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.paging.PagedListAdapter;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEmployeeAdapter.EmployeesViewHolder> {
+public class HorizontalEmployeeAdapter extends PagedListAdapter<EmployeeEntry, HorizontalEmployeeAdapter.EmployeesViewHolder> {
     private Context mContext;
-    private List<EmployeeEntry> mData;
     private List<EmployeeEntry> mAddedEmployees;
-    private List<EmployeeEntry> mRemovedEmployees;
+    private static DiffUtil.ItemCallback<EmployeeEntry> DIFF_CALLBACK =
+            new DiffUtil.ItemCallback<EmployeeEntry>() {
+                // Concert details may have changed if reloaded from the database,
+                // but ID is fixed.
+                @Override
+                public boolean areItemsTheSame(EmployeeEntry oldEmployee, EmployeeEntry newEmployee) {
+                    return oldEmployee.getEmployeeID() == newEmployee.getEmployeeID();
+                }
+
+                @Override
+                public boolean areContentsTheSame(EmployeeEntry oldEmployee,
+                                                  EmployeeEntry newEmployee) {
+                    return oldEmployee.equals(newEmployee);
+                }
+            };
 
     private EmployeesAdapter.EmployeeItemClickListener mClickListener;
     private boolean mLongClickEnabled;
+    private int mTaskID;
 
     public HorizontalEmployeeAdapter(Context context, EmployeesAdapter.EmployeeItemClickListener clickListener, boolean longClickEnabled) {
+        super(DIFF_CALLBACK);
         mContext = context;
         mClickListener = clickListener;
         mLongClickEnabled = longClickEnabled;
     }
 
+
+    public HorizontalEmployeeAdapter(Context context, EmployeesAdapter.EmployeeItemClickListener clickListener, boolean longClickEnabled, int taskId) {
+        super(DIFF_CALLBACK);
+        mContext = context;
+        mClickListener = clickListener;
+        mLongClickEnabled = longClickEnabled;
+        mTaskID = taskId;
+    }
 
     @NonNull
     @Override
@@ -49,14 +77,30 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
 
     @Override
     public void onBindViewHolder(@NonNull HorizontalEmployeeAdapter.EmployeesViewHolder holder, int position) {
-        holder.bind(position);
+
+        if (position >= getCurrentList().size()) {
+            if (mAddedEmployees.get(getCurrentList().size() - position) != null) {
+                holder.bind(position);
+            } else {
+                holder.clear();
+            }
+        } else {
+            if (getItem(position) != null) {
+                holder.bind(position);
+            } else {
+                // Null defines a placeholder item - PagedListAdapter automatically
+                // invalidates this row when the actual object is loaded from the
+                // database.
+                holder.clear();
+            }
+        }
     }
 
     @Override
     public int getItemCount() {
         int dataSize = 0, addedSize = 0;
-        if (mData != null)
-            dataSize = mData.size();
+        if (getCurrentList() != null)
+            dataSize = getCurrentList().size();
         if (mAddedEmployees != null)
             addedSize = mAddedEmployees.size();
 
@@ -65,12 +109,7 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
     }
 
     public List<EmployeeEntry> getData() {
-        return mData;
-    }
-
-    public void setData(List<EmployeeEntry> data) {
-        mData = data;
-        notifyDataSetChanged();
+        return getCurrentList().snapshot();
     }
 
     public List<EmployeeEntry> getAddedEmployees() {
@@ -87,26 +126,32 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
     }
 
     public void clearAdapter() {
-        if (mData != null)
-            mData.clear();
+        if (getCurrentList() != null)
+            getCurrentList().clear();
         if (mAddedEmployees != null)
             mAddedEmployees.clear();
     }
 
     public List<EmployeeEntry> getAllEmployees() {
         List<EmployeeEntry> employees = new ArrayList<>();
-        if (mData != null)
-            employees.addAll(mData);
+        if (getCurrentList() != null)
+            employees.addAll(getCurrentList().snapshot());
         if (mAddedEmployees != null)
             employees.addAll(mAddedEmployees);
 
         return employees;
     }
 
-    public List<EmployeeEntry> getRemovedEmployees() {
-        return mRemovedEmployees;
-    }
+    private void deleteInBackground(EmployeeEntry item, int mTaskID) {
+        AppExecutor.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                AppDatabase.getInstance(mContext).employeesTasksDao().deleteEmployeeTask(new EmployeesTasksEntry(item.getEmployeeID(), mTaskID));
+            }
+        });
 
+
+    }
 
     public class EmployeesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         ImageView employeeImage;
@@ -129,8 +174,8 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
         }
 
         void bind(int position) {
-            if (position >= mData.size()) {
-                position = position - mData.size();
+            if (position >= getCurrentList().size()) {
+                position = position - getCurrentList().size();
 
                 employeeName.setText(mAddedEmployees.get(position).getEmployeeFirstName());
 
@@ -148,22 +193,22 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
                 itemView.setTag(mAddedEmployees.get(position).getEmployeeID());
 
             } else {
-                employeeName.setText(mData.get(position).getEmployeeFirstName());
+                employeeName.setText(getItem(position).getEmployeeFirstName());
 
-                if (mData.get(position).getEmployeeImageUri() == null) {
+                if (getItem(position).getEmployeeImageUri() == null) {
                     Glide.with(mContext).clear(employeeImage);
 
-                    TextDrawable textDrawable = new TextDrawable(mContext, mData.get(position), AppUtils.dpToPx(mContext, 70), AppUtils.dpToPx(mContext, 70), AppUtils.spToPx(mContext, 28));
+                    TextDrawable textDrawable = new TextDrawable(mContext, getItem(position), AppUtils.dpToPx(mContext, 70), AppUtils.dpToPx(mContext, 70), AppUtils.spToPx(mContext, 28));
                     employeeImage.setImageDrawable(textDrawable);
 
                 } else {
                     Glide.with(mContext)
                             .asBitmap()
-                            .load(Uri.parse(mData.get(position).getEmployeeImageUri()))
+                            .load(Uri.parse(getItem(position).getEmployeeImageUri()))
                             .into(employeeImage);
                 }
 
-                itemView.setTag(mData.get(position).getEmployeeID());
+                itemView.setTag(getItem(position).getEmployeeID());
             }
         }
 
@@ -183,16 +228,12 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
                     switch (item.getItemId()) {
                         case R.id.action_remove_employee:
                             int deletePosition = getAdapterPosition();
-                            if (deletePosition < mData.size()) {
-                                if (mRemovedEmployees == null)
-                                    mRemovedEmployees = new ArrayList<>();
-                                mRemovedEmployees.add(mData.remove(deletePosition));
-//                                notifyItemRemoved(deletePosition);
-                                notifyDataSetChanged();
+                            if (deletePosition < getCurrentList().size()) {
+                                deleteInBackground(getItem(deletePosition), mTaskID);
                             } else {
-                                mAddedEmployees.remove(deletePosition - mData.size());
+                                mAddedEmployees.remove(deletePosition - getCurrentList().size());
 //                                notifyItemRemoved(deletePosition - mData.size());
-                                notifyDataSetChanged();
+//                                notifyDataSetChanged();
                             }
                             return true;
                         default:
@@ -202,6 +243,11 @@ public class HorizontalEmployeeAdapter extends RecyclerView.Adapter<HorizontalEm
             });
             popup.show();
             return true;
+        }
+
+        void clear() {
+            Glide.with(mContext).clear(employeeImage);
+            employeeName.setText("");
         }
     }
 }

@@ -2,6 +2,7 @@ package com.example.android.employeesmanagementapp.adapters;
 
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,23 +18,40 @@ import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 import com.google.android.material.card.MaterialCardView;
 
-import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.paging.PagedListAdapter;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHolder> {
+
+public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.TasksViewHolder> {
 
     private Context mContext;
-
-    private List<TaskEntry> mData;
     private TasksItemClickListener mTaskClickListener;
     private boolean mTasksAreCompleted;
 
 
+    private static DiffUtil.ItemCallback<TaskEntry> DIFF_CALLBACK =
+            new DiffUtil.ItemCallback<TaskEntry>() {
+                // Concert details may have changed if reloaded from the database,
+                // but ID is fixed.
+                @Override
+                public boolean areItemsTheSame(TaskEntry oldTask, TaskEntry newTask) {
+                    return oldTask.getTaskId() == newTask.getTaskId();
+                }
+
+                @Override
+                public boolean areContentsTheSame(TaskEntry oldTask,
+                                                  TaskEntry newTask) {
+                    return oldTask.equals(newTask);
+                }
+            };
+
+
     public TasksAdapter(Context context, TasksItemClickListener clickListener, boolean tasksAreCompleted) {
+        super(DIFF_CALLBACK);
         mContext = context;
         mTaskClickListener = clickListener;
         mTasksAreCompleted = tasksAreCompleted;
@@ -52,35 +70,23 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
 
     @Override
     public void onBindViewHolder(@NonNull final TasksViewHolder holder, int position) {
-        holder.bind(position);
+        if (getItem(position) != null) {
+            holder.bind(position);
+        } else {
+            // Null defines a placeholder item - PagedListAdapter automatically
+            // invalidates this row when the actual object is loaded from the
+            // database.
+            holder.clear();
+        }
+
     }
 
-    @Override
-    public int getItemCount() {
-        if (mData == null)
-            return 0;
-        return mData.size();
-    }
-
-    /**
-     * used to update adapters data if any change occurs
-     *
-     * @param tasks : new tasks list
-     */
-    public void setData(List<TaskEntry> tasks) {
-        mData = tasks;
-        notifyDataSetChanged();
-    }
-
-    public TaskEntry getItem(int position) {
-        return mData.get(position);
-    }
 
     /**
      * interface to handle click events done on a recycler view item
      */
     public interface TasksItemClickListener {
-        void onTaskClick(int taskRowID, int taskPosition);
+        void onTaskClick(int taskRowID, int taskPosition, boolean taskIsCompleted);
     }
 
     class TasksViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -119,8 +125,8 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
                                     AppExecutor.getInstance().diskIO().execute(new Runnable() {
                                         @Override
                                         public void run() {
-                                            AppDatabase.getInstance(mContext).employeesTasksDao().deleteTaskJoinRecords(mData.get(getAdapterPosition()).getTaskId());
-                                            AppDatabase.getInstance(mContext).tasksDao().deleteTask(mData.get(getAdapterPosition()));
+                                            AppDatabase.getInstance(mContext).employeesTasksDao().deleteTaskJoinRecords(getItem(getAdapterPosition()).getTaskId());
+                                            AppDatabase.getInstance(mContext).tasksDao().deleteTask(getItem(getAdapterPosition()));
                                         }
                                     });
 
@@ -141,22 +147,29 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
 
         void bind(int position) {
 
-            mTaskTitle.setText(mData.get(position).getTaskTitle());
+            mTaskTitle.setText(getItem(position).getTaskTitle());
 
-            mTaskDates.setText(mContext.getString(R.string.task_list_item_name_dates, AppUtils.getFriendlyDate(mData.get(position).getTaskStartDate()), AppUtils.getFriendlyDate(mData.get(position).getTaskDueDate())));
+            mTaskDates.setText(mContext.getString(R.string.task_list_item_name_dates, AppUtils.getFriendlyDate(getItem(position).getTaskStartDate()), AppUtils.getFriendlyDate(getItem(position).getTaskDueDate())));
 
-            int taskColor = ResourcesCompat.getColor(itemView.getResources(), mData.get(position).getTaskColorResource(), mContext.getTheme());
+            int taskColor = ResourcesCompat.getColor(itemView.getResources(), getItem(position).getTaskColorResource(), mContext.getTheme());
 
             mItemView.setCardBackgroundColor(taskColor);
 
-            mItemView.setTag(mData.get(position).getTaskId());
+            mItemView.setTag(getItem(position).getTaskId());
         }
 
         @Override
         public void onClick(View v) {
-            mTaskClickListener.onTaskClick((int) mItemView.getTag(), getAdapterPosition());
+            mTaskClickListener.onTaskClick((int) mItemView.getTag(), getAdapterPosition(), getItem(getAdapterPosition()).isTaskIsCompleted());
         }
 
+        void clear() {
+            mTaskTitle.setText("");
+
+            mTaskDates.setText("");
+
+            mItemView.setCardBackgroundColor(Color.WHITE);
+        }
     }
 
 }

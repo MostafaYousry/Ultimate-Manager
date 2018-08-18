@@ -3,9 +3,7 @@ package com.example.android.employeesmanagementapp.data.daos;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.entries.EmployeesTasksEntry;
 
-import java.util.List;
-
-import androidx.lifecycle.LiveData;
+import androidx.paging.DataSource;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -23,19 +21,15 @@ public interface EmployeesTasksDao {
             "INNER JOIN employees_tasks " +
             "ON employees.employee_id=employees_tasks.employee_id " +
             "WHERE employees_tasks.task_id=:taskId")
-    LiveData<List<EmployeeEntry>> getEmployeesForTask(int taskId);
+    DataSource.Factory<Integer, EmployeeEntry> getEmployeesForTask(int taskId);
 
-    @Query("SELECT COUNT(*) FROM employees " +
-            "INNER JOIN employees_tasks " +
-            "ON employees.employee_id=employees_tasks.employee_id " +
-            "WHERE employees_tasks.task_id=:taskId ")
-    int getNumEmployeesForRunningTask(int taskId);
 
     @Query("SELECT COUNT(*) FROM tasks " +
             "INNER JOIN employees_tasks " +
             "ON tasks.task_id=employees_tasks.task_id " +
             "WHERE employees_tasks.employee_id=:empId AND tasks.task_is_completed = 1")
     int getNumCompletedTasksEmployee(int empId);
+
 
     /**
      * insert a new employees tasks record

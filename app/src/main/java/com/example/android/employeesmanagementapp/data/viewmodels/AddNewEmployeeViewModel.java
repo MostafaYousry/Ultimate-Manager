@@ -9,42 +9,30 @@ import java.util.List;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
+import androidx.paging.LivePagedListBuilder;
+import androidx.paging.PagedList;
 
 public class AddNewEmployeeViewModel extends ViewModel {
-    private LiveData<EmployeeWithExtras> mEmployee;
-    private LiveData<List<DepartmentEntry>> allDepartments;
-    private LiveData<List<TaskEntry>> employeeCompletedTasks;
-    private LiveData<List<TaskEntry>> employeeRunningTasks;
-    private AppDatabase mAppDatabase;
+    public LiveData<EmployeeWithExtras> employeeEntry;
+
+    public LiveData<List<DepartmentEntry>> allDepartments;
+
+    public LiveData<PagedList<TaskEntry>> employeeCompletedTasks;
+    public LiveData<PagedList<TaskEntry>> employeeRunningTasks;
 
 
     public AddNewEmployeeViewModel(AppDatabase database, int empID) {
-        mAppDatabase = database;
         allDepartments = database.departmentsDao().loadDepartments();
+
         if (empID != -1) {
-            mEmployee = database.employeesDao().loadEmployeeById(empID);
-            employeeCompletedTasks = database.tasksDao().loadTasksForEmployee(empID, true);
-            employeeRunningTasks = database.tasksDao().loadTasksForEmployee(empID, false);
+
+            employeeEntry = database.employeesDao().loadEmployeeById(empID);
+
+            employeeCompletedTasks = new LivePagedListBuilder<>(database.tasksDao().loadTasksForEmployee(empID, true), /* page size */ 20).build();
+            employeeRunningTasks = new LivePagedListBuilder<>(database.tasksDao().loadTasksForEmployee(empID, false), /* page size */ 20).build();
 
 
         }
     }
 
-    public LiveData<EmployeeWithExtras> getEmployee() {
-        return mEmployee;
-    }
-
-    public LiveData<List<DepartmentEntry>> getAllDepartments() {
-        return allDepartments;
-    }
-
-
-    public LiveData<List<TaskEntry>> getEmployeeRunningTasks() {
-        return employeeRunningTasks;
-    }
-
-
-    public LiveData<List<TaskEntry>> getEmployeeCompletedTasks() {
-        return employeeCompletedTasks;
-    }
 }

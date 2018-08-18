@@ -12,7 +12,7 @@
     <!--string for bottom sheet button-->
     <string name="show_employees">Show employees</string>
 
-    <!--strings for add task activity-->
+    <!--strings for add taskEntry activity-->
     <string name="label_task_rating">Rating :</string>
     <string name="label_task_department">Department :</string>
     <string name="label_task_employees">Employees :</string>
@@ -103,5 +103,6 @@
     <string name="channel_name">Due Soon</string>
     <string name="channel_description">Upcoming due dates on your cards</string>
     <string name="hint_department_date_created">Date created</string>
+    <string name="view_task">View task</string>
 
 </resources>

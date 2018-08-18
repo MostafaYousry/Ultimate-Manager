@@ -83,8 +83,8 @@ public class DepartmentsArrayAdapter extends ArrayAdapter<String> {
 
 
     /**
-     * used when a department is already assigned to an existing task
-     * its used to select the previously chosen department for that task
+     * used when a department is already assigned to an existing taskEntry
+     * its used to select the previously chosen department for that taskEntry
      *
      * @param depId:
      * @return its position in the drop down list

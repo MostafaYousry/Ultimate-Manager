@@ -2,6 +2,7 @@ package com.example.android.employeesmanagementapp;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -9,6 +10,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * class for defining the behaviour of a fab in a layout containing
@@ -29,8 +31,14 @@ public class BottomNavigationFabBehavior extends CoordinatorLayout.Behavior<Floa
 
     @Override
     public boolean layoutDependsOn(CoordinatorLayout parent, FloatingActionButton child, View dependency) {
-        return dependency instanceof Snackbar.SnackbarLayout;
+        return dependency instanceof Snackbar.SnackbarLayout || dependency instanceof RecyclerView;
     }
+
+    @Override
+    public boolean onStartNestedScroll(CoordinatorLayout coordinatorLayout, FloatingActionButton child, View directTargetChild, View target, int nestedScrollAxes, int type) {
+        return true;
+    }
+
 
     @Override
     public boolean onDependentViewChanged(CoordinatorLayout parent, FloatingActionButton child, View dependency) {
@@ -55,9 +63,26 @@ public class BottomNavigationFabBehavior extends CoordinatorLayout.Behavior<Floa
         return false;
     }
 
+
     @Override
     public void onNestedScroll(@NonNull CoordinatorLayout coordinatorLayout, @NonNull FloatingActionButton child, @NonNull View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed, int type) {
+
         super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, type);
 
+        Log.d("wfwef", dyConsumed + "");
+
+        if (dyConsumed > 0) {
+//            if (child.isOrWillBeHidden())
+//                return;
+            child.hide();
+            Log.d("wfwef", "hide");
+        } else if (dyConsumed < 0) {
+//            if (child.isOrWillBeShown())
+//                return;
+            child.show();
+            Log.d("wfwef", "show");
+        }
+
     }
+
 }

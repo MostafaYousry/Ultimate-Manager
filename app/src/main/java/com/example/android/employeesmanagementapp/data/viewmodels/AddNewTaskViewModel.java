@@ -10,11 +10,15 @@ import java.util.List;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
+import androidx.paging.LivePagedListBuilder;
+import androidx.paging.PagedList;
 
 public class AddNewTaskViewModel extends ViewModel {
-    private LiveData<TaskEntry> task;
-    private LiveData<List<EmployeeEntry>> taskEmployees;
-    private LiveData<List<DepartmentEntry>> allDepartments;
+    public LiveData<TaskEntry> taskEntry;
+    public LiveData<List<DepartmentEntry>> allDepartments;
+
+    public LiveData<PagedList<EmployeeEntry>> taskEmployees;
+
 
     private AppDatabase mAppDatabase;
     private int mTaskId;
@@ -26,30 +30,19 @@ public class AddNewTaskViewModel extends ViewModel {
         allDepartments = appDatabase.departmentsDao().loadDepartments();
 
         if (taskId != -1) {
-            task = appDatabase.tasksDao().loadTaskById(taskId);
-            taskEmployees = appDatabase.employeesTasksDao().getEmployeesForTask(taskId);
+            taskEntry = appDatabase.tasksDao().loadTaskById(taskId);
+
+            taskEmployees = new LivePagedListBuilder<>(appDatabase.employeesTasksDao().getEmployeesForTask(taskId), /* page size */ 20).build();
         }
 
     }
 
 
-    public LiveData<TaskEntry> getTask() {
-        return task;
-    }
-
-    public LiveData<List<EmployeeEntry>> getTaskEmployees() {
-        return taskEmployees;
-    }
-
-    public LiveData<List<DepartmentEntry>> getAllDepartments() {
-        return allDepartments;
-    }
-
     public LiveData<List<EmployeeEntry>> getRestOfEmployeesInDep(int selectedDepartmentId, List<EmployeeEntry> exceptThese) {
 
         LiveData<List<EmployeeEntry>> restOfEmployeesInDep;
         if (mTaskId == -1 && exceptThese == null)
-            restOfEmployeesInDep = mAppDatabase.employeesDao().loadEmployeesInDep(selectedDepartmentId);
+            restOfEmployeesInDep = mAppDatabase.employeesDao().loadEmployeesInDep(selectedDepartmentId, new ArrayList<>());
         else
             restOfEmployeesInDep = mAppDatabase.employeesDao().loadEmployeesInDep(selectedDepartmentId, getIds(exceptThese));
 

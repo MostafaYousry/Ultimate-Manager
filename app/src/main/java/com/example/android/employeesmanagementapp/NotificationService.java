@@ -57,8 +57,8 @@ public class NotificationService extends Service {
         Log.e(TAG, "onStartCommand");
         super.onStartCommand(intent, flags, startId);
         if (intent != null) {
-            mTaskId = intent.getExtras().getInt("task id");
-            mTaskDueDate = intent.getExtras().getLong("task due date");
+            mTaskId = intent.getExtras().getInt("taskEntry id");
+            mTaskDueDate = intent.getExtras().getLong("taskEntry due date");
             appIsDestroyed = intent.getExtras().getBoolean("app is destroyed");
         }
         startTimer();
@@ -102,7 +102,7 @@ public class NotificationService extends Service {
                             mTaskTimer.put(allTasksId.get(i), mTimer);
                             initializeTimerTask();
                             //mTimer.schedule(mTimerTask, 10000 + i * 1000);
-                            Log.i("tasks due date", " task number = " + allTasksId.get(i));
+                            Log.i("tasks due date", " taskEntry number = " + allTasksId.get(i));
                             mTimer.schedule(mTimerTask, allTasksDueDate.get(i));
                         }
                     }
@@ -147,7 +147,7 @@ public class NotificationService extends Service {
                                 .setVisibility(1)
                                 .setDefaults(Notification.DEFAULT_ALL); //To control the level of detail visible in the notification from the lock screen
                         if (mTasksCount == 1)
-                            mBuilder.setContentText(mTasksCount + " task due date is met");
+                            mBuilder.setContentText(mTasksCount + " taskEntry due date is met");
 
                         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
                         // notificationId is a unique int for each notification that you must define

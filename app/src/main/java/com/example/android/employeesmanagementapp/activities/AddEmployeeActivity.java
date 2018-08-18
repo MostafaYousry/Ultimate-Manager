@@ -27,7 +27,6 @@ import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.EmployeeWithExtras;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
-import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.data.factories.EmpIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewEmployeeViewModel;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
@@ -35,7 +34,6 @@ import com.example.android.employeesmanagementapp.utils.ImageUtils;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -134,7 +132,7 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
         mArrayAdapter = new DepartmentsArrayAdapter(this, AppUtils.dpToPx(this, 12), AppUtils.dpToPx(this, 8), 0, AppUtils.dpToPx(this, 8), R.style.detailActivitiesTextStyle);
 
-        LiveData<List<DepartmentEntry>> departments = mViewModel.getAllDepartments();
+        LiveData<List<DepartmentEntry>> departments = mViewModel.allDepartments;
         departments.observe(this, new Observer<List<DepartmentEntry>>() {
             @Override
             public void onChanged(List<DepartmentEntry> departmentEntries) {
@@ -155,7 +153,7 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
         if (mEmployeeId == DEFAULT_EMPLOYEE_ID) {
             clearViews();
         } else {
-            final LiveData<EmployeeWithExtras> employee = mViewModel.getEmployee();
+            final LiveData<EmployeeWithExtras> employee = mViewModel.employeeEntry;
             employee.observe(this, new Observer<EmployeeWithExtras>() {
                 @Override
                 public void onChanged(EmployeeWithExtras employeeWithExtras) {
@@ -179,18 +177,11 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
         final TasksAdapter adapter = new TasksAdapter(this, this, true);
 
-        if (mEmployeeId == DEFAULT_EMPLOYEE_ID)
-            adapter.setData(new ArrayList<TaskEntry>());
-        else {
-            final LiveData<List<TaskEntry>> employeeCompletedTasks = mViewModel.getEmployeeCompletedTasks();
-            employeeCompletedTasks.observe(this, new Observer<List<TaskEntry>>() {
-                @Override
-                public void onChanged(List<TaskEntry> tasks) {
-                    employeeCompletedTasks.removeObservers(AddEmployeeActivity.this);
-                    adapter.setData(tasks);
-                }
-            });
-        }
+//        if (mEmployeeId == DEFAULT_EMPLOYEE_ID)
+//            adapter.setData(new ArrayList<TaskEntry>());
+//        else {
+        mViewModel.employeeCompletedTasks.observe(this, adapter::submitList);
+//        }
         mEmployeeCompletedTasks.setAdapter(adapter);
     }
 
@@ -434,11 +425,12 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
             }
     }
 
+
     @Override
-    public void onTaskClick(int taskRowID, int taskPosition) {
+    public void onTaskClick(int taskRowID, int taskPosition, boolean taskIsCompleted) {
         Intent intent = new Intent(this, AddTaskActivity.class);
         intent.putExtra(AddTaskActivity.TASK_ID_KEY, taskRowID);
+        intent.putExtra(AddTaskActivity.TASK_IS_COMPLETED_KEY, taskIsCompleted);
         startActivity(intent);
     }
-
 }

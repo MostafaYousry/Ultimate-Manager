@@ -1,8 +1,6 @@
 package com.example.android.employeesmanagementapp.fragments;
 
-import android.annotation.TargetApi;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,15 +13,9 @@ import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.activities.AddTaskActivity;
 import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
-import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
 
-import java.util.List;
-
-import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -69,22 +61,11 @@ public class CompletedTasksFragment extends Fragment implements TasksAdapter.Tas
         // specify an adapter
         mAdapter = new TasksAdapter(getContext(), this, true);
 
-        LiveData<List<TaskEntry>> tasksList = ViewModelProviders.of(getActivity()).get(MainViewModel.class).getCompletedTasksList();
-        tasksList.observe(this, new Observer<List<TaskEntry>>() {
-            @Override
-            public void onChanged(List<TaskEntry> taskEntries) {
-                if (taskEntries != null) {
-                    if (taskEntries.isEmpty())
-                        showEmptyView();
-                    else {
-                        mAdapter.setData(taskEntries);
-                        showRecyclerView();
-                    }
-                }
-            }
-        });
-
         mRecyclerView.setAdapter(mAdapter);
+
+        ViewModelProviders.of(getActivity()).get(MainViewModel.class).completedTasksList
+                .observe(this, mAdapter::submitList);
+
 
         return view;
     }
@@ -103,10 +84,12 @@ public class CompletedTasksFragment extends Fragment implements TasksAdapter.Tas
     }
 
 
+
     @Override
-    public void onTaskClick(int taskRowID, int taskPosition) {
+    public void onTaskClick(int taskRowID, int taskPosition, boolean taskIsCompleted) {
         Intent intent = new Intent(getActivity(), AddTaskActivity.class);
         intent.putExtra(AddTaskActivity.TASK_ID_KEY, taskRowID);
+        intent.putExtra(AddTaskActivity.TASK_IS_COMPLETED_KEY, taskIsCompleted);
         startActivity(intent);
     }
 }

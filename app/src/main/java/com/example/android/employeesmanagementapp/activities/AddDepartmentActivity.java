@@ -18,8 +18,6 @@ import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
-import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
-import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.data.factories.DepIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewDepViewModel;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
@@ -29,14 +27,12 @@ import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.Date;
-import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.ViewCompat;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -109,13 +105,10 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
         if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
             clearViews();
         } else {
-            final LiveData<DepartmentEntry> department = mViewModel.getDepartment();
-            department.observe(this, new Observer<DepartmentEntry>() {
-                @Override
-                public void onChanged(DepartmentEntry departmentEntry) {
-                    department.removeObservers(AddDepartmentActivity.this);
-                    populateUi(departmentEntry);
-                }
+            final LiveData<DepartmentEntry> department = mViewModel.departmentEntry;
+            department.observe(this, departmentEntry -> {
+                department.removeObservers(AddDepartmentActivity.this);
+                populateUi(departmentEntry);
             });
 
             setUpEmployeesRV();
@@ -166,18 +159,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
         mDepEmployeesRV.setAdapter(adapter);
 
 
-        final LiveData<List<EmployeeEntry>> depEmployees = mViewModel.getEmployees();
-        depEmployees.observe(this, new Observer<List<EmployeeEntry>>() {
-            @Override
-            public void onChanged(List<EmployeeEntry> employees) {
-                if (employees != null && !employees.isEmpty())
-                    adapter.setData(employees);
-                else {
-                    findViewById(R.id.imageView9).setVisibility(View.GONE);
-                    mDepEmployeesRV.setVisibility(View.GONE);
-                }
-            }
-        });
+        mViewModel.departmentEmployees.observe(this, adapter::submitList);
 
 
     }
@@ -187,22 +169,11 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
         mDepRunningTasksRV.setHasFixedSize(true);
 
         mDepRunningTasksRV.setLayoutManager(new LinearLayoutManager(this));
-        final TasksAdapter adapter = new TasksAdapter(this, this, false);
+        TasksAdapter adapter = new TasksAdapter(this, this, false);
         mDepRunningTasksRV.setAdapter(adapter);
 
 
-        final LiveData<List<TaskEntry>> depCompletedTasks = mViewModel.getRunningTasks();
-        depCompletedTasks.observe(this, new Observer<List<TaskEntry>>() {
-            @Override
-            public void onChanged(List<TaskEntry> tasks) {
-                if (tasks != null && !tasks.isEmpty())
-                    adapter.setData(tasks);
-                else {
-                    findViewById(R.id.imageView10).setVisibility(View.GONE);
-                    mDepRunningTasksRV.setVisibility(View.GONE);
-                }
-            }
-        });
+        mViewModel.departmentRunningTasks.observe(this, adapter::submitList);
     }
 
     private void setUpDepCompletedTasksRV() {
@@ -214,18 +185,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
         mDepCompletedTasksRV.setAdapter(adapter);
 
 
-        final LiveData<List<TaskEntry>> depCompletedTasks = mViewModel.getCompletedTasks();
-        depCompletedTasks.observe(this, new Observer<List<TaskEntry>>() {
-            @Override
-            public void onChanged(List<TaskEntry> tasks) {
-                if (tasks != null && !tasks.isEmpty())
-                    adapter.setData(tasks);
-                else {
-                    findViewById(R.id.imageView11).setVisibility(View.GONE);
-                    mDepCompletedTasksRV.setVisibility(View.GONE);
-                }
-            }
-        });
+        mViewModel.departmentCompletedTasks.observe(this, adapter::submitList);
 
     }
 
@@ -234,15 +194,15 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
         super.onStop();
 //
 //        Intent intent = new Intent(this, NotificationService.class);
-//        // send the due date and the id of the task within the intent
-//        //intent.putExtra("task due date", taskDueDate.getTime() - taskStartDAte.getTime())'
-//        //intent.putExtra("task id",mTaskId);
+//        // send the due date and the id of the taskEntry within the intent
+//        //intent.putExtra("taskEntry due date", taskDueDate.getTime() - taskStartDAte.getTime())'
+//        //intent.putExtra("taskEntry id",mTaskId);
 //
 //        //just for experiment until tasks are done
 //        Bundle bundle = new Bundle();
 //        System.out.println(mDepartmentId);
-//        bundle.putInt("task id", 38);
-//        bundle.putLong("task due date", 30);
+//        bundle.putInt("taskEntry id", 38);
+//        bundle.putLong("taskEntry due date", 30);
 //        intent.putExtras(bundle);
 //        startService(intent);
     }
@@ -390,9 +350,10 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
     }
 
     @Override
-    public void onTaskClick(int taskRowID, int taskPosition) {
+    public void onTaskClick(int taskRowID, int taskPosition, boolean taskIsCompleted) {
         Intent intent = new Intent(this, AddTaskActivity.class);
         intent.putExtra(AddTaskActivity.TASK_ID_KEY, taskRowID);
+        intent.putExtra(AddTaskActivity.TASK_IS_COMPLETED_KEY, taskIsCompleted);
         startActivity(intent);
     }
 }

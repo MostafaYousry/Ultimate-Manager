@@ -5,41 +5,26 @@ import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 
-import java.util.List;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
+import androidx.paging.LivePagedListBuilder;
+import androidx.paging.PagedList;
 
 public class AddNewDepViewModel extends ViewModel {
-    private LiveData<DepartmentEntry> mDepartment;
-    private LiveData<List<EmployeeEntry>> mEmployees;
-    private LiveData<List<TaskEntry>> mCompletedTasks;
-    private LiveData<List<TaskEntry>> mRunningTasks;
+    public LiveData<DepartmentEntry> departmentEntry;
+
+    public LiveData<PagedList<EmployeeEntry>> departmentEmployees;
+    public LiveData<PagedList<TaskEntry>> departmentCompletedTasks;
+    public LiveData<PagedList<TaskEntry>> departmentRunningTasks;
 
     public AddNewDepViewModel(AppDatabase database, int depId) {
         if (depId > 0) {
-            mDepartment = database.departmentsDao().loadDepartmentById(depId);
-            mEmployees = database.employeesDao().loadEmployeesInDep(depId);
-            mCompletedTasks = database.tasksDao().loadTasksForDepartment(depId, true);
-            mRunningTasks = database.tasksDao().loadTasksForDepartment(depId, false);
+            departmentEntry = database.departmentsDao().loadDepartmentById(depId);
+
+            departmentEmployees = new LivePagedListBuilder<>(database.employeesDao().loadEmployeesInDep(depId), /* page size */ 20).build();
+            departmentCompletedTasks = new LivePagedListBuilder<>(database.tasksDao().loadTasksForDepartment(depId, true), /* page size */ 20).build();
+            departmentRunningTasks = new LivePagedListBuilder<>(database.tasksDao().loadTasksForDepartment(depId, false), /* page size */ 20).build();
         }
     }
-
-    public LiveData<DepartmentEntry> getDepartment() {
-        return mDepartment;
-    }
-
-    public LiveData<List<EmployeeEntry>> getEmployees() {
-        return mEmployees;
-    }
-
-    public LiveData<List<TaskEntry>> getCompletedTasks() {
-        return mCompletedTasks;
-    }
-
-    public LiveData<List<TaskEntry>> getRunningTasks() {
-        return mRunningTasks;
-    }
-
 
 }

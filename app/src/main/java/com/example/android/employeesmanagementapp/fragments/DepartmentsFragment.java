@@ -14,15 +14,10 @@ import android.widget.TextView;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.activities.AddDepartmentActivity;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsAdapter;
-import com.example.android.employeesmanagementapp.data.DepartmentWithExtras;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 
-import java.util.List;
-
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -71,20 +66,8 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
         //initialise recycler view adapter
         mAdapter = new DepartmentsAdapter(getContext(), this);
 
-        LiveData<List<DepartmentWithExtras>> departmentsList = ViewModelProviders.of(getActivity()).get(MainViewModel.class).getAllDepartmentsWithExtrasList();
-        departmentsList.observe(this, new Observer<List<DepartmentWithExtras>>() {
-            @Override
-            public void onChanged(List<DepartmentWithExtras> departmentEntries) {
-                if (departmentEntries != null) {
-                    if (departmentEntries.isEmpty())
-                        showEmptyView();
-                    else {
-                        mAdapter.setData(departmentEntries);
-                        showRecyclerView();
-                    }
-                }
-            }
-        });
+        ViewModelProviders.of(getActivity()).get(MainViewModel.class).allDepartmentsWithExtrasList
+                .observe(this, mAdapter::submitList);
 
 
         mRecyclerView.setAdapter(mAdapter);

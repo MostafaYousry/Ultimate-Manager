@@ -45,7 +45,7 @@ public final class AppUtils {
     }
 
     public static void showColorPicker(Context context, int taskId) {
-        //create a bundle containing id of task
+        //create a bundle containing id of taskEntry
         Bundle bundle = new Bundle();
         bundle.putInt(ColorPickerDialogFragment.KEY_TASK_ID, taskId);
 
@@ -60,7 +60,7 @@ public final class AppUtils {
     public static void showRateTaskDialog(final Context context, final int taskID) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Task done");
-        builder.setMessage("Please rate task");
+        builder.setMessage("Please rate taskEntry");
 
         View rateDialogView = LayoutInflater.from(context).inflate(R.layout.rating_bar, null, false);
         final RatingBar ratingBar = rateDialogView.findViewById(R.id.rating_bar);

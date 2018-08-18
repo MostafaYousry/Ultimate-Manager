@@ -128,21 +128,8 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
 
         final MainViewModel mainViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
 
-        final LiveData<List<EmployeeWithExtras>> employeesList = mainViewModel.getEmployeesWithExtrasList();
-        employeesList.observe(this, new Observer<List<EmployeeWithExtras>>() {
-            @Override
-            public void onChanged(List<EmployeeWithExtras> employeeEntries) {
-                if (employeeEntries != null) {
-                    if (employeeEntries.isEmpty())
-                        showEmptyView();
-                    else {
-                        mEmployeesAdapter.setData(employeeEntries);
-                        showRecyclerView();
-                    }
-
-                }
-            }
-        });
+        mainViewModel.employeesWithExtrasList
+                .observe(this, mEmployeesAdapter::submitList);
 
 
         //set the employee recycler view adapter
@@ -252,7 +239,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
                                 abortMultiSelection();
                             }
                         });
-                            mDb.tasksDao().deleteEmptyTasks();
+                        mDb.tasksDao().deleteEmptyTasks();
 
                     }
 
@@ -278,7 +265,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
 
         final DepartmentsArrayAdapter departmentsArrayAdapter = new DepartmentsArrayAdapter(getActivity(), AppUtils.dpToPx(getActivity(), 24), AppUtils.dpToPx(getActivity(), 8), AppUtils.dpToPx(getActivity(), 0), AppUtils.dpToPx(getActivity(), 8), R.style.mainTextStyle);
 
-        final LiveData<List<DepartmentEntry>> departments = ViewModelProviders.of(getActivity()).get(MainViewModel.class).getAllDepartmentsList();
+        final LiveData<List<DepartmentEntry>> departments = ViewModelProviders.of(getActivity()).get(MainViewModel.class).allDepartmentsList;
         departments.observe(this, new Observer<List<DepartmentEntry>>() {
             @Override
             public void onChanged(List<DepartmentEntry> departmentEntries) {

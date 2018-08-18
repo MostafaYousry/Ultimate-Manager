@@ -17,6 +17,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+    }
 }
 
 dependencies {
@@ -36,11 +40,12 @@ dependencies {
     implementation 'androidx.room:room-runtime:2.0.0-rc01'
     annotationProcessor 'androidx.room:room-compiler:2.0.0-rc01'
 
-
-
     // ViewModel and LiveData
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0-rc01'
     annotationProcessor 'androidx.lifecycle:lifecycle-compiler:2.0.0-rc01'
+
+    //Paging
+    implementation "androidx.paging:paging-runtime:2.0.0-rc01"
 
 
 
