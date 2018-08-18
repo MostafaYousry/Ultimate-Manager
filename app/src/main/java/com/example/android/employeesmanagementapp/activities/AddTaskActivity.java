@@ -4,7 +4,9 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
@@ -67,6 +70,8 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
     private AppDatabase mDb;
     private AddNewTaskViewModel mViewModel;
     private int clickedTaskDepId = -1;
+    private TextWatcher mTextWatcher;
+    private boolean isOneFiledChanged = false;
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -171,7 +176,36 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         });
 
         ViewCompat.setNestedScrollingEnabled(mTaskEmployeesRV, false);
+        setUpTextWatcher();
+        mTaskTitle.addTextChangedListener(mTextWatcher);
+        mTaskDescription.addTextChangedListener(mTextWatcher);
+        mTaskStartTime.addTextChangedListener(mTextWatcher);
+        mTaskStartDate.addTextChangedListener(mTextWatcher);
+        mTaskDueTime.addTextChangedListener(mTextWatcher);
+        mTaskDueDate.addTextChangedListener(mTextWatcher);
 
+
+    }
+
+
+    private void setUpTextWatcher() {
+        mTextWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if (editable.length() != 0)
+                    isOneFiledChanged = true;
+            }
+        };
     }
 
     public void showChooseTaskEmployeesDialog(View view) {
@@ -387,10 +421,16 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
                 saveTask();
                 break;
             case android.R.id.home:
+                checkDiscardChanges();
                 finish();
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void checkDiscardChanges() {
+        if (isOneFiledChanged)
+            Toast.makeText(AddTaskActivity.this, "discard changes", Toast.LENGTH_LONG).show();
     }
 
 
