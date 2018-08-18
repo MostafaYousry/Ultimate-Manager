@@ -56,7 +56,7 @@ public class NotificationService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.e(TAG, "onStartCommand");
         super.onStartCommand(intent, flags, startId);
-        if (intent != null) {
+        if (intent != null && intent.hasExtra("task id") && intent.hasExtra("task due date")) {
             mTaskId = intent.getExtras().getInt("task id");
             mTaskDueDate = intent.getExtras().getLong("task due date");
             appIsDestroyed = intent.getExtras().getBoolean("app is destroyed");
@@ -72,6 +72,8 @@ public class NotificationService extends Service {
 
     @Override
     public void onDestroy() {
+        appIsDestroyed = true;
+        startTimer();
         super.onDestroy();
     }
 
@@ -91,6 +93,7 @@ public class NotificationService extends Service {
                 mTimer.schedule(mTimerTask, mTaskDueDate);
             }
         } else {
+            System.out.println("********************************************finally enter else");
             AppExecutor.getInstance().diskIO().execute(new Runnable() {
                 @Override
                 public void run() {
