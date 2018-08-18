@@ -69,6 +69,11 @@ public class MainViewModel extends AndroidViewModel {
         return runningTasksList;
     }
 
+    public int getNumRunningTasksList()
+    {if (runningTasksList.getValue()==null)
+    return 0;
+    return runningTasksList.getValue().size();}
+
     public LiveData<List<TaskEntry>> getCompletedTasksList() {
         return completedTasksList;
     }

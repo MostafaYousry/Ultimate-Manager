@@ -118,5 +118,9 @@ public interface TasksDao {
     @Query("UPDATE tasks SET task_color_resource = :colorRes WHERE task_id=:taskID")
     void updateTaskColor(int colorRes, int taskID);
 
+    @Query("delete from tasks where (SELECT COUNT(*) FROM employees INNER JOIN employees_tasks ON employees.employee_id=employees_tasks.employee_id WHERE employees_tasks.task_id= tasks.task_id )=0")
+    void deleteEmptyTasks();
+
+
 
 }
