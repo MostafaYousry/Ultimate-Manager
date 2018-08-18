@@ -104,5 +104,7 @@
     <string name="channel_description">Upcoming due dates on your cards</string>
     <string name="hint_department_date_created">Date created</string>
     <string name="view_task">View task</string>
+    <string name="action_mail">Mail</string>
+    <string name="action_phone">Call</string>
 
 </resources>

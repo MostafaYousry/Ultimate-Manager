@@ -143,7 +143,8 @@ public class TaskEntry {
     }
 
     public int getTaskColorResource() {
-        return taskColorResource;
+        // TODO: 8/19/18
+        return R.color.task_color_1;
     }
 
     public void setTaskColorResource(int taskColorResource) {

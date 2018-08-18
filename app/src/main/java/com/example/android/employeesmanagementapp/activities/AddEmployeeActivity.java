@@ -264,7 +264,7 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_toolbar, menu);
+        getMenuInflater().inflate(R.menu.menu_add_employee_activity, menu);
         return true;
     }
 
@@ -273,6 +273,12 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
         switch (item.getItemId()) {
             case R.id.action_save:
                 saveEmployee();
+                break;
+            case R.id.action_phone:
+                dialPhoneNumber();
+                break;
+            case R.id.action_mail:
+                composeEmail();
                 break;
             case android.R.id.home:
                 finish();
@@ -425,6 +431,22 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
             }
     }
 
+
+    private void composeEmail() {
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("mailto:" + mEmployeeEmail.getText()));
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
+    }
+
+    private void dialPhoneNumber() {
+        Intent intent = new Intent(Intent.ACTION_DIAL);
+        intent.setData(Uri.parse("tel:" + mEmployeePhone.getText()));
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
+    }
 
     @Override
     public void onTaskClick(int taskRowID, int taskPosition, boolean taskIsCompleted) {
