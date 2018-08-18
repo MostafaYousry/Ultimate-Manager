@@ -15,7 +15,10 @@ import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.activities.AddTaskActivity;
 import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
+import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
+import com.example.android.employeesmanagementapp.data.factories.TaskIdFact;
+import com.example.android.employeesmanagementapp.data.viewmodels.AddNewTaskViewModel;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
 
 import java.util.List;
@@ -82,6 +85,7 @@ public class RunningTasksFragment extends Fragment implements TasksAdapter.Tasks
         mAdapter = new TasksAdapter(getContext(), this, false);
 
         LiveData<List<TaskEntry>> tasksList = ViewModelProviders.of(getActivity()).get(MainViewModel.class).getRunningTasksList();
+
         tasksList.observe(this, new Observer<List<TaskEntry>>() {
             @Override
             public void onChanged(List<TaskEntry> taskEntries) {

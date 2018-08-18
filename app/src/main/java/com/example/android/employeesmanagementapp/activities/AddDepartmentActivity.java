@@ -1,14 +1,16 @@
 package com.example.android.employeesmanagementapp.activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
+import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
 import com.example.android.employeesmanagementapp.adapters.HorizontalEmployeeAdapter;
@@ -20,11 +22,19 @@ import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.data.factories.DepIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewDepViewModel;
+import com.example.android.employeesmanagementapp.utils.AppUtils;
+import com.example.android.employeesmanagementapp.utils.ColorUtils;
+import com.example.android.employeesmanagementapp.utils.ImageUtils;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.textfield.TextInputLayout;
 
+import java.util.Date;
 import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.core.view.ViewCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -42,10 +52,14 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
     private RecyclerView mDepCompletedTasksRV;
     private RecyclerView mDepRunningTasksRV;
     private RecyclerView mDepEmployeesRV;
-    private EditText mDepartmentName;
-    private Toolbar mToolbar;
 
-    private Toast mToast;
+    private ImageView mDepartmentImage;
+    private EditText mDepartmentName;
+    private String mDepartmentPicturePath;
+    private EditText mDepartmentDateCreated;
+
+    private Toolbar mToolbar;
+    private CollapsingToolbarLayout mCollapsingToolbar;
 
     private AppDatabase mDb;
     private AddNewDepViewModel mViewModel;
@@ -66,10 +80,19 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
 
         //find views
         mDepartmentName = findViewById(R.id.department_name);
+        mDepartmentImage = findViewById(R.id.department_image);
+        mDepartmentDateCreated = findViewById(R.id.department_date_created);
         mDepEmployeesRV = findViewById(R.id.department_employees_rv);
         mDepRunningTasksRV = findViewById(R.id.department_running_tasks_rv);
         mDepCompletedTasksRV = findViewById(R.id.department_completed_tasks_rv);
+        mCollapsingToolbar = findViewById(R.id.collapsing_toolbar);
 
+        mDepartmentImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ImageUtils.showPhotoCameraDialog(AddDepartmentActivity.this);
+            }
+        });
 
         //set toolbar as actionbar
         mToolbar = findViewById(R.id.toolbar);
@@ -98,6 +121,35 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
             setUpEmployeesRV();
             setUpDepRunningTasksRV();
             setUpDepCompletedTasksRV();
+
+            ViewCompat.setNestedScrollingEnabled(mDepEmployeesRV, false);
+            ViewCompat.setNestedScrollingEnabled(mDepCompletedTasksRV, false);
+            ViewCompat.setNestedScrollingEnabled(mDepRunningTasksRV, false);
+
+        }
+
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == ImageUtils.REQUEST_IMAGE_GET && resultCode == RESULT_OK) {
+            Uri fullPhotoUri = data.getData();
+            Glide.with(this)
+                    .asBitmap()
+                    .load(fullPhotoUri)
+                    .into(mDepartmentImage);
+
+            ImageUtils.importCopy(this, fullPhotoUri);
+            mDepartmentPicturePath = ImageUtils.sImageURI;
+
+
+        } else if (requestCode == ImageUtils.REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            mDepartmentPicturePath = ImageUtils.sImageURI;
+            Glide.with(this)
+                    .asBitmap()
+                    .load(Uri.parse(mDepartmentPicturePath))
+                    .into(mDepartmentImage);
         }
 
     }
@@ -121,7 +173,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
                 if (employees != null && !employees.isEmpty())
                     adapter.setData(employees);
                 else {
-                    findViewById(R.id.department_employees_text_view).setVisibility(View.GONE);
+                    findViewById(R.id.imageView9).setVisibility(View.GONE);
                     mDepEmployeesRV.setVisibility(View.GONE);
                 }
             }
@@ -146,7 +198,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
                 if (tasks != null && !tasks.isEmpty())
                     adapter.setData(tasks);
                 else {
-                    findViewById(R.id.textView2).setVisibility(View.GONE);
+                    findViewById(R.id.imageView10).setVisibility(View.GONE);
                     mDepRunningTasksRV.setVisibility(View.GONE);
                 }
             }
@@ -169,7 +221,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
                 if (tasks != null && !tasks.isEmpty())
                     adapter.setData(tasks);
                 else {
-                    findViewById(R.id.textView3).setVisibility(View.GONE);
+                    findViewById(R.id.imageView11).setVisibility(View.GONE);
                     mDepCompletedTasksRV.setVisibility(View.GONE);
                 }
             }
@@ -201,8 +253,21 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
             return;
 
         mDepartmentName.setText(departmentEntry.getDepartmentName());
-        getSupportActionBar().setTitle(departmentEntry.getDepartmentName());
+        mCollapsingToolbar.setTitle(departmentEntry.getDepartmentName());
 
+        if (departmentEntry.getDepartmentImageUri() == null) {
+            mDepartmentImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_departments));
+            mDepartmentImage.setScaleType(ImageView.ScaleType.CENTER);
+            mDepartmentImage.setBackgroundColor(ResourcesCompat.getColor(getResources(), ColorUtils.getDepartmentBackgroundColor(departmentEntry), getTheme()));
+        } else {
+            Glide.with(this)
+                    .asBitmap()
+                    .load(Uri.parse(departmentEntry.getDepartmentImageUri()))
+                    .into(mDepartmentImage);
+        }
+
+        mDepartmentDateCreated.setText(AppUtils.getFriendlyDate(departmentEntry.getDepartmentDateCreated()));
+        mDepartmentDateCreated.setTag(departmentEntry.getDepartmentDateCreated());
     }
 
     private void clearViews() {
@@ -212,15 +277,24 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
         mDepCompletedTasksRV.setVisibility(View.GONE);
         mDepRunningTasksRV.setVisibility(View.GONE);
         mDepEmployeesRV.setVisibility(View.GONE);
-        findViewById(R.id.textView2).setVisibility(View.GONE);
-        findViewById(R.id.textView3).setVisibility(View.GONE);
-        findViewById(R.id.department_employees_text_view).setVisibility(View.GONE);
+
+        mDepartmentImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_camera_add));
+        mDepartmentImage.setScaleType(ImageView.ScaleType.CENTER);
+        mDepartmentImage.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.secondaryColor, getTheme()));
+
+        findViewById(R.id.imageView9).setVisibility(View.GONE);
+        findViewById(R.id.imageView10).setVisibility(View.GONE);
+        findViewById(R.id.imageView11).setVisibility(View.GONE);
     }
 
 
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_toolbar, menu);
         return true;
+    }
+
+    public void pickDate(View view) {
+        AppUtils.showDatePicker(this, view);
     }
 
     @Override
@@ -238,11 +312,11 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
 
 
     private void saveDepartment() {
-        if (isValidData()) {
+        if (isDataValid()) {
             String departmentName = mDepartmentName.getText().toString();
+            Date departmentCreatedDate = (Date) mDepartmentDateCreated.getTag();
 
-
-            final DepartmentEntry newDepartment = new DepartmentEntry(departmentName);
+            final DepartmentEntry newDepartment = new DepartmentEntry(departmentName, departmentCreatedDate, mDepartmentPicturePath);
 
             AppExecutor.getInstance().diskIO().execute(new Runnable() {
                 @Override
@@ -262,18 +336,49 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
 
     }
 
-    private boolean isValidData() {
+    private boolean isDataValid() {
+
+        boolean valid = true;
+
         if (TextUtils.isEmpty(mDepartmentName.getText())) {
-            if (mToast != null) {
-                mToast.cancel();
-                mToast.show();
-            }
-            mToast = Toast.makeText(this, "Please enter a valid data", Toast.LENGTH_LONG);
-            mToast.show();
-            return false;
+            updateErrorVisibility("departmentName", true);
+            valid = false;
+        } else {
+            updateErrorVisibility("departmentName", false);
         }
 
-        return true;
+
+        if (mDepartmentDateCreated.getTag() == null) {
+            updateErrorVisibility("departmentDateCreated", true);
+            valid = false;
+        } else {
+            updateErrorVisibility("departmentDateCreated", false);
+        }
+
+        return valid;
+
+
+    }
+
+    private void updateErrorVisibility(String key, boolean show) {
+        if (show)
+            switch (key) {
+                case "departmentName":
+                    ((TextInputLayout) findViewById(R.id.department_name_TIL)).setError(getString(R.string.required_field));
+                    break;
+                case "departmentDateCreated":
+                    ((TextInputLayout) findViewById(R.id.department_date_created_TIL)).setError(getString(R.string.required_field));
+                    break;
+            }
+        else
+            switch (key) {
+                case "departmentName":
+                    ((TextInputLayout) findViewById(R.id.department_name_TIL)).setHelperText(getString(R.string.required_field));
+                    break;
+                case "departmentDateCreated":
+                    ((TextInputLayout) findViewById(R.id.department_date_created_TIL)).setHelperText(getString(R.string.required_field));
+                    break;
+            }
     }
 
 

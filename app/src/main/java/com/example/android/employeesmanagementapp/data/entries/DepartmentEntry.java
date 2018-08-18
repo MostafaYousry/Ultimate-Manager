@@ -1,5 +1,7 @@
 package com.example.android.employeesmanagementapp.data.entries;
 
+import java.util.Date;
+
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
@@ -23,13 +25,22 @@ public class DepartmentEntry {
     private String departmentName;
 
     @NonNull
+    @ColumnInfo(name = "department_date_created")
+    private Date departmentDateCreated;
+
+    @ColumnInfo(name = "department_image_uri")
+    private String departmentImageUri;
+
+    @NonNull
     @ColumnInfo(name = "department_is_deleted")
     private boolean departmentIsDeleted;
 
     //used when creating new DepartmentEntry object
     @Ignore
-    public DepartmentEntry(@NonNull String departmentName) {
+    public DepartmentEntry(String departmentName, Date departmentDateCreated, String departmentImageUri) {
         this.departmentName = departmentName;
+        this.departmentDateCreated = departmentDateCreated;
+        this.departmentImageUri = departmentImageUri;
     }
 
     //used with index of for department spinner
@@ -39,11 +50,12 @@ public class DepartmentEntry {
     }
 
     //used by room when reading from database
-    public DepartmentEntry(int departmentId, @NonNull String departmentName, boolean departmentIsDeleted) {
+    public DepartmentEntry(int departmentId, String departmentName, Date departmentDateCreated, String departmentImageUri, boolean departmentIsDeleted) {
         this.departmentId = departmentId;
         this.departmentName = departmentName;
+        this.departmentDateCreated = departmentDateCreated;
+        this.departmentImageUri = departmentImageUri;
         this.departmentIsDeleted = departmentIsDeleted;
-
     }
 
     public int getDepartmentId() {
@@ -61,6 +73,18 @@ public class DepartmentEntry {
 
     public void setDepartmentName(@NonNull String departmentName) {
         this.departmentName = departmentName;
+    }
+
+    public Date getDepartmentDateCreated() {
+        return departmentDateCreated;
+    }
+
+    public String getDepartmentImageUri() {
+        return departmentImageUri;
+    }
+
+    public void setDepartmentImageUri(String departmentImageUri) {
+        this.departmentImageUri = departmentImageUri;
     }
 
     public boolean isDepartmentIsDeleted() {
@@ -83,5 +107,10 @@ public class DepartmentEntry {
 
         return departmentId == other.getDepartmentId();
 
+    }
+
+    @Override
+    public int hashCode() {
+        return Integer.valueOf(departmentId).hashCode();
     }
 }

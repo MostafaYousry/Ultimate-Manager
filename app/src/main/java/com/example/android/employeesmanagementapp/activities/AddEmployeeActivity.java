@@ -42,6 +42,7 @@ import java.util.List;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.core.view.ViewCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -165,6 +166,8 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
         }
 
+        ViewCompat.setNestedScrollingEnabled(mEmployeeCompletedTasks, false);
+
     }
 
     private void setUpCompletedTasksRV() {
@@ -193,7 +196,7 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
 
     public void pickDate(View view) {
-        AppUtils.showDatePicker(this, view, true);
+        AppUtils.showDatePicker(this, view);
     }
 
 

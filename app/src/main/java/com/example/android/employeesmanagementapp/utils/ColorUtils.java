@@ -6,6 +6,7 @@ public final class ColorUtils {
     private static int[] taskColorResources = new int[12];
     private static int[] accent100Values = new int[16];
     private static int[] accent700Values = new int[16];
+    private static int[] accent200Values = new int[19];
 
 
     static {
@@ -40,6 +41,25 @@ public final class ColorUtils {
         accent100Values[14] = R.color.A100_15;
         accent100Values[15] = R.color.A100_16;
 
+        accent200Values[0] = R.color.A200_1;
+        accent200Values[1] = R.color.A200_2;
+        accent200Values[2] = R.color.A200_3;
+        accent200Values[3] = R.color.A200_4;
+        accent200Values[4] = R.color.A200_5;
+        accent200Values[5] = R.color.A200_6;
+        accent200Values[6] = R.color.A200_7;
+        accent200Values[7] = R.color.A200_8;
+        accent200Values[8] = R.color.A200_9;
+        accent200Values[9] = R.color.A200_10;
+        accent200Values[10] = R.color.A200_11;
+        accent200Values[11] = R.color.A200_12;
+        accent200Values[12] = R.color.A200_13;
+        accent200Values[13] = R.color.A200_14;
+        accent200Values[14] = R.color.A200_15;
+        accent200Values[15] = R.color.A200_16;
+        accent200Values[16] = R.color.A200_17;
+        accent200Values[17] = R.color.A200_18;
+        accent200Values[18] = R.color.A200_19;
 
         accent700Values[0] = R.color.A700_1;
         accent700Values[1] = R.color.A700_2;
@@ -71,4 +91,9 @@ public final class ColorUtils {
     public static int getLetterBackgroundColor(Object object) {
         return accent100Values[Math.abs(object.hashCode()) % accent100Values.length];
     }
+
+    public static int getDepartmentBackgroundColor(Object object) {
+        return accent200Values[Math.abs(object.hashCode()) % accent200Values.length];
+    }
+
 }

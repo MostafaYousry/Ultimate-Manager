@@ -38,6 +38,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.ViewCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
@@ -168,6 +169,8 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
                 pickTime(view);
             }
         });
+
+        ViewCompat.setNestedScrollingEnabled(mTaskEmployeesRV, false);
 
     }
 
@@ -537,7 +540,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
 
 
     public void pickDate(View view) {
-        AppUtils.showDatePicker(this, view, false);
+        AppUtils.showDatePicker(this, view);
     }
 
 

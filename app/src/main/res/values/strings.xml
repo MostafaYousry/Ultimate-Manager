@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">EmployeesManagementApp</string>
+    <string name="app_name">Master Manager</string>
     <string name="default_notification_channel_id">Channel ID</string>
     <!-- strings defining navigation menu items -->
     <string name="tasks">Tasks</string>
@@ -81,6 +81,18 @@
         <item quantity="other">%d running tasks</item>
     </plurals>
 
+    <plurals name="numberOfCompletedTasks">
+        <item quantity="one">%d completed task</item>
+        <item quantity="other">%d completed tasks</item>
+    </plurals>
+
+    <string name="department_summary">%s\n%s\n%s</string>
+
+    <plurals name="numberOfEmployees">
+        <item quantity="one">%d employee</item>
+        <item quantity="other">%d employees</item>
+    </plurals>
+
     <string name="employee_list_item_name">%s %s</string>
 
     <string name="task_list_item_name_dates">%s to %s</string>
@@ -90,5 +102,6 @@
     <string name="message_dialog_delete_employees">Note:  deleted employee(s) will be removed from running tasks and will be visible only from completed tasks</string>
     <string name="channel_name">Due Soon</string>
     <string name="channel_description">Upcoming due dates on your cards</string>
+    <string name="hint_department_date_created">Date created</string>
 
 </resources>

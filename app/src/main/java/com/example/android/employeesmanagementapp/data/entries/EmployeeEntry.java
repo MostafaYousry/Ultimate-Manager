@@ -116,6 +116,8 @@ public class EmployeeEntry {
     }
 
     public String getEmployeeMiddleName() {
+        if (employeeMiddleName == null)
+            return "";
         return employeeMiddleName;
     }
 
@@ -124,6 +126,8 @@ public class EmployeeEntry {
     }
 
     public String getEmployeeLastName() {
+        if (employeeLastName == null)
+            return "";
         return employeeLastName;
     }
 
@@ -198,14 +202,8 @@ public class EmployeeEntry {
 
     @Override
     public int hashCode() {
-        if (employeeMiddleName == null && employeeLastName == null)
-            return employeeFirstName.hashCode();
-        else if (employeeMiddleName == null && employeeLastName != null)
-            return employeeFirstName.hashCode() + employeeLastName.hashCode();
-        else if (employeeMiddleName != null && employeeLastName == null)
-            return employeeFirstName.hashCode() + employeeMiddleName.hashCode();
-        else
-            return employeeFirstName.hashCode() + employeeMiddleName.hashCode() + employeeLastName.hashCode();
+
+        return getEmployeeFirstName().hashCode() + getEmployeeMiddleName().hashCode() + getEmployeeLastName().hashCode();
 
     }
 }
