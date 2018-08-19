@@ -107,4 +107,24 @@
     <string name="action_mail">Mail</string>
     <string name="action_phone">Call</string>
 
+    <string name="remaining_multi_years"> %d years</string>
+    <string name="remaining_single_year">%d year</string>
+
+    <string name="remaining_multi_moths">%d months</string>
+    <string name="remaining_single_month">%d month</string>
+
+    <string name="remaining_multi_days">%d days</string>
+    <string name="remaining_single_day">%d day</string>
+
+    <string name="overdue">Overdue</string>
+    <string name="remaining_single_hour">%02d hour</string>
+    <string name="remaining_multi_hours">%02d hours</string>
+    <string name="remaining_single_minute">%02d minute</string>
+    <string name="remaining_multi_minutes">%02d minutes</string>
+    <string name="remaining_single_second">%02d second</string>
+    <string name="remaining_multi_seconds">%02d seconds</string>
+    <string name="date_three_fields">%s %s %s remaining</string>
+    <string name="date_two_fields">%s %s remaining</string>
+    <string name="date_one_fields">%s remaining</string>
+
 </resources>

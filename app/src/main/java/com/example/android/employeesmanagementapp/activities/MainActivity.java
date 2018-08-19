@@ -4,7 +4,9 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -26,6 +28,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
@@ -67,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         mToolbarText = findViewById(R.id.custom_title);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setTitle(null);
 
 
         //setup navigation view
@@ -110,14 +114,15 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, departmentsFragment, "departments").hide(departmentsFragment).commit();
             getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, employeesFragment, "employees").hide(employeesFragment).commit();
             getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, tasksFragment, "tasks").commit();
-
             mBottomNavigationView.setSelectedItemId(R.id.nav_tasks);
+            //mFab.setImageResource(R.drawable.ic_add_task);
         } else {
             tasksFragment = (TasksFragment) getSupportFragmentManager().getFragment(savedInstanceState, "tasks_fragment");
             employeesFragment = (EmployeesFragment) getSupportFragmentManager().getFragment(savedInstanceState, "employees_fragment");
             departmentsFragment = (DepartmentsFragment) getSupportFragmentManager().getFragment(savedInstanceState, "departments_fragment");
 
             mBottomNavigationView.setSelectedItemId(savedInstanceState.getInt("selected_fragment_id"));
+
         }
     }
 
@@ -202,6 +207,14 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         transaction.hide(activeFragment).show(fragment);
         activeFragment = fragment;
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+
+//        if (activeFragment instanceof TasksFragment)
+//            mFab.setImageResource(R.drawable.ic_add_task);
+//        else if(activeFragment instanceof DepartmentsFragment)
+//            mFab.setImageResource(R.drawable.ic_add_department);
+//        else if(activeFragment instanceof EmployeesFragment)
+//            mFab.setImageResource(R.drawable.ic_add_employee2);
+
         transaction.commit();
     }
 
@@ -211,7 +224,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
      */
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
         switch (item.getItemId()) {
             case R.id.nav_tasks:
                 item.setIcon(R.drawable.ic_tasks_filled);
@@ -222,6 +234,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 mTabLayout.setVisibility(View.VISIBLE);
                 mToolbarText.setText(getString(R.string.tasks));
                 mFab.setOnClickListener(mFabClickListenerTasks);
+                //mFab.setImageDrawable(getResources().getDrawable(R.drawable.ic_add_task));
                 if (mTabLayout.getSelectedTabPosition() == 1)
                     mFab.hide();
                 else mFab.show();
@@ -236,6 +249,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 mTabLayout.setVisibility(View.GONE);
                 mToolbarText.setText(getString(R.string.employees));
                 mFab.setOnClickListener(mFabClickListenerEmployees);
+                //mFab.setImageDrawable(getResources().getDrawable(R.drawable.ic_add_employee2));
                 mFab.show();
 
 
@@ -249,6 +263,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 mTabLayout.setVisibility(View.GONE);
                 mToolbarText.setText(getString(R.string.departments));
                 mFab.setOnClickListener(mFabClickListenerDepartments);
+               // mFab.setImageDrawable(getResources().getDrawable(R.drawable.ic_add_department));
                 mFab.show();
 
 
@@ -286,7 +301,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             super.onBackPressed();
         }
     }
-
 
 }
 

@@ -1,5 +1,6 @@
 package com.example.android.employeesmanagementapp.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
@@ -10,11 +11,13 @@ import android.view.View;
 import android.widget.RatingBar;
 
 import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.activities.AddTaskActivity;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.fragments.ColorPickerDialogFragment;
 import com.example.android.employeesmanagementapp.fragments.DatePickerDialogFragment;
+import com.example.android.employeesmanagementapp.fragments.TimePickerFragment;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -31,10 +34,13 @@ import androidx.fragment.app.DialogFragment;
 public final class AppUtils {
 
 
+    private static int numOfChangedFiled = 0;
+
     public static void showDatePicker(Context context, View view) {
         //create a bundle containing id of clicked text view (startDateTextView or dueDateTextView)
         Bundle bundle = new Bundle();
         bundle.putInt(DatePickerDialogFragment.KEY_DISPLAY_VIEW_ID, view.getId());
+        bundle.putLong(DatePickerDialogFragment.KEY_DISPLAY_DATE, ((Date) view.getTag()).getTime());
 
         //instantiate a DatePickerDialogFragment to show date picker dialog
         DialogFragment datePickerFragment = new DatePickerDialogFragment();
@@ -115,21 +121,78 @@ public final class AppUtils {
     }
 
     public static Date getChosenDateAndTime(Date chosenDate, Date chosenTime) {
-        Calendar dateCalendar = Calendar.getInstance();
-        dateCalendar.setTime(chosenDate);
-        Calendar timeCalendar = Calendar.getInstance();
-        timeCalendar.setTime(chosenTime);
-
         Calendar dateAndTimeCalender = Calendar.getInstance();
-        dateAndTimeCalender.set(Calendar.HOUR_OF_DAY, timeCalendar.get(Calendar.HOUR_OF_DAY));
-        dateAndTimeCalender.set(Calendar.MINUTE, timeCalendar.get(Calendar.MINUTE));
-        dateAndTimeCalender.set(Calendar.YEAR, dateCalendar.get(Calendar.YEAR));
-        dateAndTimeCalender.set(Calendar.MONTH, dateCalendar.get(Calendar.MONTH));
-        dateAndTimeCalender.set(Calendar.DAY_OF_MONTH, dateCalendar.get(Calendar.DAY_OF_MONTH));
+        Calendar dateCalendar = Calendar.getInstance();
+        Calendar timeCalendar = Calendar.getInstance();
+
+        if (chosenDate != null) {
+            dateCalendar.setTime(chosenDate);
+            dateAndTimeCalender.set(Calendar.YEAR, dateCalendar.get(Calendar.YEAR));
+            dateAndTimeCalender.set(Calendar.MONTH, dateCalendar.get(Calendar.MONTH));
+            dateAndTimeCalender.set(Calendar.DAY_OF_MONTH, dateCalendar.get(Calendar.DAY_OF_MONTH));
+        }
+
+        if (chosenTime != null) {
+            timeCalendar.setTime(chosenTime);
+            dateAndTimeCalender.set(Calendar.HOUR_OF_DAY, timeCalendar.get(Calendar.HOUR_OF_DAY));
+            dateAndTimeCalender.set(Calendar.MINUTE, timeCalendar.get(Calendar.MINUTE));
+        } else {
+            dateAndTimeCalender.set(Calendar.HOUR_OF_DAY, 0);
+            dateAndTimeCalender.set(Calendar.MINUTE, 0);
+        }
+
         return dateAndTimeCalender.getTime();
     }
 
     public static String getFullEmployeeName(EmployeeEntry employeeEntry) {
         return employeeEntry.getEmployeeFirstName() + " " + employeeEntry.getEmployeeMiddleName() + " " + employeeEntry.getEmployeeLastName();
+    }
+
+    public static void setNumOfChangedFiled(int changed) {
+        numOfChangedFiled += changed ;
+        System.out.println("********************** change = " + numOfChangedFiled);
+    }
+
+    public static int getNumOfChangedFiled() {
+        return numOfChangedFiled;
+    }
+    public static void clearOneFiledChanged(){
+        numOfChangedFiled = 0;
+    }
+
+    public static void showDiscardChangesDialog(final Context context){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Discard changes");
+        builder.setMessage("All changes will be discarded.");
+        builder.setPositiveButton("DISCARD", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                AppUtils.clearOneFiledChanged();
+                ((Activity)context).finish();
+            }
+        });
+
+        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        builder.show();
+    }
+
+    public static void showTimePicker(AddTaskActivity context, View view) {
+        //create a bundle containing id of clicked text view (startDateTextView or dueDateTextView)
+        Bundle bundle = new Bundle();
+        bundle.putInt(TimePickerFragment.KEY_DISPLAY_VIEW_ID, view.getId());
+        bundle.putLong(TimePickerFragment.KEY_DISPLAY_TIME, ((Date) view.getTag()).getTime());
+
+        //instantiate a DatePickerFragment to show date picker dialog
+        DialogFragment timePickerFragment = new TimePickerFragment();
+        timePickerFragment.setArguments(bundle);
+
+        //show th dialog
+        timePickerFragment.show(((AppCompatActivity) context).getSupportFragmentManager(), "timePicker");
     }
 }

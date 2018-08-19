@@ -2,6 +2,7 @@ package com.example.android.employeesmanagementapp.adapters;
 
 
 import android.content.Context;
+import android.os.CountDownTimer;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,6 +18,10 @@ import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 import com.google.android.material.card.MaterialCardView;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
@@ -92,6 +97,7 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
         TextView mTaskTitle;
         TextView mTaskDates;
         ImageButton mTaskOptions;
+        CountDownTimer mCountDownTimer;
 
         TasksViewHolder(final View itemView) {
             super(itemView);
@@ -148,12 +154,100 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
             mTaskTitle.setText(getItem(position).getTaskTitle());
 
             mTaskDates.setText(mContext.getString(R.string.task_list_item_name_dates, AppUtils.getFriendlyDate(getItem(position).getTaskStartDate()), AppUtils.getFriendlyDate(getItem(position).getTaskDueDate())));
+            getRemainingTime(getItem(position).getTaskDueDate());
 
             int taskColor = ResourcesCompat.getColor(itemView.getResources(), getItem(position).getTaskColorResource(), mContext.getTheme());
 
             mItemView.setCardBackgroundColor(taskColor);
 
             mItemView.setTag(getItem(position).getTaskId());
+        }
+
+        private void getRemainingTime(Date taskDueDate) {
+            if (mCountDownTimer != null)
+                mCountDownTimer.cancel();
+            mCountDownTimer = new CountDownTimer(taskDueDate.getTime() - new Date().getTime(), 1000) {
+                long years, months, days, hours, minutes, seconds;
+                String[] chosenFields = new String[3];
+                int indexOfFields = 0;
+                Calendar cal = Calendar.getInstance();
+
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    indexOfFields = 0;
+                    cal.setTimeInMillis(millisUntilFinished);
+                    seconds = (millisUntilFinished / 1000) % 60;
+                    minutes = (millisUntilFinished / (1000 * 60)) % 60;
+                    hours = (millisUntilFinished / (1000 * 60 * 60)) % 24;
+                    years = cal.get(Calendar.YEAR) - 1970;
+                    months = cal.get(Calendar.MONTH);
+                    days = cal.get(Calendar.DAY_OF_MONTH) - 2;
+
+                    if (years > 0 && indexOfFields + 1 != 4) {
+                        if (years == 1)
+                            chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_single_year, years);
+                        else
+                            chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_multi_years, years);
+                    }
+                    if (months > 0 && indexOfFields + 1 != 4) {
+
+                        if (months == 1)
+                            chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_single_month, months);
+                        else
+                            chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_multi_moths ,months);
+
+                    }
+                    if (days > 0 && indexOfFields + 1 != 4) {
+
+                        if (days == 1)
+                            chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_single_day, days);
+                        else
+                            chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_multi_days, days);
+
+                    }
+                    if (hours > 0 && indexOfFields + 1 != 4) {
+
+                        if (hours == 1)
+                            chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_single_hour, hours);
+                        else
+                            chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_multi_hours, hours);
+
+                    }
+                    if (minutes > 0 && indexOfFields + 1 != 4) {
+
+                        if (minutes == 1)
+                            chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_single_minute, minutes);
+                        else
+                            chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_multi_minutes, minutes);
+
+                    }
+                    if (seconds > 0 && indexOfFields + 1 != 4) {
+
+                        if (seconds == 1)
+                            chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_single_second, seconds);
+                        else
+                            chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_multi_seconds, seconds);
+                    }
+
+                    if (indexOfFields == 3)
+                        mTaskDates.setText(mContext.getString(R.string.date_three_fields, chosenFields[0], chosenFields[1], chosenFields[2]));
+
+                    else if (indexOfFields == 2)
+                        mTaskDates.setText(mContext.getString(R.string.date_two_fields, chosenFields[0], chosenFields[1]));
+
+                    else if (indexOfFields == 1)
+                        mTaskDates.setText(mContext.getString(R.string.date_one_fields, chosenFields[0]));
+
+
+                    mTaskDates.setTextColor(mContext.getResources().getColor(R.color.primaryTextColor));
+                }
+
+                @Override
+                public void onFinish() {
+                    mTaskDates.setText(R.string.overdue);
+                    mTaskDates.setTextColor(mContext.getResources().getColor(R.color.A700_16));
+                }
+            }.start();
         }
 
         @Override
@@ -169,7 +263,6 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
             mItemView.setCardBackgroundColor(Color.WHITE);
         }
     }
-
 }
 
 

@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.example.android.employeesmanagementapp.MyTextWatcher;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
 import com.example.android.employeesmanagementapp.adapters.HorizontalEmployeeAdapter;
@@ -106,11 +107,13 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
 
         if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
             clearViews();
+            setUpTextWatcher();
         } else {
             final LiveData<DepartmentEntry> department = mViewModel.departmentEntry;
             department.observe(this, departmentEntry -> {
                 department.removeObservers(AddDepartmentActivity.this);
                 populateUi(departmentEntry);
+                setUpTextWatcher();
             });
 
             setUpEmployeesRV();
@@ -123,6 +126,11 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
 
         }
 
+    }
+
+    private void setUpTextWatcher() {
+        mDepartmentName.addTextChangedListener(new MyTextWatcher(mDepartmentName.getText().toString()));
+        mDepartmentDateCreated.addTextChangedListener(new MyTextWatcher(mDepartmentDateCreated.getText().toString()));
     }
 
 
@@ -189,25 +197,6 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
 
     }
 
-
-    protected void onStop() {
-        super.onStop();
-//
-//        Intent intent = new Intent(this, NotificationService.class);
-//        // send the due date and the id of the taskEntry within the intent
-//        //intent.putExtra("taskEntry due date", taskDueDate.getTime() - taskStartDAte.getTime())'
-//        //intent.putExtra("taskEntry id",mTaskId);
-//
-//        //just for experiment until tasks are done
-//        Bundle bundle = new Bundle();
-//        System.out.println(mDepartmentId);
-//        bundle.putInt("taskEntry id", 38);
-//        bundle.putLong("taskEntry due date", 30);
-//        intent.putExtras(bundle);
-//        startService(intent);
-    }
-
-
     private void populateUi(DepartmentEntry departmentEntry) {
         if (departmentEntry == null)
             return;
@@ -266,12 +255,11 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
                 saveDepartment();
                 break;
             case android.R.id.home:
-                finish();
+                onBackPressed();
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
-
 
     private void saveDepartment() {
         if (isDataValid()) {
@@ -357,5 +345,13 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
         intent.putExtra(AddTaskActivity.TASK_ID_KEY, taskRowID);
         intent.putExtra(AddTaskActivity.TASK_IS_COMPLETED_KEY, taskIsCompleted);
         startActivity(intent);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (AppUtils.getNumOfChangedFiled() > 0 || (mDepartmentPicturePath != null && !mMainDepartmentPicturePath.equals(mDepartmentPicturePath))) {
+            AppUtils.showDiscardChangesDialog(AddDepartmentActivity.this);
+        }
+        else super.onBackPressed();
     }
 }

@@ -1,10 +1,12 @@
 package com.example.android.employeesmanagementapp.activities;
 
 import android.annotation.SuppressLint;
+import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,6 +15,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.example.android.employeesmanagementapp.MyTextWatcher;
 import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
@@ -71,6 +74,8 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
     private AppDatabase mDb;
     private AddNewTaskViewModel mViewModel;
     private int clickedTaskDepId = -1;
+    private TextWatcher mTextWatcher;
+    public boolean isOneFiledChanged = false;
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -137,6 +142,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
 
         if (mTaskId == DEFAULT_TASK_ID) {
             clearViews();
+            setUpTextWatcher();
         } else {
             final LiveData<TaskEntry> task = mViewModel.taskEntry;
             task.observe(this, new Observer<TaskEntry>() {
@@ -144,6 +150,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
                 public void onChanged(@Nullable TaskEntry taskEntry) {
                     task.removeObserver(this);
                     populateUI(taskEntry);
+                    setUpTextWatcher();
                 }
             });
         }
@@ -182,6 +189,18 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         ViewCompat.setNestedScrollingEnabled(mTaskEmployeesRV, false);
 
     }
+
+    private void setUpTextWatcher() {
+        mTaskTitle.addTextChangedListener(new MyTextWatcher(mTaskTitle.getText().toString()));
+        mTaskDescription.addTextChangedListener(new MyTextWatcher(mTaskDescription.getText().toString()));
+        mTaskStartTime.addTextChangedListener(new MyTextWatcher(mTaskStartTime.getText().toString()));
+        mTaskStartDate.addTextChangedListener(new MyTextWatcher(mTaskStartDate.getText().toString()));
+        mTaskDueTime.addTextChangedListener(new MyTextWatcher(mTaskDueTime.getText().toString()));
+        mTaskDueDate.addTextChangedListener(new MyTextWatcher(mTaskDueDate.getText().toString()));
+
+
+    }
+
 
     public void showChooseTaskEmployeesDialog(View view) {
 
@@ -416,8 +435,8 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
     protected void onStop() {
         super.onStop();
         Intent intent = new Intent(this, NotificationService.class);
-        intent.putExtra("taskEntry id", mTaskId);
-        intent.putExtra("taskEntry due date", AppUtils.getChosenDateAndTime(((Date) mTaskDueDate.getTag()), ((Date) mTaskDueTime.getTag())).getTime() - new Date().getTime());
+        intent.putExtra("task id", mTaskId);
+        intent.putExtra("task due date", AppUtils.getChosenDateAndTime(((Date) mTaskDueDate.getTag()), ((Date) mTaskDueTime.getTag())).getTime() - new Date().getTime());
         intent.putExtra("app is destroyed", false);
         startService(intent);
 
@@ -439,7 +458,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
                 saveTask();
                 break;
             case android.R.id.home:
-                finish();
+                onBackPressed();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -480,7 +499,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
                         }
                     }
                 });
-
+            AppUtils.clearOneFiledChanged();
             finish();
         }
 
@@ -528,16 +547,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
     }
 
     public void pickTime(View view) {
-        //create a bundle containing id of clicked text view (startDateTextView or dueDateTextView)
-        Bundle bundle = new Bundle();
-        bundle.putInt("time_view_id", view.getId());
-
-        //instantiate a DatePickerFragment to show date picker dialog
-        DialogFragment timePickerFragment = new TimePickerFragment();
-        timePickerFragment.setArguments(bundle);
-
-        //show th dialog
-        timePickerFragment.show(getSupportFragmentManager(), "timePicker");
+        AppUtils.showTimePicker(this, view);
     }
 
     private void updateErrorVisibility(String key, boolean show) {
@@ -554,7 +564,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
                     break;
                 case "employees":
                     AlertDialog.Builder builder = new AlertDialog.Builder(AddTaskActivity.this);
-                    builder.setMessage("There must be at least one employee assigned to this taskEntry.");
+                    builder.setMessage("There must be at least one employee assigned to this task.");
                     builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
@@ -589,5 +599,13 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         Intent intent = new Intent(this, AddEmployeeActivity.class);
         intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY, employeeRowID);
         startActivity(intent);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (AppUtils.getNumOfChangedFiled() > 0 || (mHorizontalEmployeeAdapter.getRemovedEmployees() != null && mHorizontalEmployeeAdapter.getRemovedEmployees().size() != 0) || (mHorizontalEmployeeAdapter.getAddedEmployees() != null && mHorizontalEmployeeAdapter.getAddedEmployees().size() != 0) || (int) mTaskDepartment.getSelectedView().getTag() != clickedTaskDepId) {
+            AppUtils.showDiscardChangesDialog(AddTaskActivity.this);
+        } else
+            super.onBackPressed();
     }
 }
