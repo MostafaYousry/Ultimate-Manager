@@ -8,10 +8,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -42,7 +39,7 @@ public final class ImageUtils {
     }
 
     private static void pickPhoto(Context context) {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.setType("image/*");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
 
@@ -92,49 +89,49 @@ public final class ImageUtils {
         return image;
     }
 
-    public static void importCopy(final Context context, final Uri fullPhotoUri) {
-        File photoFile = null;
-        try {
-            photoFile = createImageFile(context);
-        } catch (IOException ex) {
-            System.out.println("error occurred");
-        }
-        if (photoFile != null) {
-            sImageURI = FileProvider.getUriForFile(context,
-                    "com.example.android.employeesmanagementapp.fileprovider",
-                    photoFile).toString();
-
-            final File finalPhotoFile = photoFile;
-            new Runnable() {
-                @Override
-                public void run() {
-                    InputStream is = null;
-                    OutputStream os = null;
-                    try {
-                        is = context.getContentResolver().openInputStream(fullPhotoUri);
-                        os = new FileOutputStream(finalPhotoFile);
-                        byte[] buffer = new byte[1024];
-                        int length;
-
-                        while ((length = is.read(buffer)) > 0) {
-                            os.write(buffer, 0, length);
-
-                        }
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } finally {
-                        try {
-                            is.close();
-                            os.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }.run();
-
-        }
-
-    }
+//    public static void importCopy(final Context context, final Uri fullPhotoUri) {
+//        File photoFile = null;
+//        try {
+//            photoFile = createImageFile(context);
+//        } catch (IOException ex) {
+//            System.out.println("error occurred");
+//        }
+//        if (photoFile != null) {
+//            sImageURI = FileProvider.getUriForFile(context,
+//                    "com.example.android.employeesmanagementapp.fileprovider",
+//                    photoFile).toString();
+//
+//            final File finalPhotoFile = photoFile;
+//            new Runnable() {
+//                @Override
+//                public void run() {
+//                    InputStream is = null;
+//                    OutputStream os = null;
+//                    try {
+//                        is = context.getContentResolver().openInputStream(fullPhotoUri);
+//                        os = new FileOutputStream(finalPhotoFile);
+//                        byte[] buffer = new byte[1024];
+//                        int length;
+//
+//                        while ((length = is.read(buffer)) > 0) {
+//                            os.write(buffer, 0, length);
+//
+//                        }
+//
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    } finally {
+//                        try {
+//                            is.close();
+//                            os.close();
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//            }.run();
+//
+//        }
+//
+//    }
 }

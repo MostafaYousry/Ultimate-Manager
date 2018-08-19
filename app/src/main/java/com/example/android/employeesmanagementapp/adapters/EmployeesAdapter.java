@@ -3,6 +3,7 @@ package com.example.android.employeesmanagementapp.adapters;
 import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,8 +45,6 @@ public class EmployeesAdapter extends PagedListAdapter<EmployeeWithExtras, Emplo
 
     private static DiffUtil.ItemCallback<EmployeeWithExtras> DIFF_CALLBACK =
             new DiffUtil.ItemCallback<EmployeeWithExtras>() {
-                // Concert details may have changed if reloaded from the database,
-                // but ID is fixed.
                 @Override
                 public boolean areItemsTheSame(EmployeeWithExtras oldEmployee, EmployeeWithExtras newEmployee) {
                     return oldEmployee.employeeEntry.getEmployeeID() == newEmployee.employeeEntry.getEmployeeID();
@@ -54,7 +53,7 @@ public class EmployeesAdapter extends PagedListAdapter<EmployeeWithExtras, Emplo
                 @Override
                 public boolean areContentsTheSame(EmployeeWithExtras oldEmployee,
                                                   EmployeeWithExtras newEmployee) {
-                    return oldEmployee.employeeEntry.equals(newEmployee.employeeEntry);
+                    return oldEmployee.equals(newEmployee);
                 }
             };
 
@@ -178,7 +177,7 @@ public class EmployeesAdapter extends PagedListAdapter<EmployeeWithExtras, Emplo
             String runningTasksStr = mContext.getResources().getQuantityString(R.plurals.numberOfRunningTasks, numberRunningTasks, numberRunningTasks);
             mNumRunningTasks.setText(runningTasksStr);
 
-            if (employeeWithExtras.employeeEntry.getEmployeeImageUri() == null) {
+            if (TextUtils.isEmpty(employeeWithExtras.employeeEntry.getEmployeeImageUri())) {
                 Context context = mContext;
 
                 Glide.with(context).clear(mEmployeeImage);

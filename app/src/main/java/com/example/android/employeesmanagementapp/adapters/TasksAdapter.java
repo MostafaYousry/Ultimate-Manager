@@ -35,8 +35,6 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
 
     private static DiffUtil.ItemCallback<TaskEntry> DIFF_CALLBACK =
             new DiffUtil.ItemCallback<TaskEntry>() {
-                // Concert details may have changed if reloaded from the database,
-                // but ID is fixed.
                 @Override
                 public boolean areItemsTheSame(TaskEntry oldTask, TaskEntry newTask) {
                     return oldTask.getTaskId() == newTask.getTaskId();

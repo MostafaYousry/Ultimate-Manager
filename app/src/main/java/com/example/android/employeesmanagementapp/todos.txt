@@ -2,6 +2,8 @@ todo fix title when multi select in employees
 
 todo discard changes dialog zy contacts app
 
+todo check if images are still their after reboot
+
 todo hide fab with bottom nav on scroll
 
 todo keep track of time ex: 2 months and 10 days remaining (display in item task rv instead of start date - due date)

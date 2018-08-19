@@ -2,6 +2,7 @@ package com.example.android.employeesmanagementapp.data;
 
 import android.content.Context;
 
+import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.data.daos.DepartmentsDao;
 import com.example.android.employeesmanagementapp.data.daos.EmployeesDao;
 import com.example.android.employeesmanagementapp.data.daos.EmployeesTasksDao;
@@ -11,10 +12,13 @@ import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.entries.EmployeesTasksEntry;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 
+import java.util.Date;
+
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
+import androidx.sqlite.db.SupportSQLiteDatabase;
 
 /**
  * class for main app database
@@ -33,84 +37,84 @@ public abstract class AppDatabase extends RoomDatabase {
         if (sInstance == null) {
             synchronized (LOCK) {
                 sInstance = Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class, AppDatabase.DATABASE_NAME)
-//                        .addCallback(new Callback() {
-//                            @Override
-//                            public void onCreate(SupportSQLiteDatabase db) {
-//                                super.onCreate(db);
-//                                AppExecutor.getInstance().diskIO().execute(new Runnable() {
-//                                    @Override
-//                                    public void run() {
-//                                        AppDatabase db = getInstance(context);
-//
-//                                        db.departmentsDao().addDepartment(new DepartmentEntry(1, "dep1", new Date(), null, false));
-//                                        db.departmentsDao().addDepartment(new DepartmentEntry(2, "dep2", new Date(), null, false));
-//                                        db.departmentsDao().addDepartment(new DepartmentEntry(3, "dep3", new Date(), null, false));
-//                                        db.departmentsDao().addDepartment(new DepartmentEntry(4, "dep4", new Date(), null, false));
-//                                        db.departmentsDao().addDepartment(new DepartmentEntry(5, "dep5", new Date(), null, false));
-//                                        db.departmentsDao().addDepartment(new DepartmentEntry(6, "dep6", new Date(), null, false));
-//                                        db.departmentsDao().addDepartment(new DepartmentEntry(7, "dep7", new Date(), null, false));
-//                                        db.departmentsDao().addDepartment(new DepartmentEntry(8, "dep8", new Date(), null, false));
-//                                        db.departmentsDao().addDepartment(new DepartmentEntry(9, "dep9", new Date(), null, false));
-//
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(1, 1, "mostafa", "yousry", null, 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(2, 2, "karim", "hamdy", "abdel azziz", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(3, 3, "ammar", "yasser", "ismaeil", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(4, 2, "amir", "swidan", "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(5, 2, "omar", "zawawi", "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(6, 3, "mohamed", null, "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(7, 4, "abdelrahman", "wael", "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(8, 5, "amr", "saleh", "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(9, 6, "hussein", null, "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(10, 6, "loay", "fakhr", "el din", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(11, 7, "yamany", null, null, 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(12, 8, "ziad", "ashraf", "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(13, 9, "ramy", "essam", "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(14, 2, "zorba", "zanaty", "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(15, 2, "ismaeil", "el", "yamany", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(16, 5, "abdallah", "amr", "el maradny", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(17, 5, "shawky", "maom", "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", null, false));
-//
-//                                        db.tasksDao().addTask(new TaskEntry(1, 1, "task1", "askasmas", new Date(), new Date(), 3, true, R.color.task_color_1));
-//                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(1, 1));
-//
-//                                        db.tasksDao().addTask(new TaskEntry(2, 5, "task2", "askasmas", new Date(), new Date(), 2, true, R.color.task_color_1));
-//                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(8, 2));
-//                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(16, 2));
-//
-//                                        db.tasksDao().addTask(new TaskEntry(3, 2, "task3", "askasmas", new Date(), new Date(), 1, true, R.color.task_color_1));
-//                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(4, 3));
-//                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(5, 3));
-//                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(2, 3));
-//
-//                                        db.tasksDao().addTask(new TaskEntry(4, 2, "task4", "askasmas", new Date(), new Date(), 0, true, R.color.task_color_1));
-//                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(5, 4));
-//                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(4, 4));
-//                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(15, 4));
-//
-//                                        db.tasksDao().addTask(new TaskEntry(5, 8, "task5", "askasmas", new Date(), new Date(), 0, false, R.color.task_color_1));
-//                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(12, 5));
-//
-//                                        db.tasksDao().addTask(new TaskEntry(6, 9, "task6", "askasmas", new Date(), new Date(), 0, false, R.color.task_color_1));
-//                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(13, 6));
-//
-//                                        db.tasksDao().addTask(new TaskEntry(7, 2, "task7", "askasmas", new Date(), new Date(), 0, false, R.color.task_color_1));
-//                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(14, 7));
-//                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(15, 7));
-//                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(2, 7));
-//
-//                                        db.tasksDao().addTask(new TaskEntry(8, 5, "task8", "askasmas", new Date(), new Date(), 0, false, R.color.task_color_1));
-//                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(8, 8));
-//
-//                                        db.tasksDao().addTask(new TaskEntry(9, 6, "task9", "askasmas", new Date(), new Date(), 0, false, R.color.task_color_1));
-//                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(9, 9));
-//                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(10, 9));
-//
-//                                        db.tasksDao().addTask(new TaskEntry(10, 6, "task10", "askasmas", new Date(), new Date(), 0, false, R.color.task_color_1));
-//                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(9, 10));
-//                                    }
-//                               });
-//                            }
-//                        })
+                        .addCallback(new Callback() {
+                            @Override
+                            public void onCreate(SupportSQLiteDatabase db) {
+                                super.onCreate(db);
+                                AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        AppDatabase db = getInstance(context);
+
+                                        db.departmentsDao().addDepartment(new DepartmentEntry(1, "dep1", new Date(), "", false));
+                                        db.departmentsDao().addDepartment(new DepartmentEntry(2, "dep2", new Date(), "", false));
+                                        db.departmentsDao().addDepartment(new DepartmentEntry(3, "dep3", new Date(), "", false));
+                                        db.departmentsDao().addDepartment(new DepartmentEntry(4, "dep4", new Date(), "", false));
+                                        db.departmentsDao().addDepartment(new DepartmentEntry(5, "dep5", new Date(), "", false));
+                                        db.departmentsDao().addDepartment(new DepartmentEntry(6, "dep6", new Date(), "", false));
+                                        db.departmentsDao().addDepartment(new DepartmentEntry(7, "dep7", new Date(), "", false));
+                                        db.departmentsDao().addDepartment(new DepartmentEntry(8, "dep8", new Date(), "", false));
+                                        db.departmentsDao().addDepartment(new DepartmentEntry(9, "dep9", new Date(), "", false));
+
+                                        db.employeesDao().addEmployee(new EmployeeEntry(1, 1, "mostafa", "yousry", null, 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(2, 2, "karim", "hamdy", "abdel azziz", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(3, 3, "ammar", "yasser", "ismaeil", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(4, 2, "amir", "swidan", "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(5, 2, "omar", "zawawi", "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(6, 3, "mohamed", null, "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(7, 4, "abdelrahman", "wael", "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(8, 5, "amr", "saleh", "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(9, 6, "hussein", null, "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(10, 6, "loay", "fakhr", "el din", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(11, 7, "yamany", null, null, 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(12, 8, "ziad", "ashraf", "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(13, 9, "ramy", "essam", "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(14, 2, "zorba", "zanaty", "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(15, 2, "ismaeil", "el", "yamany", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(16, 5, "abdallah", "amr", "el maradny", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
+                                        db.employeesDao().addEmployee(new EmployeeEntry(17, 5, "shawky", "maom", "dfmnweifmw", 23, new Date(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
+
+                                        db.tasksDao().addTask(new TaskEntry(1, 1, "task1", "askasmas", new Date(), new Date(), 3, true, R.color.task_color_1));
+                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(1, 1));
+
+                                        db.tasksDao().addTask(new TaskEntry(2, 5, "task2", "askasmas", new Date(), new Date(), 2, true, R.color.task_color_1));
+                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(8, 2));
+                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(16, 2));
+
+                                        db.tasksDao().addTask(new TaskEntry(3, 2, "task3", "askasmas", new Date(), new Date(), 1, true, R.color.task_color_1));
+                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(4, 3));
+                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(5, 3));
+                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(2, 3));
+
+                                        db.tasksDao().addTask(new TaskEntry(4, 2, "task4", "askasmas", new Date(), new Date(), 0, true, R.color.task_color_1));
+                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(5, 4));
+                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(4, 4));
+                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(15, 4));
+
+                                        db.tasksDao().addTask(new TaskEntry(5, 8, "task5", "askasmas", new Date(), new Date(), 0, false, R.color.task_color_1));
+                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(12, 5));
+
+                                        db.tasksDao().addTask(new TaskEntry(6, 9, "task6", "askasmas", new Date(), new Date(), 0, false, R.color.task_color_1));
+                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(13, 6));
+
+                                        db.tasksDao().addTask(new TaskEntry(7, 2, "task7", "askasmas", new Date(), new Date(), 0, false, R.color.task_color_1));
+                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(14, 7));
+                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(15, 7));
+                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(2, 7));
+
+                                        db.tasksDao().addTask(new TaskEntry(8, 5, "task8", "askasmas", new Date(), new Date(), 0, false, R.color.task_color_1));
+                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(8, 8));
+
+                                        db.tasksDao().addTask(new TaskEntry(9, 6, "task9", "askasmas", new Date(), new Date(), 0, false, R.color.task_color_1));
+                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(9, 9));
+                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(10, 9));
+
+                                        db.tasksDao().addTask(new TaskEntry(10, 6, "task10", "askasmas", new Date(), new Date(), 0, false, R.color.task_color_1));
+                                        db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(9, 10));
+                                    }
+                                });
+                            }
+                        })
                         .build();
             }
         }

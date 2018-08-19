@@ -34,6 +34,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -129,7 +130,19 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
         final MainViewModel mainViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
 
         mainViewModel.employeesWithExtrasList
-                .observe(this, mEmployeesAdapter::submitList);
+                .observe(this, new Observer<PagedList<EmployeeWithExtras>>() {
+                    @Override
+                    public void onChanged(PagedList<EmployeeWithExtras> employeeWithExtras) {
+                        if (employeeWithExtras != null) {
+                            if (employeeWithExtras.isEmpty())
+                                showEmptyView();
+                            else {
+                                mEmployeesAdapter.submitList(employeeWithExtras);
+                                showRecyclerView();
+                            }
+                        }
+                    }
+                });
 
 
         //set the employee recycler view adapter
@@ -262,6 +275,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
     private void showChooseDepDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(getString(R.string.choose_department_dialog_title));
+//        builder.setMessage("selected employees will be removed from their assigned running task , completed tasks will not be affected.");
 
         final DepartmentsArrayAdapter departmentsArrayAdapter = new DepartmentsArrayAdapter(getActivity(), AppUtils.dpToPx(getActivity(), 24), AppUtils.dpToPx(getActivity(), 8), AppUtils.dpToPx(getActivity(), 0), AppUtils.dpToPx(getActivity(), 8), R.style.mainTextStyle);
 
@@ -282,9 +296,13 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
                     public void run() {
                         int selectedDepartmentId = departmentsArrayAdapter.getDepId(i);
                         for (EmployeeWithExtras employeeWithExtras : mEmployeesAdapter.getSelectedOnes()) {
+                            mDb.employeesTasksDao().deleteEmployeeFromRunningTasks(employeeWithExtras.employeeEntry.getEmployeeID());
                             employeeWithExtras.employeeEntry.setDepartmentId(selectedDepartmentId);
                             mDb.employeesDao().updateEmployee(employeeWithExtras.employeeEntry);
                         }
+
+                        mDb.tasksDao().deleteEmptyTasks();
+
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {

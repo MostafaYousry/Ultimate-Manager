@@ -281,11 +281,9 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         mHorizontalEmployeeAdapter = new HorizontalEmployeeAdapter(this, this, true, mTaskId);
         mTaskEmployeesRV.setAdapter(mHorizontalEmployeeAdapter);
 
-//        if (mTaskId == DEFAULT_TASK_ID) {
-//            mHorizontalEmployeeAdapter.setData(new ArrayList<EmployeeEntry>());
-//        } else {
-        mViewModel.taskEmployees.observe(this, mHorizontalEmployeeAdapter::submitList);
-//        }
+        if (mTaskId != DEFAULT_TASK_ID) {
+            mViewModel.taskEmployees.observe(this, mHorizontalEmployeeAdapter::submitList);
+        }
     }
 
     private void clearViews() {
@@ -397,6 +395,8 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
 
         mTaskDepartment.setEnabled(false);
         mTaskDepartment.setFocusable(false);
+
+        findViewById(R.id.add_employees_to_task_button).setClickable(false);
 
     }
 

@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -93,12 +95,17 @@ public class DepartmentsArrayAdapter extends ArrayAdapter<String> {
         if (mDepartmentEntryList == null)
             return 0;
 
-        return mDepartmentEntryList.indexOf(new DepartmentEntry(depId));
-
+        return Collections.binarySearch(mDepartmentEntryList, new DepartmentEntry(depId), new Comparator<DepartmentEntry>() {
+            @Override
+            public int compare(DepartmentEntry e1, DepartmentEntry e2) {
+                return Integer.compare(e1.getDepartmentId(), e2.getDepartmentId());
+            }
+        });
     }
 
     public void setData(List<DepartmentEntry> departmentEntryList) {
         mDepartmentEntryList = departmentEntryList;
+
         notifyDataSetChanged();
     }
 

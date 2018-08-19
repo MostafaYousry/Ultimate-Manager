@@ -51,7 +51,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
 
     private ImageView mDepartmentImage;
     private EditText mDepartmentName;
-    private String mDepartmentPicturePath;
+    private String mDepartmentPicturePath = "";
     private EditText mDepartmentDateCreated;
 
     private Toolbar mToolbar;
@@ -78,6 +78,8 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
         mDepartmentName = findViewById(R.id.department_name);
         mDepartmentImage = findViewById(R.id.department_image);
         mDepartmentDateCreated = findViewById(R.id.department_date_created);
+        mDepartmentDateCreated.setOnClickListener(view -> pickDate(view));
+
         mDepEmployeesRV = findViewById(R.id.department_employees_rv);
         mDepRunningTasksRV = findViewById(R.id.department_running_tasks_rv);
         mDepCompletedTasksRV = findViewById(R.id.department_completed_tasks_rv);
@@ -128,13 +130,11 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == ImageUtils.REQUEST_IMAGE_GET && resultCode == RESULT_OK) {
             Uri fullPhotoUri = data.getData();
+            mDepartmentPicturePath = fullPhotoUri.toString();
             Glide.with(this)
                     .asBitmap()
                     .load(fullPhotoUri)
                     .into(mDepartmentImage);
-
-            ImageUtils.importCopy(this, fullPhotoUri);
-            mDepartmentPicturePath = ImageUtils.sImageURI;
 
 
         } else if (requestCode == ImageUtils.REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
@@ -215,14 +215,16 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
         mDepartmentName.setText(departmentEntry.getDepartmentName());
         mCollapsingToolbar.setTitle(departmentEntry.getDepartmentName());
 
-        if (departmentEntry.getDepartmentImageUri() == null) {
+        mDepartmentPicturePath = departmentEntry.getDepartmentImageUri();
+
+        if (TextUtils.isEmpty(mDepartmentPicturePath)) {
             mDepartmentImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_departments));
             mDepartmentImage.setScaleType(ImageView.ScaleType.CENTER);
             mDepartmentImage.setBackgroundColor(ResourcesCompat.getColor(getResources(), ColorUtils.getDepartmentBackgroundColor(departmentEntry), getTheme()));
         } else {
             Glide.with(this)
                     .asBitmap()
-                    .load(Uri.parse(departmentEntry.getDepartmentImageUri()))
+                    .load(Uri.parse(mDepartmentPicturePath))
                     .into(mDepartmentImage);
         }
 

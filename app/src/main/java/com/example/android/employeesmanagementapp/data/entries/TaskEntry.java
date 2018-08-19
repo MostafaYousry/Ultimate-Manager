@@ -144,10 +144,32 @@ public class TaskEntry {
 
     public int getTaskColorResource() {
         // TODO: 8/19/18
-        return R.color.task_color_1;
+        return taskColorResource;
     }
 
     public void setTaskColorResource(int taskColorResource) {
         this.taskColorResource = taskColorResource;
     }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (!(obj instanceof TaskEntry))
+            return false;
+
+        TaskEntry entry = (TaskEntry) obj;
+
+        return Integer.compare(taskId, entry.taskId) == 0
+                && Integer.compare(departmentID, entry.departmentID) == 0
+                && taskTitle.equals(entry.taskTitle)
+                && taskDescription.equals(entry.taskDescription)
+                && taskStartDate.equals(entry.taskStartDate)
+                && taskDueDate.equals(entry.taskDueDate)
+                && Float.compare(taskRating, entry.taskRating) == 0
+                && Boolean.compare(taskIsCompleted, entry.taskIsCompleted) == 0
+                && Integer.compare(taskColorResource, entry.taskColorResource) == 0;
+    }
+
 }

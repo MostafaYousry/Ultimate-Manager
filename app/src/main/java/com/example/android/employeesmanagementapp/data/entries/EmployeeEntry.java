@@ -200,6 +200,31 @@ public class EmployeeEntry {
         isChecked = checked;
     }
 
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (!(obj instanceof EmployeeEntry))
+            return false;
+
+        EmployeeEntry entry = (EmployeeEntry) obj;
+
+        return Integer.compare(employeeID, entry.employeeID) == 0
+                && Integer.compare(departmentId, entry.departmentId) == 0
+                && employeeFirstName.equals(entry.employeeFirstName)
+                && employeeMiddleName.equals(entry.employeeMiddleName)
+                && employeeLastName.equals(entry.employeeLastName)
+                && Float.compare(employeeSalary, entry.employeeSalary) == 0
+                && employeeHireDate.equals(entry.employeeHireDate)
+                && employeeImageUri.equals(entry.employeeImageUri)
+                && employeeEmail.equals(entry.employeeEmail)
+                && employeePhone.equals(entry.employeePhone)
+                && employeeNote.equals(entry.employeeNote)
+                && Boolean.compare(employeeIsDeleted, entry.employeeIsDeleted) == 0
+                && Boolean.compare(isChecked, entry.isChecked) == 0;
+    }
+
     @Override
     public int hashCode() {
 

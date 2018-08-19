@@ -18,4 +18,22 @@ public class DepartmentWithExtras {
 
     @ColumnInfo(name = "num_of_employees")
     public int numOfEmployees;
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (!(obj instanceof DepartmentWithExtras))
+            return false;
+
+        DepartmentWithExtras entry = (DepartmentWithExtras) obj;
+
+        return departmentEntry.equals(entry.departmentEntry)
+                && Integer.compare(numRunningTasks, entry.numRunningTasks) == 0
+                && Integer.compare(numCompletedTasks, entry.numCompletedTasks) == 0
+                && Integer.compare(numOfEmployees, entry.numOfEmployees) == 0;
+
+    }
+
 }

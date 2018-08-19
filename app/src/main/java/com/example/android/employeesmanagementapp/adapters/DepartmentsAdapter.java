@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -45,8 +46,7 @@ public class DepartmentsAdapter extends PagedListAdapter<DepartmentWithExtras, D
 
     private static DiffUtil.ItemCallback<DepartmentWithExtras> DIFF_CALLBACK =
             new DiffUtil.ItemCallback<DepartmentWithExtras>() {
-                // Concert details may have changed if reloaded from the database,
-                // but ID is fixed.
+
                 @Override
                 public boolean areItemsTheSame(DepartmentWithExtras oldDepartment, DepartmentWithExtras newDepartment) {
                     return oldDepartment.departmentEntry.getDepartmentId() == newDepartment.departmentEntry.getDepartmentId();
@@ -55,8 +55,10 @@ public class DepartmentsAdapter extends PagedListAdapter<DepartmentWithExtras, D
                 @Override
                 public boolean areContentsTheSame(DepartmentWithExtras oldDepartment,
                                                   DepartmentWithExtras newDepartment) {
-                    return oldDepartment.departmentEntry.equals(newDepartment.departmentEntry);
+                    return oldDepartment.equals(newDepartment);
                 }
+
+
             };
 
 
@@ -209,7 +211,7 @@ public class DepartmentsAdapter extends PagedListAdapter<DepartmentWithExtras, D
             mDepartmentSummary.setText(mContext.getString(R.string.department_summary, numberOfEmployees, runningTasksSummary, completedTasksSummary));
 
 
-            if (getItem(position).departmentEntry.getDepartmentImageUri() == null) {
+            if (TextUtils.isEmpty(getItem(position).departmentEntry.getDepartmentImageUri())) {
                 Glide.with(mContext).clear(mDepartmentImage);
                 mDepartmentImage.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_departments));
                 mDepartmentImage.setScaleType(ImageView.ScaleType.CENTER);

@@ -97,15 +97,18 @@ public class DepartmentEntry {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (obj == this)
             return true;
-        if (obj == null)
+        if (!(obj instanceof DepartmentEntry))
             return false;
-        if (getClass() != obj.getClass())
-            return false;
-        DepartmentEntry other = (DepartmentEntry) obj;
 
-        return departmentId == other.getDepartmentId();
+        DepartmentEntry entry = (DepartmentEntry) obj;
+
+        return Integer.compare(departmentId, entry.departmentId) == 0
+                && departmentName.equals(entry.departmentName)
+                && departmentDateCreated.equals(entry.departmentDateCreated)
+                && departmentImageUri.equals(entry.departmentImageUri)
+                && Boolean.compare(departmentIsDeleted, entry.departmentIsDeleted) == 0;
 
     }
 

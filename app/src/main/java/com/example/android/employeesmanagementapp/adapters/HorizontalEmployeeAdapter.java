@@ -2,6 +2,7 @@ package com.example.android.employeesmanagementapp.adapters;
 
 import android.content.Context;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -33,8 +34,6 @@ public class HorizontalEmployeeAdapter extends PagedListAdapter<EmployeeEntry, H
     private List<EmployeeEntry> mAddedEmployees;
     private static DiffUtil.ItemCallback<EmployeeEntry> DIFF_CALLBACK =
             new DiffUtil.ItemCallback<EmployeeEntry>() {
-                // Concert details may have changed if reloaded from the database,
-                // but ID is fixed.
                 @Override
                 public boolean areItemsTheSame(EmployeeEntry oldEmployee, EmployeeEntry newEmployee) {
                     return oldEmployee.getEmployeeID() == newEmployee.getEmployeeID();
@@ -78,8 +77,8 @@ public class HorizontalEmployeeAdapter extends PagedListAdapter<EmployeeEntry, H
     @Override
     public void onBindViewHolder(@NonNull HorizontalEmployeeAdapter.EmployeesViewHolder holder, int position) {
 
-        if (position >= getCurrentList().size()) {
-            if (mAddedEmployees.get(getCurrentList().size() - position) != null) {
+        if (position >= (getCurrentList() == null ? 0 : getCurrentList().size())) {
+            if (mAddedEmployees.get(position - (getCurrentList() == null ? 0 : getCurrentList().size())) != null) {
                 holder.bind(position);
             } else {
                 holder.clear();
@@ -130,6 +129,7 @@ public class HorizontalEmployeeAdapter extends PagedListAdapter<EmployeeEntry, H
             getCurrentList().clear();
         if (mAddedEmployees != null)
             mAddedEmployees.clear();
+        notifyDataSetChanged();
     }
 
     public List<EmployeeEntry> getAllEmployees() {
@@ -174,12 +174,13 @@ public class HorizontalEmployeeAdapter extends PagedListAdapter<EmployeeEntry, H
         }
 
         void bind(int position) {
-            if (position >= getCurrentList().size()) {
-                position = position - getCurrentList().size();
+            if (position >= (getCurrentList() == null ? 0 : getCurrentList().size())) {
+                position = position - (getCurrentList() == null ? 0 : getCurrentList().size());
 
                 employeeName.setText(mAddedEmployees.get(position).getEmployeeFirstName());
 
-                if (mAddedEmployees.get(position).getEmployeeImageUri() == null) {
+
+                if (TextUtils.isEmpty(mAddedEmployees.get(position).getEmployeeImageUri())) {
                     Glide.with(mContext).clear(employeeImage);
 
                     TextDrawable textDrawable = new TextDrawable(mContext, mAddedEmployees.get(position), AppUtils.dpToPx(mContext, 70), AppUtils.dpToPx(mContext, 70), AppUtils.spToPx(mContext, 28));
@@ -195,7 +196,8 @@ public class HorizontalEmployeeAdapter extends PagedListAdapter<EmployeeEntry, H
             } else {
                 employeeName.setText(getItem(position).getEmployeeFirstName());
 
-                if (getItem(position).getEmployeeImageUri() == null) {
+
+                if (TextUtils.isEmpty(getItem(position).getEmployeeImageUri())) {
                     Glide.with(mContext).clear(employeeImage);
 
                     TextDrawable textDrawable = new TextDrawable(mContext, getItem(position), AppUtils.dpToPx(mContext, 70), AppUtils.dpToPx(mContext, 70), AppUtils.spToPx(mContext, 28));
@@ -228,12 +230,18 @@ public class HorizontalEmployeeAdapter extends PagedListAdapter<EmployeeEntry, H
                     switch (item.getItemId()) {
                         case R.id.action_remove_employee:
                             int deletePosition = getAdapterPosition();
+                            if (getCurrentList() == null) {
+                                mAddedEmployees.remove(deletePosition);
+                                notifyItemRemoved(deletePosition);
+                                return true;
+                            }
+
                             if (deletePosition < getCurrentList().size()) {
                                 deleteInBackground(getItem(deletePosition), mTaskID);
                             } else {
                                 mAddedEmployees.remove(deletePosition - getCurrentList().size());
-//                                notifyItemRemoved(deletePosition - mData.size());
-//                                notifyDataSetChanged();
+//                                notifyItemRemoved(deletePosition - getCurrentList().size());
+                                notifyDataSetChanged();
                             }
                             return true;
                         default:
