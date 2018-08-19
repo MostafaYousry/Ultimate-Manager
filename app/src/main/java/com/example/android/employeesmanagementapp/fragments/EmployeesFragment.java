@@ -26,8 +26,11 @@ import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import org.w3c.dom.Text;
+
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -57,6 +60,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
     private boolean mIsInMultiSelectMode;
 
     private Toolbar mActivityToolBar;
+    private TextView mActivityToolBarText;
     private FloatingActionButton mActivityFab;
     private boolean selectOptionPressed;
 
@@ -74,6 +78,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
         super.onActivityCreated(savedInstanceState);
 
         mActivityToolBar = getActivity().findViewById(R.id.toolbar);
+        mActivityToolBarText = getActivity().findViewById(R.id.custom_title);
         mActivityToolBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -147,6 +152,10 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
 
         //set the employee recycler view adapter
         mRecyclerView.setAdapter(mEmployeesAdapter);
+
+
+
+
     }
 
     private void showEmptyView() {
@@ -340,7 +349,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
         mIsInMultiSelectMode = false;
         getActivity().invalidateOptionsMenu();
         mActivityToolBar.setNavigationIcon(null);
-        mActivityToolBar.setTitle(R.string.employees);
+        mActivityToolBarText.setText("Employees");
         mActivityFab.show();
     }
 
@@ -350,7 +359,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
             selectOptionPressed = false;
             getActivity().invalidateOptionsMenu();
         }
-        mActivityToolBar.setTitle(String.valueOf(numSelected));
+        mActivityToolBarText.setText(String.valueOf(numSelected)+" Employees");
     }
 
 
