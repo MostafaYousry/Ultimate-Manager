@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.activities.AddTaskActivity;
+import com.example.android.employeesmanagementapp.activities.MainActivity;
 import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
@@ -20,9 +21,11 @@ import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.data.factories.TaskIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewTaskViewModel;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
@@ -40,6 +43,7 @@ public class RunningTasksFragment extends Fragment implements TasksAdapter.Tasks
     private RecyclerView mRecyclerView;
     private TasksAdapter mAdapter;
     private AppDatabase mDb;
+    private MainActivity mMain;
     private LinearLayout emptyView;
     private TextView emptyViewTextView;
 
@@ -55,8 +59,7 @@ public class RunningTasksFragment extends Fragment implements TasksAdapter.Tasks
         super.onCreate(savedInstanceState);
 
         mDb = AppDatabase.getInstance(getContext());
-
-
+        mMain = new MainActivity();
     }
 
     @Override
@@ -101,6 +104,10 @@ public class RunningTasksFragment extends Fragment implements TasksAdapter.Tasks
         });
 
         mRecyclerView.setAdapter(mAdapter);
+
+
+
+
 
         return view;
     }

@@ -65,6 +65,7 @@
         app:layout_anchor="@id/bottom_navigation_view"
         app:layout_anchorGravity="top|end"
         app:backgroundTint="@color/primaryLightColor"
+        android:foregroundTint="@android:color/transparent"
         app:layout_behavior="com.example.android.employeesmanagementapp.BottomNavigationFabBehavior"
         app:useCompatPadding="true" />
 

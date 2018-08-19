@@ -17,9 +17,11 @@ import com.example.android.employeesmanagementapp.adapters.DepartmentsAdapter;
 import com.example.android.employeesmanagementapp.data.DepartmentWithExtras;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
@@ -98,6 +100,7 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
 
         //applying default rv animations
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+
 
 
         return rootView;
