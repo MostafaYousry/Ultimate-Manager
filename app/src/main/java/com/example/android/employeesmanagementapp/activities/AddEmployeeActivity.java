@@ -18,6 +18,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.example.android.employeesmanagementapp.MyTextWatcher;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.TextDrawable;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
@@ -70,6 +71,7 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
     private RatingBar mEmployeeRating;
     private RecyclerView mEmployeeCompletedTasks;
     private String mEmployeePicturePath;
+    private String mMainEmployeePicturePath;
 
     private DepartmentsArrayAdapter mArrayAdapter;
 
@@ -161,6 +163,7 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
                 public void onChanged(EmployeeWithExtras employeeWithExtras) {
                     employee.removeObservers(AddEmployeeActivity.this);
                     populateUi(employeeWithExtras);
+                    setUpTextWatcher();
                 }
             });
 
@@ -168,6 +171,17 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
         ViewCompat.setNestedScrollingEnabled(mEmployeeCompletedTasks, false);
 
+    }
+
+    private void setUpTextWatcher() {
+        mEmployeeFirstName.addTextChangedListener(new MyTextWatcher(mEmployeeFirstName.getText().toString()));
+        mEmployeeMiddleName.addTextChangedListener(new MyTextWatcher(mEmployeeMiddleName.getText().toString()));
+        mEmployeeLastName.addTextChangedListener(new MyTextWatcher(mEmployeeLastName.getText().toString()));
+        mEmployeeEmail.addTextChangedListener(new MyTextWatcher(mEmployeeEmail.getText().toString()));
+        mEmployeePhone.addTextChangedListener(new MyTextWatcher(mEmployeePhone.getText().toString()));
+        mEmployeeSalary.addTextChangedListener(new MyTextWatcher(mEmployeeSalary.getText().toString()));
+        mEmployeeHireDate.addTextChangedListener(new MyTextWatcher(mEmployeeHireDate.getText().toString()));
+        mEmployeeNote.addTextChangedListener(new MyTextWatcher(mEmployeeNote.getText().toString()));
     }
 
     private void setUpCompletedTasksRV() {
@@ -265,6 +279,7 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
                     .asBitmap()
                     .load(Uri.parse(employeeWithExtras.employeeEntry.getEmployeeImageUri()))
                     .into(mEmployeeImage);
+            mMainEmployeePicturePath = employeeWithExtras.employeeEntry.getEmployeeImageUri();
         }
 
 
@@ -284,10 +299,18 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
                 saveEmployee();
                 break;
             case android.R.id.home:
-                finish();
+                checkDiscardChanges();
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void checkDiscardChanges() {
+        System.out.println("*************************** clicked Dep Id = " + clickedEmployeeDepId);
+        System.out.println("*************************** clicked emp dep Id = " + mEmployeeDepartment.getSelectedView().getTag());
+        if (AppUtils.getNumOfChangedFiled() > 0 ||( mEmployeePicturePath != null && !mMainEmployeePicturePath.equals(mEmployeePicturePath)) || clickedEmployeeDepId != (int) mEmployeeDepartment.getSelectedView().getTag()) {
+            AppUtils.showDiscardChangesDialog(AddEmployeeActivity.this);
+        } else finish();
     }
 
     @Override

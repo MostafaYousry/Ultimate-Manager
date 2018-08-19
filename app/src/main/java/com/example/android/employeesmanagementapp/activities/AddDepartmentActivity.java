@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.example.android.employeesmanagementapp.MyTextWatcher;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
 import com.example.android.employeesmanagementapp.adapters.HorizontalEmployeeAdapter;
@@ -56,6 +57,8 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
     private ImageView mDepartmentImage;
     private EditText mDepartmentName;
     private String mDepartmentPicturePath;
+    private String mMainDepartmentPicturePath;
+
     private EditText mDepartmentDateCreated;
 
     private Toolbar mToolbar;
@@ -115,6 +118,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
                 public void onChanged(DepartmentEntry departmentEntry) {
                     department.removeObservers(AddDepartmentActivity.this);
                     populateUi(departmentEntry);
+                    setUpTextWatcher();
                 }
             });
 
@@ -128,6 +132,11 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
 
         }
 
+    }
+
+    private void setUpTextWatcher() {
+        mDepartmentName.addTextChangedListener(new MyTextWatcher(mDepartmentName.getText().toString()));
+        mDepartmentDateCreated.addTextChangedListener(new MyTextWatcher(mDepartmentDateCreated.getText().toString()));
     }
 
 
@@ -264,6 +273,8 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
                     .asBitmap()
                     .load(Uri.parse(departmentEntry.getDepartmentImageUri()))
                     .into(mDepartmentImage);
+
+            mMainDepartmentPicturePath = departmentEntry.getDepartmentImageUri();
         }
 
         mDepartmentDateCreated.setText(AppUtils.getFriendlyDate(departmentEntry.getDepartmentDateCreated()));
@@ -304,10 +315,16 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
                 saveDepartment();
                 break;
             case android.R.id.home:
-                finish();
+                checkDiscardChanges();
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void checkDiscardChanges() {
+        if (AppUtils.getNumOfChangedFiled() > 0 || (mDepartmentPicturePath != null && !mMainDepartmentPicturePath.equals(mDepartmentPicturePath))) {
+            AppUtils.showDiscardChangesDialog(AddDepartmentActivity.this);
+        } else finish();
     }
 
 

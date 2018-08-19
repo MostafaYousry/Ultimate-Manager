@@ -1,5 +1,6 @@
 package com.example.android.employeesmanagementapp.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.widget.RatingBar;
 
 import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.activities.AddTaskActivity;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
@@ -30,6 +32,8 @@ import androidx.fragment.app.DialogFragment;
  */
 public final class AppUtils {
 
+
+    private static int numOfChangedFiled = 0;
 
     public static void showDatePicker(Context context, View view) {
         //create a bundle containing id of clicked text view (startDateTextView or dueDateTextView)
@@ -140,5 +144,38 @@ public final class AppUtils {
 
     public static String getFullEmployeeName(EmployeeEntry employeeEntry) {
         return employeeEntry.getEmployeeFirstName() + " " + employeeEntry.getEmployeeMiddleName() + " " + employeeEntry.getEmployeeLastName();
+    }
+
+    public static void setNumOfChangedFiled(int changed) {
+        numOfChangedFiled += changed ;
+        System.out.println("********************** change = " + numOfChangedFiled);
+    }
+
+    public static int getNumOfChangedFiled() {
+        return numOfChangedFiled;
+    }
+    public static void clearOneFiledChanged(){
+        numOfChangedFiled = 0;
+    }
+
+    public static void showDiscardChangesDialog(final Context context){
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Discard changes");
+        builder.setMessage("All changes will be discarded.");
+        builder.setPositiveButton("DISCARD", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                AppUtils.clearOneFiledChanged();
+                ((Activity)context).finish();
+            }
+        });
+
+        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        builder.show();
     }
 }
