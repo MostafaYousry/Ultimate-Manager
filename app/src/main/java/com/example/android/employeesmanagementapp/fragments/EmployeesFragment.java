@@ -26,11 +26,8 @@ import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import org.w3c.dom.Text;
-
 import java.util.List;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -288,13 +285,11 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
 
         final DepartmentsArrayAdapter departmentsArrayAdapter = new DepartmentsArrayAdapter(getActivity(), AppUtils.dpToPx(getActivity(), 24), AppUtils.dpToPx(getActivity(), 8), AppUtils.dpToPx(getActivity(), 0), AppUtils.dpToPx(getActivity(), 8), R.style.mainTextStyle);
 
-        final LiveData<List<DepartmentEntry>> departments = ViewModelProviders.of(getActivity()).get(MainViewModel.class).allDepartmentsList;
-        departments.observe(this, new Observer<List<DepartmentEntry>>() {
-            @Override
-            public void onChanged(List<DepartmentEntry> departmentEntries) {
-                departments.removeObservers(getActivity());
-                departmentsArrayAdapter.setData(departmentEntries);
-            }
+
+        final LiveData<List<DepartmentEntry>> departments = mDb.departmentsDao().loadDepartments();
+        departments.observe(this, departmentEntries -> {
+            departments.removeObservers(getActivity());
+            departmentsArrayAdapter.setData(departmentEntries);
         });
 
         builder.setSingleChoiceItems(departmentsArrayAdapter, 0, new DialogInterface.OnClickListener() {

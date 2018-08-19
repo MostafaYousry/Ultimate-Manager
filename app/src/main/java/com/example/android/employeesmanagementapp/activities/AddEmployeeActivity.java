@@ -1,6 +1,5 @@
 package com.example.android.employeesmanagementapp.activities;
 
-import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -8,7 +7,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,7 +17,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.example.android.employeesmanagementapp.MyTextWatcher;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.TextDrawable;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
@@ -27,36 +24,31 @@ import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.EmployeeWithExtras;
-import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.factories.EmpIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewEmployeeViewModel;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
-import com.example.android.employeesmanagementapp.utils.ImageUtils;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.Date;
-import java.util.List;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.ViewCompat;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapter.TasksItemClickListener {
+public class AddEmployeeActivity extends BaseAddActivity implements TasksAdapter.TasksItemClickListener {
 
     public static final String EMPLOYEE_ID_KEY = "employee_id";
-    private static final String TAG = AddEmployeeActivity.class.getSimpleName();
     private static final int DEFAULT_EMPLOYEE_ID = -1;
 
     private int mEmployeeId;
+    private EmployeeEntry mOldEmployeeEntry;
 
     private EditText mEmployeeFirstName;
     private EditText mEmployeeMiddleName;
@@ -68,13 +60,11 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
     private TextView mEmployeeHireDate;
     private Spinner mEmployeeDepartment;
     private ImageView mEmployeeImage;
-    private RatingBar mEmployeeRating;
-    private RecyclerView mEmployeeCompletedTasks;
     private String mEmployeePicturePath = "";
+    private RatingBar mEmployeeRating;
+    private RecyclerView mEmployeeCompletedTasksRv;
 
     private DepartmentsArrayAdapter mArrayAdapter;
-
-    private Toolbar mToolbar;
     private CollapsingToolbarLayout mCollapsingToolbar;
 
     private boolean departmentsLoaded;
@@ -84,7 +74,6 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
     private AddNewEmployeeViewModel mViewModel;
 
 
-    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,10 +89,11 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
             mEmployeeId = intent.getIntExtra(EMPLOYEE_ID_KEY, DEFAULT_EMPLOYEE_ID);
         }
 
+        //instantiate AddNewEmployeeViewModel for this employee id
         mViewModel = ViewModelProviders.of(this, new EmpIdFact(mDb, mEmployeeId)).get(AddNewEmployeeViewModel.class);
 
         //set toolbar as actionbar
-        mToolbar = findViewById(R.id.toolbar);
+        Toolbar mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
 
         //set toolbar home icon
@@ -120,28 +110,32 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
         mEmployeeSalary = findViewById(R.id.employee_salary);
         mEmployeeNote = findViewById(R.id.employee_note);
         mEmployeeHireDate = findViewById(R.id.employee_hire_date);
-        mEmployeeHireDate.setOnClickListener(view -> pickDate(view));
+
+        //set employee hire date view click listener
+        mEmployeeHireDate.setOnClickListener(this::showDatePicker);
+
         mEmployeeDepartment = findViewById(R.id.employee_department);
         mCollapsingToolbar = findViewById(R.id.collapsing_toolbar);
-
         mEmployeeImage = findViewById(R.id.employee_image);
-        mEmployeeImage.setOnClickListener(view -> ImageUtils.showPhotoCameraDialog(AddEmployeeActivity.this));
+
+        //set click Listener to listen for clicks on image view
+        mEmployeeImage.setOnClickListener(view -> showPhotoCameraDialog());
+
         mEmployeeRating = findViewById(R.id.employee_rating);
 
 
+        //create a new departments array adapter for employee department spinner
         mArrayAdapter = new DepartmentsArrayAdapter(this, AppUtils.dpToPx(this, 12), AppUtils.dpToPx(this, 8), 0, AppUtils.dpToPx(this, 8), R.style.detailActivitiesTextStyle);
 
-        LiveData<List<DepartmentEntry>> departments = mViewModel.allDepartments;
-        departments.observe(this, new Observer<List<DepartmentEntry>>() {
-            @Override
-            public void onChanged(List<DepartmentEntry> departmentEntries) {
-                mArrayAdapter.setData(departmentEntries);
-                departmentsLoaded = true;
-                if (clickedEmployeeDepId != -1) {
-                    mEmployeeDepartment.setSelection(mArrayAdapter.getPositionForItemId(clickedEmployeeDepId));
-                }
+        mViewModel.allDepartments.observe(this, departmentEntries -> {
+            mArrayAdapter.setData(departmentEntries);
+            departmentsLoaded = true;
+            if (clickedEmployeeDepId != -1) {
+                mEmployeeDepartment.setSelection(mArrayAdapter.getPositionForItemId(clickedEmployeeDepId));
             }
         });
+
+        //set the adapter
         mEmployeeDepartment.setAdapter(mArrayAdapter);
 
 
@@ -151,73 +145,52 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
         if (mEmployeeId == DEFAULT_EMPLOYEE_ID) {
             clearViews();
-            setUpTextWatcher();
         } else {
             final LiveData<EmployeeWithExtras> employee = mViewModel.employeeEntry;
-            employee.observe(this, new Observer<EmployeeWithExtras>() {
-                @Override
-                public void onChanged(EmployeeWithExtras employeeWithExtras) {
-                    employee.removeObservers(AddEmployeeActivity.this);
-                    populateUi(employeeWithExtras);
-                    setUpTextWatcher();
-                }
+            employee.observe(this, employeeWithExtras -> {
+                employee.removeObservers(AddEmployeeActivity.this);
+                populateUi(employeeWithExtras);
             });
 
         }
 
-        ViewCompat.setNestedScrollingEnabled(mEmployeeCompletedTasks, false);
+        ViewCompat.setNestedScrollingEnabled(mEmployeeCompletedTasksRv, false);
 
-    }
-
-    private void setUpTextWatcher() {
-        mEmployeeFirstName.addTextChangedListener(new MyTextWatcher(mEmployeeFirstName.getText().toString()));
-        mEmployeeMiddleName.addTextChangedListener(new MyTextWatcher(mEmployeeMiddleName.getText().toString()));
-        mEmployeeLastName.addTextChangedListener(new MyTextWatcher(mEmployeeLastName.getText().toString()));
-        mEmployeeEmail.addTextChangedListener(new MyTextWatcher(mEmployeeEmail.getText().toString()));
-        mEmployeePhone.addTextChangedListener(new MyTextWatcher(mEmployeePhone.getText().toString()));
-        mEmployeeSalary.addTextChangedListener(new MyTextWatcher(mEmployeeSalary.getText().toString()));
-        mEmployeeHireDate.addTextChangedListener(new MyTextWatcher(mEmployeeHireDate.getText().toString()));
-        mEmployeeNote.addTextChangedListener(new MyTextWatcher(mEmployeeNote.getText().toString()));
     }
 
     private void setUpCompletedTasksRV() {
-        mEmployeeCompletedTasks = findViewById(R.id.employee_tasks_rv);
-        mEmployeeCompletedTasks.setHasFixedSize(true);
+        mEmployeeCompletedTasksRv = findViewById(R.id.employee_tasks_rv);
+        mEmployeeCompletedTasksRv.setHasFixedSize(true);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        mEmployeeCompletedTasks.setLayoutManager(layoutManager);
+        mEmployeeCompletedTasksRv.setLayoutManager(layoutManager);
 
         final TasksAdapter adapter = new TasksAdapter(this, this, true);
 
         if (mEmployeeId != DEFAULT_EMPLOYEE_ID)
             mViewModel.employeeCompletedTasks.observe(this, adapter::submitList);
 
-        mEmployeeCompletedTasks.setAdapter(adapter);
+        mEmployeeCompletedTasksRv.setAdapter(adapter);
     }
 
-
-    public void pickDate(View view) {
-        AppUtils.showDatePicker(this, view);
-    }
-
-
+    /**
+     * used to change toolbar text when user changes employee name
+     */
     private void setUpNameET() {
         mEmployeeFirstName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                Log.d(TAG, "Name is changing");
-                mCollapsingToolbar.setTitle(s);
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+                mCollapsingToolbar.setTitle(s);
             }
 
             @Override
             public void afterTextChanged(Editable s) {
                 if (TextUtils.isEmpty(s.toString())) {
-                    getSupportActionBar().setTitle(getString(R.string.add_new_employee));
+                    mCollapsingToolbar.setTitle(getString(R.string.add_new_employee));
                 }
             }
         });
@@ -228,7 +201,7 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
         mCollapsingToolbar.setTitle(getString(R.string.add_new_employee));
         mEmployeeDepartment.setSelection(0);
         mEmployeeRating.setVisibility(View.GONE);
-        mEmployeeCompletedTasks.setVisibility(View.GONE);
+        mEmployeeCompletedTasksRv.setVisibility(View.GONE);
         findViewById(R.id.imageView9).setVisibility(View.GONE);
 
         mEmployeeImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_camera_add));
@@ -241,6 +214,8 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
         if (employeeWithExtras == null)
             return;
 
+        mOldEmployeeEntry = employeeWithExtras.employeeEntry;
+
         clickedEmployeeDepId = employeeWithExtras.employeeEntry.getDepartmentId();
 
         mEmployeeFirstName.setText(employeeWithExtras.employeeEntry.getEmployeeFirstName());
@@ -252,14 +227,14 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
         mEmployeeSalary.setText(String.valueOf(employeeWithExtras.employeeEntry.getEmployeeSalary()));
         mEmployeeHireDate.setText(AppUtils.getFriendlyDate(employeeWithExtras.employeeEntry.getEmployeeHireDate()));
         mEmployeeHireDate.setTag(employeeWithExtras.employeeEntry.getEmployeeHireDate());
-        mEmployeePicturePath = employeeWithExtras.employeeEntry.getEmployeeImageUri();
-
 
         mCollapsingToolbar.setTitle(employeeWithExtras.employeeEntry.getEmployeeFirstName());
+
         if (departmentsLoaded)
             mEmployeeDepartment.setSelection(mArrayAdapter.getPositionForItemId(employeeWithExtras.employeeEntry.getDepartmentId()));
         mEmployeeRating.setRating(employeeWithExtras.employeeRating);
 
+        mEmployeePicturePath = employeeWithExtras.employeeEntry.getEmployeeImageUri();
         if (TextUtils.isEmpty(mEmployeePicturePath)) {
             TextDrawable textDrawable = new TextDrawable(this, employeeWithExtras.employeeEntry, AppUtils.dpToPx(this, 70), AppUtils.dpToPx(this, 70), AppUtils.spToPx(this, 28));
             mEmployeeImage.setImageDrawable(textDrawable);
@@ -284,7 +259,7 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_save:
-                saveEmployee();
+                save();
                 break;
             case R.id.action_phone:
                 dialPhoneNumber();
@@ -301,7 +276,7 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == ImageUtils.REQUEST_IMAGE_GET && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_IMAGE_GET && resultCode == RESULT_OK) {
             Uri fullPhotoUri = data.getData();
             mEmployeePicturePath = fullPhotoUri.toString();
             Glide.with(this)
@@ -310,8 +285,8 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
                     .into(mEmployeeImage);
 
 
-        } else if (requestCode == ImageUtils.REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            mEmployeePicturePath = ImageUtils.sImageURI;
+        } else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            mEmployeePicturePath = cameraImageUri;
             Glide.with(this)
                     .asBitmap()
                     .load(Uri.parse(mEmployeePicturePath))
@@ -320,21 +295,58 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
     }
 
-    private void saveEmployee() {
+    private EmployeeEntry getEmployeeEntry() {
+        String employeeFirstName = mEmployeeFirstName.getText().toString();
+        String employeeMiddleName = mEmployeeMiddleName.getText().toString();
+        String employeeLastName = mEmployeeLastName.getText().toString();
+        float employeeSalary = Float.parseFloat(mEmployeeSalary.getText().toString());
+        String employeeEmail = mEmployeeEmail.getText().toString();
+        String employeePhone = mEmployeePhone.getText().toString();
+        String employeeNote = mEmployeeNote.getText().toString();
+        Date employeeHireDate = (Date) mEmployeeHireDate.getTag();
+        int departmentId = (int) mEmployeeDepartment.getSelectedView().getTag();
+
+        if (mEmployeeId == DEFAULT_EMPLOYEE_ID)
+            return new EmployeeEntry(departmentId, employeeFirstName, employeeMiddleName, employeeLastName, employeeSalary, employeeHireDate, employeeEmail, employeePhone, employeeNote, mEmployeePicturePath);
+        else
+            return new EmployeeEntry(mEmployeeId, departmentId, employeeFirstName, employeeMiddleName, employeeLastName, employeeSalary, employeeHireDate, employeeEmail, employeePhone, employeeNote, mEmployeePicturePath, mOldEmployeeEntry.isEmployeeIsDeleted());
+    }
+
+    private void composeEmail() {
+        if (TextUtils.isEmpty(mEmployeeEmail.getText()))
+            return;
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("mailto:" + mEmployeeEmail.getText()));
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
+    }
+
+    private void dialPhoneNumber() {
+        if (TextUtils.isEmpty(mEmployeePhone.getText()))
+            return;
+        Intent intent = new Intent(Intent.ACTION_DIAL);
+        intent.setData(Uri.parse("tel:" + mEmployeePhone.getText()));
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
+    }
+
+    @Override
+    public void onTaskClick(int taskRowID, int taskPosition, boolean taskIsCompleted) {
+        Intent intent = new Intent(this, AddTaskActivity.class);
+        intent.putExtra(AddTaskActivity.TASK_ID_KEY, taskRowID);
+        intent.putExtra(AddTaskActivity.TASK_IS_COMPLETED_KEY, taskIsCompleted);
+        startActivity(intent);
+    }
+
+    @Override
+    protected void save() {
         if (isDataValid()) {
 
-            String employeeFirstName = mEmployeeFirstName.getText().toString();
-            String employeeMiddleName = mEmployeeMiddleName.getText().toString();
-            String employeeLastName = mEmployeeLastName.getText().toString();
-            float employeeSalary = Float.parseFloat(mEmployeeSalary.getText().toString());
-            String employeeEmail = mEmployeeEmail.getText().toString();
-            String employeePhone = mEmployeePhone.getText().toString();
-            String employeeNote = mEmployeeNote.getText().toString();
-            Date employeeHireDate = (Date) mEmployeeHireDate.getTag();
-            int departmentId = (int) mEmployeeDepartment.getSelectedView().getTag();
+            final EmployeeEntry employeeEntry = getEmployeeEntry();
 
-
-            if (mEmployeeId != DEFAULT_EMPLOYEE_ID && clickedEmployeeDepId != departmentId) {
+            if (mEmployeeId != DEFAULT_EMPLOYEE_ID && clickedEmployeeDepId != employeeEntry.getDepartmentId()) {
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("Note");
@@ -348,9 +360,8 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
                                 mDb.employeesTasksDao().deleteEmployeeFromRunningTasks(mEmployeeId);
                                 mDb.tasksDao().deleteEmptyTasks();
 
-                                EmployeeEntry newEmployee = new EmployeeEntry(departmentId, employeeFirstName, employeeMiddleName, employeeLastName, employeeSalary, employeeHireDate, employeeEmail, employeePhone, employeeNote, mEmployeePicturePath);
-                                newEmployee.setEmployeeID(mEmployeeId);
-                                mDb.employeesDao().updateEmployee(newEmployee);
+                                employeeEntry.setEmployeeID(mEmployeeId);
+                                mDb.employeesDao().updateEmployee(employeeEntry);
                                 dialogInterface.dismiss();
 
                                 finish();
@@ -371,16 +382,14 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
                 builder.show();
 
             } else {
-                final EmployeeEntry newEmployee = new EmployeeEntry(departmentId, employeeFirstName, employeeMiddleName, employeeLastName, employeeSalary, employeeHireDate, employeeEmail, employeePhone, employeeNote, mEmployeePicturePath);
 
                 AppExecutor.getInstance().diskIO().execute(new Runnable() {
                     @Override
                     public void run() {
                         if (mEmployeeId == DEFAULT_EMPLOYEE_ID)
-                            mDb.employeesDao().addEmployee(newEmployee);
+                            mDb.employeesDao().addEmployee(employeeEntry);
                         else {
-                            newEmployee.setEmployeeID(mEmployeeId);
-                            mDb.employeesDao().updateEmployee(newEmployee);
+                            mDb.employeesDao().updateEmployee(employeeEntry);
                         }
                     }
                 });
@@ -389,10 +398,10 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
 
         }
-
     }
 
-    private boolean isDataValid() {
+    @Override
+    protected boolean isDataValid() {
 
         boolean valid = true;
 
@@ -440,7 +449,8 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
     }
 
-    private void updateErrorVisibility(String key, boolean show) {
+    @Override
+    protected void updateErrorVisibility(String key, boolean show) {
         if (show)
             switch (key) {
                 case "firstName":
@@ -483,38 +493,67 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
     }
 
 
-    private void composeEmail() {
-        if (TextUtils.isEmpty(mEmployeeEmail.getText()))
-            return;
-        Intent intent = new Intent(Intent.ACTION_SENDTO);
-        intent.setData(Uri.parse("mailto:" + mEmployeeEmail.getText()));
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
-        }
-    }
+    @Override
+    protected boolean fieldsChanged() {
+        if (mEmployeeId == DEFAULT_EMPLOYEE_ID) {
+            if (!TextUtils.isEmpty(mEmployeeFirstName.getText()))
+                return true;
 
-    private void dialPhoneNumber() {
-        if (TextUtils.isEmpty(mEmployeePhone.getText()))
-            return;
-        Intent intent = new Intent(Intent.ACTION_DIAL);
-        intent.setData(Uri.parse("tel:" + mEmployeePhone.getText()));
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
-        }
+            if (!TextUtils.isEmpty(mEmployeeMiddleName.getText()))
+                return true;
+
+            if (!TextUtils.isEmpty(mEmployeeLastName.getText()))
+                return true;
+
+            if (!TextUtils.isEmpty(mEmployeeEmail.getText()))
+                return true;
+
+            if (!TextUtils.isEmpty(mEmployeePhone.getText()))
+                return true;
+
+            if (!TextUtils.isEmpty(mEmployeeSalary.getText()))
+                return true;
+
+            if (mEmployeeHireDate.getTag() != null)
+                return true;
+
+            if (!TextUtils.isEmpty(mEmployeeNote.getText()))
+                return true;
+
+            if (!TextUtils.isEmpty(mEmployeePicturePath))
+                return true;
+
+            if (mEmployeeDepartment.getSelectedItemPosition() != 0)
+                return true;
+        } else
+            return !mOldEmployeeEntry.equals(getEmployeeEntry());
+
+
+        return false;
     }
 
     @Override
-    public void onTaskClick(int taskRowID, int taskPosition, boolean taskIsCompleted) {
-        Intent intent = new Intent(this, AddTaskActivity.class);
-        intent.putExtra(AddTaskActivity.TASK_ID_KEY, taskRowID);
-        intent.putExtra(AddTaskActivity.TASK_IS_COMPLETED_KEY, taskIsCompleted);
-        startActivity(intent);
+    protected void showDiscardChangesDialog() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Discard changes");
+        builder.setMessage("All changes will be discarded.");
+        builder.setNegativeButton("DISCARD", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+                finish();
+            }
+        });
+
+        builder.setPositiveButton("SAVE", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                save();
+                dialogInterface.dismiss();
+            }
+        });
+        builder.show();
     }
 
-    @Override
-    public void onBackPressed() {
-        if (AppUtils.getNumOfChangedFiled() > 0 || (mEmployeePicturePath != null && !mMainEmployeePicturePath.equals(mEmployeePicturePath)) || clickedEmployeeDepId != (int) mEmployeeDepartment.getSelectedView().getTag()) {
-            AppUtils.showDiscardChangesDialog(AddEmployeeActivity.this);
-        } else super.onBackPressed();
-    }
 }

@@ -3,6 +3,7 @@ package com.example.android.employeesmanagementapp.data.entries;
 import com.example.android.employeesmanagementapp.R;
 
 import java.util.Date;
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
@@ -143,7 +144,6 @@ public class TaskEntry {
     }
 
     public int getTaskColorResource() {
-        // TODO: 8/19/18
         return taskColorResource;
     }
 
@@ -172,4 +172,8 @@ public class TaskEntry {
                 && Integer.compare(taskColorResource, entry.taskColorResource) == 0;
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(taskId, departmentID, taskTitle, taskDescription, taskStartDate, taskDueDate, taskRating, taskIsCompleted, taskColorResource);
+    }
 }

@@ -10,8 +10,6 @@ import android.widget.TimePicker;
 
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 
-import java.sql.Time;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 

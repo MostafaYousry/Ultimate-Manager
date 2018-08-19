@@ -1,6 +1,7 @@
 package com.example.android.employeesmanagementapp.data.entries;
 
 import java.util.Date;
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
@@ -114,6 +115,6 @@ public class DepartmentEntry {
 
     @Override
     public int hashCode() {
-        return Integer.valueOf(departmentId).hashCode();
+        return Objects.hash(departmentId, departmentName, departmentDateCreated, departmentImageUri, departmentIsDeleted);
     }
 }

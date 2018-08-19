@@ -32,6 +32,7 @@ import androidx.recyclerview.widget.RecyclerView;
 public class HorizontalEmployeeAdapter extends PagedListAdapter<EmployeeEntry, HorizontalEmployeeAdapter.EmployeesViewHolder> {
     private Context mContext;
     private List<EmployeeEntry> mAddedEmployees;
+    private boolean changeOccurred;
     private static DiffUtil.ItemCallback<EmployeeEntry> DIFF_CALLBACK =
             new DiffUtil.ItemCallback<EmployeeEntry>() {
                 @Override
@@ -122,6 +123,8 @@ public class HorizontalEmployeeAdapter extends PagedListAdapter<EmployeeEntry, H
             mAddedEmployees.addAll(chosenEmployees);
         notifyDataSetChanged();
 //        notifyItemRangeInserted(mData.size() , chosenEmployees.size());
+
+        changeOccurred = true;
     }
 
     public void clearAdapter() {
@@ -151,6 +154,10 @@ public class HorizontalEmployeeAdapter extends PagedListAdapter<EmployeeEntry, H
         });
 
 
+    }
+
+    public boolean didChangeOccur() {
+        return changeOccurred;
     }
 
     public class EmployeesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
@@ -229,6 +236,7 @@ public class HorizontalEmployeeAdapter extends PagedListAdapter<EmployeeEntry, H
                 public boolean onMenuItemClick(MenuItem item) {
                     switch (item.getItemId()) {
                         case R.id.action_remove_employee:
+                            changeOccurred = true;
                             int deletePosition = getAdapterPosition();
                             if (getCurrentList() == null) {
                                 mAddedEmployees.remove(deletePosition);

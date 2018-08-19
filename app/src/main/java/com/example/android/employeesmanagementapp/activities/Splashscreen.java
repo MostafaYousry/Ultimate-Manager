@@ -1,9 +1,9 @@
 package com.example.android.employeesmanagementapp.activities;
-import android.os.Bundle;
+
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
 import android.widget.ImageView;
-import com.example.android.employeesmanagementapp.activities.MainActivity;
 
 import com.example.android.employeesmanagementapp.R;
 

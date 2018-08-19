@@ -60,7 +60,7 @@ public interface DepartmentsDao {
      * @return : number of departments in the company
      */
     @Query("SELECT COUNT(*) FROM departments where department_is_deleted = 0 ")
-    int getNumDepartments();
+    LiveData<Integer> getNumDepartments();
 
     /**
      * insert a new department record

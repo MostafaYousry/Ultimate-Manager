@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.android.employeesmanagementapp">
 
-
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
@@ -14,7 +13,6 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher3_square"
@@ -23,12 +21,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-
-        <activity android:name=".activities.Splashscreen">
-
-        </activity>
-
-
+        <activity android:name=".activities.Splashscreen"></activity>
         <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -36,15 +29,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activities.AddTaskActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
-
         <activity android:name=".activities.AddEmployeeActivity" />
-
         <activity android:name=".activities.AddDepartmentActivity" />
-
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -70,6 +59,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </service>
+
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
@@ -80,10 +70,10 @@
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
     </application>
-
 
 </manifest>

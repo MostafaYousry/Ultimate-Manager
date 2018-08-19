@@ -1,6 +1,7 @@
 package com.example.android.employeesmanagementapp.data.entries;
 
 import java.util.Date;
+import java.util.Objects;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
@@ -228,7 +229,7 @@ public class EmployeeEntry {
     @Override
     public int hashCode() {
 
-        return getEmployeeFirstName().hashCode() + getEmployeeMiddleName().hashCode() + getEmployeeLastName().hashCode();
+        return Objects.hash(employeeID, departmentId, employeeFirstName, employeeMiddleName, employeeLastName, employeeSalary, employeeHireDate, employeeImageUri, employeeEmail, employeePhone, employeeNote, employeeIsDeleted, isChecked);
 
     }
 }

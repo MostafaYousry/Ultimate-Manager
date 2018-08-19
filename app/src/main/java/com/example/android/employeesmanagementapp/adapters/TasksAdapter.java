@@ -2,30 +2,36 @@ package com.example.android.employeesmanagementapp.adapters;
 
 
 import android.content.Context;
-import android.os.CountDownTimer;
+import android.content.DialogInterface;
 import android.graphics.Color;
+import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
+import com.example.android.employeesmanagementapp.fragments.ColorPickerDialogFragment;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.fragment.app.DialogFragment;
 import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
@@ -92,6 +98,48 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
         void onTaskClick(int taskRowID, int taskPosition, boolean taskIsCompleted);
     }
 
+    private void showColorPicker(int taskId) {
+        Bundle bundle = new Bundle();
+        bundle.putInt(ColorPickerDialogFragment.KEY_TASK_ID, taskId);
+
+        DialogFragment colorPickerDialogFragment = new ColorPickerDialogFragment();
+        colorPickerDialogFragment.setArguments(bundle);
+
+        colorPickerDialogFragment.show(((AppCompatActivity) mContext).getSupportFragmentManager(), "colorPicker");
+    }
+
+    private void showRateTaskDialog(final int taskID) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        builder.setTitle("Task done");
+        builder.setMessage("Please rate task");
+
+        View rateDialogView = LayoutInflater.from(mContext).inflate(R.layout.rating_bar, null, false);
+        final RatingBar ratingBar = rateDialogView.findViewById(R.id.rating_bar);
+        ratingBar.setPaddingRelative(AppUtils.dpToPx(mContext, 16), 0, AppUtils.dpToPx(mContext, 16), 0);
+        builder.setView(rateDialogView);
+
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(final DialogInterface dialog, int which) {
+                AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        AppDatabase.getInstance(mContext).tasksDao().rateTask(ratingBar.getRating(), taskID);
+                        dialog.dismiss();
+                    }
+                });
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.show();
+    }
+
     class TasksViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         MaterialCardView mItemView;
         TextView mTaskTitle;
@@ -122,7 +170,7 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
                         public boolean onMenuItemClick(final MenuItem item) {
                             switch (item.getItemId()) {
                                 case R.id.action_mark_as_done:
-                                    AppUtils.showRateTaskDialog(mContext, (int) itemView.getTag());
+                                    showRateTaskDialog((int) itemView.getTag());
                                     return true;
                                 case R.id.action_delete_task:
 
@@ -136,7 +184,7 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
 
                                     return true;
                                 case R.id.action_color_task:
-                                    AppUtils.showColorPicker(mContext, (int) itemView.getTag());
+                                    showColorPicker((int) itemView.getTag());
                                     return true;
                                 default:
                                     return false;
@@ -194,7 +242,7 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
                         if (months == 1)
                             chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_single_month, months);
                         else
-                            chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_multi_moths ,months);
+                            chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_multi_moths, months);
 
                     }
                     if (days > 0 && indexOfFields + 1 != 4) {
@@ -263,6 +311,8 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
             mItemView.setCardBackgroundColor(Color.WHITE);
         }
     }
+
+
 }
 
 

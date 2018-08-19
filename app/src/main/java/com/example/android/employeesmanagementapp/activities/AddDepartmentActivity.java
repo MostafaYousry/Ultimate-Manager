@@ -1,5 +1,6 @@
 package com.example.android.employeesmanagementapp.activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,7 +12,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.example.android.employeesmanagementapp.MyTextWatcher;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
 import com.example.android.employeesmanagementapp.adapters.HorizontalEmployeeAdapter;
@@ -23,13 +23,12 @@ import com.example.android.employeesmanagementapp.data.factories.DepIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewDepViewModel;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 import com.example.android.employeesmanagementapp.utils.ColorUtils;
-import com.example.android.employeesmanagementapp.utils.ImageUtils;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.Date;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.ViewCompat;
@@ -39,12 +38,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
-public class AddDepartmentActivity extends AppCompatActivity implements EmployeesAdapter.EmployeeItemClickListener, TasksAdapter.TasksItemClickListener {
+public class AddDepartmentActivity extends BaseAddActivity implements EmployeesAdapter.EmployeeItemClickListener, TasksAdapter.TasksItemClickListener {
 
     public static final String DEPARTMENT_ID_KEY = "department_id";
-    private static final String TAG = AddDepartmentActivity.class.getSimpleName();
     private static final int DEFAULT_DEPARTMENT_ID = -1;
     private int mDepartmentId;
+    private DepartmentEntry mOldDepartmentEntry;
 
     private RecyclerView mDepCompletedTasksRV;
     private RecyclerView mDepRunningTasksRV;
@@ -55,7 +54,6 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
     private String mDepartmentPicturePath = "";
     private EditText mDepartmentDateCreated;
 
-    private Toolbar mToolbar;
     private CollapsingToolbarLayout mCollapsingToolbar;
 
     private AppDatabase mDb;
@@ -79,7 +77,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
         mDepartmentName = findViewById(R.id.department_name);
         mDepartmentImage = findViewById(R.id.department_image);
         mDepartmentDateCreated = findViewById(R.id.department_date_created);
-        mDepartmentDateCreated.setOnClickListener(view -> pickDate(view));
+        mDepartmentDateCreated.setOnClickListener(this::showDatePicker);
 
         mDepEmployeesRV = findViewById(R.id.department_employees_rv);
         mDepRunningTasksRV = findViewById(R.id.department_running_tasks_rv);
@@ -89,12 +87,12 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
         mDepartmentImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ImageUtils.showPhotoCameraDialog(AddDepartmentActivity.this);
+                showPhotoCameraDialog();
             }
         });
 
         //set toolbar as actionbar
-        mToolbar = findViewById(R.id.toolbar);
+        Toolbar mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
 
         //set toolbar home icon
@@ -107,13 +105,11 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
 
         if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
             clearViews();
-            setUpTextWatcher();
         } else {
             final LiveData<DepartmentEntry> department = mViewModel.departmentEntry;
             department.observe(this, departmentEntry -> {
                 department.removeObservers(AddDepartmentActivity.this);
                 populateUi(departmentEntry);
-                setUpTextWatcher();
             });
 
             setUpEmployeesRV();
@@ -128,15 +124,10 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
 
     }
 
-    private void setUpTextWatcher() {
-        mDepartmentName.addTextChangedListener(new MyTextWatcher(mDepartmentName.getText().toString()));
-        mDepartmentDateCreated.addTextChangedListener(new MyTextWatcher(mDepartmentDateCreated.getText().toString()));
-    }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == ImageUtils.REQUEST_IMAGE_GET && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_IMAGE_GET && resultCode == RESULT_OK) {
             Uri fullPhotoUri = data.getData();
             mDepartmentPicturePath = fullPhotoUri.toString();
             Glide.with(this)
@@ -145,8 +136,8 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
                     .into(mDepartmentImage);
 
 
-        } else if (requestCode == ImageUtils.REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            mDepartmentPicturePath = ImageUtils.sImageURI;
+        } else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            mDepartmentPicturePath = cameraImageUri;
             Glide.with(this)
                     .asBitmap()
                     .load(Uri.parse(mDepartmentPicturePath))
@@ -201,6 +192,8 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
         if (departmentEntry == null)
             return;
 
+        mOldDepartmentEntry = departmentEntry;
+
         mDepartmentName.setText(departmentEntry.getDepartmentName());
         mCollapsingToolbar.setTitle(departmentEntry.getDepartmentName());
 
@@ -244,15 +237,11 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
         return true;
     }
 
-    public void pickDate(View view) {
-        AppUtils.showDatePicker(this, view);
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_save:
-                saveDepartment();
+                save();
                 break;
             case android.R.id.home:
                 onBackPressed();
@@ -261,32 +250,33 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
         return super.onOptionsItemSelected(item);
     }
 
-    private void saveDepartment() {
-        if (isDataValid()) {
-            String departmentName = mDepartmentName.getText().toString();
-            Date departmentCreatedDate = (Date) mDepartmentDateCreated.getTag();
+    private DepartmentEntry getDepartmentEntry() {
+        String departmentName = mDepartmentName.getText().toString();
+        Date departmentCreatedDate = (Date) mDepartmentDateCreated.getTag();
 
-            final DepartmentEntry newDepartment = new DepartmentEntry(departmentName, departmentCreatedDate, mDepartmentPicturePath);
-
-            AppExecutor.getInstance().diskIO().execute(new Runnable() {
-                @Override
-                public void run() {
-                    if (mDepartmentId == DEFAULT_DEPARTMENT_ID)
-                        mDb.departmentsDao().addDepartment(newDepartment);
-                    else {
-                        newDepartment.setDepartmentId(mDepartmentId);
-                        mDb.departmentsDao().updateDepartment(newDepartment);
-                    }
-
-                }
-            });
-
-            finish();
-        }
-
+        if (mDepartmentId == DEFAULT_DEPARTMENT_ID)
+            return new DepartmentEntry(departmentName, departmentCreatedDate, mDepartmentPicturePath);
+        else
+            return new DepartmentEntry(mDepartmentId, departmentName, departmentCreatedDate, mDepartmentPicturePath, mOldDepartmentEntry.isDepartmentIsDeleted());
     }
 
-    private boolean isDataValid() {
+    @Override
+    public void onEmployeeClick(int employeeRowID, int employeePosition) {
+        Intent intent = new Intent(this, AddEmployeeActivity.class);
+        intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY, employeeRowID);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onTaskClick(int taskRowID, int taskPosition, boolean taskIsCompleted) {
+        Intent intent = new Intent(this, AddTaskActivity.class);
+        intent.putExtra(AddTaskActivity.TASK_ID_KEY, taskRowID);
+        intent.putExtra(AddTaskActivity.TASK_IS_COMPLETED_KEY, taskIsCompleted);
+        startActivity(intent);
+    }
+
+    @Override
+    protected boolean isDataValid() {
 
         boolean valid = true;
 
@@ -310,7 +300,8 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
 
     }
 
-    private void updateErrorVisibility(String key, boolean show) {
+    @Override
+    protected void updateErrorVisibility(String key, boolean show) {
         if (show)
             switch (key) {
                 case "departmentName":
@@ -331,27 +322,66 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
             }
     }
 
-
     @Override
-    public void onEmployeeClick(int employeeRowID, int employeePosition) {
-        Intent intent = new Intent(this, AddEmployeeActivity.class);
-        intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY, employeeRowID);
-        startActivity(intent);
-    }
+    protected void save() {
+        if (isDataValid()) {
 
-    @Override
-    public void onTaskClick(int taskRowID, int taskPosition, boolean taskIsCompleted) {
-        Intent intent = new Intent(this, AddTaskActivity.class);
-        intent.putExtra(AddTaskActivity.TASK_ID_KEY, taskRowID);
-        intent.putExtra(AddTaskActivity.TASK_IS_COMPLETED_KEY, taskIsCompleted);
-        startActivity(intent);
-    }
+            final DepartmentEntry newDepartment = getDepartmentEntry();
 
-    @Override
-    public void onBackPressed() {
-        if (AppUtils.getNumOfChangedFiled() > 0 || (mDepartmentPicturePath != null && !mMainDepartmentPicturePath.equals(mDepartmentPicturePath))) {
-            AppUtils.showDiscardChangesDialog(AddDepartmentActivity.this);
+            AppExecutor.getInstance().diskIO().execute(() -> {
+                if (mDepartmentId == DEFAULT_DEPARTMENT_ID)
+                    mDb.departmentsDao().addDepartment(newDepartment);
+                else {
+                    mDb.departmentsDao().updateDepartment(newDepartment);
+                }
+
+            });
+
+            finish();
         }
-        else super.onBackPressed();
+    }
+
+
+    @Override
+    protected boolean fieldsChanged() {
+        if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
+            if (!TextUtils.isEmpty(mDepartmentName.getText()))
+                return true;
+
+            if (mDepartmentDateCreated.getTag() != null)
+                return true;
+
+            if (!TextUtils.isEmpty(mDepartmentPicturePath))
+                return true;
+
+        } else
+            return !mOldDepartmentEntry.equals(getDepartmentEntry());
+
+
+        return false;
+    }
+
+    @Override
+    protected void showDiscardChangesDialog() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Discard changes");
+        builder.setMessage("All changes will be discarded.");
+        builder.setNegativeButton("DISCARD", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+                finish();
+            }
+        });
+
+        builder.setPositiveButton("SAVE", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                save();
+                dialogInterface.dismiss();
+            }
+        });
+        builder.show();
     }
 }

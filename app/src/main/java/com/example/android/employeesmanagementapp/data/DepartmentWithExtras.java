@@ -2,6 +2,8 @@ package com.example.android.employeesmanagementapp.data;
 
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 
+import java.util.Objects;
+
 import androidx.room.ColumnInfo;
 import androidx.room.Embedded;
 
@@ -36,4 +38,8 @@ public class DepartmentWithExtras {
 
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(departmentEntry, numRunningTasks, numCompletedTasks, numOfEmployees);
+    }
 }

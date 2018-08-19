@@ -1,13 +1,25 @@
-todo use paging architecture component for loading lists in small chunks
-
-todo glide place holders
+todo fix null pointer exception when showing previous date/time for a newly created task/employee/department
 
 todo different icon for each fab location ie(tasks , departments , employees)
 
-todo deleted employees same as delete tasks
+icons in add activities
 
-todo when changing dep of emp , remove from running tasks
+paged list builder
 
-todo create department dialogue bug(if no departments it only appears once)
+glide placholders -- ?
+
+lock fired employee
+
+load lists when showing splash screen
+
+change app icon
+
+change app name
+
+splashscreen icon animation
+
+see fab icons
+
+notify item removed
 
 todo -----------------T E S T-----------------------------
