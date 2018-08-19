@@ -144,7 +144,8 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
                 departmentsLoaded = true;
                 if (clickedEmployeeDepId != -1) {
                     mEmployeeDepartment.setSelection(mArrayAdapter.getPositionForItemId(clickedEmployeeDepId));
-                }
+                } else
+                    clickedEmployeeDepId = mArrayAdapter.getDepId(0);
             }
         });
         mEmployeeDepartment.setAdapter(mArrayAdapter);
@@ -156,6 +157,7 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
         if (mEmployeeId == DEFAULT_EMPLOYEE_ID) {
             clearViews();
+            setUpTextWatcher();
         } else {
             final LiveData<EmployeeWithExtras> employee = mViewModel.getEmployee();
             employee.observe(this, new Observer<EmployeeWithExtras>() {
@@ -299,18 +301,10 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
                 saveEmployee();
                 break;
             case android.R.id.home:
-                checkDiscardChanges();
+                onBackPressed();
                 break;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void checkDiscardChanges() {
-        System.out.println("*************************** clicked Dep Id = " + clickedEmployeeDepId);
-        System.out.println("*************************** clicked emp dep Id = " + mEmployeeDepartment.getSelectedView().getTag());
-        if (AppUtils.getNumOfChangedFiled() > 0 ||( mEmployeePicturePath != null && !mMainEmployeePicturePath.equals(mEmployeePicturePath)) || clickedEmployeeDepId != (int) mEmployeeDepartment.getSelectedView().getTag()) {
-            AppUtils.showDiscardChangesDialog(AddEmployeeActivity.this);
-        } else finish();
     }
 
     @Override
@@ -464,4 +458,10 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
         startActivity(intent);
     }
 
+    @Override
+    public void onBackPressed() {
+        if (AppUtils.getNumOfChangedFiled() > 0 || (mEmployeePicturePath != null && !mMainEmployeePicturePath.equals(mEmployeePicturePath)) || clickedEmployeeDepId != (int) mEmployeeDepartment.getSelectedView().getTag()) {
+            AppUtils.showDiscardChangesDialog(AddEmployeeActivity.this);
+        } else super.onBackPressed();
+    }
 }

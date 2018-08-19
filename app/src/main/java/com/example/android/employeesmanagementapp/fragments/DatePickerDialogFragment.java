@@ -22,8 +22,10 @@ import androidx.fragment.app.DialogFragment;
 public class DatePickerDialogFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
     public static final String KEY_DISPLAY_VIEW_ID = "date_view_id";
+    public static final String KEY_DISPLAY_DATE = "date to be displayed";
 
     private View mViewToShowDateIn;
+    private Long mDate;
 
 
     @NonNull
@@ -34,12 +36,15 @@ public class DatePickerDialogFragment extends DialogFragment implements DatePick
         if (bundle != null) {
             if (bundle.containsKey(KEY_DISPLAY_VIEW_ID))
                 mViewToShowDateIn = getActivity().findViewById(bundle.getInt(KEY_DISPLAY_VIEW_ID));
+            if (bundle.containsKey(KEY_DISPLAY_DATE))
+                mDate = bundle.getLong(KEY_DISPLAY_DATE);
 
         }
 
 
         // populate with current date as the default date in the picker
         final Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(mDate);
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);

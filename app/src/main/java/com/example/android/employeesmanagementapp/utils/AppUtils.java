@@ -17,6 +17,7 @@ import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.fragments.ColorPickerDialogFragment;
 import com.example.android.employeesmanagementapp.fragments.DatePickerDialogFragment;
+import com.example.android.employeesmanagementapp.fragments.TimePickerFragment;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -39,6 +40,7 @@ public final class AppUtils {
         //create a bundle containing id of clicked text view (startDateTextView or dueDateTextView)
         Bundle bundle = new Bundle();
         bundle.putInt(DatePickerDialogFragment.KEY_DISPLAY_VIEW_ID, view.getId());
+        bundle.putLong(DatePickerDialogFragment.KEY_DISPLAY_DATE, ((Date) view.getTag()).getTime());
 
         //instantiate a DatePickerDialogFragment to show date picker dialog
         DialogFragment datePickerFragment = new DatePickerDialogFragment();
@@ -159,6 +161,7 @@ public final class AppUtils {
     }
 
     public static void showDiscardChangesDialog(final Context context){
+
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Discard changes");
         builder.setMessage("All changes will be discarded.");
@@ -177,5 +180,19 @@ public final class AppUtils {
             }
         });
         builder.show();
+    }
+
+    public static void showTimePicker(AddTaskActivity context, View view) {
+        //create a bundle containing id of clicked text view (startDateTextView or dueDateTextView)
+        Bundle bundle = new Bundle();
+        bundle.putInt(TimePickerFragment.KEY_DISPLAY_VIEW_ID, view.getId());
+        bundle.putLong(TimePickerFragment.KEY_DISPLAY_TIME, ((Date) view.getTag()).getTime());
+
+        //instantiate a DatePickerFragment to show date picker dialog
+        DialogFragment timePickerFragment = new TimePickerFragment();
+        timePickerFragment.setArguments(bundle);
+
+        //show th dialog
+        timePickerFragment.show(((AppCompatActivity) context).getSupportFragmentManager(), "timePicker");
     }
 }

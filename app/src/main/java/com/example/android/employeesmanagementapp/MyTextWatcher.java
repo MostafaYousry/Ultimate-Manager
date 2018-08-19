@@ -23,6 +23,8 @@ public class MyTextWatcher implements TextWatcher {
 
     @Override
     public void afterTextChanged(Editable editable) {
+        System.out.println("************************* main text" + mMainText);
+        System.out.println("************************* editable " + editable.toString());
         if (!editable.toString().equals(mMainText) && !mIsChanged) {
             AppUtils.setNumOfChangedFiled(1);
             mIsChanged = true;

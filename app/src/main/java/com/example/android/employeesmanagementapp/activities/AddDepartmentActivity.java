@@ -111,6 +111,7 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
 
         if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
             clearViews();
+            setUpTextWatcher();
         } else {
             final LiveData<DepartmentEntry> department = mViewModel.getDepartment();
             department.observe(this, new Observer<DepartmentEntry>() {
@@ -238,25 +239,6 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
 
     }
 
-
-    protected void onStop() {
-        super.onStop();
-//
-//        Intent intent = new Intent(this, NotificationService.class);
-//        // send the due date and the id of the task within the intent
-//        //intent.putExtra("task due date", taskDueDate.getTime() - taskStartDAte.getTime())'
-//        //intent.putExtra("task id",mTaskId);
-//
-//        //just for experiment until tasks are done
-//        Bundle bundle = new Bundle();
-//        System.out.println(mDepartmentId);
-//        bundle.putInt("task id", 38);
-//        bundle.putLong("task due date", 30);
-//        intent.putExtras(bundle);
-//        startService(intent);
-    }
-
-
     private void populateUi(DepartmentEntry departmentEntry) {
         if (departmentEntry == null)
             return;
@@ -315,18 +297,11 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
                 saveDepartment();
                 break;
             case android.R.id.home:
-                checkDiscardChanges();
+                onBackPressed();
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
-
-    private void checkDiscardChanges() {
-        if (AppUtils.getNumOfChangedFiled() > 0 || (mDepartmentPicturePath != null && !mMainDepartmentPicturePath.equals(mDepartmentPicturePath))) {
-            AppUtils.showDiscardChangesDialog(AddDepartmentActivity.this);
-        } else finish();
-    }
-
 
     private void saveDepartment() {
         if (isDataValid()) {
@@ -411,5 +386,13 @@ public class AddDepartmentActivity extends AppCompatActivity implements Employee
         Intent intent = new Intent(this, AddTaskActivity.class);
         intent.putExtra(AddTaskActivity.TASK_ID_KEY, taskRowID);
         startActivity(intent);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (AppUtils.getNumOfChangedFiled() > 0 || (mDepartmentPicturePath != null && !mMainDepartmentPicturePath.equals(mDepartmentPicturePath))) {
+            AppUtils.showDiscardChangesDialog(AddDepartmentActivity.this);
+        }
+        else super.onBackPressed();
     }
 }

@@ -1,6 +1,7 @@
 package com.example.android.employeesmanagementapp.activities;
 
 import android.annotation.SuppressLint;
+import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -120,7 +121,8 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
                 departmentsLoaded = true;
                 if (clickedTaskDepId != -1) {
                     mTaskDepartment.setSelection(mDepartmentsArrayAdapter.getPositionForItemId(clickedTaskDepId));
-                }
+                } else
+                    clickedTaskDepId = mDepartmentsArrayAdapter.getDepId(0);
             }
         });
 
@@ -132,6 +134,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
 
         if (mTaskId == DEFAULT_TASK_ID) {
             clearViews();
+            setUpTextWatcher();
         } else {
             final LiveData<TaskEntry> task = mViewModel.getTask();
             task.observe(this, new Observer<TaskEntry>() {
@@ -404,17 +407,10 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
                 saveTask();
                 break;
             case android.R.id.home:
-                checkDiscardChanges();
+                onBackPressed();
                 break;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void checkDiscardChanges() {
-        if (AppUtils.getNumOfChangedFiled() > 0 || (mHorizontalEmployeeAdapter.getRemovedEmployees() != null && mHorizontalEmployeeAdapter.getRemovedEmployees().size() != 0) || (mHorizontalEmployeeAdapter.getAddedEmployees() != null && mHorizontalEmployeeAdapter.getAddedEmployees().size() != 0) || (int) mTaskDepartment.getSelectedView().getTag() != clickedTaskDepId) {
-            AppUtils.showDiscardChangesDialog(AddTaskActivity.this);
-        } else
-            finish();
     }
 
 
@@ -512,16 +508,7 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
     }
 
     public void pickTime(View view) {
-        //create a bundle containing id of clicked text view (startDateTextView or dueDateTextView)
-        Bundle bundle = new Bundle();
-        bundle.putInt("time_view_id", view.getId());
-
-        //instantiate a DatePickerFragment to show date picker dialog
-        DialogFragment timePickerFragment = new TimePickerFragment();
-        timePickerFragment.setArguments(bundle);
-
-        //show th dialog
-        timePickerFragment.show(getSupportFragmentManager(), "timePicker");
+        AppUtils.showTimePicker(this, view);
     }
 
     private void updateErrorVisibility(String key, boolean show) {
@@ -573,5 +560,13 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         Intent intent = new Intent(this, AddEmployeeActivity.class);
         intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY, employeeRowID);
         startActivity(intent);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (AppUtils.getNumOfChangedFiled() > 0 || (mHorizontalEmployeeAdapter.getRemovedEmployees() != null && mHorizontalEmployeeAdapter.getRemovedEmployees().size() != 0) || (mHorizontalEmployeeAdapter.getAddedEmployees() != null && mHorizontalEmployeeAdapter.getAddedEmployees().size() != 0) || (int) mTaskDepartment.getSelectedView().getTag() != clickedTaskDepId) {
+            AppUtils.showDiscardChangesDialog(AddTaskActivity.this);
+        } else
+            super.onBackPressed();
     }
 }
