@@ -173,6 +173,13 @@ public class AddEmployeeActivity extends AppCompatActivity implements TasksAdapt
 
         ViewCompat.setNestedScrollingEnabled(mEmployeeCompletedTasks, false);
 
+        mEmployeeHireDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pickDate(view);
+            }
+        });
+
     }
 
     private void setUpTextWatcher() {

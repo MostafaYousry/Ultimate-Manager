@@ -127,8 +127,7 @@
                     android:focusable="false"
                     android:hint="@string/hint_department_date_created"
                     android:inputType="text"
-                    android:maxLines="1"
-                    android:onClick="pickDate" />
+                    android:maxLines="1" />
 
             </com.google.android.material.textfield.TextInputLayout>
 

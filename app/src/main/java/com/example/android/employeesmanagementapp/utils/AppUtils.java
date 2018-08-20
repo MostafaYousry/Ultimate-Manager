@@ -40,7 +40,10 @@ public final class AppUtils {
         //create a bundle containing id of clicked text view (startDateTextView or dueDateTextView)
         Bundle bundle = new Bundle();
         bundle.putInt(DatePickerDialogFragment.KEY_DISPLAY_VIEW_ID, view.getId());
-        bundle.putLong(DatePickerDialogFragment.KEY_DISPLAY_DATE, ((Date) view.getTag()).getTime());
+        if (view.getTag() != null)
+            bundle.putLong(DatePickerDialogFragment.KEY_DISPLAY_DATE, ((Date) view.getTag()).getTime());
+        else
+            bundle.putLong(DatePickerDialogFragment.KEY_DISPLAY_DATE, new Date().getTime());
 
         //instantiate a DatePickerDialogFragment to show date picker dialog
         DialogFragment datePickerFragment = new DatePickerDialogFragment();
@@ -149,18 +152,19 @@ public final class AppUtils {
     }
 
     public static void setNumOfChangedFiled(int changed) {
-        numOfChangedFiled += changed ;
+        numOfChangedFiled += changed;
         System.out.println("********************** change = " + numOfChangedFiled);
     }
 
     public static int getNumOfChangedFiled() {
         return numOfChangedFiled;
     }
-    public static void clearOneFiledChanged(){
+
+    public static void clearOneFiledChanged() {
         numOfChangedFiled = 0;
     }
 
-    public static void showDiscardChangesDialog(final Context context){
+    public static void showDiscardChangesDialog(final Context context) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Discard changes");
@@ -169,7 +173,7 @@ public final class AppUtils {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 AppUtils.clearOneFiledChanged();
-                ((Activity)context).finish();
+                ((Activity) context).finish();
             }
         });
 
@@ -186,7 +190,10 @@ public final class AppUtils {
         //create a bundle containing id of clicked text view (startDateTextView or dueDateTextView)
         Bundle bundle = new Bundle();
         bundle.putInt(TimePickerFragment.KEY_DISPLAY_VIEW_ID, view.getId());
-        bundle.putLong(TimePickerFragment.KEY_DISPLAY_TIME, ((Date) view.getTag()).getTime());
+        if (view.getTag() != null)
+            bundle.putLong(TimePickerFragment.KEY_DISPLAY_TIME, ((Date) view.getTag()).getTime());
+        else
+            bundle.putLong(TimePickerFragment.KEY_DISPLAY_TIME, new Date().getTime());
 
         //instantiate a DatePickerFragment to show date picker dialog
         DialogFragment timePickerFragment = new TimePickerFragment();

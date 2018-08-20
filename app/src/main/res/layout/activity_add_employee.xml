@@ -311,7 +311,6 @@
                     android:focusable="false"
                     android:hint="@string/hint_employee_hire_date"
                     android:inputType="text"
-                    android:onClick="pickDate"
                     android:maxLines="1" />
 
             </com.google.android.material.textfield.TextInputLayout>

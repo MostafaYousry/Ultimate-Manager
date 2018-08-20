@@ -23,7 +23,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        
+
         <activity android:name=".activities.Splashscreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,8 +31,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
-        
+
+
         <activity android:name=".activities.MainActivity">
 
             <intent-filter>
@@ -45,11 +45,16 @@
 
         <activity
             android:name=".activities.AddTaskActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:windowSoftInputMode="adjustPan" />
 
-        <activity android:name=".activities.AddEmployeeActivity" />
+        <activity
+            android:name=".activities.AddEmployeeActivity"
+            android:windowSoftInputMode="adjustPan" />
 
-        <activity android:name=".activities.AddDepartmentActivity" />
+        <activity
+            android:name=".activities.AddDepartmentActivity"
+            android:windowSoftInputMode="adjustPan" />
 
 
         <provider
