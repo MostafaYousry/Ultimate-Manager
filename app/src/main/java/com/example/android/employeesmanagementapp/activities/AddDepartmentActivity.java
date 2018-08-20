@@ -125,6 +125,13 @@ public class AddDepartmentActivity extends BaseAddActivity implements Horizontal
 
         }
 
+        mDepartmentDateCreated.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pickDate(view);
+            }
+        });
+
     }
 
 

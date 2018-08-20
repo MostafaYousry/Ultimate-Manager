@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.android.employeesmanagementapp">
 
+
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
@@ -13,6 +14,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher3_square"
@@ -21,6 +23,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+
         <activity android:name=".activities.Splashscreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,15 +32,22 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activities.MainActivity" />
+
+        <activity android:name=".activities.MainActivity"/>
+
 
         <activity
             android:name=".activities.AddTaskActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:windowSoftInputMode="adjustPan" />
 
-        <activity android:name=".activities.AddEmployeeActivity" />
+        <activity
+            android:name=".activities.AddEmployeeActivity"
+            android:windowSoftInputMode="adjustPan" />
 
-        <activity android:name=".activities.AddDepartmentActivity" />
+        <activity
+            android:name=".activities.AddDepartmentActivity"
+            android:windowSoftInputMode="adjustPan" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

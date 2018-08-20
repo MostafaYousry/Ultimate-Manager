@@ -172,6 +172,13 @@ public class AddEmployeeActivity extends BaseAddActivity implements TasksAdapter
 
         ViewCompat.setNestedScrollingEnabled(mEmployeeCompletedTasksRv, false);
 
+        mEmployeeHireDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pickDate(view);
+            }
+        });
+
     }
 
     private void setUpRunningTasksRV() {
