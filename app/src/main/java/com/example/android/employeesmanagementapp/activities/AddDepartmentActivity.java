@@ -13,12 +13,13 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.example.android.employeesmanagementapp.R;
-import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
 import com.example.android.employeesmanagementapp.adapters.HorizontalEmployeeAdapter;
 import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
+import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
+import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.data.factories.DepIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewDepViewModel;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
@@ -33,12 +34,14 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.ViewCompat;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
-public class AddDepartmentActivity extends BaseAddActivity implements EmployeesAdapter.EmployeeItemClickListener, TasksAdapter.TasksItemClickListener {
+public class AddDepartmentActivity extends BaseAddActivity implements HorizontalEmployeeAdapter.HorizontalEmployeeItemClickListener, TasksAdapter.TasksItemClickListener {
 
     public static final String DEPARTMENT_ID_KEY = "department_id";
     private static final int DEFAULT_DEPARTMENT_ID = -1;
@@ -158,33 +161,69 @@ public class AddDepartmentActivity extends BaseAddActivity implements EmployeesA
         mDepEmployeesRV.setAdapter(adapter);
 
 
-        mViewModel.departmentEmployees.observe(this, adapter::submitList);
+        mViewModel.departmentEmployees.observe(this, new Observer<PagedList<EmployeeEntry>>() {
+            @Override
+            public void onChanged(PagedList<EmployeeEntry> employeeEntries) {
+                if (employeeEntries != null && !employeeEntries.isEmpty()) {
+                    adapter.submitList(employeeEntries);
+                    mDepEmployeesRV.setVisibility(View.VISIBLE);
+                    findViewById(R.id.imageView9).setVisibility(View.VISIBLE);
+                } else {
+                    mDepEmployeesRV.setVisibility(View.GONE);
+                    findViewById(R.id.imageView9).setVisibility(View.GONE);
+                }
+            }
+        });
 
 
     }
 
     private void setUpDepRunningTasksRV() {
 
-        mDepRunningTasksRV.setHasFixedSize(true);
+        mDepRunningTasksRV.setHasFixedSize(false);
 
         mDepRunningTasksRV.setLayoutManager(new LinearLayoutManager(this));
         TasksAdapter adapter = new TasksAdapter(this, this, false);
         mDepRunningTasksRV.setAdapter(adapter);
 
 
-        mViewModel.departmentRunningTasks.observe(this, adapter::submitList);
+        mViewModel.departmentRunningTasks.observe(this, new Observer<PagedList<TaskEntry>>() {
+            @Override
+            public void onChanged(PagedList<TaskEntry> taskEntries) {
+                if (taskEntries != null && !taskEntries.isEmpty()) {
+                    adapter.submitList(taskEntries);
+                    mDepRunningTasksRV.setVisibility(View.VISIBLE);
+                    findViewById(R.id.imageView10).setVisibility(View.VISIBLE);
+                } else {
+                    mDepRunningTasksRV.setVisibility(View.GONE);
+                    findViewById(R.id.imageView10).setVisibility(View.GONE);
+                }
+            }
+        });
     }
 
     private void setUpDepCompletedTasksRV() {
 
-        mDepCompletedTasksRV.setHasFixedSize(true);
+        mDepCompletedTasksRV.setHasFixedSize(false);
 
         mDepCompletedTasksRV.setLayoutManager(new LinearLayoutManager(this));
         final TasksAdapter adapter = new TasksAdapter(this, this, true);
         mDepCompletedTasksRV.setAdapter(adapter);
 
 
-        mViewModel.departmentCompletedTasks.observe(this, adapter::submitList);
+        mViewModel.departmentCompletedTasks.observe(this, new Observer<PagedList<TaskEntry>>() {
+            @Override
+            public void onChanged(PagedList<TaskEntry> taskEntries) {
+                if (taskEntries != null && !taskEntries.isEmpty()) {
+                    adapter.submitList(taskEntries);
+                    mDepCompletedTasksRV.setVisibility(View.VISIBLE);
+                    findViewById(R.id.imageView11).setVisibility(View.VISIBLE);
+                } else {
+                    mDepCompletedTasksRV.setVisibility(View.GONE);
+                    findViewById(R.id.imageView11).setVisibility(View.GONE);
+                }
+            }
+        });
 
     }
 
@@ -261,9 +300,10 @@ public class AddDepartmentActivity extends BaseAddActivity implements EmployeesA
     }
 
     @Override
-    public void onEmployeeClick(int employeeRowID, int employeePosition) {
+    public void onEmployeeClick(int employeeRowID, int employeePosition, boolean isFired) {
         Intent intent = new Intent(this, AddEmployeeActivity.class);
         intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY, employeeRowID);
+        intent.putExtra(AddEmployeeActivity.EMPLOYEE_IS_FIRED, isFired);
         startActivity(intent);
     }
 
@@ -384,4 +424,5 @@ public class AddDepartmentActivity extends BaseAddActivity implements EmployeesA
         });
         builder.show();
     }
+
 }

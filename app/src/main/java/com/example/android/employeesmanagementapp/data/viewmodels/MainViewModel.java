@@ -35,10 +35,16 @@ public class MainViewModel extends AndroidViewModel {
 
         AppDatabase db = AppDatabase.getInstance(application.getApplicationContext());
 
-        runningTasksList = new LivePagedListBuilder<>(db.tasksDao().loadRunningTasks(), /* page size */ 20).build();
-        completedTasksList = new LivePagedListBuilder<>(db.tasksDao().loadCompletedTasks(), /* page size */ 20).build();
-        employeesWithExtrasList = new LivePagedListBuilder<>(db.employeesDao().loadEmployees(), /* page size */ 20).build();
-        allDepartmentsWithExtrasList = new LivePagedListBuilder<>(db.departmentsDao().loadDepartmentsWithExtras(), /* page size */ 20).build();
+        PagedList.Config config = new PagedList.Config.Builder()
+                .setEnablePlaceholders(true)
+                .setPrefetchDistance(50)
+                .setPageSize(10)
+                .build();
+
+        runningTasksList = new LivePagedListBuilder<>(db.tasksDao().loadRunningTasks(), config).build();
+        completedTasksList = new LivePagedListBuilder<>(db.tasksDao().loadCompletedTasks(), config).build();
+        employeesWithExtrasList = new LivePagedListBuilder<>(db.employeesDao().loadEmployees(), config).build();
+        allDepartmentsWithExtrasList = new LivePagedListBuilder<>(db.departmentsDao().loadDepartmentsWithExtras(), config).build();
 
         numOfCompanyDepartments = db.departmentsDao().getNumDepartments();
     }

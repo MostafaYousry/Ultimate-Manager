@@ -5,7 +5,6 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -47,11 +46,11 @@ public class HorizontalEmployeeAdapter extends PagedListAdapter<EmployeeEntry, H
                 }
             };
 
-    private EmployeesAdapter.EmployeeItemClickListener mClickListener;
+    private HorizontalEmployeeItemClickListener mClickListener;
     private boolean mLongClickEnabled;
     private int mTaskID;
 
-    public HorizontalEmployeeAdapter(Context context, EmployeesAdapter.EmployeeItemClickListener clickListener, boolean longClickEnabled) {
+    public HorizontalEmployeeAdapter(Context context, HorizontalEmployeeItemClickListener clickListener, boolean longClickEnabled) {
         super(DIFF_CALLBACK);
         mContext = context;
         mClickListener = clickListener;
@@ -59,12 +58,21 @@ public class HorizontalEmployeeAdapter extends PagedListAdapter<EmployeeEntry, H
     }
 
 
-    public HorizontalEmployeeAdapter(Context context, EmployeesAdapter.EmployeeItemClickListener clickListener, boolean longClickEnabled, int taskId) {
+    public HorizontalEmployeeAdapter(Context context, HorizontalEmployeeItemClickListener clickListener, boolean longClickEnabled, int taskId) {
         super(DIFF_CALLBACK);
         mContext = context;
         mClickListener = clickListener;
         mLongClickEnabled = longClickEnabled;
         mTaskID = taskId;
+    }
+
+    @Override
+    public int getItemCount() {
+        int dataSize = super.getItemCount(), addedSize = 0;
+        if (mAddedEmployees != null)
+            addedSize = mAddedEmployees.size();
+
+        return dataSize + addedSize;
     }
 
     @NonNull
@@ -96,20 +104,8 @@ public class HorizontalEmployeeAdapter extends PagedListAdapter<EmployeeEntry, H
         }
     }
 
-    @Override
-    public int getItemCount() {
-        int dataSize = 0, addedSize = 0;
-        if (getCurrentList() != null)
-            dataSize = getCurrentList().size();
-        if (mAddedEmployees != null)
-            addedSize = mAddedEmployees.size();
-
-
-        return dataSize + addedSize;
-    }
-
-    public List<EmployeeEntry> getData() {
-        return getCurrentList().snapshot();
+    public interface HorizontalEmployeeItemClickListener {
+        void onEmployeeClick(int employeeRowID, int employeePosition, boolean isFired);
     }
 
     public List<EmployeeEntry> getAddedEmployees() {
@@ -128,8 +124,6 @@ public class HorizontalEmployeeAdapter extends PagedListAdapter<EmployeeEntry, H
     }
 
     public void clearAdapter() {
-        if (getCurrentList() != null)
-            getCurrentList().clear();
         if (mAddedEmployees != null)
             mAddedEmployees.clear();
         notifyDataSetChanged();
@@ -223,7 +217,10 @@ public class HorizontalEmployeeAdapter extends PagedListAdapter<EmployeeEntry, H
 
         @Override
         public void onClick(View view) {
-            mClickListener.onEmployeeClick((int) mItemView.getTag(), getAdapterPosition());
+            if (getAdapterPosition() >= (getCurrentList() == null ? 0 : getCurrentList().size()))
+                mClickListener.onEmployeeClick((int) mItemView.getTag(), getAdapterPosition(), mAddedEmployees.get(getAdapterPosition()).isEmployeeIsDeleted());
+            else
+                mClickListener.onEmployeeClick((int) mItemView.getTag(), getAdapterPosition(), getItem(getAdapterPosition()).isEmployeeIsDeleted());
         }
 
         @Override
@@ -231,30 +228,27 @@ public class HorizontalEmployeeAdapter extends PagedListAdapter<EmployeeEntry, H
             PopupMenu popup = new PopupMenu(view.getContext(), view);
             popup.setGravity(Gravity.TOP);
             popup.inflate(R.menu.menu_task_employee_options);
-            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    switch (item.getItemId()) {
-                        case R.id.action_remove_employee:
-                            changeOccurred = true;
-                            int deletePosition = getAdapterPosition();
-                            if (getCurrentList() == null) {
-                                mAddedEmployees.remove(deletePosition);
-                                notifyItemRemoved(deletePosition);
-                                return true;
-                            }
-
-                            if (deletePosition < getCurrentList().size()) {
-                                deleteInBackground(getItem(deletePosition), mTaskID);
-                            } else {
-                                mAddedEmployees.remove(deletePosition - getCurrentList().size());
-//                                notifyItemRemoved(deletePosition - getCurrentList().size());
-                                notifyDataSetChanged();
-                            }
+            popup.setOnMenuItemClickListener(item -> {
+                switch (item.getItemId()) {
+                    case R.id.action_remove_employee:
+                        changeOccurred = true;
+                        int deletePosition = getAdapterPosition();
+                        if (getCurrentList() == null) {
+                            mAddedEmployees.remove(deletePosition);
+                            notifyItemRemoved(deletePosition);
                             return true;
-                        default:
-                            return false;
-                    }
+                        }
+
+                        if (deletePosition < getCurrentList().size()) {
+                            deleteInBackground(getItem(deletePosition), mTaskID);
+                        } else {
+                            mAddedEmployees.remove(deletePosition - getCurrentList().size());
+//                                notifyItemRemoved(deletePosition - getCurrentList().size());
+                            notifyDataSetChanged();
+                        }
+                        return true;
+                    default:
+                        return false;
                 }
             });
             popup.show();

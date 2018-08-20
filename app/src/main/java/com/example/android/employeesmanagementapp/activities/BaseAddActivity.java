@@ -47,7 +47,6 @@ public abstract class BaseAddActivity extends AppCompatActivity {
     protected void showDatePicker(View view) {
         Bundle bundle = new Bundle();
         bundle.putInt(DatePickerDialogFragment.KEY_DISPLAY_VIEW_ID, view.getId());
-        bundle.putLong(DatePickerDialogFragment.KEY_DISPLAY_DATE, ((Date) view.getTag()).getTime());
 
         DialogFragment datePickerFragment = new DatePickerDialogFragment();
         datePickerFragment.setArguments(bundle);
@@ -58,7 +57,6 @@ public abstract class BaseAddActivity extends AppCompatActivity {
     protected void showTimePicker(View view) {
         Bundle bundle = new Bundle();
         bundle.putInt(TimePickerFragment.KEY_DISPLAY_VIEW_ID, view.getId());
-        bundle.putLong(TimePickerFragment.KEY_DISPLAY_TIME, ((Date) view.getTag()).getTime());
 
         DialogFragment timePickerFragment = new TimePickerFragment();
         timePickerFragment.setArguments(bundle);

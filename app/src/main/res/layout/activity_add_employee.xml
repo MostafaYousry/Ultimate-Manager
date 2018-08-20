@@ -2,7 +2,7 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main_content"
+    android:id="@+id/coordinator"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
@@ -320,13 +320,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="20dp"
-                android:src="@drawable/ic_completed_tasks"
+                android:layout_marginTop="16dp"
+                android:src="@drawable/ic_running_tasks"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textInputLayout5" />
+                app:layout_constraintTop_toBottomOf="@+id/employee_completed_tasks_rv" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/employee_tasks_rv"
+                android:id="@+id/employee_running_tasks_rv"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -335,6 +335,30 @@
                 android:clipToPadding="false"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/imageView9"
+                app:layout_constraintTop_toBottomOf="@+id/employee_completed_tasks_rv"
+                tools:itemCount="3"
+                tools:listitem="@layout/item_tasks_rv" />
+
+            <ImageView
+                android:id="@+id/imageView11"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:src="@drawable/ic_completed_tasks"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textInputLayout5" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/employee_completed_tasks_rv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="8dp"
+                android:clipToPadding="false"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imageView11"
                 app:layout_constraintTop_toBottomOf="@+id/textInputLayout5"
                 tools:itemCount="3"
                 tools:listitem="@layout/item_tasks_rv" />

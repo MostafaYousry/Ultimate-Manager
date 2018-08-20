@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Master Manager</string>
+    <string name="app_name">Ultimate Manager</string>
     <string name="default_notification_channel_id">Channel ID</string>
     <!-- strings defining navigation menu items -->
     <string name="tasks">Tasks</string>

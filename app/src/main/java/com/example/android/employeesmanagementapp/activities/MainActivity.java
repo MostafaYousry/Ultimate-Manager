@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     }
 
     void loadFragment(Fragment fragment) {
-        if (activeFragment == fragment)
+        if (activeFragment == null || activeFragment == fragment)
             return;
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();

@@ -7,7 +7,6 @@ import android.util.TypedValue;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 
@@ -37,30 +36,6 @@ public final class AppUtils {
 
     public static String getFriendlyTime(Date date) {
         return SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT).format(date);
-    }
-
-    public static Date getChosenDateAndTime(Date chosenDate, Date chosenTime) {
-        Calendar dateAndTimeCalender = Calendar.getInstance();
-        Calendar dateCalendar = Calendar.getInstance();
-        Calendar timeCalendar = Calendar.getInstance();
-
-        if (chosenDate != null) {
-            dateCalendar.setTime(chosenDate);
-            dateAndTimeCalender.set(Calendar.YEAR, dateCalendar.get(Calendar.YEAR));
-            dateAndTimeCalender.set(Calendar.MONTH, dateCalendar.get(Calendar.MONTH));
-            dateAndTimeCalender.set(Calendar.DAY_OF_MONTH, dateCalendar.get(Calendar.DAY_OF_MONTH));
-        }
-
-        if (chosenTime != null) {
-            timeCalendar.setTime(chosenTime);
-            dateAndTimeCalender.set(Calendar.HOUR_OF_DAY, timeCalendar.get(Calendar.HOUR_OF_DAY));
-            dateAndTimeCalender.set(Calendar.MINUTE, timeCalendar.get(Calendar.MINUTE));
-        } else {
-            dateAndTimeCalender.set(Calendar.HOUR_OF_DAY, 0);
-            dateAndTimeCalender.set(Calendar.MINUTE, 0);
-        }
-
-        return dateAndTimeCalender.getTime();
     }
 
     public static String getFullEmployeeName(EmployeeEntry employeeEntry) {

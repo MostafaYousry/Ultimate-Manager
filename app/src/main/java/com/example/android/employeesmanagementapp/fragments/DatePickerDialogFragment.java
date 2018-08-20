@@ -10,7 +10,6 @@ import android.widget.TextView;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 
 import java.util.Calendar;
-import java.util.Date;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
@@ -22,10 +21,9 @@ import androidx.fragment.app.DialogFragment;
 public class DatePickerDialogFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
     public static final String KEY_DISPLAY_VIEW_ID = "date_view_id";
-    public static final String KEY_DISPLAY_DATE = "date to be displayed";
 
     private View mViewToShowDateIn;
-    private Long mDate;
+    private Calendar mCalendar;
 
 
     @NonNull
@@ -36,32 +34,29 @@ public class DatePickerDialogFragment extends DialogFragment implements DatePick
         if (bundle != null) {
             if (bundle.containsKey(KEY_DISPLAY_VIEW_ID))
                 mViewToShowDateIn = getActivity().findViewById(bundle.getInt(KEY_DISPLAY_VIEW_ID));
-            if (bundle.containsKey(KEY_DISPLAY_DATE))
-                mDate = bundle.getLong(KEY_DISPLAY_DATE);
+        }
 
+        if (mViewToShowDateIn.getTag() != null)
+            mCalendar = (Calendar) mViewToShowDateIn.getTag();
+        else {
+            mCalendar = Calendar.getInstance();
+            mCalendar.set(Calendar.HOUR_OF_DAY, 0);
+            mCalendar.set(Calendar.MINUTE, 0);
         }
 
 
-        // populate with current date as the default date in the picker
-        final Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(mDate);
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-
-        // Create a new instancMyDatePickerDialoge of DatePickerDialog and return it
-        return new DatePickerDialog(getActivity(), this, year, month, day);
+        return new DatePickerDialog(getActivity(), this, mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH), mCalendar.get(Calendar.DAY_OF_MONTH));
     }
 
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
         TextView textView = (TextView) mViewToShowDateIn;
-        Calendar cal = Calendar.getInstance();
-        cal.set(year, month, dayOfMonth);
-        Date currentDate = cal.getTime();
-        textView.setText(AppUtils.getFriendlyDate(currentDate));
-        textView.setTag(currentDate);
+
+        mCalendar.set(year, month, dayOfMonth);
+
+        textView.setText(AppUtils.getFriendlyDate(mCalendar.getTime()));
+        textView.setTag(mCalendar);
     }
 
 }

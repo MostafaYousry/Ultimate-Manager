@@ -201,8 +201,8 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
 
             mTaskTitle.setText(getItem(position).getTaskTitle());
 
-            mTaskDates.setText(mContext.getString(R.string.task_list_item_name_dates, AppUtils.getFriendlyDate(getItem(position).getTaskStartDate()), AppUtils.getFriendlyDate(getItem(position).getTaskDueDate())));
-            getRemainingTime(getItem(position).getTaskDueDate());
+            mTaskDates.setText(mContext.getString(R.string.task_list_item_name_dates, AppUtils.getFriendlyDate(getItem(position).getTaskStartDate().getTime()), AppUtils.getFriendlyDate(getItem(position).getTaskDueDate().getTime())));
+            getRemainingTime(getItem(position).getTaskDueDate().getTime());
 
             int taskColor = ResourcesCompat.getColor(itemView.getResources(), getItem(position).getTaskColorResource(), mContext.getTheme());
 
@@ -287,13 +287,13 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
                         mTaskDates.setText(mContext.getString(R.string.date_one_fields, chosenFields[0]));
 
 
-                    mTaskDates.setTextColor(mContext.getResources().getColor(R.color.primaryTextColor));
+                    mTaskDates.setTextColor(ResourcesCompat.getColor(itemView.getResources(), R.color.primaryTextColor, mContext.getTheme()));
                 }
 
                 @Override
                 public void onFinish() {
                     mTaskDates.setText(R.string.overdue);
-                    mTaskDates.setTextColor(mContext.getResources().getColor(R.color.A700_16));
+                    mTaskDates.setTextColor(ResourcesCompat.getColor(itemView.getResources(), R.color.A700_16, mContext.getTheme()));
                 }
             }.start();
         }

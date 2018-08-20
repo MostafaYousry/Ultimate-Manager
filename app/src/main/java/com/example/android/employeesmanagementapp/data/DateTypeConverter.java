@@ -1,6 +1,5 @@
 package com.example.android.employeesmanagementapp.data;
 
-
 import java.util.Date;
 
 import androidx.room.TypeConverter;

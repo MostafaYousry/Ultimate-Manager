@@ -12,37 +12,44 @@ import android.widget.TextView;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.activities.AddTaskActivity;
 import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
-import com.example.android.employeesmanagementapp.data.AppDatabase;
-import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
 
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class CompletedTasksFragment extends Fragment implements TasksAdapter.TasksItemClickListener {
 
-    private final String TAG = CompletedTasksFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private TasksAdapter mAdapter;
-    private AppDatabase mDb;
     private LinearLayout emptyView;
     private TextView emptyViewTextView;
     private ImageView emptyViewImageView;
 
-    public CompletedTasksFragment() {
-        // Required empty public constructor
-    }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        ViewModelProviders.of(getActivity()).get(MainViewModel.class).completedTasksList
+                .observe(this, taskEntries -> {
+                    if (taskEntries != null) {
+                        if (taskEntries.isEmpty()) {
+                            showEmptyView();
+                        } else {
+                            mAdapter.submitList(taskEntries);
+                            showRecyclerView();
+                        }
+                    }
+
+                });
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        mDb = AppDatabase.getInstance(getContext());
 
         View view = inflater.inflate(R.layout.fragments_rv, container, false);
 
@@ -65,20 +72,6 @@ public class CompletedTasksFragment extends Fragment implements TasksAdapter.Tas
         mAdapter = new TasksAdapter(getContext(), this, true);
 
         mRecyclerView.setAdapter(mAdapter);
-
-        ViewModelProviders.of(getActivity()).get(MainViewModel.class).completedTasksList
-                .observe(this, new Observer<PagedList<TaskEntry>>() {
-                    @Override
-                    public void onChanged(PagedList<TaskEntry> taskEntries) {
-                        if (taskEntries != null)
-                            if (taskEntries.isEmpty())
-                                showEmptyView();
-                            else {
-                                mAdapter.submitList(taskEntries);
-                                showRecyclerView();
-                            }
-                    }
-                });
 
 
         return view;

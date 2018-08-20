@@ -13,14 +13,10 @@ import android.widget.TextView;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.activities.AddTaskActivity;
 import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
-import com.example.android.employeesmanagementapp.data.AppDatabase;
-import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
 
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,27 +26,28 @@ import androidx.recyclerview.widget.RecyclerView;
  */
 public class RunningTasksFragment extends Fragment implements TasksAdapter.TasksItemClickListener {
 
-    private final String TAG = RunningTasksFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private TasksAdapter mAdapter;
-    private AppDatabase mDb;
     private LinearLayout emptyView;
     private TextView emptyViewTextView;
 
     private ImageView emptyViewImageView;
 
 
-    public RunningTasksFragment() {
-        // Required empty public constructor
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mDb = AppDatabase.getInstance(getContext());
-
-
+        ViewModelProviders.of(getActivity()).get(MainViewModel.class).runningTasksList
+                .observe(this, taskEntries -> {
+                    if (taskEntries != null) {
+                        if (taskEntries.isEmpty()) {
+                            showEmptyView();
+                        } else {
+                            mAdapter.submitList(taskEntries);
+                            showRecyclerView();
+                        }
+                    }
+                });
     }
 
     @Override
@@ -80,22 +77,13 @@ public class RunningTasksFragment extends Fragment implements TasksAdapter.Tasks
 
         mRecyclerView.setAdapter(mAdapter);
 
-        ViewModelProviders.of(getActivity()).get(MainViewModel.class).runningTasksList
-                .observe(this, new Observer<PagedList<TaskEntry>>() {
-                    @Override
-                    public void onChanged(PagedList<TaskEntry> taskEntries) {
-                        if (taskEntries != null)
-                            if (taskEntries.isEmpty())
-                                showEmptyView();
-                            else {
-                                mAdapter.submitList(taskEntries);
-                                showRecyclerView();
-                            }
-                    }
-                });
-
 
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
     }
 
     private void showEmptyView() {

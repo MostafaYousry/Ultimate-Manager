@@ -1,25 +1,9 @@
-todo fix null pointer exception when showing previous date/time for a newly created task/employee/department
-
-todo different icon for each fab location ie(tasks , departments , employees)
-
-icons in add activities
-
-paged list builder
-
-glide placholders -- ?
-
-lock fired employee
-
-load lists when showing splash screen
-
-change app icon
-
-change app name
-
-splashscreen icon animation
-
-see fab icons
+load lists while showing splash screen
 
 notify item removed
+
+clean resources strings ...
+
+comments
 
 todo -----------------T E S T-----------------------------

@@ -1,6 +1,5 @@
 package com.example.android.employeesmanagementapp.activities;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -15,7 +14,6 @@ import android.widget.TextView;
 import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
-import com.example.android.employeesmanagementapp.adapters.EmployeesAdapter;
 import com.example.android.employeesmanagementapp.adapters.HorizontalEmployeeAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
@@ -30,7 +28,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.List;
 
 import androidx.annotation.Nullable;
@@ -43,7 +41,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class AddTaskActivity extends BaseAddActivity implements EmployeesAdapter.EmployeeItemClickListener {
+public class AddTaskActivity extends BaseAddActivity implements HorizontalEmployeeAdapter.HorizontalEmployeeItemClickListener {
 
     public static final String TASK_ID_KEY = "task_id";
     public static final String TASK_IS_COMPLETED_KEY = "task_is_completed";
@@ -108,8 +106,7 @@ public class AddTaskActivity extends BaseAddActivity implements EmployeesAdapter
 
 
         if (!mTaskIsCompleted) {
-            LiveData<List<DepartmentEntry>> departments = mViewModel.allDepartments;
-            departments.observe(this, departmentEntries -> {
+            mViewModel.allDepartments.observe(this, departmentEntries -> {
                 mDepartmentsArrayAdapter.setData(departmentEntries);
                 departmentsLoaded = true;
                 if (clickedTaskDepId != -1) {
@@ -172,62 +169,41 @@ public class AddTaskActivity extends BaseAddActivity implements EmployeesAdapter
 
 
         final LiveData<List<EmployeeEntry>> restOfEmployees = mViewModel.getRestOfEmployeesInDep(depId, exceptThese);
-        restOfEmployees.observe(this, new Observer<List<EmployeeEntry>>() {
-            @Override
-            public void onChanged(final List<EmployeeEntry> employeeEntries) {
-                restOfEmployees.removeObservers(AddTaskActivity.this);
-                if (employeeEntries != null) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(AddTaskActivity.this);
-                    if (employeeEntries.isEmpty()) {
-                        builder.setTitle("Empty department");
-                        builder.setMessage("No employees in department please choose another one");
-                        builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.dismiss();
-                            }
-                        });
-                        builder.show();
+        restOfEmployees.observe(this, employeeEntries -> {
+            restOfEmployees.removeObservers(AddTaskActivity.this);
+            if (employeeEntries != null) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(AddTaskActivity.this);
+                if (employeeEntries.isEmpty()) {
+                    builder.setTitle("Empty department");
+                    builder.setMessage("No employees in department please choose another one");
+                    builder.setPositiveButton("ok", (dialogInterface, i) -> dialogInterface.dismiss());
+                    builder.show();
 
-                    } else {
-                        builder.setTitle("Employees available");
-                        builder.setCancelable(false);
-                        final List<EmployeeEntry> chosenOnes = new ArrayList<>();
+                } else {
+                    builder.setTitle("Employees available");
+                    builder.setCancelable(false);
+                    final List<EmployeeEntry> chosenOnes = new ArrayList<>();
 
-                        final boolean[] isChecked = new boolean[employeeEntries.size()];
+                    final boolean[] isChecked = new boolean[employeeEntries.size()];
 
-                        builder.setMultiChoiceItems(getEmployeeNames(employeeEntries), isChecked, new DialogInterface.OnMultiChoiceClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i, boolean checked) {
-                                isChecked[i] = checked;
+                    builder.setMultiChoiceItems(getEmployeeNames(employeeEntries), isChecked, (dialogInterface, i, checked) -> {
+                        isChecked[i] = checked;
 
-                                if (checked) {
-                                    chosenOnes.add(employeeEntries.get(i));
-                                } else {
-                                    chosenOnes.remove(employeeEntries.get(i));
-                                }
-                            }
-                        });
+                        if (checked) {
+                            chosenOnes.add(employeeEntries.get(i));
+                        } else {
+                            chosenOnes.remove(employeeEntries.get(i));
+                        }
+                    });
 
-                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                mHorizontalEmployeeAdapter.setAddedEmployees(chosenOnes);
-                            }
-                        });
-                        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
+                    builder.setPositiveButton("OK", (dialog, which) -> mHorizontalEmployeeAdapter.setAddedEmployees(chosenOnes));
+                    builder.setNegativeButton("CANCEL", (dialog, which) -> dialog.dismiss());
 
-                        builder.show();
-                    }
-
+                    builder.show();
                 }
 
             }
+
         });
 
     }
@@ -251,18 +227,20 @@ public class AddTaskActivity extends BaseAddActivity implements EmployeesAdapter
         mTaskEmployeesRV.setLayoutManager(layoutManager);
 
         mHorizontalEmployeeAdapter = new HorizontalEmployeeAdapter(this, this, true, mTaskId);
-        mTaskEmployeesRV.setAdapter(mHorizontalEmployeeAdapter);
 
         if (mTaskId != DEFAULT_TASK_ID) {
             mViewModel.taskEmployees.observe(this, mHorizontalEmployeeAdapter::submitList);
         }
+        mTaskEmployeesRV.setAdapter(mHorizontalEmployeeAdapter);
     }
 
     private void clearViews() {
         mTaskTitle.setText("");
         mTaskDescription.setText("");
         mTaskStartDate.setText("");
+        mTaskStartDate.setTag(Calendar.getInstance());
         mTaskDueDate.setText("");
+        mTaskDueDate.setTag(Calendar.getInstance());
         mTaskStartTime.setText("");
         mTaskDueTime.setText("");
         mTaskDepartment.setSelection(0);
@@ -289,17 +267,14 @@ public class AddTaskActivity extends BaseAddActivity implements EmployeesAdapter
 
         clickedTaskDepId = taskEntry.getDepartmentID();
         if (mTaskIsCompleted) {
-            mDb.departmentsDao().loadDepartmentById(clickedTaskDepId).observe(this, new Observer<DepartmentEntry>() {
-                @Override
-                public void onChanged(DepartmentEntry departmentEntry) {
-                    if (departmentEntry != null) {
-                        List<DepartmentEntry> list = new ArrayList<>(1);
-                        list.add(departmentEntry);
-                        mDepartmentsArrayAdapter.setData(list);
-                        mTaskDepartment.setSelection(0);
-                    }
-
+            mDb.departmentsDao().loadDepartmentById(clickedTaskDepId).observe(this, departmentEntry -> {
+                if (departmentEntry != null) {
+                    List<DepartmentEntry> list = new ArrayList<>(1);
+                    list.add(departmentEntry);
+                    mDepartmentsArrayAdapter.setData(list);
+                    mTaskDepartment.setSelection(0);
                 }
+
             });
 
 
@@ -331,17 +306,15 @@ public class AddTaskActivity extends BaseAddActivity implements EmployeesAdapter
         mTaskTitle.setText(taskEntry.getTaskTitle());
         mTaskDescription.setText(taskEntry.getTaskDescription());
 
-        mTaskStartDate.setText(AppUtils.getFriendlyDate(taskEntry.getTaskStartDate()));
+        mTaskStartDate.setText(AppUtils.getFriendlyDate(taskEntry.getTaskStartDate().getTime()));
         mTaskStartDate.setTag(taskEntry.getTaskStartDate());
 
-        mTaskDueDate.setText(AppUtils.getFriendlyDate(taskEntry.getTaskDueDate()));
+        mTaskDueDate.setText(AppUtils.getFriendlyDate(taskEntry.getTaskDueDate().getTime()));
         mTaskDueDate.setTag(taskEntry.getTaskDueDate());
 
-        mTaskStartTime.setText(AppUtils.getFriendlyTime(taskEntry.getTaskStartDate()));
-        mTaskStartTime.setTag(taskEntry.getTaskStartDate());
+        mTaskStartTime.setText(AppUtils.getFriendlyTime(taskEntry.getTaskStartDate().getTime()));
 
-        mTaskDueTime.setText(AppUtils.getFriendlyTime(taskEntry.getTaskDueDate()));
-        mTaskDueTime.setTag(taskEntry.getTaskDueDate());
+        mTaskDueTime.setText(AppUtils.getFriendlyTime(taskEntry.getTaskDueDate().getTime()));
 
 
     }
@@ -391,7 +364,7 @@ public class AddTaskActivity extends BaseAddActivity implements EmployeesAdapter
         super.onStop();
         Intent intent = new Intent(this, NotificationService.class);
         intent.putExtra("task id", mTaskId);
-        intent.putExtra("task due date", AppUtils.getChosenDateAndTime(((Date) mTaskDueDate.getTag()), ((Date) mTaskDueTime.getTag())).getTime() - new Date().getTime());
+        intent.putExtra("task due date", ((Calendar) mTaskDueDate.getTag()).getTime());
         intent.putExtra("app is destroyed", false);
         startService(intent);
 
@@ -434,8 +407,8 @@ public class AddTaskActivity extends BaseAddActivity implements EmployeesAdapter
         if (mTaskTitle.getText().length() > 40) {
             valid = false;
         }
-        Date startDate = (Date) mTaskStartDate.getTag();
-        Date dueDate = (Date) mTaskDueDate.getTag();
+        Calendar startDate = (Calendar) mTaskStartDate.getTag();
+        Calendar dueDate = (Calendar) mTaskDueDate.getTag();
 
 
         if (startDate == null) {
@@ -476,12 +449,7 @@ public class AddTaskActivity extends BaseAddActivity implements EmployeesAdapter
                 case "employees":
                     AlertDialog.Builder builder = new AlertDialog.Builder(AddTaskActivity.this);
                     builder.setMessage("There must be at least one employee assigned to this task.");
-                    builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            dialogInterface.dismiss();
-                        }
-                    });
+                    builder.setPositiveButton("ok", (dialogInterface, i) -> dialogInterface.dismiss());
                     builder.show();
             }
         else
@@ -527,9 +495,10 @@ public class AddTaskActivity extends BaseAddActivity implements EmployeesAdapter
 
 
     @Override
-    public void onEmployeeClick(int employeeRowID, int employeePosition) {
+    public void onEmployeeClick(int employeeRowID, int employeePosition, boolean isFired) {
         Intent intent = new Intent(this, AddEmployeeActivity.class);
         intent.putExtra(AddEmployeeActivity.EMPLOYEE_ID_KEY, employeeRowID);
+        intent.putExtra(AddEmployeeActivity.EMPLOYEE_IS_FIRED, isFired);
         startActivity(intent);
     }
 
@@ -537,8 +506,8 @@ public class AddTaskActivity extends BaseAddActivity implements EmployeesAdapter
         int departmentId = (int) mTaskDepartment.getSelectedView().getTag();
         String taskTitle = mTaskTitle.getText().toString();
         String taskDescription = mTaskDescription.getText().toString();
-        Date taskDueDate = AppUtils.getChosenDateAndTime(((Date) mTaskDueDate.getTag()), ((Date) mTaskDueTime.getTag()));
-        Date taskStartDate = AppUtils.getChosenDateAndTime(((Date) mTaskStartDate.getTag()), ((Date) mTaskStartTime.getTag()));
+        Calendar taskDueDate = (Calendar) mTaskDueDate.getTag();
+        Calendar taskStartDate = (Calendar) mTaskStartDate.getTag();
 
         if (mTaskId == DEFAULT_TASK_ID)
             return new TaskEntry(departmentId, taskTitle, taskDescription, taskStartDate, taskDueDate);
@@ -555,16 +524,16 @@ public class AddTaskActivity extends BaseAddActivity implements EmployeesAdapter
             if (!TextUtils.isEmpty(mTaskDescription.getText()))
                 return true;
 
-            if (mTaskStartDate.getTag() != null)
+            if (!TextUtils.isEmpty(mTaskStartDate.getText()))
                 return true;
 
-            if (mTaskDueDate.getTag() != null)
+            if (!TextUtils.isEmpty(mTaskDueDate.getText()))
                 return true;
 
-            if (mTaskStartTime.getTag() != null)
+            if (!TextUtils.isEmpty(mTaskStartTime.getText()))
                 return true;
 
-            if (mTaskDueTime.getTag() != null)
+            if (!TextUtils.isEmpty(mTaskDueTime.getText()))
                 return true;
 
             if (mTaskDepartment.getSelectedItemPosition() != 0)
@@ -594,4 +563,11 @@ public class AddTaskActivity extends BaseAddActivity implements EmployeesAdapter
         builder.show();
     }
 
+    @Override
+    public void onBackPressed() {
+        if (mTaskIsCompleted)
+            finish();
+        else
+            super.onBackPressed();
+    }
 }

@@ -18,7 +18,7 @@ import com.example.android.employeesmanagementapp.activities.MainActivity;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 
-import java.util.Date;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
@@ -97,16 +97,17 @@ public class NotificationService extends Service {
             AppExecutor.getInstance().diskIO().execute(new Runnable() {
                 @Override
                 public void run() {
-                    List<Date> allTasksDueDate = AppDatabase.getInstance(getApplicationContext()).tasksDao().getAllTasksDueDate();
+                    List<Calendar> allTasksDueDate = AppDatabase.getInstance(getApplicationContext()).tasksDao().getAllTasksDueDate();
                     List<Integer> allTasksId = AppDatabase.getInstance(getApplicationContext()).tasksDao().getAllTasksId();
                     for (int i = 0; i < allTasksDueDate.size(); i++) {
-                        if (allTasksDueDate.get(i).compareTo(new Date()) >= 0) {
+
+                        if (allTasksDueDate.get(i).compareTo(Calendar.getInstance()) >= 0) {
                             mTimer = new Timer();
                             mTaskTimer.put(allTasksId.get(i), mTimer);
                             initializeTimerTask();
                             //mTimer.schedule(mTimerTask, 10000 + i * 1000);
                             Log.i("tasks due date", " task number = " + allTasksId.get(i));
-                            mTimer.schedule(mTimerTask, allTasksDueDate.get(i));
+                            mTimer.schedule(mTimerTask, allTasksDueDate.get(i).getTime());
                         }
                     }
                 }

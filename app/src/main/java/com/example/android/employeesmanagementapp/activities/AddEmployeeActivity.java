@@ -24,20 +24,25 @@ import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.EmployeeWithExtras;
+import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.factories.EmpIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewEmployeeViewModel;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.ViewCompat;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -46,6 +51,9 @@ public class AddEmployeeActivity extends BaseAddActivity implements TasksAdapter
 
     public static final String EMPLOYEE_ID_KEY = "employee_id";
     private static final int DEFAULT_EMPLOYEE_ID = -1;
+    public static final String EMPLOYEE_IS_FIRED = "employee_is_fired";
+    private static final boolean DEFAULT_EMPLOYEE_IS_FIRED = false;
+    private boolean mEmployeeIsFired;
 
     private int mEmployeeId;
     private EmployeeEntry mOldEmployeeEntry;
@@ -63,6 +71,8 @@ public class AddEmployeeActivity extends BaseAddActivity implements TasksAdapter
     private String mEmployeePicturePath = "";
     private RatingBar mEmployeeRating;
     private RecyclerView mEmployeeCompletedTasksRv;
+    private RecyclerView mEmployeeRunningTasksRv;
+
 
     private DepartmentsArrayAdapter mArrayAdapter;
     private CollapsingToolbarLayout mCollapsingToolbar;
@@ -87,6 +97,7 @@ public class AddEmployeeActivity extends BaseAddActivity implements TasksAdapter
         Intent intent = getIntent();
         if (intent != null) {
             mEmployeeId = intent.getIntExtra(EMPLOYEE_ID_KEY, DEFAULT_EMPLOYEE_ID);
+            mEmployeeIsFired = intent.getBooleanExtra(EMPLOYEE_IS_FIRED, DEFAULT_EMPLOYEE_IS_FIRED);
         }
 
         //instantiate AddNewEmployeeViewModel for this employee id
@@ -127,19 +138,24 @@ public class AddEmployeeActivity extends BaseAddActivity implements TasksAdapter
         //create a new departments array adapter for employee department spinner
         mArrayAdapter = new DepartmentsArrayAdapter(this, AppUtils.dpToPx(this, 12), AppUtils.dpToPx(this, 8), 0, AppUtils.dpToPx(this, 8), R.style.detailActivitiesTextStyle);
 
-        mViewModel.allDepartments.observe(this, departmentEntries -> {
-            mArrayAdapter.setData(departmentEntries);
-            departmentsLoaded = true;
-            if (clickedEmployeeDepId != -1) {
-                mEmployeeDepartment.setSelection(mArrayAdapter.getPositionForItemId(clickedEmployeeDepId));
-            }
-        });
+        if (!mEmployeeIsFired) {
+            mViewModel.allDepartments.observe(this, departmentEntries -> {
+                mArrayAdapter.setData(departmentEntries);
+                departmentsLoaded = true;
+                if (clickedEmployeeDepId != -1) {
+                    mEmployeeDepartment.setSelection(mArrayAdapter.getPositionForItemId(clickedEmployeeDepId));
+                }
+            });
+        } else {
+            Snackbar.make(findViewById(R.id.coordinator), "Fired employees are view only", Snackbar.LENGTH_LONG).show();
+        }
 
         //set the adapter
         mEmployeeDepartment.setAdapter(mArrayAdapter);
 
 
         setUpNameET();
+        setUpRunningTasksRV();
         setUpCompletedTasksRV();
 
 
@@ -158,9 +174,33 @@ public class AddEmployeeActivity extends BaseAddActivity implements TasksAdapter
 
     }
 
+    private void setUpRunningTasksRV() {
+        mEmployeeRunningTasksRv = findViewById(R.id.employee_running_tasks_rv);
+        mEmployeeRunningTasksRv.setHasFixedSize(false);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        mEmployeeRunningTasksRv.setLayoutManager(layoutManager);
+
+        final TasksAdapter adapter = new TasksAdapter(this, this, true);
+
+        if (mEmployeeId != DEFAULT_EMPLOYEE_ID)
+            mViewModel.employeeRunningTasks.observe(this, taskEntries -> {
+                if (taskEntries != null && !taskEntries.isEmpty()) {
+                    adapter.submitList(taskEntries);
+                    mEmployeeRunningTasksRv.setVisibility(View.VISIBLE);
+                    findViewById(R.id.imageView9).setVisibility(View.VISIBLE);
+                } else {
+                    mEmployeeRunningTasksRv.setVisibility(View.GONE);
+                    findViewById(R.id.imageView9).setVisibility(View.GONE);
+                }
+            });
+
+        mEmployeeRunningTasksRv.setAdapter(adapter);
+    }
+
     private void setUpCompletedTasksRV() {
-        mEmployeeCompletedTasksRv = findViewById(R.id.employee_tasks_rv);
-        mEmployeeCompletedTasksRv.setHasFixedSize(true);
+        mEmployeeCompletedTasksRv = findViewById(R.id.employee_completed_tasks_rv);
+        mEmployeeCompletedTasksRv.setHasFixedSize(false);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mEmployeeCompletedTasksRv.setLayoutManager(layoutManager);
@@ -168,7 +208,16 @@ public class AddEmployeeActivity extends BaseAddActivity implements TasksAdapter
         final TasksAdapter adapter = new TasksAdapter(this, this, true);
 
         if (mEmployeeId != DEFAULT_EMPLOYEE_ID)
-            mViewModel.employeeCompletedTasks.observe(this, adapter::submitList);
+            mViewModel.employeeCompletedTasks.observe(this, taskEntries -> {
+                if (taskEntries != null && !taskEntries.isEmpty()) {
+                    adapter.submitList(taskEntries);
+                    mEmployeeCompletedTasksRv.setVisibility(View.VISIBLE);
+                    findViewById(R.id.imageView11).setVisibility(View.VISIBLE);
+                } else {
+                    mEmployeeCompletedTasksRv.setVisibility(View.GONE);
+                    findViewById(R.id.imageView11).setVisibility(View.GONE);
+                }
+            });
 
         mEmployeeCompletedTasksRv.setAdapter(adapter);
     }
@@ -218,6 +267,28 @@ public class AddEmployeeActivity extends BaseAddActivity implements TasksAdapter
 
         clickedEmployeeDepId = employeeWithExtras.employeeEntry.getDepartmentId();
 
+        if (mEmployeeIsFired) {
+            mDb.departmentsDao().loadDepartmentById(clickedEmployeeDepId).observe(this, new Observer<DepartmentEntry>() {
+                @Override
+                public void onChanged(DepartmentEntry departmentEntry) {
+                    if (departmentEntry != null) {
+                        List<DepartmentEntry> list = new ArrayList<>(1);
+                        list.add(departmentEntry);
+                        mArrayAdapter.setData(list);
+                        mEmployeeDepartment.setSelection(0);
+                    }
+
+                }
+            });
+
+
+            disableViewClicks();
+        } else {
+            if (departmentsLoaded)
+                mEmployeeDepartment.setSelection(mArrayAdapter.getPositionForItemId(employeeWithExtras.employeeEntry.getDepartmentId()));
+
+        }
+
         mEmployeeFirstName.setText(employeeWithExtras.employeeEntry.getEmployeeFirstName());
         mEmployeeMiddleName.setText(employeeWithExtras.employeeEntry.getEmployeeMiddleName());
         mEmployeeLastName.setText(employeeWithExtras.employeeEntry.getEmployeeLastName());
@@ -230,8 +301,6 @@ public class AddEmployeeActivity extends BaseAddActivity implements TasksAdapter
 
         mCollapsingToolbar.setTitle(employeeWithExtras.employeeEntry.getEmployeeFirstName());
 
-        if (departmentsLoaded)
-            mEmployeeDepartment.setSelection(mArrayAdapter.getPositionForItemId(employeeWithExtras.employeeEntry.getDepartmentId()));
         mEmployeeRating.setRating(employeeWithExtras.employeeRating);
 
         mEmployeePicturePath = employeeWithExtras.employeeEntry.getEmployeeImageUri();
@@ -248,10 +317,34 @@ public class AddEmployeeActivity extends BaseAddActivity implements TasksAdapter
 
     }
 
+    private void disableViewClicks() {
+        mEmployeeImage.setClickable(false);
+        mEmployeeFirstName.setEnabled(false);
+        mEmployeeFirstName.setFocusable(false);
+        mEmployeeMiddleName.setEnabled(false);
+        mEmployeeMiddleName.setFocusable(false);
+        mEmployeeLastName.setEnabled(false);
+        mEmployeeLastName.setFocusable(false);
+        mEmployeeEmail.setEnabled(false);
+        mEmployeeEmail.setFocusable(false);
+        mEmployeePhone.setEnabled(false);
+        mEmployeePhone.setFocusable(false);
+        mEmployeeSalary.setEnabled(false);
+        mEmployeeSalary.setFocusable(false);
+        mEmployeeHireDate.setEnabled(false);
+        mEmployeeHireDate.setFocusable(false);
+        mEmployeeDepartment.setEnabled(false);
+        mEmployeeDepartment.setFocusable(false);
+        mEmployeeNote.setEnabled(false);
+        mEmployeeNote.setFocusable(false);
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_add_employee_activity, menu);
+        if (mEmployeeIsFired)
+            menu.removeItem(R.id.action_save);
         return true;
     }
 
@@ -554,6 +647,14 @@ public class AddEmployeeActivity extends BaseAddActivity implements TasksAdapter
             }
         });
         builder.show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mEmployeeIsFired)
+            finish();
+        else
+            super.onBackPressed();
     }
 
 }
