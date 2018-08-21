@@ -231,7 +231,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
                     else if (indexOfFields == 1)
                         mTaskDates.setText(mContext.getString(R.string.date_one_fields, chosenFields[0]));
 
-
+                    System.out.println(mTaskDates.getText());
                     mTaskDates.setTextColor(mContext.getResources().getColor(R.color.primaryTextColor));
                 }
 

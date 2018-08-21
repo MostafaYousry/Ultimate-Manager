@@ -30,17 +30,12 @@ import androidx.core.app.NotificationManagerCompat;
 public class NotificationService extends Service {
     //we are going to use a mHandler to be able to run in our TimerTask
     private final Handler mHandler = new Handler();
-    private Timer mTimer;
-    private TimerTask mTimerTask;
     private String TAG = "Timers";
     private static int mTasksCount = 0;
-    private int mTaskId;
-    private Long mTaskDueDate;
-    private boolean appIsDestroyed = true;
-    private static HashMap<Integer, Timer> mTaskTimer = new HashMap<>();
 
 
     public NotificationService() {
+
     }
 
     public static void setTasksCount(int tasksCount) {
@@ -56,13 +51,33 @@ public class NotificationService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.e(TAG, "onStartCommand");
         super.onStartCommand(intent, flags, startId);
-        if (intent != null && intent.hasExtra("task id") && intent.hasExtra("task due date")) {
-            mTaskId = intent.getExtras().getInt("task id");
-            mTaskDueDate = intent.getExtras().getLong("task due date");
-            appIsDestroyed = intent.getExtras().getBoolean("app is destroyed");
-        }
-        startTimer();
+        if (intent != null && intent.getExtras().getBoolean("intent is sent from receiver")) sendNotifications();
         return START_STICKY;
+    }
+
+    private void sendNotifications() {
+        createNotificationChannel("22327");
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext(), "22327")
+                .setSmallIcon(R.drawable.ic_task_notification)
+                .setContentTitle(getResources().getText(R.string.app_name))
+                .setContentText(++mTasksCount + " tasks due date are met")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                // Set the intent that will fire when the user taps the notification
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+                .setVisibility(1)
+                .setDefaults(Notification.DEFAULT_ALL); //To control the level of detail visible in the notification from the lock screen
+        if (mTasksCount == 1)
+            mBuilder.setContentText(mTasksCount + " task due date is met");
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
+        // notificationId is a unique int for each notification that you must define
+        notificationManager.notify(22327, mBuilder.build());
+        setBadge(getApplicationContext(), mTasksCount);
     }
 
     @Override
@@ -72,95 +87,7 @@ public class NotificationService extends Service {
 
     @Override
     public void onDestroy() {
-        appIsDestroyed = true;
-        startTimer();
         super.onDestroy();
-    }
-
-    public void startTimer() {
-
-        if (!appIsDestroyed) {
-            if (mTaskTimer.containsKey(mTaskId)) {
-                mTimer = mTaskTimer.get(mTaskId);
-                stopTimerTask();
-                mTaskTimer.remove(mTaskId);
-            }
-            if (mTaskDueDate >= 0) {
-                mTimer = new Timer();
-                mTaskTimer.put(mTaskId, mTimer);
-                initializeTimerTask();
-                //mTimer.schedule(mTimerTask, 10000);
-                mTimer.schedule(mTimerTask, mTaskDueDate);
-            }
-        } else {
-            System.out.println("********************************************finally enter else");
-            AppExecutor.getInstance().diskIO().execute(new Runnable() {
-                @Override
-                public void run() {
-                    List<Date> allTasksDueDate = AppDatabase.getInstance(getApplicationContext()).tasksDao().getAllTasksDueDate();
-                    List<Integer> allTasksId = AppDatabase.getInstance(getApplicationContext()).tasksDao().getAllTasksId();
-                    for (int i = 0; i < allTasksDueDate.size(); i++) {
-                        if (allTasksDueDate.get(i).compareTo(new Date()) >= 0) {
-                            mTimer = new Timer();
-                            mTaskTimer.put(allTasksId.get(i), mTimer);
-                            initializeTimerTask();
-                            //mTimer.schedule(mTimerTask, 10000 + i * 1000);
-                            Log.i("tasks due date", " task number = " + allTasksId.get(i));
-                            mTimer.schedule(mTimerTask, allTasksDueDate.get(i));
-                        }
-                    }
-                }
-            });
-
-        }
-
-        System.out.println("start mTimer");
-    }
-
-    public void stopTimerTask() {
-        //stop the mTimer, if it's not already null
-        if (mTimer != null) {
-            mTimer.cancel();
-            mTimer = null;
-        }
-    }
-
-    public void initializeTimerTask() {
-
-        mTimerTask = new TimerTask() {
-            public void run() {
-
-                //use a mHandler to run a toast that shows the current timestamp
-                final boolean notification = mHandler.post(new Runnable() {
-                    public void run() {
-
-                        createNotificationChannel("22327");
-                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
-
-                        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext(),"22327")
-                                .setSmallIcon(R.drawable.ic_task_notification)
-                                .setContentTitle(getResources().getText(R.string.app_name))
-                                .setContentText(++mTasksCount + " tasks due date are met")
-                                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                                // Set the intent that will fire when the user taps the notification
-                                .setContentIntent(pendingIntent)
-                                .setAutoCancel(true)
-                                .setVisibility(1)
-                                .setDefaults(Notification.DEFAULT_ALL); //To control the level of detail visible in the notification from the lock screen
-                        if (mTasksCount == 1)
-                            mBuilder.setContentText(mTasksCount + " task due date is met");
-
-                        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
-                        // notificationId is a unique int for each notification that you must define
-                        notificationManager.notify(22327, mBuilder.build());
-                        setBadge(getApplicationContext(), mTasksCount);
-
-                    }
-                });
-            }
-        };
     }
 
     private void createNotificationChannel(String CHANNEL_ID) {

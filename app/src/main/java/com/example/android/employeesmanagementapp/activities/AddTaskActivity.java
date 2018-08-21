@@ -1,7 +1,10 @@
 package com.example.android.employeesmanagementapp.activities;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,6 +18,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.example.android.employeesmanagementapp.MyAlarmReceiver;
 import com.example.android.employeesmanagementapp.MyTextWatcher;
 import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
@@ -34,6 +38,7 @@ import com.example.android.employeesmanagementapp.utils.AppUtils;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -385,12 +390,33 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
     @Override
     protected void onStop() {
         super.onStop();
-        Intent intent = new Intent(this, NotificationService.class);
-        intent.putExtra("task id", mTaskId);
-        intent.putExtra("task due date", AppUtils.getChosenDateAndTime(((Date) mTaskDueDate.getTag()), ((Date) mTaskDueTime.getTag())).getTime() - new Date().getTime());
-        intent.putExtra("app is destroyed", false);
-        startService(intent);
+        stopPreviousAlarm();
+        createNewAlarm();
 
+    }
+
+    private void stopPreviousAlarm() {
+        try {
+            Intent intent = new Intent(getApplicationContext(), MyAlarmReceiver.class);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, mTaskId, intent, 0);
+            AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+            alarmManager.cancel(pendingIntent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createNewAlarm() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(AppUtils.getChosenDateAndTime((Date) mTaskDueDate.getTag(), (Date) mTaskDueTime.getTag()));
+        if (calendar.getTime().compareTo(new Date()) >= 0) {
+            Intent intent = new Intent(this, MyAlarmReceiver.class);
+            intent.setClass(this, MyAlarmReceiver.class);
+            intent.putExtra("mobile restart", false);
+            final PendingIntent pIntent = PendingIntent.getBroadcast(this, mTaskId, intent, 0);
+            AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+            alarm.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() - 1000, 0, pIntent);
+        }
     }
 
     @Override
