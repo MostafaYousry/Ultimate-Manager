@@ -14,7 +14,7 @@ import android.widget.TextView;
 import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
-import com.example.android.employeesmanagementapp.adapters.HorizontalEmployeeAdapter;
+import com.example.android.employeesmanagementapp.adapters.HorizontalAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
@@ -41,7 +41,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class AddTaskActivity extends BaseAddActivity implements HorizontalEmployeeAdapter.HorizontalEmployeeItemClickListener {
+public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapter.HorizontalEmployeeItemClickListener {
 
     public static final String TASK_ID_KEY = "task_id";
     public static final String TASK_IS_COMPLETED_KEY = "task_is_completed";
@@ -59,7 +59,7 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalEmploy
     private RecyclerView mTaskEmployeesRV;
     private int mTaskId;
     private TaskEntry mOldTaskEntry;
-    private HorizontalEmployeeAdapter mHorizontalEmployeeAdapter;
+    private HorizontalAdapter mHorizontalEmployeeAdapter;
     private DepartmentsArrayAdapter mDepartmentsArrayAdapter;
     private AppDatabase mDb;
     private AddNewTaskViewModel mViewModel;
@@ -226,11 +226,13 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalEmploy
         layoutManager.setOrientation(RecyclerView.HORIZONTAL);
         mTaskEmployeesRV.setLayoutManager(layoutManager);
 
-        mHorizontalEmployeeAdapter = new HorizontalEmployeeAdapter(this, this, true, mTaskId);
 
         if (mTaskId != DEFAULT_TASK_ID) {
+            mHorizontalEmployeeAdapter = new HorizontalAdapter(this, true, true, mTaskId, this);
             mViewModel.taskEmployees.observe(this, mHorizontalEmployeeAdapter::submitList);
-        }
+        } else
+            mHorizontalEmployeeAdapter = new HorizontalAdapter(this, false, true, mTaskId, this);
+
         mTaskEmployeesRV.setAdapter(mHorizontalEmployeeAdapter);
     }
 
@@ -407,18 +409,16 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalEmploy
         if (mTaskTitle.getText().length() > 40) {
             valid = false;
         }
-        Calendar startDate = (Calendar) mTaskStartDate.getTag();
-        Calendar dueDate = (Calendar) mTaskDueDate.getTag();
 
 
-        if (startDate == null) {
+        if (TextUtils.isEmpty(mTaskStartDate.getText())) {
             updateErrorVisibility("startDate", true);
             valid = false;
         } else {
             updateErrorVisibility("startDate", false);
         }
 
-        if (dueDate == null) {
+        if (TextUtils.isEmpty(mTaskDueDate.getText())) {
             updateErrorVisibility("dueDate", true);
             valid = false;
         } else {
@@ -480,15 +480,16 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalEmploy
                 }
             });
 
-
-            final List<EmployeeEntry> addedEmployees = mHorizontalEmployeeAdapter.getAddedEmployees();
-            if (addedEmployees != null && !addedEmployees.isEmpty())
-                AppExecutor.getInstance().diskIO().execute(() -> {
-                    for (int i = 0; i < addedEmployees.size(); i++) {
-                        EmployeesTasksEntry newEmployeeTask = new EmployeesTasksEntry(addedEmployees.get(i).getEmployeeID(), mTaskId);
-                        mDb.employeesTasksDao().addEmployeeTask(newEmployeeTask);
-                    }
-                });
+            if (mTaskId == DEFAULT_TASK_ID) {
+                final List<EmployeeEntry> addedEmployees = mHorizontalEmployeeAdapter.getAddedEmployees();
+                if (!addedEmployees.isEmpty())
+                    AppExecutor.getInstance().diskIO().execute(() -> {
+                        for (int i = 0; i < addedEmployees.size(); i++) {
+                            EmployeesTasksEntry newEmployeeTask = new EmployeesTasksEntry(addedEmployees.get(i).getEmployeeID(), mTaskId);
+                            mDb.employeesTasksDao().addEmployeeTask(newEmployeeTask);
+                        }
+                    });
+            }
             finish();
         }
     }
@@ -538,29 +539,14 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalEmploy
 
             if (mTaskDepartment.getSelectedItemPosition() != 0)
                 return true;
+
+            if (mHorizontalEmployeeAdapter.didChangeOccur())
+                return true;
         } else
             return !mOldTaskEntry.equals(getTaskEntry()) || mHorizontalEmployeeAdapter.didChangeOccur();
 
 
         return false;
-    }
-
-    @Override
-    protected void showDiscardChangesDialog() {
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Discard changes");
-        builder.setMessage("All changes will be discarded.");
-        builder.setNegativeButton("DISCARD", (dialogInterface, i) -> {
-            dialogInterface.dismiss();
-            finish();
-        });
-
-        builder.setPositiveButton("SAVE", (dialogInterface, i) -> {
-            save();
-            dialogInterface.dismiss();
-        });
-        builder.show();
     }
 
     @Override

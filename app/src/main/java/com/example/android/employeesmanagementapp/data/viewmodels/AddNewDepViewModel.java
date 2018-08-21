@@ -21,9 +21,14 @@ public class AddNewDepViewModel extends ViewModel {
         if (depId > 0) {
             departmentEntry = database.departmentsDao().loadDepartmentById(depId);
 
-            departmentEmployees = new LivePagedListBuilder<>(database.employeesDao().loadEmployeesInDep(depId), /* page size */ 20).build();
-            departmentCompletedTasks = new LivePagedListBuilder<>(database.tasksDao().loadTasksForDepartment(depId, true), /* page size */ 20).build();
-            departmentRunningTasks = new LivePagedListBuilder<>(database.tasksDao().loadTasksForDepartment(depId, false), /* page size */ 20).build();
+            PagedList.Config config = new PagedList.Config.Builder()
+                    .setPrefetchDistance(50)
+                    .setPageSize(10)
+                    .build();
+
+            departmentEmployees = new LivePagedListBuilder<>(database.employeesDao().loadEmployeesInDep(depId), config).build();
+            departmentCompletedTasks = new LivePagedListBuilder<>(database.tasksDao().loadTasksForDepartment(depId, true), config).build();
+            departmentRunningTasks = new LivePagedListBuilder<>(database.tasksDao().loadTasksForDepartment(depId, false), config).build();
         }
     }
 

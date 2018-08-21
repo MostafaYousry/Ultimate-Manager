@@ -1,6 +1,6 @@
 package com.example.android.employeesmanagementapp.data.entries;
 
-import java.util.Date;
+import java.util.Calendar;
 import java.util.Objects;
 
 import androidx.room.ColumnInfo;
@@ -40,7 +40,7 @@ public class EmployeeEntry {
     private float employeeSalary;
 
     @ColumnInfo(name = "employee_hire_date")
-    private Date employeeHireDate;
+    private Calendar employeeHireDate;
 
     @ColumnInfo(name = "employee_image_uri")
     private String employeeImageUri;
@@ -63,7 +63,7 @@ public class EmployeeEntry {
 
     //used when creating new EmployeeWithExtras object
     @Ignore
-    public EmployeeEntry(int departmentId, String employeeFirstName, String employeeMiddleName, String employeeLastName, float employeeSalary, Date employeeHireDate, String employeeEmail, String employeePhone, String employeeNote, String employeeImageUri) {
+    public EmployeeEntry(int departmentId, String employeeFirstName, String employeeMiddleName, String employeeLastName, float employeeSalary, Calendar employeeHireDate, String employeeEmail, String employeePhone, String employeeNote, String employeeImageUri) {
         this.departmentId = departmentId;
         this.employeeFirstName = employeeFirstName;
         this.employeeMiddleName = employeeMiddleName;
@@ -77,7 +77,7 @@ public class EmployeeEntry {
     }
 
     //used by room when reading from database
-    public EmployeeEntry(int employeeID, int departmentId, String employeeFirstName, String employeeMiddleName, String employeeLastName, float employeeSalary, Date employeeHireDate, String employeeEmail, String employeePhone, String employeeNote, String employeeImageUri, boolean employeeIsDeleted) {
+    public EmployeeEntry(int employeeID, int departmentId, String employeeFirstName, String employeeMiddleName, String employeeLastName, float employeeSalary, Calendar employeeHireDate, String employeeEmail, String employeePhone, String employeeNote, String employeeImageUri, boolean employeeIsDeleted) {
         this.employeeID = employeeID;
         this.departmentId = departmentId;
         this.employeeFirstName = employeeFirstName;
@@ -144,11 +144,11 @@ public class EmployeeEntry {
         this.employeeSalary = employeeSalary;
     }
 
-    public Date getEmployeeHireDate() {
+    public Calendar getEmployeeHireDate() {
         return employeeHireDate;
     }
 
-    public void setEmployeeHireDate(Date employeeHireDate) {
+    public void setEmployeeHireDate(Calendar employeeHireDate) {
         this.employeeHireDate = employeeHireDate;
     }
 

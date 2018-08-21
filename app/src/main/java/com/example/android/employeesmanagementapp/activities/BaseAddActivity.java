@@ -35,7 +35,22 @@ public abstract class BaseAddActivity extends AppCompatActivity {
 
     protected abstract boolean fieldsChanged();
 
-    protected abstract void showDiscardChangesDialog();
+    protected void showDiscardChangesDialog() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Discard changes");
+        builder.setMessage("All changes will be discarded.");
+        builder.setNegativeButton("DISCARD", (dialogInterface, i) -> {
+            dialogInterface.dismiss();
+            finish();
+        });
+
+        builder.setPositiveButton("SAVE", (dialogInterface, i) -> {
+            save();
+            dialogInterface.dismiss();
+        });
+        builder.show();
+    }
 
     @Override
     public void onBackPressed() {

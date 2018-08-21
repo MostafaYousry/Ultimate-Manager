@@ -28,8 +28,13 @@ public class AddNewEmployeeViewModel extends ViewModel {
 
             employeeEntry = database.employeesDao().loadEmployeeById(empID);
 
-            employeeCompletedTasks = new LivePagedListBuilder<>(database.tasksDao().loadTasksForEmployee(empID, true), /* page size */ 20).build();
-            employeeRunningTasks = new LivePagedListBuilder<>(database.tasksDao().loadTasksForEmployee(empID, false), /* page size */ 20).build();
+            PagedList.Config config = new PagedList.Config.Builder()
+                    .setPrefetchDistance(50)
+                    .setPageSize(10)
+                    .build();
+
+            employeeCompletedTasks = new LivePagedListBuilder<>(database.tasksDao().loadTasksForEmployee(empID, true), config).build();
+            employeeRunningTasks = new LivePagedListBuilder<>(database.tasksDao().loadTasksForEmployee(empID, false), config).build();
 
 
         }

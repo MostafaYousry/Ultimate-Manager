@@ -32,7 +32,12 @@ public class AddNewTaskViewModel extends ViewModel {
         if (taskId != -1) {
             taskEntry = appDatabase.tasksDao().loadTaskById(taskId);
 
-            taskEmployees = new LivePagedListBuilder<>(appDatabase.employeesTasksDao().getEmployeesForTask(taskId), /* page size */ 20).build();
+            PagedList.Config config = new PagedList.Config.Builder()
+                    .setPrefetchDistance(50)
+                    .setPageSize(10)
+                    .build();
+
+            taskEmployees = new LivePagedListBuilder<>(appDatabase.employeesTasksDao().getEmployeesForTask(taskId), config).build();
         }
 
     }

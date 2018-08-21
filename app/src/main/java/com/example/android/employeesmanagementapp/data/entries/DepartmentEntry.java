@@ -1,6 +1,6 @@
 package com.example.android.employeesmanagementapp.data.entries;
 
-import java.util.Date;
+import java.util.Calendar;
 import java.util.Objects;
 
 import androidx.annotation.NonNull;
@@ -27,7 +27,7 @@ public class DepartmentEntry {
 
     @NonNull
     @ColumnInfo(name = "department_date_created")
-    private Date departmentDateCreated;
+    private Calendar departmentDateCreated;
 
     @ColumnInfo(name = "department_image_uri")
     private String departmentImageUri;
@@ -38,7 +38,7 @@ public class DepartmentEntry {
 
     //used when creating new DepartmentEntry object
     @Ignore
-    public DepartmentEntry(String departmentName, Date departmentDateCreated, String departmentImageUri) {
+    public DepartmentEntry(String departmentName, Calendar departmentDateCreated, String departmentImageUri) {
         this.departmentName = departmentName;
         this.departmentDateCreated = departmentDateCreated;
         this.departmentImageUri = departmentImageUri;
@@ -51,7 +51,7 @@ public class DepartmentEntry {
     }
 
     //used by room when reading from database
-    public DepartmentEntry(int departmentId, String departmentName, Date departmentDateCreated, String departmentImageUri, boolean departmentIsDeleted) {
+    public DepartmentEntry(int departmentId, String departmentName, Calendar departmentDateCreated, String departmentImageUri, boolean departmentIsDeleted) {
         this.departmentId = departmentId;
         this.departmentName = departmentName;
         this.departmentDateCreated = departmentDateCreated;
@@ -76,7 +76,7 @@ public class DepartmentEntry {
         this.departmentName = departmentName;
     }
 
-    public Date getDepartmentDateCreated() {
+    public Calendar getDepartmentDateCreated() {
         return departmentDateCreated;
     }
 

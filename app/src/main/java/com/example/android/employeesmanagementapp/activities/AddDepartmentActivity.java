@@ -1,6 +1,5 @@
 package com.example.android.employeesmanagementapp.activities;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,7 +12,7 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.example.android.employeesmanagementapp.R;
-import com.example.android.employeesmanagementapp.adapters.HorizontalEmployeeAdapter;
+import com.example.android.employeesmanagementapp.adapters.HorizontalAdapter;
 import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
@@ -27,9 +26,8 @@ import com.example.android.employeesmanagementapp.utils.ColorUtils;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.util.Date;
+import java.util.Calendar;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.ViewCompat;
@@ -41,7 +39,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
-public class AddDepartmentActivity extends BaseAddActivity implements HorizontalEmployeeAdapter.HorizontalEmployeeItemClickListener, TasksAdapter.TasksItemClickListener {
+public class AddDepartmentActivity extends BaseAddActivity implements HorizontalAdapter.HorizontalEmployeeItemClickListener, TasksAdapter.TasksItemClickListener {
 
     public static final String DEPARTMENT_ID_KEY = "department_id";
     private static final int DEFAULT_DEPARTMENT_ID = -1;
@@ -87,12 +85,7 @@ public class AddDepartmentActivity extends BaseAddActivity implements Horizontal
         mDepCompletedTasksRV = findViewById(R.id.department_completed_tasks_rv);
         mCollapsingToolbar = findViewById(R.id.collapsing_toolbar);
 
-        mDepartmentImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showPhotoCameraDialog();
-            }
-        });
+        mDepartmentImage.setOnClickListener(view -> showPhotoCameraDialog());
 
         //set toolbar as actionbar
         Toolbar mToolbar = findViewById(R.id.toolbar);
@@ -124,13 +117,6 @@ public class AddDepartmentActivity extends BaseAddActivity implements Horizontal
             ViewCompat.setNestedScrollingEnabled(mDepRunningTasksRV, false);
 
         }
-
-        mDepartmentDateCreated.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                pickDate(view);
-            }
-        });
 
     }
 
@@ -164,7 +150,7 @@ public class AddDepartmentActivity extends BaseAddActivity implements Horizontal
         layoutManager.setOrientation(RecyclerView.HORIZONTAL);
         mDepEmployeesRV.setLayoutManager(layoutManager);
 
-        final HorizontalEmployeeAdapter adapter = new HorizontalEmployeeAdapter(this, this, false);
+        final HorizontalAdapter adapter = new HorizontalAdapter(this, true, false, 0, this);
         mDepEmployeesRV.setAdapter(adapter);
 
 
@@ -256,7 +242,7 @@ public class AddDepartmentActivity extends BaseAddActivity implements Horizontal
                     .into(mDepartmentImage);
         }
 
-        mDepartmentDateCreated.setText(AppUtils.getFriendlyDate(departmentEntry.getDepartmentDateCreated()));
+        mDepartmentDateCreated.setText(AppUtils.getFriendlyDate(departmentEntry.getDepartmentDateCreated().getTime()));
         mDepartmentDateCreated.setTag(departmentEntry.getDepartmentDateCreated());
     }
 
@@ -298,7 +284,7 @@ public class AddDepartmentActivity extends BaseAddActivity implements Horizontal
 
     private DepartmentEntry getDepartmentEntry() {
         String departmentName = mDepartmentName.getText().toString();
-        Date departmentCreatedDate = (Date) mDepartmentDateCreated.getTag();
+        Calendar departmentCreatedDate = (Calendar) mDepartmentDateCreated.getTag();
 
         if (mDepartmentId == DEFAULT_DEPARTMENT_ID)
             return new DepartmentEntry(departmentName, departmentCreatedDate, mDepartmentPicturePath);
@@ -406,30 +392,6 @@ public class AddDepartmentActivity extends BaseAddActivity implements Horizontal
 
 
         return false;
-    }
-
-    @Override
-    protected void showDiscardChangesDialog() {
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Discard changes");
-        builder.setMessage("All changes will be discarded.");
-        builder.setNegativeButton("DISCARD", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-                finish();
-            }
-        });
-
-        builder.setPositiveButton("SAVE", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                save();
-                dialogInterface.dismiss();
-            }
-        });
-        builder.show();
     }
 
 }

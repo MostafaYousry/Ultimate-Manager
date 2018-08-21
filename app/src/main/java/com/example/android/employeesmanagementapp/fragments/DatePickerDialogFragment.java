@@ -53,10 +53,12 @@ public class DatePickerDialogFragment extends DialogFragment implements DatePick
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
         TextView textView = (TextView) mViewToShowDateIn;
 
-        mCalendar.set(year, month, dayOfMonth);
+        Calendar calendar = (Calendar) mCalendar.clone();
 
-        textView.setText(AppUtils.getFriendlyDate(mCalendar.getTime()));
-        textView.setTag(mCalendar);
+        calendar.set(year, month, dayOfMonth);
+
+        textView.setText(AppUtils.getFriendlyDate(calendar.getTime()));
+        textView.setTag(calendar);
     }
 
 }

@@ -34,7 +34,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.List;
 
 import androidx.appcompat.app.AlertDialog;
@@ -172,13 +172,6 @@ public class AddEmployeeActivity extends BaseAddActivity implements TasksAdapter
 
         ViewCompat.setNestedScrollingEnabled(mEmployeeCompletedTasksRv, false);
 
-        mEmployeeHireDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                pickDate(view);
-            }
-        });
-
     }
 
     private void setUpRunningTasksRV() {
@@ -303,7 +296,7 @@ public class AddEmployeeActivity extends BaseAddActivity implements TasksAdapter
         mEmployeeNote.setText(employeeWithExtras.employeeEntry.getEmployeeNote());
         mEmployeeEmail.setText(employeeWithExtras.employeeEntry.getEmployeeEmail());
         mEmployeeSalary.setText(String.valueOf(employeeWithExtras.employeeEntry.getEmployeeSalary()));
-        mEmployeeHireDate.setText(AppUtils.getFriendlyDate(employeeWithExtras.employeeEntry.getEmployeeHireDate()));
+        mEmployeeHireDate.setText(AppUtils.getFriendlyDate(employeeWithExtras.employeeEntry.getEmployeeHireDate().getTime()));
         mEmployeeHireDate.setTag(employeeWithExtras.employeeEntry.getEmployeeHireDate());
 
         mCollapsingToolbar.setTitle(employeeWithExtras.employeeEntry.getEmployeeFirstName());
@@ -403,7 +396,7 @@ public class AddEmployeeActivity extends BaseAddActivity implements TasksAdapter
         String employeeEmail = mEmployeeEmail.getText().toString();
         String employeePhone = mEmployeePhone.getText().toString();
         String employeeNote = mEmployeeNote.getText().toString();
-        Date employeeHireDate = (Date) mEmployeeHireDate.getTag();
+        Calendar employeeHireDate = (Calendar) mEmployeeHireDate.getTag();
         int departmentId = (int) mEmployeeDepartment.getSelectedView().getTag();
 
         if (mEmployeeId == DEFAULT_EMPLOYEE_ID)
@@ -632,29 +625,6 @@ public class AddEmployeeActivity extends BaseAddActivity implements TasksAdapter
         return false;
     }
 
-    @Override
-    protected void showDiscardChangesDialog() {
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Discard changes");
-        builder.setMessage("All changes will be discarded.");
-        builder.setNegativeButton("DISCARD", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-                finish();
-            }
-        });
-
-        builder.setPositiveButton("SAVE", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                save();
-                dialogInterface.dismiss();
-            }
-        });
-        builder.show();
-    }
 
     @Override
     public void onBackPressed() {

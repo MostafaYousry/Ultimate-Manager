@@ -1,7 +1,5 @@
 load lists while showing splash screen
 
-notify item removed
-
 clean resources strings ...
 
 comments

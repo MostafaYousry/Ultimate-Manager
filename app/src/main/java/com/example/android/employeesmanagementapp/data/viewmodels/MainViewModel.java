@@ -36,7 +36,6 @@ public class MainViewModel extends AndroidViewModel {
         AppDatabase db = AppDatabase.getInstance(application.getApplicationContext());
 
         PagedList.Config config = new PagedList.Config.Builder()
-                .setEnablePlaceholders(true)
                 .setPrefetchDistance(50)
                 .setPageSize(10)
                 .build();
