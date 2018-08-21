@@ -126,5 +126,6 @@
     <string name="date_three_fields">%s %s %s remaining</string>
     <string name="date_two_fields">%s %s remaining</string>
     <string name="date_one_fields">%s remaining</string>
+    <string name="toolbar_add_department">Add department</string>
 
 </resources>
