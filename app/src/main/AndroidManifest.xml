@@ -85,15 +85,6 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
-        <!--<receiver-->
-        <!--android:name=".BootUpReceiver"-->
-        <!--android:enabled="true">-->
-        <!--<intent-filter>-->
-        <!--<action android:name="android.intent.action.BOOT_COMPLETED" />-->
-        <!--<category android:name="android.intent.category.DEFAULT" />-->
-        <!--</intent-filter>-->
-        <!--</receiver>-->
-
         <receiver
             android:name=".MyAlarmReceiver"
             android:enabled="true"

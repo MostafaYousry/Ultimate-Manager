@@ -413,7 +413,6 @@ public class AddTaskActivity extends AppCompatActivity implements EmployeesAdapt
         if (calendar.getTime().compareTo(new Date()) >= 0) {
             Intent intent = new Intent(this, MyAlarmReceiver.class);
             intent.setClass(this, MyAlarmReceiver.class);
-            intent.putExtra("mobile restart", false);
             final PendingIntent pIntent = PendingIntent.getBroadcast(this, mTaskId, intent, 0);
             AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
