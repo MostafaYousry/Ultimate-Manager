@@ -139,9 +139,11 @@ public final class AppUtils {
             timeCalendar.setTime(chosenTime);
             dateAndTimeCalender.set(Calendar.HOUR_OF_DAY, timeCalendar.get(Calendar.HOUR_OF_DAY));
             dateAndTimeCalender.set(Calendar.MINUTE, timeCalendar.get(Calendar.MINUTE));
+            dateAndTimeCalender.set(Calendar.SECOND,0);
         } else {
             dateAndTimeCalender.set(Calendar.HOUR_OF_DAY, 0);
             dateAndTimeCalender.set(Calendar.MINUTE, 0);
+            dateAndTimeCalender.set(Calendar.SECOND,0);
         }
 
         return dateAndTimeCalender.getTime();

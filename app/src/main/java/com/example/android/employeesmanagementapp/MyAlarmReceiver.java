@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
@@ -22,20 +23,19 @@ public class MyAlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context, Intent intent) {
         System.out.println(intent.getAction());
-        if("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
+        if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
             System.out.println("*********************** restart");
             AppExecutor.getInstance().diskIO().execute(new Runnable() {
                 @Override
                 public void run() {
                     allTasksId = AppDatabase.getInstance(context).tasksDao().getAllTasksId();
-                    allTasksDate= AppDatabase.getInstance(context).tasksDao().getAllTasksDueDate();
+                    allTasksDate = AppDatabase.getInstance(context).tasksDao().getAllTasksDueDate();
                     stopPreviousAlarm(context);
                     createNewAlarm(context);
                 }
             });
 
-        }
-        else {
+        } else {
             System.out.println(intent.getExtras().getInt("task id"));
             System.out.println("*********************** not restart");
             Intent serviceIntent = new Intent(context, NotificationService.class);
@@ -45,18 +45,21 @@ public class MyAlarmReceiver extends BroadcastReceiver {
     }
 
     private void createNewAlarm(Context context) {
-        for (int i = 0;i < allTasksId.size(); i++) {
+        for (int i = 0; i < allTasksId.size(); i++) {
             System.out.println(allTasksDate.get(i).compareTo(new Date()));
-            if (allTasksDate.get(i).compareTo(new Date()) >= - 100 * 1000) {
+            if (allTasksDate.get(i).getTime() - new Date().getTime() >= -60 * 1000) {
                 System.out.println("************************ task id = " + allTasksId.get(i));
                 System.out.println("ok will restart");
                 Intent intent = new Intent(context, MyAlarmReceiver.class);
-                intent.putExtra("task id",allTasksId.get(i));
+                intent.putExtra("task id", allTasksId.get(i));
                 final PendingIntent pIntent = PendingIntent.getBroadcast(context, allTasksId.get(i), intent, 0);
                 AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(allTasksDate.get(i));
-                alarm.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 0, pIntent);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    alarm.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pIntent);
+                } else
+                    alarm.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 0, pIntent);
             }
         }
     }
