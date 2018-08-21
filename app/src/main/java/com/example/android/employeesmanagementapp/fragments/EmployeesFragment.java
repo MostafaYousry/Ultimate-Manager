@@ -1,7 +1,6 @@
 package com.example.android.employeesmanagementapp.fragments;
 
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -26,16 +25,12 @@ import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import org.w3c.dom.Text;
-
 import java.util.List;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -46,7 +41,6 @@ import androidx.recyclerview.widget.RecyclerView;
  */
 public class EmployeesFragment extends Fragment implements EmployeesAdapter.EmployeeItemClickListener, EmployeesAdapter.EmployeeSelectedStateListener {
 
-    public static final String TAG = EmployeesFragment.class.getSimpleName();
 
     private RecyclerView mRecyclerView;
     private EmployeesAdapter mEmployeesAdapter;
@@ -64,11 +58,22 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
     private FloatingActionButton mActivityFab;
     private boolean selectOptionPressed;
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDb = AppDatabase.getInstance(getContext());
+
+        ViewModelProviders.of(getActivity()).get(MainViewModel.class).employeesWithExtrasList
+                .observe(this, employeeWithExtras -> {
+                    if (employeeWithExtras != null) {
+                        if (employeeWithExtras.isEmpty()) {
+                            showEmptyView();
+                        } else {
+                            mEmployeesAdapter.submitList(employeeWithExtras);
+                            showRecyclerView();
+                        }
+                    }
+                });
 
         setHasOptionsMenu(true);
     }
@@ -131,29 +136,9 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
         //create object of EmployeesAdapter and send data
         mEmployeesAdapter = new EmployeesAdapter(getContext(), this, this);
 
-        final MainViewModel mainViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
-
-        final LiveData<List<EmployeeWithExtras>> employeesList = mainViewModel.getEmployeesWithExtrasList();
-        employeesList.observe(this, new Observer<List<EmployeeWithExtras>>() {
-            @Override
-            public void onChanged(List<EmployeeWithExtras> employeeEntries) {
-                if (employeeEntries != null) {
-                    if (employeeEntries.isEmpty())
-                        showEmptyView();
-                    else {
-                        mEmployeesAdapter.setData(employeeEntries);
-                        showRecyclerView();
-                    }
-
-                }
-            }
-        });
-
 
         //set the employee recycler view adapter
         mRecyclerView.setAdapter(mEmployeesAdapter);
-
-
 
 
     }
@@ -230,53 +215,31 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
         builder.setTitle(getString(R.string.title_dialog_delete_employees));
         builder.setMessage(getString(R.string.message_dialog_delete_employees));
 
-        builder.setPositiveButton(getString(R.string.delete_employees), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(getString(R.string.delete_employees), (dialog, which) -> AppExecutor.getInstance().diskIO().execute(() -> {
 
-            @Override
-            public void onClick(final DialogInterface dialog, int which) {
-                AppExecutor.getInstance().diskIO().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        for (EmployeeWithExtras employeeWithExtras : mEmployeesAdapter.getSelectedOnes()) {
+            for (EmployeeWithExtras employeeWithExtras : mEmployeesAdapter.getSelectedOnes()) {
 
-                            int empID = employeeWithExtras.employeeEntry.getEmployeeID();
+                int empID = employeeWithExtras.employeeEntry.getEmployeeID();
 
-                            if (employeeWithExtras.employeeNumRunningTasks == 0 && mDb.employeesTasksDao().getNumCompletedTasksEmployee(empID) > 0) {
-                                mDb.employeesDao().deleteEmployee(empID);
-                            } else if (employeeWithExtras.employeeNumRunningTasks > 0 && mDb.employeesTasksDao().getNumCompletedTasksEmployee(empID) == 0) {
-                                mDb.employeesTasksDao().deleteEmployeeJoinRecords(empID);
-                                mDb.employeesDao().deleteEmployee(employeeWithExtras.employeeEntry);
-                            } else if (employeeWithExtras.employeeNumRunningTasks > 0 && mDb.employeesTasksDao().getNumCompletedTasksEmployee(empID) > 0) {
-                                mDb.employeesTasksDao().deleteEmployeeFromRunningTasks(empID);
-                                mDb.employeesDao().deleteEmployee(empID);
-                            } else {
-                                mDb.employeesDao().deleteEmployee(employeeWithExtras.employeeEntry);
-                            }
-
-                        }
-
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                abortMultiSelection();
-                            }
-                        });
-                            mDb.tasksDao().deleteEmptyTasks();
-
-                    }
-
-                });
-
+                if (employeeWithExtras.employeeNumRunningTasks == 0 && mDb.employeesTasksDao().getNumCompletedTasksEmployee(empID) > 0) {
+                    mDb.employeesDao().deleteEmployee(empID);
+                } else if (employeeWithExtras.employeeNumRunningTasks > 0 && mDb.employeesTasksDao().getNumCompletedTasksEmployee(empID) == 0) {
+                    mDb.employeesTasksDao().deleteEmployeeJoinRecords(empID);
+                    mDb.employeesDao().deleteEmployee(employeeWithExtras.employeeEntry);
+                } else if (employeeWithExtras.employeeNumRunningTasks > 0 && mDb.employeesTasksDao().getNumCompletedTasksEmployee(empID) > 0) {
+                    mDb.employeesTasksDao().deleteEmployeeFromRunningTasks(empID);
+                    mDb.employeesDao().deleteEmployee(empID);
+                } else {
+                    mDb.employeesDao().deleteEmployee(employeeWithExtras.employeeEntry);
+                }
 
             }
-        });
-        builder.setNegativeButton(getString(R.string.cancel_delete_employee), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
 
-            }
-        });
+            getActivity().runOnUiThread(() -> abortMultiSelection());
+            mDb.tasksDao().deleteEmptyTasks();
+
+        }));
+        builder.setNegativeButton(getString(R.string.cancel_delete_employee), (dialog, which) -> dialog.dismiss());
 
         builder.show();
     }
@@ -284,47 +247,34 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
     private void showChooseDepDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(getString(R.string.choose_department_dialog_title));
+//        builder.setMessage("selected employees will be removed from their assigned running task , completed tasks will not be affected.");
 
         final DepartmentsArrayAdapter departmentsArrayAdapter = new DepartmentsArrayAdapter(getActivity(), AppUtils.dpToPx(getActivity(), 24), AppUtils.dpToPx(getActivity(), 8), AppUtils.dpToPx(getActivity(), 0), AppUtils.dpToPx(getActivity(), 8), R.style.mainTextStyle);
 
-        final LiveData<List<DepartmentEntry>> departments = ViewModelProviders.of(getActivity()).get(MainViewModel.class).getAllDepartmentsList();
-        departments.observe(this, new Observer<List<DepartmentEntry>>() {
-            @Override
-            public void onChanged(List<DepartmentEntry> departmentEntries) {
-                departments.removeObservers(getActivity());
-                departmentsArrayAdapter.setData(departmentEntries);
-            }
+
+        final LiveData<List<DepartmentEntry>> departments = mDb.departmentsDao().loadDepartments();
+        departments.observe(this, departmentEntries -> {
+            departments.removeObservers(getActivity());
+            departmentsArrayAdapter.setData(departmentEntries);
         });
 
-        builder.setSingleChoiceItems(departmentsArrayAdapter, 0, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, final int i) {
-                AppExecutor.getInstance().diskIO().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        int selectedDepartmentId = departmentsArrayAdapter.getDepId(i);
-                        for (EmployeeWithExtras employeeWithExtras : mEmployeesAdapter.getSelectedOnes()) {
-                            employeeWithExtras.employeeEntry.setDepartmentId(selectedDepartmentId);
-                            mDb.employeesDao().updateEmployee(employeeWithExtras.employeeEntry);
-                        }
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                abortMultiSelection();
-                            }
-                        });
-                    }
-                });
-                dialogInterface.dismiss();
-            }
+        builder.setSingleChoiceItems(departmentsArrayAdapter, 0, (dialogInterface, i) -> {
+            AppExecutor.getInstance().diskIO().execute(() -> {
+                int selectedDepartmentId = departmentsArrayAdapter.getDepId(i);
+                for (EmployeeWithExtras employeeWithExtras : mEmployeesAdapter.getSelectedOnes()) {
+                    mDb.employeesTasksDao().deleteEmployeeFromRunningTasks(employeeWithExtras.employeeEntry.getEmployeeID());
+                    employeeWithExtras.employeeEntry.setDepartmentId(selectedDepartmentId);
+                    mDb.employeesDao().updateEmployee(employeeWithExtras.employeeEntry);
+                }
+
+                mDb.tasksDao().deleteEmptyTasks();
+
+                getActivity().runOnUiThread(() -> abortMultiSelection());
+            });
+            dialogInterface.dismiss();
         });
 
-        builder.setNegativeButton(getString(R.string.choose_department_dialog_cancel_button), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+        builder.setNegativeButton(getString(R.string.choose_department_dialog_cancel_button), (dialog, which) -> dialog.dismiss());
 
         builder.show();
     }
@@ -349,7 +299,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
         mIsInMultiSelectMode = false;
         getActivity().invalidateOptionsMenu();
         mActivityToolBar.setNavigationIcon(null);
-        mActivityToolBarText.setText("Employees");
+        mActivityToolBarText.setText(getString(R.string.employees));
         mActivityFab.show();
     }
 
@@ -359,7 +309,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
             selectOptionPressed = false;
             getActivity().invalidateOptionsMenu();
         }
-        mActivityToolBarText.setText(String.valueOf(numSelected)+" Employees");
+        mActivityToolBarText.setText(String.valueOf(numSelected));
     }
 
 

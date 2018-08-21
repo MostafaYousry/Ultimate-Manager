@@ -1,6 +1,7 @@
 package com.example.android.employeesmanagementapp.data.entries;
 
-import java.util.Date;
+import java.util.Calendar;
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
@@ -26,7 +27,7 @@ public class DepartmentEntry {
 
     @NonNull
     @ColumnInfo(name = "department_date_created")
-    private Date departmentDateCreated;
+    private Calendar departmentDateCreated;
 
     @ColumnInfo(name = "department_image_uri")
     private String departmentImageUri;
@@ -37,7 +38,7 @@ public class DepartmentEntry {
 
     //used when creating new DepartmentEntry object
     @Ignore
-    public DepartmentEntry(String departmentName, Date departmentDateCreated, String departmentImageUri) {
+    public DepartmentEntry(String departmentName, Calendar departmentDateCreated, String departmentImageUri) {
         this.departmentName = departmentName;
         this.departmentDateCreated = departmentDateCreated;
         this.departmentImageUri = departmentImageUri;
@@ -50,7 +51,7 @@ public class DepartmentEntry {
     }
 
     //used by room when reading from database
-    public DepartmentEntry(int departmentId, String departmentName, Date departmentDateCreated, String departmentImageUri, boolean departmentIsDeleted) {
+    public DepartmentEntry(int departmentId, String departmentName, Calendar departmentDateCreated, String departmentImageUri, boolean departmentIsDeleted) {
         this.departmentId = departmentId;
         this.departmentName = departmentName;
         this.departmentDateCreated = departmentDateCreated;
@@ -75,7 +76,7 @@ public class DepartmentEntry {
         this.departmentName = departmentName;
     }
 
-    public Date getDepartmentDateCreated() {
+    public Calendar getDepartmentDateCreated() {
         return departmentDateCreated;
     }
 
@@ -97,20 +98,23 @@ public class DepartmentEntry {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (obj == this)
             return true;
-        if (obj == null)
+        if (!(obj instanceof DepartmentEntry))
             return false;
-        if (getClass() != obj.getClass())
-            return false;
-        DepartmentEntry other = (DepartmentEntry) obj;
 
-        return departmentId == other.getDepartmentId();
+        DepartmentEntry entry = (DepartmentEntry) obj;
+
+        return Integer.compare(departmentId, entry.departmentId) == 0
+                && departmentName.equals(entry.departmentName)
+                && departmentDateCreated.equals(entry.departmentDateCreated)
+                && departmentImageUri.equals(entry.departmentImageUri)
+                && Boolean.compare(departmentIsDeleted, entry.departmentIsDeleted) == 0;
 
     }
 
     @Override
     public int hashCode() {
-        return Integer.valueOf(departmentId).hashCode();
+        return Objects.hash(departmentId, departmentName, departmentDateCreated, departmentImageUri, departmentIsDeleted);
     }
 }

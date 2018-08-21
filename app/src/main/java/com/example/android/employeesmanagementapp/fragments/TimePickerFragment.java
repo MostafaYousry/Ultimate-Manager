@@ -8,53 +8,47 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 
-import java.sql.Time;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 
 import androidx.fragment.app.DialogFragment;
 
 public class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
     public static final String KEY_DISPLAY_VIEW_ID = "time_view_id";
-    public static final String KEY_DISPLAY_TIME = "time to be displayed";
 
     private View viewToShowTimeIn;
-    private Long mTime;
+    private int viewId;
+    private Calendar mCalendar;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the current time as the default values for the picker
         Bundle bundle = getArguments();
 
-
         if (bundle != null) {
-            if (bundle.containsKey(KEY_DISPLAY_VIEW_ID))
-                viewToShowTimeIn = getActivity().findViewById(bundle.getInt(KEY_DISPLAY_VIEW_ID));
-            if (bundle.containsKey(KEY_DISPLAY_TIME))
-                mTime = bundle.getLong(KEY_DISPLAY_TIME);
+            if (bundle.containsKey(KEY_DISPLAY_VIEW_ID)) {
+                viewId = bundle.getInt(KEY_DISPLAY_VIEW_ID);
+                viewToShowTimeIn = getActivity().findViewById(viewId);
+            }
+
         }
 
+        if (viewId == R.id.task_start_date_time)
+            mCalendar = (Calendar) getActivity().findViewById(R.id.task_start_date).getTag();
+        else
+            mCalendar = (Calendar) getActivity().findViewById(R.id.task_due_date).getTag();
 
-        final Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(mTime);
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int minute = calendar.get(Calendar.MINUTE);
-        // Create a new instance of TimePickerDialog and return it
 
-        return new TimePickerDialog(getActivity(), this, hour, minute, DateFormat.is24HourFormat(getActivity()));
+        return new TimePickerDialog(getActivity(), this, mCalendar.get(Calendar.HOUR_OF_DAY), mCalendar.get(Calendar.MINUTE), DateFormat.is24HourFormat(getActivity()));
     }
 
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         // Do something with the time chosen by the user
         TextView textView = (TextView) viewToShowTimeIn;
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
-        cal.set(Calendar.MINUTE, minute);
-        Date currentTime = cal.getTime();
-        textView.setText(AppUtils.getFriendlyTime(currentTime));
-        textView.setTag(currentTime);
+        mCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+        mCalendar.set(Calendar.MINUTE, minute);
+        textView.setText(AppUtils.getFriendlyTime(mCalendar.getTime()));
     }
 }

@@ -3,6 +3,7 @@ package com.example.android.employeesmanagementapp.adapters;
 import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,16 +23,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.paging.PagedListAdapter;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.EmployeesViewHolder> {
+public class EmployeesAdapter extends PagedListAdapter<EmployeeWithExtras, EmployeesAdapter.EmployeesViewHolder> {
     public static final int SELECTION_MODE_SINGLE = 1;
 
     private Context mContext;
 
 
     final private EmployeeItemClickListener mClickListener;
-    private List<EmployeeWithExtras> mData;
     public static final int SELECTION_MODE_MULTIPLE = 2;
     private static final String TAG = EmployeesAdapter.class.getSimpleName();
     private static final int HIGHLIGHT_COLOR = 0x999be6ff;
@@ -41,7 +43,22 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
     private EmployeeSelectedStateListener mEmployeeSelectedStateListener;
 
 
+    private static DiffUtil.ItemCallback<EmployeeWithExtras> DIFF_CALLBACK =
+            new DiffUtil.ItemCallback<EmployeeWithExtras>() {
+                @Override
+                public boolean areItemsTheSame(EmployeeWithExtras oldEmployee, EmployeeWithExtras newEmployee) {
+                    return oldEmployee.employeeEntry.getEmployeeID() == newEmployee.employeeEntry.getEmployeeID();
+                }
+
+                @Override
+                public boolean areContentsTheSame(EmployeeWithExtras oldEmployee,
+                                                  EmployeeWithExtras newEmployee) {
+                    return oldEmployee.equals(newEmployee);
+                }
+            };
+
     public EmployeesAdapter(Context context, @NonNull EmployeeItemClickListener listener, @NonNull EmployeeSelectedStateListener employeeSelectedStateListener) {
+        super(DIFF_CALLBACK);
         mContext = context;
         mClickListener = listener;
         mEmployeeSelectedStateListener = employeeSelectedStateListener;
@@ -61,16 +78,16 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
 
     @Override
     public void onBindViewHolder(@NonNull EmployeesViewHolder holder, int position) {
-        holder.bind(position);
-    }
+        if (getItem(position) != null) {
+            holder.bind(position);
+        } else {
+            // Null defines a placeholder item - PagedListAdapter automatically
+            // invalidates this row when the actual object is loaded from the
+            // database.
+            holder.clear();
+        }
 
-    @Override
-    public int getItemCount() {
-        if (mData == null)
-            return 0;
-        return mData.size();
     }
-
 
     /**
      * used by employees fragment to start or finish a multi selection operation
@@ -84,22 +101,12 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
         } else {
             for (EmployeeWithExtras extras : mSelectedOnes) {
                 extras.employeeEntry.setChecked(false);
-                notifyItemChanged(mData.indexOf(extras));
+                notifyItemChanged(getCurrentList().indexOf(extras));
 
             }
             mSelectedOnes = null;
         }
         employeesSelectionMode = selectionMode;
-    }
-
-    /**
-     * used to update adapters data if any change occurs
-     *
-     * @param employees new employees list
-     */
-    public void setData(List<EmployeeWithExtras> employees) {
-        mData = employees;
-        notifyDataSetChanged();
     }
 
     public List<EmployeeWithExtras> getSelectedOnes() {
@@ -155,11 +162,11 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
 
         void bind(final int position) {
 
-            updateCheckedState(mData.get(position).employeeEntry);
+            updateCheckedState(getItem(position).employeeEntry);
 
 
             //change the item data by the position
-            EmployeeWithExtras employeeWithExtras = mData.get(position);
+            EmployeeWithExtras employeeWithExtras = getItem(position);
 
 
             mEmployeeName.setText(mContext.getString(R.string.employee_list_item_name, employeeWithExtras.employeeEntry.getEmployeeFirstName(), employeeWithExtras.employeeEntry.getEmployeeMiddleName() != null ? employeeWithExtras.employeeEntry.getEmployeeMiddleName() : ""));
@@ -170,7 +177,7 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
             String runningTasksStr = mContext.getResources().getQuantityString(R.plurals.numberOfRunningTasks, numberRunningTasks, numberRunningTasks);
             mNumRunningTasks.setText(runningTasksStr);
 
-            if (employeeWithExtras.employeeEntry.getEmployeeImageUri() == null) {
+            if (TextUtils.isEmpty(employeeWithExtras.employeeEntry.getEmployeeImageUri())) {
                 Context context = mContext;
 
                 Glide.with(context).clear(mEmployeeImage);
@@ -195,7 +202,7 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
         public void onClick(View v) {
 
             if (employeesSelectionMode == SELECTION_MODE_MULTIPLE) {
-                EmployeeWithExtras extras = mData.get(getAdapterPosition());
+                EmployeeWithExtras extras = getItem(getAdapterPosition());
                 extras.employeeEntry.setChecked(!extras.employeeEntry.isChecked());
                 updateCheckedState(extras.employeeEntry);
 
@@ -223,11 +230,11 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
             if (employeesSelectionMode != SELECTION_MODE_MULTIPLE) {
                 mEmployeeSelectedStateListener.onMultiSelectStart();
 
-                mData.get(getAdapterPosition()).employeeEntry.setChecked(true);
-                updateCheckedState(mData.get(getAdapterPosition()).employeeEntry);
+                getItem(getAdapterPosition()).employeeEntry.setChecked(true);
+                updateCheckedState(getItem(getAdapterPosition()).employeeEntry);
 
                 mSelectedOnes = new ArrayList<>();
-                mSelectedOnes.add(mData.get(getAdapterPosition()));
+                mSelectedOnes.add(getItem(getAdapterPosition()));
                 mEmployeeSelectedStateListener.onSelectedNumChanged(mSelectedOnes.size());
 
                 employeesSelectionMode = SELECTION_MODE_MULTIPLE;
@@ -250,5 +257,19 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.Empl
         }
 
 
+        void clear() {
+
+//            updateCheckedState(mData.get(position).employeeEntry);
+
+            mEmployeeName.setText("");
+
+            mEmployeeRating.setRating(0);
+
+            mNumRunningTasks.setText("");
+
+            Glide.with(mContext).clear(mEmployeeImage);
+
+
+        }
     }
 }

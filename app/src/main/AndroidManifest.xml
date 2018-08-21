@@ -34,15 +34,8 @@
         </activity>
 
 
-        <activity android:name=".activities.MainActivity">
+        <activity android:name=".activities.MainActivity"/>
 
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-
-        </activity>
 
         <activity
             android:name=".activities.AddTaskActivity"
@@ -56,7 +49,6 @@
         <activity
             android:name=".activities.AddDepartmentActivity"
             android:windowSoftInputMode="adjustPan" />
-
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -81,6 +73,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </service>
+
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
@@ -93,12 +86,11 @@
             android:process=":remote">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <category android:name="android.intent.category.HOME" />
+
             </intent-filter>
         </receiver>
 
 
     </application>
-
 
 </manifest>

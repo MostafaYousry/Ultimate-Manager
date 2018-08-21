@@ -2,7 +2,6 @@ package com.example.android.employeesmanagementapp.fragments;
 
 
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,22 +12,10 @@ import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.activities.AddTaskActivity;
-import com.example.android.employeesmanagementapp.activities.MainActivity;
 import com.example.android.employeesmanagementapp.adapters.TasksAdapter;
-import com.example.android.employeesmanagementapp.data.AppDatabase;
-import com.example.android.employeesmanagementapp.data.AppExecutor;
-import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
-import com.example.android.employeesmanagementapp.data.factories.TaskIdFact;
-import com.example.android.employeesmanagementapp.data.viewmodels.AddNewTaskViewModel;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.List;
-
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -39,27 +26,28 @@ import androidx.recyclerview.widget.RecyclerView;
  */
 public class RunningTasksFragment extends Fragment implements TasksAdapter.TasksItemClickListener {
 
-    private final String TAG = RunningTasksFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private TasksAdapter mAdapter;
-    private AppDatabase mDb;
-    private MainActivity mMain;
     private LinearLayout emptyView;
     private TextView emptyViewTextView;
 
     private ImageView emptyViewImageView;
 
 
-    public RunningTasksFragment() {
-        // Required empty public constructor
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mDb = AppDatabase.getInstance(getContext());
-        mMain = new MainActivity();
+        ViewModelProviders.of(getActivity()).get(MainViewModel.class).runningTasksList
+                .observe(this, taskEntries -> {
+                    if (taskEntries != null) {
+                        if (taskEntries.isEmpty()) {
+                            showEmptyView();
+                        } else {
+                            mAdapter.submitList(taskEntries);
+                            showRecyclerView();
+                        }
+                    }
+                });
     }
 
     @Override
@@ -87,29 +75,15 @@ public class RunningTasksFragment extends Fragment implements TasksAdapter.Tasks
         // specify an adapter
         mAdapter = new TasksAdapter(getContext(), this, false);
 
-        LiveData<List<TaskEntry>> tasksList = ViewModelProviders.of(getActivity()).get(MainViewModel.class).getRunningTasksList();
-
-        tasksList.observe(this, new Observer<List<TaskEntry>>() {
-            @Override
-            public void onChanged(List<TaskEntry> taskEntries) {
-                if (taskEntries != null) {
-                    if (taskEntries.isEmpty())
-                        showEmptyView();
-                    else {
-                        mAdapter.setData(taskEntries);
-                        showRecyclerView();
-                    }
-                }
-            }
-        });
-
         mRecyclerView.setAdapter(mAdapter);
 
 
-
-
-
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
     }
 
     private void showEmptyView() {
@@ -126,9 +100,10 @@ public class RunningTasksFragment extends Fragment implements TasksAdapter.Tasks
 
 
     @Override
-    public void onTaskClick(int taskRowID, int taskPosition) {
+    public void onTaskClick(int taskRowID, int taskPosition, boolean taskIsCompleted) {
         Intent intent = new Intent(getActivity(), AddTaskActivity.class);
         intent.putExtra(AddTaskActivity.TASK_ID_KEY, taskRowID);
+        intent.putExtra(AddTaskActivity.TASK_IS_COMPLETED_KEY, taskIsCompleted);
         startActivity(intent);
     }
 }

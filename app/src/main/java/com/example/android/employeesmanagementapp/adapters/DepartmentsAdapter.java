@@ -1,9 +1,11 @@
 package com.example.android.employeesmanagementapp.adapters;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -18,31 +20,53 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.android.employeesmanagementapp.R;
+import com.example.android.employeesmanagementapp.data.AppDatabase;
+import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.DepartmentWithExtras;
+import com.example.android.employeesmanagementapp.data.EmployeeWithExtras;
+import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.utils.ColorUtils;
 import com.google.android.material.card.MaterialCardView;
 
-import java.util.List;
-
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.paging.PagedListAdapter;
 import androidx.palette.graphics.Palette;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.DepartmentsViewHolder> {
+public class DepartmentsAdapter extends PagedListAdapter<DepartmentWithExtras, DepartmentsAdapter.DepartmentsViewHolder> {
     private static final String TAG = DepartmentsAdapter.class.getSimpleName();
 
     private Context mContext;
 
-    private List<DepartmentWithExtras> mDepartments;
     private DepartmentItemClickListener mDepartmentItemClickListener;
 
+    private static DiffUtil.ItemCallback<DepartmentWithExtras> DIFF_CALLBACK =
+            new DiffUtil.ItemCallback<DepartmentWithExtras>() {
+
+                @Override
+                public boolean areItemsTheSame(DepartmentWithExtras oldDepartment, DepartmentWithExtras newDepartment) {
+                    return oldDepartment.departmentEntry.getDepartmentId() == newDepartment.departmentEntry.getDepartmentId();
+                }
+
+                @Override
+                public boolean areContentsTheSame(DepartmentWithExtras oldDepartment,
+                                                  DepartmentWithExtras newDepartment) {
+                    return oldDepartment.equals(newDepartment);
+                }
+
+
+            };
+
+
     public DepartmentsAdapter(Context context, @NonNull DepartmentItemClickListener gridItemClickListener) {
+        super(DIFF_CALLBACK);
         mContext = context;
         mDepartmentItemClickListener = gridItemClickListener;
     }
-
 
     @NonNull
     @Override
@@ -55,24 +79,14 @@ public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull DepartmentsViewHolder holder, int position) {
-        holder.bind(position);
-    }
-
-    @Override
-    public int getItemCount() {
-        if (mDepartments == null)
-            return 0;
-        return mDepartments.size();
-    }
-
-    /**
-     * used to update adapters data if any change occurs
-     *
-     * @param departments new departments list
-     */
-    public void setData(List<DepartmentWithExtras> departments) {
-        mDepartments = departments;
-        notifyDataSetChanged();
+        if (getItem(position) != null) {
+            holder.bind(position);
+        } else {
+            // Null defines a placeholder item - PagedListAdapter automatically
+            // invalidates this row when the actual object is loaded from the
+            // database.
+            holder.clear();
+        }
     }
 
     /**
@@ -115,100 +129,100 @@ public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.
                             switch (item.getItemId()) {
                                 case R.id.action_delete_department:
 
-//                                            AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
-//                                            alertDialog.setTitle("Alert");
-//                                            alertDialog.setMessage("if you deleted this Department all its employees and tasks will be deleted");
-//                                            alertDialog.setPositiveButton("ok", new DialogInterface.OnClickListener() {
-//                                                @Override
-//                                                public void onClick(DialogInterface dialogInterface, int i) {
-//                                                    mAddNewDepViewModel = ViewModelProviders.of(DepartmentsFragment.this, new DepIdFact(mDb, mAdapter.getClickedDepartment().getDepartmentId())).get(AddNewDepViewModel.class);
-//                                                    final LiveData<List<TaskEntry>> depRunningTasks = mAddNewDepViewModel.getRunningTasks();
-//                                                    depRunningTasks.observe(DepartmentsFragment.this, new Observer<List<TaskEntry>>() {
-//                                                        @Override
-//                                                        public void onChanged(final List<TaskEntry> taskEntries) {
-//                                                            depRunningTasks.removeObserver(this);
-//                                                            AppExecutor.getInstance().diskIO().execute(new Runnable() {
-//                                                                @Override
-//                                                                public void run() {
-//                                                                    for (TaskEntry taskEntry : taskEntries) {
-//                                                                        Log.i("test", taskEntry.getTaskTitle());
-//                                                                        mDb.employeesTasksDao().deleteTaskJoinRecords(taskEntry.getTaskId());
-//                                                                        mDb.tasksDao().deleteTask(taskEntry);
-//                                                                    }
-//                                                                }
-//                                                            });
-//                                                        }
-//                                                    });
-//                                                    final LiveData<List<EmployeeEntry>> depEmployees = mAddNewDepViewModel.getEmployees();
-//                                                    depEmployees.observe(DepartmentsFragment.this, new Observer<List<EmployeeEntry>>() {
-//                                                        @Override
-//                                                        public void onChanged(final List<EmployeeEntry> employeeEntries) {
-//                                                            depEmployees.removeObserver(this);
-//                                                            AppExecutor.getInstance().diskIO().execute(new Runnable() {
-//                                                                @Override
-//                                                                public void run() {
-//                                                                    for (EmployeeEntry employeeEntry : employeeEntries) {
-//                                                                        mDb.employeesDao().deleteEmployeeFromDepartmentTask(employeeEntry.getEmployeeID());
-//                                                                    }
-//                                                                }
-//                                                            });
-//                                                        }
-//                                                    });
-//
-//                                                    AppExecutor.getInstance().diskIO().execute(new Runnable() {
-//                                                        @Override
-//                                                        public void run() {
-//                                                            mAdapter.getClickedDepartment().setDepartmentIsDeleted(true);
-//                                                            Log.i("test", mAdapter.getClickedDepartment().getDepartmentName());
-//                                                            mDb.departmentsDao().updateDepartment(mAdapter.getClickedDepartment());
-//                                                        }
-//                                                    });
-//                                                }
-//                                            });
-//                                            alertDialog.show();
-//                                        }
-//                                    });
-//                                    //todo: make sure not to delete a full department
-//                                    //hasEmployees=  mDb.employeesDao().loadEmployees(mSelectedDepartments.get(i).getDepartmentId());
-//                                    //if(mhasEmployees != null)
-//                                    // Toast.makeText(getContext(),"Can't delete this department because it has employees please move them or delete them first", Toast.LENGTH_LONG).show();
-//                                    return true;
+                                    final AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
+                                    alertDialog.setTitle("Note");
+                                    alertDialog.setMessage("All running tasks and employees are about to be deleted, completed tasks will be saved.\nDo you wish to continue ?");
+                                    alertDialog.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                                            AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    AppDatabase db = AppDatabase.getInstance(mContext);
+                                                    DepartmentEntry departmentEntry = getItem(getAdapterPosition()).departmentEntry;
+
+                                                    for (EmployeeWithExtras employeeWithExtras : db.employeesDao().loadEmployeesExtrasInDep(departmentEntry.getDepartmentId())) {
+
+                                                        int empID = employeeWithExtras.employeeEntry.getEmployeeID();
+
+                                                        if (employeeWithExtras.employeeNumRunningTasks == 0 && db.employeesTasksDao().getNumCompletedTasksEmployee(empID) > 0) {
+                                                            db.employeesDao().deleteEmployee(empID);
+                                                        } else if (employeeWithExtras.employeeNumRunningTasks > 0 && db.employeesTasksDao().getNumCompletedTasksEmployee(empID) == 0) {
+                                                            db.employeesTasksDao().deleteEmployeeJoinRecords(empID);
+                                                            db.employeesDao().deleteEmployee(employeeWithExtras.employeeEntry);
+                                                        } else if (employeeWithExtras.employeeNumRunningTasks > 0 && db.employeesTasksDao().getNumCompletedTasksEmployee(empID) > 0) {
+                                                            db.employeesTasksDao().deleteEmployeeFromRunningTasks(empID);
+                                                            db.employeesDao().deleteEmployee(empID);
+                                                        } else {
+                                                            db.employeesDao().deleteEmployee(employeeWithExtras.employeeEntry);
+                                                        }
+
+                                                    }
+
+                                                    db.tasksDao().deleteEmptyTasks();
+
+                                                    if (db.departmentsDao().getNumCompletedTasksDepartment(departmentEntry.getDepartmentId()) == 0) {
+                                                        db.departmentsDao().deleteDepartment(departmentEntry);
+                                                    } else {
+                                                        departmentEntry.setDepartmentIsDeleted(true);
+                                                        db.departmentsDao().updateDepartment(departmentEntry);
+                                                    }
+
+                                                }
+                                            });
+
+                                        }
+
+
+                                    });
+
+                                    alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            dialogInterface.dismiss();
+                                        }
+                                    });
+                                    alertDialog.show();
+                                    return true;
                                 default:
                                     return false;
                             }
                         }
                     });
-                    //displaying the popup
+
+
                     popup.show();
                 }
+
             });
-
-
             // set the item click listener
             itemView.setOnClickListener(this);
         }
 
         public void bind(int position) {
-            mDepartmentName.setText(mDepartments.get(position).departmentEntry.getDepartmentName());
+            mDepartmentName.setText(getItem(position).departmentEntry.getDepartmentName());
 
-            String runningTasksSummary = mContext.getResources().getQuantityString(R.plurals.numberOfRunningTasks, mDepartments.get(position).numRunningTasks, mDepartments.get(position).numRunningTasks);
-            String completedTasksSummary = mContext.getResources().getQuantityString(R.plurals.numberOfCompletedTasks, mDepartments.get(position).numCompletedTasks, mDepartments.get(position).numCompletedTasks);
-            String numberOfEmployees = mContext.getResources().getQuantityString(R.plurals.numberOfEmployees, mDepartments.get(position).numOfEmployees, mDepartments.get(position).numOfEmployees);
+            String runningTasksSummary = mContext.getResources().getQuantityString(R.plurals.numberOfRunningTasks, getItem(position).numRunningTasks, getItem(position).numRunningTasks);
+            String completedTasksSummary = mContext.getResources().getQuantityString(R.plurals.numberOfCompletedTasks, getItem(position).numCompletedTasks, getItem(position).numCompletedTasks);
+            String numberOfEmployees = mContext.getResources().getQuantityString(R.plurals.numberOfEmployees, getItem(position).numOfEmployees, getItem(position).numOfEmployees);
 
             mDepartmentSummary.setText(mContext.getString(R.string.department_summary, numberOfEmployees, runningTasksSummary, completedTasksSummary));
 
 
-            if (mDepartments.get(position).departmentEntry.getDepartmentImageUri() == null) {
+            if (TextUtils.isEmpty(getItem(position).departmentEntry.getDepartmentImageUri())) {
+                Glide.with(mContext).clear(mDepartmentImage);
                 mDepartmentImage.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_departments));
                 mDepartmentImage.setScaleType(ImageView.ScaleType.CENTER);
 
-                mDepartmentImage.setBackgroundColor(ResourcesCompat.getColor(mContext.getResources(), ColorUtils.getDepartmentBackgroundColor(mDepartments.get(position).departmentEntry), mContext.getTheme()));
+                mDepartmentImage.setBackgroundColor(ResourcesCompat.getColor(mContext.getResources(), ColorUtils.getDepartmentBackgroundColor(getItem(position).departmentEntry), mContext.getTheme()));
 
                 mItemView.setCardBackgroundColor(ResourcesCompat.getColor(mContext.getResources(), R.color.department_fallback_color, mContext.getTheme()));
             } else {
                 Glide.with(mContext)
                         .asBitmap()
-                        .load(Uri.parse(mDepartments.get(position).departmentEntry.getDepartmentImageUri()))
+                        .load(Uri.parse(getItem(position).departmentEntry.getDepartmentImageUri()))
                         .listener(new RequestListener<Bitmap>() {
                             @Override
                             public boolean onLoadFailed(GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
@@ -224,7 +238,7 @@ public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.
                         .into(mDepartmentImage);
             }
 
-            mItemView.setTag(mDepartments.get(position).departmentEntry.getDepartmentId());
+            mItemView.setTag(getItem(position).departmentEntry.getDepartmentId());
         }
 
         @Override
@@ -251,5 +265,13 @@ public class DepartmentsAdapter extends RecyclerView.Adapter<DepartmentsAdapter.
             });
         }
 
+        void clear() {
+            mDepartmentName.setText("");
+            mDepartmentSummary.setText("");
+
+            Glide.with(mContext).clear(mDepartmentImage);
+            mItemView.setCardBackgroundColor(Color.WHITE);
+
+        }
     }
 }

@@ -2,16 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="#242729"
+    android:background="@android:color/white"
     android:layout_gravity="center"
-    android:id="@+id/lin_lay"
     android:gravity="center"
     android:orientation="vertical" >
 
     <ImageView
-        android:id="@+id/splash"
         android:layout_width="187dp"
         android:layout_height="203dp"
+        android:scaleType="fitXY"
         android:background="@drawable/ic_boss_app" />
 
     <TextView

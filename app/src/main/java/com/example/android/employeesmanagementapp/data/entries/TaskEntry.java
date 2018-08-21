@@ -2,7 +2,8 @@ package com.example.android.employeesmanagementapp.data.entries;
 
 import com.example.android.employeesmanagementapp.R;
 
-import java.util.Date;
+import java.util.Calendar;
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
@@ -37,10 +38,10 @@ public class TaskEntry {
     private String taskDescription;
 
     @ColumnInfo(name = "task_start_date")
-    private Date taskStartDate;
+    private Calendar taskStartDate;
 
     @ColumnInfo(name = "task_due_date")
-    private Date taskDueDate;
+    private Calendar taskDueDate;
 
     @ColumnInfo(name = "task_rating")
     private float taskRating;              //from 0 to 5
@@ -54,7 +55,7 @@ public class TaskEntry {
 
     //used when creating new TaskEntry object
     @Ignore
-    public TaskEntry(@NonNull int departmentID, String taskTitle, String taskDescription, Date taskStartDate, Date taskDueDate) {
+    public TaskEntry(@NonNull int departmentID, String taskTitle, String taskDescription, Calendar taskStartDate, Calendar taskDueDate) {
         this.departmentID = departmentID;
         this.taskTitle = taskTitle;
         this.taskDescription = taskDescription;
@@ -66,7 +67,7 @@ public class TaskEntry {
 
 
     //used by room when reading from database
-    public TaskEntry(int taskId, int departmentID, String taskTitle, String taskDescription, Date taskStartDate, Date taskDueDate, float taskRating, boolean taskIsCompleted, int taskColorResource) {
+    public TaskEntry(int taskId, int departmentID, String taskTitle, String taskDescription, Calendar taskStartDate, Calendar taskDueDate, float taskRating, boolean taskIsCompleted, int taskColorResource) {
         this.taskId = taskId;
         this.departmentID = departmentID;
         this.taskTitle = taskTitle;
@@ -110,19 +111,19 @@ public class TaskEntry {
         this.taskDescription = taskDescription;
     }
 
-    public Date getTaskStartDate() {
+    public Calendar getTaskStartDate() {
         return taskStartDate;
     }
 
-    public void setTaskStartDate(Date taskStartDate) {
+    public void setTaskStartDate(Calendar taskStartDate) {
         this.taskStartDate = taskStartDate;
     }
 
-    public Date getTaskDueDate() {
+    public Calendar getTaskDueDate() {
         return taskDueDate;
     }
 
-    public void setTaskDueDate(Date taskDueDate) {
+    public void setTaskDueDate(Calendar taskDueDate) {
         this.taskDueDate = taskDueDate;
     }
 
@@ -148,5 +149,31 @@ public class TaskEntry {
 
     public void setTaskColorResource(int taskColorResource) {
         this.taskColorResource = taskColorResource;
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (!(obj instanceof TaskEntry))
+            return false;
+
+        TaskEntry entry = (TaskEntry) obj;
+
+        return Integer.compare(taskId, entry.taskId) == 0
+                && Integer.compare(departmentID, entry.departmentID) == 0
+                && taskTitle.equals(entry.taskTitle)
+                && taskDescription.equals(entry.taskDescription)
+                && taskStartDate.equals(entry.taskStartDate)
+                && taskDueDate.equals(entry.taskDueDate)
+                && Float.compare(taskRating, entry.taskRating) == 0
+                && Boolean.compare(taskIsCompleted, entry.taskIsCompleted) == 0
+                && Integer.compare(taskColorResource, entry.taskColorResource) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(taskId, departmentID, taskTitle, taskDescription, taskStartDate, taskDueDate, taskRating, taskIsCompleted, taskColorResource);
     }
 }

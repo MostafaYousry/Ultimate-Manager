@@ -14,17 +14,10 @@ import android.widget.TextView;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.activities.AddDepartmentActivity;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsAdapter;
-import com.example.android.employeesmanagementapp.data.DepartmentWithExtras;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.List;
-
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -36,8 +29,6 @@ import androidx.recyclerview.widget.RecyclerView;
  */
 public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.DepartmentItemClickListener {
 
-    private final String TAG = DepartmentsFragment.class.getSimpleName();
-
     private RecyclerView mRecyclerView;
     private DepartmentsAdapter mAdapter;
     private LinearLayout mEmptyView;
@@ -45,9 +36,26 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
     private ImageView mEmptyViewImageView;
 
 
-    public DepartmentsFragment() {
-        // Required empty public constructor
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+
+        ViewModelProviders.of(getActivity()).get(MainViewModel.class)
+                .allDepartmentsWithExtrasList
+                .observe(this, departmentWithExtras -> {
+                    if (departmentWithExtras != null) {
+                        if (departmentWithExtras.isEmpty()) {
+                            showEmptyView();
+                        } else {
+                            mAdapter.submitList(departmentWithExtras);
+                            showRecyclerView();
+                        }
+                    }
+
+                });
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -73,21 +81,6 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
         //initialise recycler view adapter
         mAdapter = new DepartmentsAdapter(getContext(), this);
 
-        LiveData<List<DepartmentWithExtras>> departmentsList = ViewModelProviders.of(getActivity()).get(MainViewModel.class).getAllDepartmentsWithExtrasList();
-        departmentsList.observe(this, new Observer<List<DepartmentWithExtras>>() {
-            @Override
-            public void onChanged(List<DepartmentWithExtras> departmentEntries) {
-                if (departmentEntries != null) {
-                    if (departmentEntries.isEmpty())
-                        showEmptyView();
-                    else {
-                        mAdapter.setData(departmentEntries);
-                        showRecyclerView();
-                    }
-                }
-            }
-        });
-
 
         mRecyclerView.setAdapter(mAdapter);
 
@@ -100,7 +93,6 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
 
         //applying default rv animations
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-
 
 
         return rootView;

@@ -2,6 +2,8 @@ package com.example.android.employeesmanagementapp.data;
 
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 
+import java.util.Objects;
+
 import androidx.room.ColumnInfo;
 import androidx.room.Embedded;
 
@@ -18,4 +20,26 @@ public class DepartmentWithExtras {
 
     @ColumnInfo(name = "num_of_employees")
     public int numOfEmployees;
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (!(obj instanceof DepartmentWithExtras))
+            return false;
+
+        DepartmentWithExtras entry = (DepartmentWithExtras) obj;
+
+        return departmentEntry.equals(entry.departmentEntry)
+                && Integer.compare(numRunningTasks, entry.numRunningTasks) == 0
+                && Integer.compare(numCompletedTasks, entry.numCompletedTasks) == 0
+                && Integer.compare(numOfEmployees, entry.numOfEmployees) == 0;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(departmentEntry, numRunningTasks, numCompletedTasks, numOfEmployees);
+    }
 }

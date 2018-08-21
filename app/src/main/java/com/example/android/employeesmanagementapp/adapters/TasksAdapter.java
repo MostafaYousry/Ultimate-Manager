@@ -2,6 +2,9 @@ package com.example.android.employeesmanagementapp.adapters;
 
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.Color;
+import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -9,34 +12,55 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
+import com.example.android.employeesmanagementapp.fragments.ColorPickerDialogFragment;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.paging.PagedListAdapter;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHolder> {
+
+public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.TasksViewHolder> {
 
     private Context mContext;
-
-    private List<TaskEntry> mData;
     private TasksItemClickListener mTaskClickListener;
     private boolean mTasksAreCompleted;
 
 
+    private static DiffUtil.ItemCallback<TaskEntry> DIFF_CALLBACK =
+            new DiffUtil.ItemCallback<TaskEntry>() {
+                @Override
+                public boolean areItemsTheSame(TaskEntry oldTask, TaskEntry newTask) {
+                    return oldTask.getTaskId() == newTask.getTaskId();
+                }
+
+                @Override
+                public boolean areContentsTheSame(TaskEntry oldTask,
+                                                  TaskEntry newTask) {
+                    return oldTask.equals(newTask);
+                }
+            };
+
+
     public TasksAdapter(Context context, TasksItemClickListener clickListener, boolean tasksAreCompleted) {
+        super(DIFF_CALLBACK);
         mContext = context;
         mTaskClickListener = clickListener;
         mTasksAreCompleted = tasksAreCompleted;
@@ -55,35 +79,65 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
 
     @Override
     public void onBindViewHolder(@NonNull final TasksViewHolder holder, int position) {
-        holder.bind(position);
+        if (getItem(position) != null) {
+            holder.bind(position);
+        } else {
+            // Null defines a placeholder item - PagedListAdapter automatically
+            // invalidates this row when the actual object is loaded from the
+            // database.
+            holder.clear();
+        }
+
     }
 
-    @Override
-    public int getItemCount() {
-        if (mData == null)
-            return 0;
-        return mData.size();
-    }
-
-    /**
-     * used to update adapters data if any change occurs
-     *
-     * @param tasks : new tasks list
-     */
-    public void setData(List<TaskEntry> tasks) {
-        mData = tasks;
-        notifyDataSetChanged();
-    }
-
-    public TaskEntry getItem(int position) {
-        return mData.get(position);
-    }
 
     /**
      * interface to handle click events done on a recycler view item
      */
     public interface TasksItemClickListener {
-        void onTaskClick(int taskRowID, int taskPosition);
+        void onTaskClick(int taskRowID, int taskPosition, boolean taskIsCompleted);
+    }
+
+    private void showColorPicker(int taskId) {
+        Bundle bundle = new Bundle();
+        bundle.putInt(ColorPickerDialogFragment.KEY_TASK_ID, taskId);
+
+        DialogFragment colorPickerDialogFragment = new ColorPickerDialogFragment();
+        colorPickerDialogFragment.setArguments(bundle);
+
+        colorPickerDialogFragment.show(((AppCompatActivity) mContext).getSupportFragmentManager(), "colorPicker");
+    }
+
+    private void showRateTaskDialog(final int taskID) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        builder.setTitle("Task done");
+        builder.setMessage("Please rate task");
+
+        View rateDialogView = LayoutInflater.from(mContext).inflate(R.layout.rating_bar, null, false);
+        final RatingBar ratingBar = rateDialogView.findViewById(R.id.rating_bar);
+        ratingBar.setPaddingRelative(AppUtils.dpToPx(mContext, 16), 0, AppUtils.dpToPx(mContext, 16), 0);
+        builder.setView(rateDialogView);
+
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(final DialogInterface dialog, int which) {
+                AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        AppDatabase.getInstance(mContext).tasksDao().rateTask(ratingBar.getRating(), taskID);
+                        dialog.dismiss();
+                    }
+                });
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.show();
     }
 
     class TasksViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -116,21 +170,21 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
                         public boolean onMenuItemClick(final MenuItem item) {
                             switch (item.getItemId()) {
                                 case R.id.action_mark_as_done:
-                                    AppUtils.showRateTaskDialog(mContext, (int) itemView.getTag());
+                                    showRateTaskDialog((int) itemView.getTag());
                                     return true;
                                 case R.id.action_delete_task:
 
                                     AppExecutor.getInstance().diskIO().execute(new Runnable() {
                                         @Override
                                         public void run() {
-                                            AppDatabase.getInstance(mContext).employeesTasksDao().deleteTaskJoinRecords(mData.get(getAdapterPosition()).getTaskId());
-                                            AppDatabase.getInstance(mContext).tasksDao().deleteTask(mData.get(getAdapterPosition()));
+                                            AppDatabase.getInstance(mContext).employeesTasksDao().deleteTaskJoinRecords(getItem(getAdapterPosition()).getTaskId());
+                                            AppDatabase.getInstance(mContext).tasksDao().deleteTask(getItem(getAdapterPosition()));
                                         }
                                     });
 
                                     return true;
                                 case R.id.action_color_task:
-                                    AppUtils.showColorPicker(mContext, (int) itemView.getTag());
+                                    showColorPicker((int) itemView.getTag());
                                     return true;
                                 default:
                                     return false;
@@ -145,15 +199,16 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
 
         void bind(int position) {
 
-            mTaskTitle.setText(mData.get(position).getTaskTitle());
+            mTaskTitle.setText(getItem(position).getTaskTitle());
 
-            getRemainingTime(mData.get(position).getTaskDueDate());
+            mTaskDates.setText(mContext.getString(R.string.task_list_item_name_dates, AppUtils.getFriendlyDate(getItem(position).getTaskStartDate().getTime()), AppUtils.getFriendlyDate(getItem(position).getTaskDueDate().getTime())));
+            getRemainingTime(getItem(position).getTaskDueDate().getTime());
 
-            int taskColor = ResourcesCompat.getColor(itemView.getResources(), mData.get(position).getTaskColorResource(), mContext.getTheme());
+            int taskColor = ResourcesCompat.getColor(itemView.getResources(), getItem(position).getTaskColorResource(), mContext.getTheme());
 
             mItemView.setCardBackgroundColor(taskColor);
 
-            mItemView.setTag(mData.get(position).getTaskId());
+            mItemView.setTag(getItem(position).getTaskId());
         }
 
         private void getRemainingTime(Date taskDueDate) {
@@ -187,7 +242,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
                         if (months == 1)
                             chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_single_month, months);
                         else
-                            chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_multi_moths ,months);
+                            chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_multi_moths, months);
 
                     }
                     if (days > 0 && indexOfFields + 1 != 4) {
@@ -231,21 +286,29 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
                     else if (indexOfFields == 1)
                         mTaskDates.setText(mContext.getString(R.string.date_one_fields, chosenFields[0]));
 
-                    System.out.println(mTaskDates.getText());
-                    mTaskDates.setTextColor(mContext.getResources().getColor(R.color.primaryTextColor));
+
+                    mTaskDates.setTextColor(ResourcesCompat.getColor(itemView.getResources(), R.color.primaryTextColor, mContext.getTheme()));
                 }
 
                 @Override
                 public void onFinish() {
                     mTaskDates.setText(R.string.overdue);
-                    mTaskDates.setTextColor(mContext.getResources().getColor(R.color.A700_16));
+                    mTaskDates.setTextColor(ResourcesCompat.getColor(itemView.getResources(), R.color.A700_16, mContext.getTheme()));
                 }
             }.start();
         }
 
         @Override
         public void onClick(View v) {
-            mTaskClickListener.onTaskClick((int) mItemView.getTag(), getAdapterPosition());
+            mTaskClickListener.onTaskClick((int) mItemView.getTag(), getAdapterPosition(), getItem(getAdapterPosition()).isTaskIsCompleted());
+        }
+
+        void clear() {
+            mTaskTitle.setText("");
+
+            mTaskDates.setText("");
+
+            mItemView.setCardBackgroundColor(Color.WHITE);
         }
     }
 }

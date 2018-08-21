@@ -1,13 +1,7 @@
-todo use paging architecture component for loading lists in small chunks
+load lists while showing splash screen
 
-todo glide place holders
+clean resources strings ...
 
-todo different icon for each fab location ie(tasks , departments , employees)
-
-todo deleted employees same as delete tasks
-
-todo when changing dep of emp , remove from running tasks
-
-todo create department dialogue bug(if no departments it only appears once)
+comments
 
 todo -----------------T E S T-----------------------------

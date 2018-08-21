@@ -1,29 +1,20 @@
 package com.example.android.employeesmanagementapp.activities;
-import android.os.Bundle;
-import android.app.Activity;
+
 import android.content.Intent;
-import android.widget.ImageView;
-import com.example.android.employeesmanagementapp.activities.MainActivity;
+import android.os.Bundle;
 
 import com.example.android.employeesmanagementapp.R;
 
-import java.util.Random;
+import androidx.appcompat.app.AppCompatActivity;
 
 
-public class Splashscreen extends Activity {
+public class Splashscreen extends AppCompatActivity {
 
     Thread splashTread;
-    ImageView imageView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splashscreen);
-        imageView = (ImageView)findViewById(R.id.splash);
-        imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-        int[] ids = new int[]{R.drawable.ic_boss_app,R.drawable.ic_boss_app, R.drawable.ic_boss_app};
-        Random randomGenerator = new Random();
-        int r= randomGenerator.nextInt(ids.length);
-        this.imageView.setImageDrawable(getResources().getDrawable(ids[r]));
 
         splashTread = new Thread() {
             @Override
@@ -39,7 +30,6 @@ public class Splashscreen extends Activity {
                             MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     startActivity(intent);
-                    Splashscreen.this.finish();
                 } catch (InterruptedException e) {
                     // do nothing
                 } finally {

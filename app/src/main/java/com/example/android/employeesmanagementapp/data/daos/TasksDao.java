@@ -2,10 +2,11 @@ package com.example.android.employeesmanagementapp.data.daos;
 
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 
-import java.util.Date;
+import java.util.Calendar;
 import java.util.List;
 
 import androidx.lifecycle.LiveData;
+import androidx.paging.DataSource;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -27,7 +28,7 @@ public interface TasksDao {
      * @return list of TaskEntry objects wrapped with LiveData
      */
     @Query("SELECT * FROM tasks WHERE task_is_completed = 0")
-    LiveData<List<TaskEntry>> loadRunningTasks();
+    DataSource.Factory<Integer, TaskEntry> loadRunningTasks();
 
 
     /**
@@ -36,7 +37,7 @@ public interface TasksDao {
      * @return list of TaskEntry objects wrapped with LiveData
      */
     @Query("SELECT * FROM tasks WHERE task_is_completed = 1")
-    LiveData<List<TaskEntry>> loadCompletedTasks();
+    DataSource.Factory<Integer, TaskEntry> loadCompletedTasks();
 
     /**
      * load all tasks that are running or completed for an existing employee
@@ -47,7 +48,7 @@ public interface TasksDao {
      */
     @Query("select  tasks.task_id , department_id , task_title , task_description,task_start_date,task_due_date,task_rating,task_is_completed , task_color_resource from tasks " +
             "inner join employees_tasks on tasks.task_id = employees_tasks.task_id where employees_tasks.employee_id = :employeeId AND task_is_completed = :taskIsCompleted")
-    LiveData<List<TaskEntry>> loadTasksForEmployee(int employeeId, boolean taskIsCompleted);
+    DataSource.Factory<Integer, TaskEntry> loadTasksForEmployee(int employeeId, boolean taskIsCompleted);
 
     /**
      * load all tasks that are running or completed for an existing department
@@ -57,34 +58,34 @@ public interface TasksDao {
      * @return list of TaskEntry objects wrapped with LiveData
      */
     @Query("SELECT * FROM tasks WHERE department_id = :departmentId AND task_is_completed = :taskIsCompleted")
-    LiveData<List<TaskEntry>> loadTasksForDepartment(int departmentId, boolean taskIsCompleted);
+    DataSource.Factory<Integer, TaskEntry> loadTasksForDepartment(int departmentId, boolean taskIsCompleted);
 
     /**
-     * loads an existing task record
+     * loads an existing taskEntry record
      *
-     * @param taskId : the id of the task record to be loaded
+     * @param taskId : the id of the taskEntry record to be loaded
      * @return TaskEntry object wrapped with LiveData
      */
     @Query("SELECT * FROM tasks WHERE task_id = :taskId")
     LiveData<TaskEntry> loadTaskById(int taskId);
 
     @Query("SELECT task_due_date FROM tasks WHERE task_is_completed = 0")
-    List<Date> getAllTasksDueDate();
+    List<Calendar> getAllTasksDueDate();
 
     @Query("SELECT task_id FROM tasks WHERE task_is_completed = 0")
     List<Integer> getAllTasksId();
 
     /**
-     * insert a new task record
+     * insert a new taskEntry record
      *
      * @param taskEntry
-     * @return row id of the inserted task record
+     * @return row id of the inserted taskEntry record
      */
     @Insert
     long addTask(TaskEntry taskEntry);
 
     /**
-     * deletes an existing task record
+     * deletes an existing taskEntry record
      *
      * @param taskEntry
      */
@@ -92,7 +93,7 @@ public interface TasksDao {
     void deleteTask(TaskEntry taskEntry);
 
     /**
-     * updates columns of an existing task record
+     * updates columns of an existing taskEntry record
      *
      * @param taskEntry
      */
@@ -100,7 +101,7 @@ public interface TasksDao {
     void updateTask(TaskEntry taskEntry);
 
     /**
-     * update rating of a completed task
+     * update rating of a completed taskEntry
      *
      * @param taskRating : int number of stars
      * @param taskID
@@ -110,7 +111,7 @@ public interface TasksDao {
 
 
     /**
-     * update task color
+     * update taskEntry color
      *
      * @param colorRes : color resource
      * @param taskID

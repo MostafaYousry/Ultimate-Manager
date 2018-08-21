@@ -5,16 +5,12 @@ import android.app.Application;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.DepartmentWithExtras;
 import com.example.android.employeesmanagementapp.data.EmployeeWithExtras;
-import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import androidx.arch.core.util.Function;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Transformations;
+import androidx.paging.LivePagedListBuilder;
+import androidx.paging.PagedList;
 
 /**
  * View Model class
@@ -26,59 +22,30 @@ import androidx.lifecycle.Transformations;
  */
 public class MainViewModel extends AndroidViewModel {
 
-    private LiveData<List<DepartmentWithExtras>> allDepartmentsWithExtrasList;
-    private LiveData<List<DepartmentEntry>> allDepartmentsList;
-    private LiveData<List<TaskEntry>> runningTasksList;
-    private LiveData<List<TaskEntry>> completedTasksList;
-    private LiveData<List<EmployeeWithExtras>> employeesWithExtrasList;
+    public LiveData<Integer> numOfCompanyDepartments;
+
+    public final LiveData<PagedList<DepartmentWithExtras>> allDepartmentsWithExtrasList;
+    public final LiveData<PagedList<TaskEntry>> runningTasksList;
+    public final LiveData<PagedList<TaskEntry>> completedTasksList;
+    public final LiveData<PagedList<EmployeeWithExtras>> employeesWithExtrasList;
 
 
     public MainViewModel(final Application application) {
         super(application);
 
-        allDepartmentsWithExtrasList = AppDatabase.getInstance(application.getApplicationContext()).departmentsDao().loadDepartmentsWithExtras();
-        runningTasksList = AppDatabase.getInstance(application.getApplicationContext()).tasksDao().loadRunningTasks();
-        completedTasksList = AppDatabase.getInstance(application.getApplicationContext()).tasksDao().loadCompletedTasks();
-        employeesWithExtrasList = AppDatabase.getInstance(application.getApplicationContext()).employeesDao().loadEmployees();
+        AppDatabase db = AppDatabase.getInstance(application.getApplicationContext());
 
-        allDepartmentsList = Transformations.map(allDepartmentsWithExtrasList, new Function<List<DepartmentWithExtras>, List<DepartmentEntry>>() {
+        PagedList.Config config = new PagedList.Config.Builder()
+                .setPrefetchDistance(50)
+                .setPageSize(10)
+                .build();
 
-            @Override
-            public List<DepartmentEntry> apply(List<DepartmentWithExtras> input) {
-                List<DepartmentEntry> departmentEntries = new ArrayList<>(input.size());
-                for (DepartmentWithExtras extras : input) {
-                    departmentEntries.add(extras.departmentEntry);
-                }
+        runningTasksList = new LivePagedListBuilder<>(db.tasksDao().loadRunningTasks(), config).build();
+        completedTasksList = new LivePagedListBuilder<>(db.tasksDao().loadCompletedTasks(), config).build();
+        employeesWithExtrasList = new LivePagedListBuilder<>(db.employeesDao().loadEmployees(), config).build();
+        allDepartmentsWithExtrasList = new LivePagedListBuilder<>(db.departmentsDao().loadDepartmentsWithExtras(), config).build();
 
-                return departmentEntries;
-
-            }
-        });
-
+        numOfCompanyDepartments = db.departmentsDao().getNumDepartments();
     }
 
-    public LiveData<List<DepartmentEntry>> getAllDepartmentsList() {
-        return allDepartmentsList;
-    }
-
-    public LiveData<List<DepartmentWithExtras>> getAllDepartmentsWithExtrasList() {
-        return allDepartmentsWithExtrasList;
-    }
-
-    public LiveData<List<TaskEntry>> getRunningTasksList() {
-        return runningTasksList;
-    }
-
-    public int getNumRunningTasksList()
-    {if (runningTasksList.getValue()==null)
-    return 0;
-    return runningTasksList.getValue().size();}
-
-    public LiveData<List<TaskEntry>> getCompletedTasksList() {
-        return completedTasksList;
-    }
-
-    public LiveData<List<EmployeeWithExtras>> getEmployeesWithExtrasList() {
-        return employeesWithExtrasList;
-    }
 }

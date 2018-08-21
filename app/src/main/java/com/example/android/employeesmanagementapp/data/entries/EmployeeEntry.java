@@ -1,6 +1,7 @@
 package com.example.android.employeesmanagementapp.data.entries;
 
-import java.util.Date;
+import java.util.Calendar;
+import java.util.Objects;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
@@ -39,7 +40,7 @@ public class EmployeeEntry {
     private float employeeSalary;
 
     @ColumnInfo(name = "employee_hire_date")
-    private Date employeeHireDate;
+    private Calendar employeeHireDate;
 
     @ColumnInfo(name = "employee_image_uri")
     private String employeeImageUri;
@@ -62,7 +63,7 @@ public class EmployeeEntry {
 
     //used when creating new EmployeeWithExtras object
     @Ignore
-    public EmployeeEntry(int departmentId, String employeeFirstName, String employeeMiddleName, String employeeLastName, float employeeSalary, Date employeeHireDate, String employeeEmail, String employeePhone, String employeeNote, String employeeImageUri) {
+    public EmployeeEntry(int departmentId, String employeeFirstName, String employeeMiddleName, String employeeLastName, float employeeSalary, Calendar employeeHireDate, String employeeEmail, String employeePhone, String employeeNote, String employeeImageUri) {
         this.departmentId = departmentId;
         this.employeeFirstName = employeeFirstName;
         this.employeeMiddleName = employeeMiddleName;
@@ -76,7 +77,7 @@ public class EmployeeEntry {
     }
 
     //used by room when reading from database
-    public EmployeeEntry(int employeeID, int departmentId, String employeeFirstName, String employeeMiddleName, String employeeLastName, float employeeSalary, Date employeeHireDate, String employeeEmail, String employeePhone, String employeeNote, String employeeImageUri, boolean employeeIsDeleted) {
+    public EmployeeEntry(int employeeID, int departmentId, String employeeFirstName, String employeeMiddleName, String employeeLastName, float employeeSalary, Calendar employeeHireDate, String employeeEmail, String employeePhone, String employeeNote, String employeeImageUri, boolean employeeIsDeleted) {
         this.employeeID = employeeID;
         this.departmentId = departmentId;
         this.employeeFirstName = employeeFirstName;
@@ -143,11 +144,11 @@ public class EmployeeEntry {
         this.employeeSalary = employeeSalary;
     }
 
-    public Date getEmployeeHireDate() {
+    public Calendar getEmployeeHireDate() {
         return employeeHireDate;
     }
 
-    public void setEmployeeHireDate(Date employeeHireDate) {
+    public void setEmployeeHireDate(Calendar employeeHireDate) {
         this.employeeHireDate = employeeHireDate;
     }
 
@@ -200,10 +201,35 @@ public class EmployeeEntry {
         isChecked = checked;
     }
 
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (!(obj instanceof EmployeeEntry))
+            return false;
+
+        EmployeeEntry entry = (EmployeeEntry) obj;
+
+        return Integer.compare(employeeID, entry.employeeID) == 0
+                && Integer.compare(departmentId, entry.departmentId) == 0
+                && employeeFirstName.equals(entry.employeeFirstName)
+                && employeeMiddleName.equals(entry.employeeMiddleName)
+                && employeeLastName.equals(entry.employeeLastName)
+                && Float.compare(employeeSalary, entry.employeeSalary) == 0
+                && employeeHireDate.equals(entry.employeeHireDate)
+                && employeeImageUri.equals(entry.employeeImageUri)
+                && employeeEmail.equals(entry.employeeEmail)
+                && employeePhone.equals(entry.employeePhone)
+                && employeeNote.equals(entry.employeeNote)
+                && Boolean.compare(employeeIsDeleted, entry.employeeIsDeleted) == 0
+                && Boolean.compare(isChecked, entry.isChecked) == 0;
+    }
+
     @Override
     public int hashCode() {
 
-        return getEmployeeFirstName().hashCode() + getEmployeeMiddleName().hashCode() + getEmployeeLastName().hashCode();
+        return Objects.hash(employeeID, departmentId, employeeFirstName, employeeMiddleName, employeeLastName, employeeSalary, employeeHireDate, employeeImageUri, employeeEmail, employeePhone, employeeNote, employeeIsDeleted, isChecked);
 
     }
 }

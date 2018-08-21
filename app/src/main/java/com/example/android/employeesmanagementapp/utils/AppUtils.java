@@ -32,73 +32,6 @@ import androidx.fragment.app.DialogFragment;
  * class for app utilities
  */
 public final class AppUtils {
-
-
-    private static int numOfChangedFiled = 0;
-
-    public static void showDatePicker(Context context, View view) {
-        //create a bundle containing id of clicked text view (startDateTextView or dueDateTextView)
-        Bundle bundle = new Bundle();
-        bundle.putInt(DatePickerDialogFragment.KEY_DISPLAY_VIEW_ID, view.getId());
-        if (view.getTag() != null)
-            bundle.putLong(DatePickerDialogFragment.KEY_DISPLAY_DATE, ((Date) view.getTag()).getTime());
-        else
-            bundle.putLong(DatePickerDialogFragment.KEY_DISPLAY_DATE, new Date().getTime());
-
-        //instantiate a DatePickerDialogFragment to show date picker dialog
-        DialogFragment datePickerFragment = new DatePickerDialogFragment();
-        datePickerFragment.setArguments(bundle);
-
-        //show th dialog
-        datePickerFragment.show(((AppCompatActivity) context).getSupportFragmentManager(), "datePicker");
-    }
-
-    public static void showColorPicker(Context context, int taskId) {
-        //create a bundle containing id of task
-        Bundle bundle = new Bundle();
-        bundle.putInt(ColorPickerDialogFragment.KEY_TASK_ID, taskId);
-
-        //instantiate a ColorPickerDialogFragment
-        DialogFragment colorPickerDialogFragment = new ColorPickerDialogFragment();
-        colorPickerDialogFragment.setArguments(bundle);
-
-        //show th dialog
-        colorPickerDialogFragment.show(((AppCompatActivity) context).getSupportFragmentManager(), "colorPicker");
-    }
-
-    public static void showRateTaskDialog(final Context context, final int taskID) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Task done");
-        builder.setMessage("Please rate task");
-
-        View rateDialogView = LayoutInflater.from(context).inflate(R.layout.rating_bar, null, false);
-        final RatingBar ratingBar = rateDialogView.findViewById(R.id.rating_bar);
-//        ratingBar.setPaddingRelative(dpToPx(context ,16), 0, dpToPx(context,16), 0);
-        builder.setView(rateDialogView);
-
-        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(final DialogInterface dialog, int which) {
-                AppExecutor.getInstance().diskIO().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        AppDatabase.getInstance(context).tasksDao().rateTask(ratingBar.getRating(), taskID);
-                        dialog.dismiss();
-                    }
-                });
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-
-        builder.show();
-    }
-
-
     /**
      * Converts dp to pixel
      */
@@ -121,32 +54,6 @@ public final class AppUtils {
 
     public static String getFriendlyTime(Date date) {
         return SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT).format(date);
-    }
-
-    public static Date getChosenDateAndTime(Date chosenDate, Date chosenTime) {
-        Calendar dateAndTimeCalender = Calendar.getInstance();
-        Calendar dateCalendar = Calendar.getInstance();
-        Calendar timeCalendar = Calendar.getInstance();
-
-        if (chosenDate != null) {
-            dateCalendar.setTime(chosenDate);
-            dateAndTimeCalender.set(Calendar.YEAR, dateCalendar.get(Calendar.YEAR));
-            dateAndTimeCalender.set(Calendar.MONTH, dateCalendar.get(Calendar.MONTH));
-            dateAndTimeCalender.set(Calendar.DAY_OF_MONTH, dateCalendar.get(Calendar.DAY_OF_MONTH));
-        }
-
-        if (chosenTime != null) {
-            timeCalendar.setTime(chosenTime);
-            dateAndTimeCalender.set(Calendar.HOUR_OF_DAY, timeCalendar.get(Calendar.HOUR_OF_DAY));
-            dateAndTimeCalender.set(Calendar.MINUTE, timeCalendar.get(Calendar.MINUTE));
-            dateAndTimeCalender.set(Calendar.SECOND,0);
-        } else {
-            dateAndTimeCalender.set(Calendar.HOUR_OF_DAY, 0);
-            dateAndTimeCalender.set(Calendar.MINUTE, 0);
-            dateAndTimeCalender.set(Calendar.SECOND,0);
-        }
-
-        return dateAndTimeCalender.getTime();
     }
 
     public static String getFullEmployeeName(EmployeeEntry employeeEntry) {
