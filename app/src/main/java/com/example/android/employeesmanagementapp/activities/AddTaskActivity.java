@@ -3,9 +3,7 @@ package com.example.android.employeesmanagementapp.activities;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.app.TimePickerDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,8 +18,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.MyAlarmReceiver;
-import com.example.android.employeesmanagementapp.MyTextWatcher;
-import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
 import com.example.android.employeesmanagementapp.adapters.HorizontalAdapter;
@@ -39,14 +35,13 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.ViewCompat;
-import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -141,7 +136,6 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
 
         if (mTaskId == DEFAULT_TASK_ID) {
             clearViews();
-            setUpTextWatcher();
         } else {
             final LiveData<TaskEntry> task = mViewModel.taskEntry;
             task.observe(this, new Observer<TaskEntry>() {
@@ -149,7 +143,6 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
                 public void onChanged(@Nullable TaskEntry taskEntry) {
                     task.removeObserver(this);
                     populateUI(taskEntry);
-                    setUpTextWatcher();
                 }
             });
         }
@@ -166,17 +159,6 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
         mTaskDueTime.setOnClickListener(this::showTimePicker);
 
         ViewCompat.setNestedScrollingEnabled(mTaskEmployeesRV, false);
-
-    }
-
-    private void setUpTextWatcher() {
-        mTaskTitle.addTextChangedListener(new MyTextWatcher(mTaskTitle.getText().toString()));
-        mTaskDescription.addTextChangedListener(new MyTextWatcher(mTaskDescription.getText().toString()));
-        mTaskStartTime.addTextChangedListener(new MyTextWatcher(mTaskStartTime.getText().toString()));
-        mTaskStartDate.addTextChangedListener(new MyTextWatcher(mTaskStartDate.getText().toString()));
-        mTaskDueTime.addTextChangedListener(new MyTextWatcher(mTaskDueTime.getText().toString()));
-        mTaskDueDate.addTextChangedListener(new MyTextWatcher(mTaskDueDate.getText().toString()));
-
 
     }
 
@@ -230,8 +212,6 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
 
                     builder.show();
                 }
-
-            }
 
             }
         });
@@ -394,15 +374,12 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
     @Override
     protected void onStop() {
         super.onStop();
+        // if there is a previous alarm manager is created stop it and create a new one with the new taskDueDate
         stopPreviousAlarm();
         createNewAlarm();
 
     }
-        Intent intent = new Intent(this, NotificationService.class);
-        intent.putExtra("task id", mTaskId);
-        intent.putExtra("task due date", ((Calendar) mTaskDueDate.getTag()).getTime());
-        intent.putExtra("app is destroyed", false);
-        startService(intent);
+
 
     private void stopPreviousAlarm() {
         try {
@@ -416,17 +393,16 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
     }
 
     private void createNewAlarm() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(AppUtils.getChosenDateAndTime((Date) mTaskDueDate.getTag(), (Date) mTaskDueTime.getTag()));
+        Calendar calendar = (Calendar) mTaskDueDate.getTag();
         if (calendar.getTime().compareTo(new Date()) >= 0) {
             Intent intent = new Intent(this, MyAlarmReceiver.class);
-            intent.setClass(this, MyAlarmReceiver.class);
-            final PendingIntent pIntent = PendingIntent.getBroadcast(this, mTaskId, intent, 0);
+            PendingIntent pIntent = PendingIntent.getBroadcast(this, mTaskId, intent, 0);
             AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+            //solve the problem of start the service for android8
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 alarm.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() - 1000, pIntent);
             } else
-                alarm.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() - 1000, 0, pIntent);
+                alarm.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() - 1500, 0, pIntent);
         }
     }
 
@@ -467,7 +443,6 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
         if (mTaskTitle.getText().length() > 40) {
             valid = false;
         }
-
 
         if (TextUtils.isEmpty(mTaskStartDate.getText())) {
             updateErrorVisibility("startDate", true);

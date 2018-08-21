@@ -29,7 +29,6 @@ import androidx.core.app.NotificationManagerCompat;
 
 public class NotificationService extends Service {
     //we are going to use a mHandler to be able to run in our TimerTask
-    private final Handler mHandler = new Handler();
     private String TAG = "Timers";
     private static int mTasksCount = 0;
 
@@ -51,12 +50,17 @@ public class NotificationService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.e(TAG, "onStartCommand");
         super.onStartCommand(intent, flags, startId);
-        if (intent != null && intent.getExtras().getBoolean("intent is sent from receiver")) sendNotifications();
+
+        //check that the service was called after the alarmManager finished or not to send the notification
+        if (intent != null && intent.getExtras().getBoolean("intent is sent from receiver"))
+            sendNotifications();
         return START_STICKY;
     }
 
     private void sendNotifications() {
+
         createNotificationChannel("22327");
+
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
@@ -66,17 +70,17 @@ public class NotificationService extends Service {
                 .setContentTitle(getResources().getText(R.string.app_name))
                 .setContentText(++mTasksCount + " tasks due date are met")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                // Set the intent that will fire when the user taps the notification
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true)
-                .setVisibility(1)
-                .setDefaults(Notification.DEFAULT_ALL); //To control the level of detail visible in the notification from the lock screen
+                .setContentIntent(pendingIntent)  // Set the intent that will fire when the user taps the notification
+                .setAutoCancel(true) // cancel the notification from the notifications bar after open the app
+                .setVisibility(1)  //To control the level of detail visible in the notification from the lock screen
+                .setDefaults(Notification.DEFAULT_ALL); //set the default of led, sound and vibration of the mobile when the notification is sent
         if (mTasksCount == 1)
             mBuilder.setContentText(mTasksCount + " task due date is met");
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
-        // notificationId is a unique int for each notification that you must define
         notificationManager.notify(22327, mBuilder.build());
+
+
         setBadge(getApplicationContext(), mTasksCount);
     }
 
@@ -90,6 +94,7 @@ public class NotificationService extends Service {
         super.onDestroy();
     }
 
+    // create the channel of the notification
     private void createNotificationChannel(String CHANNEL_ID) {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
@@ -106,6 +111,7 @@ public class NotificationService extends Service {
         }
     }
 
+    //set the badfe of the app icon for the number of notifications the user doesn't check them
     public static void setBadge(Context context, int count) {
         String launcherClassName = getLauncherClassName(context);
         if (launcherClassName == null) {

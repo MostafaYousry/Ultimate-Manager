@@ -49,6 +49,7 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
         TextView textView = (TextView) viewToShowTimeIn;
         mCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
         mCalendar.set(Calendar.MINUTE, minute);
+        mCalendar.set(Calendar.SECOND,0);
         textView.setText(AppUtils.getFriendlyTime(mCalendar.getTime()));
     }
 }

@@ -165,30 +165,24 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
                         menu.removeItem(R.id.action_delete_task);
                     }
 
-                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        @Override
-                        public boolean onMenuItemClick(final MenuItem item) {
-                            switch (item.getItemId()) {
-                                case R.id.action_mark_as_done:
-                                    showRateTaskDialog((int) itemView.getTag());
-                                    return true;
-                                case R.id.action_delete_task:
+                    popup.setOnMenuItemClickListener(item -> {
+                        switch (item.getItemId()) {
+                            case R.id.action_mark_as_done:
+                                showRateTaskDialog((int) itemView.getTag());
+                                return true;
+                            case R.id.action_delete_task:
 
-                                    AppExecutor.getInstance().diskIO().execute(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            AppDatabase.getInstance(mContext).employeesTasksDao().deleteTaskJoinRecords(getItem(getAdapterPosition()).getTaskId());
-                                            AppDatabase.getInstance(mContext).tasksDao().deleteTask(getItem(getAdapterPosition()));
-                                        }
-                                    });
+                                AppExecutor.getInstance().diskIO().execute(() -> {
+                                    AppDatabase.getInstance(mContext).employeesTasksDao().deleteTaskJoinRecords(getItem(getAdapterPosition()).getTaskId());
+                                    AppDatabase.getInstance(mContext).tasksDao().deleteTask(getItem(getAdapterPosition()));
+                                });
 
-                                    return true;
-                                case R.id.action_color_task:
-                                    showColorPicker((int) itemView.getTag());
-                                    return true;
-                                default:
-                                    return false;
-                            }
+                                return true;
+                            case R.id.action_color_task:
+                                showColorPicker((int) itemView.getTag());
+                                return true;
+                            default:
+                                return false;
                         }
                     });
                     popup.show();
@@ -202,7 +196,10 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
             mTaskTitle.setText(getItem(position).getTaskTitle());
 
             mTaskDates.setText(mContext.getString(R.string.task_list_item_name_dates, AppUtils.getFriendlyDate(getItem(position).getTaskStartDate().getTime()), AppUtils.getFriendlyDate(getItem(position).getTaskDueDate().getTime())));
-            getRemainingTime(getItem(position).getTaskDueDate().getTime());
+            if(!getItem(position).isTaskIsCompleted()) {
+                mTaskDates.setVisibility(View.VISIBLE);
+                getRemainingTime(getItem(position).getTaskDueDate().getTime());
+            }
 
             int taskColor = ResourcesCompat.getColor(itemView.getResources(), getItem(position).getTaskColorResource(), mContext.getTheme());
 
