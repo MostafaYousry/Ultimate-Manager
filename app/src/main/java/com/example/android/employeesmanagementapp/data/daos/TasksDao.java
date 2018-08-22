@@ -25,16 +25,15 @@ public interface TasksDao {
     /**
      * load all tasks that are running
      *
-     * @return list of TaskEntry objects wrapped with LiveData
+     * @return Data source factory to be used in paged list adapter for paging lists
      */
     @Query("SELECT * FROM tasks WHERE task_is_completed = 0")
     DataSource.Factory<Integer, TaskEntry> loadRunningTasks();
 
-
     /**
-     * load all tasks that are running
+     * load all tasks that are completed
      *
-     * @return list of TaskEntry objects wrapped with LiveData
+     * @return Data source factory to be used in paged list adapter for paging lists
      */
     @Query("SELECT * FROM tasks WHERE task_is_completed = 1")
     DataSource.Factory<Integer, TaskEntry> loadCompletedTasks();
@@ -44,7 +43,7 @@ public interface TasksDao {
      *
      * @param taskIsCompleted: true for completed tasks / false for running tasks
      * @param employeeId:      the employee record id for loading tasks for
-     * @return list of TaskEntry objects wrapped with LiveData
+     * @return Data source factory to be used in paged list adapter for paging lists
      */
     @Query("select  tasks.task_id , department_id , task_title , task_description,task_start_date,task_due_date,task_rating,task_is_completed , task_color_resource from tasks " +
             "inner join employees_tasks on tasks.task_id = employees_tasks.task_id where employees_tasks.employee_id = :employeeId AND task_is_completed = :taskIsCompleted")
@@ -76,6 +75,30 @@ public interface TasksDao {
     List<Integer> getAllTasksId();
 
     /**
+     * update rating of a completed taskEntry
+     *
+     * @param taskRating : int number of stars
+     * @param taskID
+     */
+    @Query("UPDATE tasks SET task_rating = :taskRating , task_is_completed = 1 WHERE task_id=:taskID")
+    void rateTask(float taskRating, int taskID);
+
+    /**
+     * update task color
+     *
+     * @param colorRes : color resource
+     * @param taskID
+     */
+    @Query("UPDATE tasks SET task_color_resource = :colorRes WHERE task_id=:taskID")
+    void updateTaskColor(int colorRes, int taskID);
+
+    /**
+     * deletes tasks with no employees if exists
+     */
+    @Query("delete from tasks where (SELECT COUNT(*) FROM employees INNER JOIN employees_tasks ON employees.employee_id=employees_tasks.employee_id WHERE employees_tasks.task_id= tasks.task_id )=0")
+    void deleteTasksWithNoEmployees();
+
+    /**
      * insert a new taskEntry record
      *
      * @param taskEntry
@@ -99,29 +122,4 @@ public interface TasksDao {
      */
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateTask(TaskEntry taskEntry);
-
-    /**
-     * update rating of a completed taskEntry
-     *
-     * @param taskRating : int number of stars
-     * @param taskID
-     */
-    @Query("UPDATE tasks SET task_rating = :taskRating , task_is_completed = 1 WHERE task_id=:taskID")
-    void rateTask(float taskRating, int taskID);
-
-
-    /**
-     * update taskEntry color
-     *
-     * @param colorRes : color resource
-     * @param taskID
-     */
-    @Query("UPDATE tasks SET task_color_resource = :colorRes WHERE task_id=:taskID")
-    void updateTaskColor(int colorRes, int taskID);
-
-    @Query("delete from tasks where (SELECT COUNT(*) FROM employees INNER JOIN employees_tasks ON employees.employee_id=employees_tasks.employee_id WHERE employees_tasks.task_id= tasks.task_id )=0")
-    void deleteEmptyTasks();
-
-
-
 }

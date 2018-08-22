@@ -26,7 +26,7 @@ public interface EmployeesDao {
     /**
      * load all employees
      *
-     * @return list of EmployeeWithExtras objects wrapped with LiveData
+     * @return Data source factory to be used in paged list adapter for paging lists
      */
     @Query("WITH \n" +
             "  -- Common Table Expression 1 - Average of Completed Tasks per employee\n" +
@@ -56,6 +56,15 @@ public interface EmployeesDao {
             " \tWHERE employees.employee_is_deleted = 0")
     DataSource.Factory<Integer, EmployeeWithExtras> loadEmployees();
 
+    /**
+     * loads all employees in certian department
+     * and also gets some extras
+     * number of running tasks for every employee
+     * rating for every employee
+     *
+     * @param depId : department id
+     * @return list of employee with extras object
+     */
     @Query("WITH \n" +
             "  -- Common Table Expression 1 - Average of Completed Tasks per employee\n" +
             "    employee_completedtask_info AS (\n" +
@@ -96,15 +105,16 @@ public interface EmployeesDao {
     /**
      * load all employees in this department except certain employees
      * <p>
-     * used in add employees to tasks dialog
+     * used in add employees to task dialog
      *
-     * @return list of EmployeeWithExtras objects wrapped with LiveData
+     * @return list of Employee entry objects wrapped with LiveData
      */
     @Query(" SELECT * from employees where department_id = :departmentId AND employee_is_deleted = 0 AND employee_id NOT IN (:exceptThese)")
     LiveData<List<EmployeeEntry>> loadEmployeesInDep(int departmentId, List<Integer> exceptThese);
 
     /**
      * load an existing employee record by it's id
+     * and add rating and number of running tasks as extras
      *
      * @param employeeId : the employee record's id
      * @return EmployeeWithExtras object wrapped with LiveData
@@ -137,12 +147,14 @@ public interface EmployeesDao {
             "\tWHERE employees.employee_id = :employeeId;")
     LiveData<EmployeeWithExtras> loadEmployeeById(int employeeId);
 
-
     /**
-     * @return : number of employees in the company
+     * fires employee sets boolean only rather than deleting record
+     * because this employee has completed tasks
+     *
+     * @param empID
      */
-    @Query("SELECT COUNT(*) FROM employees where employee_is_deleted = 0")
-    int getNumEmployees();
+    @Query("UPDATE employees SET employee_is_deleted = 1 WHERE employee_id=:empID")
+    void markEmployeeAsDeleted(int empID);
 
     /**
      * insert a new employee record
@@ -167,14 +179,4 @@ public interface EmployeesDao {
      */
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateEmployee(EmployeeEntry employeeEntry);
-
-    /**
-     * update columns of an existing employee record to fire him
-     *
-     * @param empID
-     */
-    @Query("UPDATE employees SET employee_is_deleted = 1 WHERE employee_id=:empID")
-    void deleteEmployee(int empID);
-
-
 }

@@ -2,7 +2,6 @@ package com.example.android.employeesmanagementapp.activities;
 
 import android.app.NotificationManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -27,13 +26,21 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
 
+/**
+ * main app activity that shows all 3 main
+ * --company tasks(running,completed)
+ * --company employees
+ * --company departments
+ */
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
+    //used to display title in toolbar with applied font
+    private TextView mToolbarTitleTextView;
 
-    private Toolbar mToolbar;
-    private TextView mToolbarText;
     private BottomNavigationView mBottomNavigationView;
+
     private TabLayout mTabLayout;
+
     private FloatingActionButton mFab;
 
     private TasksFragment tasksFragment;
@@ -61,23 +68,29 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             cancelNotification(getApplicationContext(), 22327);
 
         //set toolbar as actionbar
-        mToolbar = findViewById(R.id.toolbar);
-        mToolbarText = findViewById(R.id.custom_title);
+        Toolbar mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
+
+        //set toolbar home icon
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setTitle(null);
 
-
-        //setup navigation view
+        //find views
+        mTabLayout = findViewById(R.id.tab_layout);
+        mFab = findViewById(R.id.fab);
         mBottomNavigationView = findViewById(R.id.bottom_navigation_view);
+        //toolbar text view to show title in with applied font
+        mToolbarTitleTextView = findViewById(R.id.custom_title);
+
+        //setup bottom navigation view's actions when changing between navigation items
         mBottomNavigationView.setOnNavigationItemSelectedListener(this);
 
 
-        mTabLayout = findViewById(R.id.tab_layout);
-        mFab = findViewById(R.id.fab);
-
         setUpFabClickListeners();
 
+        //observe number of departments in company
+        //to decide weather to allow adding employees/tasks or not
+        //as in order to create a task/employee they should be assigned to a department
         ViewModelProviders.of(this).get(MainViewModel.class).numOfCompanyDepartments.observe(this, numOfDepartments -> {
             if (numOfDepartments != null) {
                 mNumberOfDepartments = numOfDepartments;
@@ -85,22 +98,37 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             }
         });
 
-        if (savedInstanceState == null) {
+
+        if (savedInstanceState == null) {//first time the activity is created
+
+            //create instance of each fragment to be saved
+            //later in onSaveInstanceState()
+            //and to prevent unneeded fragment recreations
             tasksFragment = new TasksFragment();
             employeesFragment = new EmployeesFragment();
             departmentsFragment = new DepartmentsFragment();
+
+            //active fragment will be tasks fragment (home fragment)
             activeFragment = tasksFragment;
 
+            //adds all 3 fragments to the fragment manager
+            //with employees and department fragments hidden
+            //while task fragment is shown
             getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, departmentsFragment, "departments").hide(departmentsFragment).commit();
             getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, employeesFragment, "employees").hide(employeesFragment).commit();
             getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, tasksFragment, "tasks").commit();
+
+            //sets the selected navigation item to be tasks
             mBottomNavigationView.setSelectedItemId(R.id.nav_tasks);
 
-        } else {
+        } else {//activity is recreated
+
+            //restore fragments instances from bundle
             tasksFragment = (TasksFragment) getSupportFragmentManager().getFragment(savedInstanceState, "tasks_fragment");
             employeesFragment = (EmployeesFragment) getSupportFragmentManager().getFragment(savedInstanceState, "employees_fragment");
             departmentsFragment = (DepartmentsFragment) getSupportFragmentManager().getFragment(savedInstanceState, "departments_fragment");
 
+            //restore selected active fragment from bundle
             mBottomNavigationView.setSelectedItemId(savedInstanceState.getInt("selected_fragment_id"));
 
         }
@@ -112,41 +140,42 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         nMgr.cancel(notificationId);
     }
 
+    /**
+     * creates and caches fab click listeners
+     * each listener should work when certain conditions are met
+     */
     private void setUpFabClickListeners() {
 
+        //click listener to be applied when there are no departments in the company
+        //shows a dialog to either create a department or dismiss dialog
         mFabClickListenerNoDeps = view -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            builder.setTitle("No Departments");
-            builder.setMessage("Please create a department first");
-            builder.setPositiveButton("CREATE", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    Intent intent = new Intent(MainActivity.this, AddDepartmentActivity.class);
-                    startActivity(intent);
-                    dialogInterface.dismiss();
-                }
+            builder.setTitle(getString(R.string.dialog_title_no_departments));
+            builder.setMessage(getString(R.string.dialog_message_no_departments));
+            builder.setPositiveButton(getString(R.string.dialog_positive_btn_create), (dialogInterface, i) -> {
+                Intent intent = new Intent(MainActivity.this, AddDepartmentActivity.class);
+                startActivity(intent);
+                dialogInterface.dismiss();
             });
 
-            builder.setNegativeButton("NOT NOW", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                }
-            });
+            builder.setNegativeButton(getString(R.string.dialog_negative_btn_not_now), (dialogInterface, i) -> dialogInterface.dismiss());
 
             builder.show();
         };
 
+        //click listener that launches AddEmployeeActivity
         mFabClickListenerEmployees = view -> {
             Intent intent = new Intent(MainActivity.this, AddEmployeeActivity.class);
             startActivity(intent);
         };
 
+        //click listener that launches AddTaskActivity
         mFabClickListenerTasks = view -> {
             Intent intent = new Intent(MainActivity.this, AddTaskActivity.class);
             startActivity(intent);
         };
 
+        //click listener that launches AddDepartmentActivity
         mFabClickListenerDepartments = view -> {
             Intent intent = new Intent(MainActivity.this, AddDepartmentActivity.class);
             startActivity(intent);
@@ -160,6 +189,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             NotificationService.setBadge(getApplicationContext(), 0);
             NotificationService.setTasksCount(0);
         }
+
+        //clear all fab listeners
         mFabClickListenerNoDeps = null;
         mFabClickListenerTasks = null;
         mFabClickListenerEmployees = null;
@@ -167,14 +198,22 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     }
 
-    void loadFragment(Fragment fragment) {
+    /**
+     * used to switch between active fragment
+     * and the provided fragment
+     *
+     * @param fragment : fragment to be shown
+     */
+    private void loadFragment(Fragment fragment) {
         if (activeFragment == null || activeFragment == fragment)
             return;
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.hide(activeFragment).show(fragment);
-        activeFragment = fragment;
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+
+        transaction.hide(activeFragment).show(fragment);
+
+        activeFragment = fragment;
 
         transaction.commit();
     }
@@ -182,6 +221,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     /**
      * used to handle switching between fragments when a new navigation item is selected
+     * handles appbar/fab changes for each fragment
      */
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -218,6 +258,10 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         return true;
     }
 
+    /**
+     * decides what listener to use depending on
+     * active fragment and number of company departments
+     */
     private void adjustFabListeners() {
         if (mNumberOfDepartments == 0) {
             if (activeFragment instanceof TasksFragment || activeFragment instanceof EmployeesFragment)
@@ -234,6 +278,13 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         }
     }
 
+    /**
+     * saves instances of fragments and id of selected fragment
+     * to be later restored if activity
+     * is recreated
+     *
+     * @param outState
+     */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -245,6 +296,13 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     }
 
 
+    /**
+     * handles flipping icons of bottom navigation menu items
+     * from outlined icons to filled icons
+     * according to selected state of each menu item
+     *
+     * @param item
+     */
     private void adjustBottomNavigationIcons(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.nav_tasks:
@@ -268,23 +326,37 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     }
 
+    /**
+     * handles assigning titles to toolbar
+     * according to which fragment is currently visible
+     * and shows tab layout if active fragment is tasks
+     * hides it otherwise
+     *
+     * @param item
+     */
     private void adjustAppBar(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.nav_tasks:
                 mTabLayout.setVisibility(View.VISIBLE);
-                mToolbarText.setText(getString(R.string.tasks));
+                mToolbarTitleTextView.setText(getString(R.string.tasks));
                 break;
             case R.id.nav_employees:
                 mTabLayout.setVisibility(View.GONE);
-                mToolbarText.setText(getString(R.string.employees));
+                mToolbarTitleTextView.setText(getString(R.string.employees));
                 break;
             case R.id.nav_departments:
                 mTabLayout.setVisibility(View.GONE);
-                mToolbarText.setText(getString(R.string.departments));
+                mToolbarTitleTextView.setText(getString(R.string.departments));
                 break;
         }
     }
 
+    /**
+     * checks first if there is a multi selection happening
+     * in employees fragment and ends it first then returns to home fragment(tasks) if
+     * active fragment is not tasks
+     *
+     */
     @Override
     public void onBackPressed() {
 

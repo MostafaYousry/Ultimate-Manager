@@ -2,6 +2,8 @@ load lists while showing splash screen
 
 clean resources strings ...
 
+color of round rect spinner
+
 comments
 
 todo -----------------T E S T-----------------------------

@@ -43,9 +43,9 @@
 
 
     <!--strings for toolbar title-->
-    <string name="add_task">Add task</string>
-    <string name="edit_task">Edit task</string>
-    <string name="add_new_employee">Add new employee</string>
+    <string name="toolbar_add_task">Add task</string>
+    <string name="toolbar_edit_task">Edit task</string>
+    <string name="toolbar_add_employee">Add employee</string>
     <string name="edit_employee">Edit employee</string>
     <string name="add_new_department">Add new department</string>
     <string name="edit_department">Edit_department</string>
@@ -103,7 +103,7 @@
     <string name="channel_name">Due Soon</string>
     <string name="channel_description">Upcoming due dates on your cards</string>
     <string name="hint_department_date_created">Date created</string>
-    <string name="view_task">View task</string>
+    <string name="toolbar_view_task">View task</string>
     <string name="action_mail">Mail</string>
     <string name="action_phone">Call</string>
 
@@ -126,6 +126,31 @@
     <string name="date_three_fields">%s %s %s remaining</string>
     <string name="date_two_fields">%s %s remaining</string>
     <string name="date_one_fields">%s remaining</string>
+    <string name="snackbar_fired_employee_hint">Fired employees are view only</string>
     <string name="toolbar_add_department">Add department</string>
+    <string name="dialog_title_note">Note</string>
+    <string name="dialog_message_employee_department_changed">Department changed, employee will be removed from all running tasks in old department. Do you wish to continue ?</string>
+    <string name="dialog_negative_btn_cancel">cancel</string>
+    <string name="snackbar_completed_task_hint">Completed tasks are view only</string>
+    <string name="dialog_message_no_available_employees">No available employees, please choose another one</string>
+    <string name="dialog_positive_btn_ok">ok</string>
+    <string name="dialog_title_available_employees">Available employees</string>
+    <string name="dialog_title_discard_changes">Discard changes</string>
+    <string name="dialog_message_discard">All changes will be discarded</string>
+    <string name="dialog_negative_btn_discard">DISCARD</string>
+    <string name="dialog_positive_btn_save">SAVE</string>
+    <string name="image_option_load">Load picture</string>
+    <string name="image_option_camera">Take a photo</string>
+    <string name="dialog_title_no_departments">No departments</string>
+    <string name="dialog_message_no_departments">Please create a department first</string>
+    <string name="dialog_positive_btn_create">CREATE</string>
+    <string name="dialog_negative_btn_not_now">NOT NOW</string>
+    <string name="dialog_message_delete_department">All running tasks and employees are about to be deleted, completed tasks will be saved. Do you wish to continue ?</string>
+    <string name="dialog_positive_btn_continue">Continue</string>
+    <string name="dialog_title_task_done">Task done</string>
+    <string name="dialog_message_rate_task">Please rate task</string>
+    <string name="dialog_positive_btn_confirm">Confirm</string>
+    <string name="tab_layout_title_running">Running</string>
+    <string name="tab_layout_title_completed">Completed</string>
 
 </resources>

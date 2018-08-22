@@ -10,14 +10,14 @@ import android.widget.TextView;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /**
- * array adapter for spinners and autocomplete text views
+ * array adapter for spinners
+ * to display department names in a dropdown list
  */
 public class DepartmentsArrayAdapter extends ArrayAdapter<String> {
 
@@ -52,11 +52,13 @@ public class DepartmentsArrayAdapter extends ArrayAdapter<String> {
                             @NonNull ViewGroup parent) {
         if (convertView == null) {
             TextView textView = new TextView(getContext());
+            //apply style to the text view item
             if (Build.VERSION.SDK_INT < 23) {
                 textView.setTextAppearance(getContext(), mStyle);
             } else {
                 textView.setTextAppearance(mStyle);
             }
+            //apply padding to the text as needed
             textView.setPadding(mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom);
             convertView = textView;
         }
@@ -88,24 +90,20 @@ public class DepartmentsArrayAdapter extends ArrayAdapter<String> {
      * used when a department is already assigned to an existing taskEntry
      * its used to select the previously chosen department for that taskEntry
      *
-     * @param depId:
+     * @param depId: department id
      * @return its position in the drop down list
      */
     public int getPositionForItemId(int depId) {
         if (mDepartmentEntryList == null)
             return 0;
 
-        return Collections.binarySearch(mDepartmentEntryList, new DepartmentEntry(depId), new Comparator<DepartmentEntry>() {
-            @Override
-            public int compare(DepartmentEntry e1, DepartmentEntry e2) {
-                return Integer.compare(e1.getDepartmentId(), e2.getDepartmentId());
-            }
-        });
+        //using binary search since list is sorted by ids
+        return Collections.binarySearch(mDepartmentEntryList, new DepartmentEntry(depId), (e1, e2)
+                -> Integer.compare(e1.getDepartmentId(), e2.getDepartmentId()));
     }
 
     public void setData(List<DepartmentEntry> departmentEntryList) {
         mDepartmentEntryList = departmentEntryList;
-
         notifyDataSetChanged();
     }
 

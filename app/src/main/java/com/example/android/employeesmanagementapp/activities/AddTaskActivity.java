@@ -46,9 +46,17 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
     public static final String TASK_ID_KEY = "task_id";
     public static final String TASK_IS_COMPLETED_KEY = "task_is_completed";
     private static final boolean DEFAULT_TASK_IS_COMPLETED = false;
-    private boolean mTaskIsCompleted;
     private static final int DEFAULT_TASK_ID = -1;
+
+    private TaskEntry mOldTaskEntry;
+
+    private boolean mTaskIsCompleted;
+
     boolean departmentsLoaded = false;
+    private int clickedTaskDepId = -1;
+
+    private int mTaskId;
+
     private EditText mTaskTitle;
     private EditText mTaskDescription;
     private TextView mTaskStartDate;
@@ -57,13 +65,12 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
     private TextView mTaskDueTime;
     private Spinner mTaskDepartment;
     private RecyclerView mTaskEmployeesRV;
-    private int mTaskId;
-    private TaskEntry mOldTaskEntry;
+
     private HorizontalAdapter mHorizontalEmployeeAdapter;
     private DepartmentsArrayAdapter mDepartmentsArrayAdapter;
+
     private AppDatabase mDb;
     private AddNewTaskViewModel mViewModel;
-    private int clickedTaskDepId = -1;
 
 
     @Override
@@ -71,7 +78,20 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
 
-        //bind views
+        //create db instance
+        mDb = AppDatabase.getInstance(this);
+
+        //check if activity was opened from a click on rv item or from the fab
+        Intent intent = getIntent();
+        if (intent != null) {
+            mTaskId = intent.getIntExtra(TASK_ID_KEY, DEFAULT_TASK_ID);
+
+            //boolean to decide weather to lock views (as task is completed)
+            //or to enable them
+            mTaskIsCompleted = intent.getBooleanExtra(TASK_IS_COMPLETED_KEY, DEFAULT_TASK_IS_COMPLETED);
+        }
+
+        //find views
         mTaskTitle = findViewById(R.id.task_title);
         mTaskDescription = findViewById(R.id.task_description);
         mTaskStartDate = findViewById(R.id.task_start_date);
@@ -79,32 +99,26 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
         mTaskStartTime = findViewById(R.id.task_start_date_time);
         mTaskDueTime = findViewById(R.id.task_due_date_time);
         mTaskDepartment = findViewById(R.id.task_department);
-        Toolbar mToolbar = findViewById(R.id.toolbar);
         mTaskEmployeesRV = findViewById(R.id.task_employees_rv);
 
-        mDb = AppDatabase.getInstance(this);
 
-        //check if activity was opened from a click on rv item or from the fab
-        Intent intent = getIntent();
-        if (intent != null) {
-            mTaskId = intent.getIntExtra(TASK_ID_KEY, DEFAULT_TASK_ID);
-            mTaskIsCompleted = intent.getBooleanExtra(TASK_IS_COMPLETED_KEY, DEFAULT_TASK_IS_COMPLETED);
-        }
-
+        //instantiate AddNewTaskViewModel for this task id
         mViewModel = ViewModelProviders.of(this, new TaskIdFact(mDb, mTaskId)).get(AddNewTaskViewModel.class);
 
 
         //set toolbar as actionbar
+        Toolbar mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
 
         //set toolbar home icon
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
 
-
+        //create a new departments array adapter for employee department spinner
         mDepartmentsArrayAdapter = new DepartmentsArrayAdapter(this, AppUtils.dpToPx(this, 12), AppUtils.dpToPx(this, 8), AppUtils.dpToPx(this, 0), AppUtils.dpToPx(this, 8), R.style.detailActivitiesTextStyle);
 
 
+        //if task is completed don't load all departments (unnecessary)
         if (!mTaskIsCompleted) {
             mViewModel.allDepartments.observe(this, departmentEntries -> {
                 mDepartmentsArrayAdapter.setData(departmentEntries);
@@ -114,18 +128,23 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
                 }
             });
         } else {
-            Snackbar.make(findViewById(R.id.coordinator), "Completed tasks are view only", Snackbar.LENGTH_LONG).show();
+            //display a snackbar to show that this task is completed
+            //and cannot be edited
+            Snackbar.make(findViewById(R.id.coordinator), getString(R.string.snackbar_completed_task_hint), Snackbar.LENGTH_LONG).show();
         }
 
 
+        //set the adapter for departments spinner
         mTaskDepartment.setAdapter(mDepartmentsArrayAdapter);
 
 
-        setUpToolBar();
+        setUpToolBarTitle();
 
+        //decide weather to load old task or create a new one
         if (mTaskId == DEFAULT_TASK_ID) {
             clearViews();
         } else {
+            //load task entry from db
             final LiveData<TaskEntry> task = mViewModel.taskEntry;
             task.observe(this, new Observer<TaskEntry>() {
                 @Override
@@ -139,23 +158,49 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
 
         setUpTaskEmployeesRV();
 
+        //set click listeners to open date picker / time picker dialog
         mTaskDueDate.setOnClickListener(this::showDatePicker);
-
         mTaskStartDate.setOnClickListener(this::showDatePicker);
-
         mTaskStartTime.setOnClickListener(this::showTimePicker);
-
         mTaskDueTime.setOnClickListener(this::showTimePicker);
 
+        //disable nested scrolling to avoid sluggish scrolling
+        //because recycler view is inside nested scroll view
         ViewCompat.setNestedScrollingEnabled(mTaskEmployeesRV, false);
 
     }
 
+    /**
+     * set toolbar title accordingly
+     * add new task/view completed task/edit running task
+     */
+    private void setUpToolBarTitle() {
+        if (!mTaskIsCompleted)
+            if (mTaskId == DEFAULT_TASK_ID) {
+                getSupportActionBar().setTitle(getString(R.string.toolbar_add_task));
+            } else {
+                getSupportActionBar().setTitle(getString(R.string.toolbar_edit_task));
+            }
+        else
+            getSupportActionBar().setTitle(getString(R.string.toolbar_view_task));
+    }
 
+
+    /**
+     * shows dialog with all available employees in the selected department
+     * that can be assigned to this running/new task
+     * <p>
+     * triggered when user click on employee with + icon
+     *
+     * @param view
+     */
     public void showChooseTaskEmployeesDialog(View view) {
 
-        final int depId;
+        int depId;
         List<EmployeeEntry> exceptThese;
+
+        //get the department id for this task and the employees previously selected for this task
+        //to get all employees in department except them
         if (mTaskId == DEFAULT_TASK_ID) {
             depId = (int) mTaskDepartment.getSelectedView().getTag();
             if (mHorizontalEmployeeAdapter.getItemCount() == 0)
@@ -167,23 +212,24 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
             exceptThese = mHorizontalEmployeeAdapter.getAllEmployees();
         }
 
-
+        //load all available employees in this department
         final LiveData<List<EmployeeEntry>> restOfEmployees = mViewModel.getRestOfEmployeesInDep(depId, exceptThese);
         restOfEmployees.observe(this, employeeEntries -> {
             restOfEmployees.removeObservers(AddTaskActivity.this);
             if (employeeEntries != null) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(AddTaskActivity.this);
+
+                //if no available employees exist show a dialog displaying so
                 if (employeeEntries.isEmpty()) {
-                    builder.setTitle("Empty department");
-                    builder.setMessage("No employees in department please choose another one");
-                    builder.setPositiveButton("ok", (dialogInterface, i) -> dialogInterface.dismiss());
+                    builder.setMessage(getString(R.string.dialog_message_no_available_employees));
+                    builder.setPositiveButton(getString(R.string.dialog_positive_btn_ok), (dialogInterface, i) -> dialogInterface.dismiss());
                     builder.show();
 
                 } else {
-                    builder.setTitle("Employees available");
+                    builder.setTitle(getString(R.string.dialog_title_available_employees));
                     builder.setCancelable(false);
-                    final List<EmployeeEntry> chosenOnes = new ArrayList<>();
 
+                    final List<EmployeeEntry> chosenOnes = new ArrayList<>();
                     final boolean[] isChecked = new boolean[employeeEntries.size()];
 
                     builder.setMultiChoiceItems(getEmployeeNames(employeeEntries), isChecked, (dialogInterface, i, checked) -> {
@@ -196,8 +242,14 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
                         }
                     });
 
-                    builder.setPositiveButton("OK", (dialog, which) -> mHorizontalEmployeeAdapter.setAddedEmployees(chosenOnes));
-                    builder.setNegativeButton("CANCEL", (dialog, which) -> dialog.dismiss());
+                    //if ok is chosen pass the added list to horizontal adapter to display it
+                    builder.setPositiveButton(getString(R.string.dialog_positive_btn_ok), (dialog, which) -> {
+                        if (!chosenOnes.isEmpty())
+                            mHorizontalEmployeeAdapter.setAddedEmployees(chosenOnes);
+                        dialog.dismiss();
+                    });
+
+                    builder.setNegativeButton(getString(R.string.dialog_negative_btn_cancel), (dialog, which) -> dialog.dismiss());
 
                     builder.show();
                 }
@@ -208,6 +260,12 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
 
     }
 
+    /**
+     * maps employee entries to list of employee names to be displayed in choose employees dialog
+     *
+     * @param employeeEntries
+     * @return
+     */
     private String[] getEmployeeNames(List<EmployeeEntry> employeeEntries) {
 
         String[] arr = new String[employeeEntries.size()];
@@ -219,13 +277,17 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
     }
 
 
+    /**
+     * shows list of all task's employees in
+     * a recycler view that uses horizontal linear layout manager
+     * to display list as a horizontally scrolling list
+     */
     private void setUpTaskEmployeesRV() {
 
         mTaskEmployeesRV.setHasFixedSize(true);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(RecyclerView.HORIZONTAL);
         mTaskEmployeesRV.setLayoutManager(layoutManager);
-
 
         if (mTaskId != DEFAULT_TASK_ID) {
             mHorizontalEmployeeAdapter = new HorizontalAdapter(this, true, true, mTaskId, this);
@@ -236,17 +298,16 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
         mTaskEmployeesRV.setAdapter(mHorizontalEmployeeAdapter);
     }
 
+    /**
+     * restore state of views to adding a new task
+     */
     private void clearViews() {
-        mTaskTitle.setText("");
-        mTaskDescription.setText("");
-        mTaskStartDate.setText("");
-        mTaskStartDate.setTag(Calendar.getInstance());
-        mTaskDueDate.setText("");
-        mTaskDueDate.setTag(Calendar.getInstance());
-        mTaskStartTime.setText("");
-        mTaskDueTime.setText("");
+
         mTaskDepartment.setSelection(0);
 
+        //listener for task department changes to clear selected employees list
+        //triggered only for new tasks
+        //as we don't allow changes to task's department after it is created and assigned to employees
         mTaskDepartment.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             @Override
@@ -261,13 +322,25 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
 
     }
 
+    /**
+     * displays all this task's data in relevant views
+     *
+     * @param taskEntry
+     */
     private void populateUI(TaskEntry taskEntry) {
         if (taskEntry == null)
             return;
 
+        //save an old version of the task entry to be diffed (using equals)
+        //later on to decide weather to show discard changes dialog or not
         mOldTaskEntry = taskEntry;
 
+        //the task department id is saved to select this department later in spinner
+        //if department's are not yet loaded if they are loaded we select it now
         clickedTaskDepId = taskEntry.getDepartmentID();
+
+        //if task is completed w load only it's department and not the whole list
+        //and disable views(click and focus)
         if (mTaskIsCompleted) {
             mDb.departmentsDao().loadDepartmentById(clickedTaskDepId).observe(this, departmentEntry -> {
                 if (departmentEntry != null) {
@@ -278,17 +351,16 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
                 }
 
             });
-
-
             disableViewClicks();
-
         } else {
+
             if (departmentsLoaded)
                 mTaskDepartment.setSelection(mDepartmentsArrayAdapter.getPositionForItemId(taskEntry.getDepartmentID()));
 
+            //disable changing task's department after being created and assigned to employees
             mTaskDepartment.setEnabled(false);
 
-            // TODO: 8/15/18
+            // TODO: 8/21/18
 //        mTaskDepartment.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
@@ -309,9 +381,12 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
         mTaskDescription.setText(taskEntry.getTaskDescription());
 
         mTaskStartDate.setText(AppUtils.getFriendlyDate(taskEntry.getTaskStartDate().getTime()));
+
+        //set tag on this view to be used in date and time picker fragment and saved in save()
         mTaskStartDate.setTag(taskEntry.getTaskStartDate());
 
         mTaskDueDate.setText(AppUtils.getFriendlyDate(taskEntry.getTaskDueDate().getTime()));
+        //set tag on this view to be used in date and time picker fragment and saved in save()
         mTaskDueDate.setTag(taskEntry.getTaskDueDate());
 
         mTaskStartTime.setText(AppUtils.getFriendlyTime(taskEntry.getTaskStartDate().getTime()));
@@ -321,6 +396,9 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
 
     }
 
+    /**
+     * disables clicking and focusing in the layout
+     */
     private void disableViewClicks() {
 
 
@@ -349,17 +427,6 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
 
     }
 
-    private void setUpToolBar() {
-        if (!mTaskIsCompleted)
-            if (mTaskId == DEFAULT_TASK_ID) {
-                getSupportActionBar().setTitle(getString(R.string.add_task));
-            } else {
-                getSupportActionBar().setTitle(getString(R.string.edit_task));
-            }
-        else
-            getSupportActionBar().setTitle(getString(R.string.view_task));
-    }
-
 
     @Override
     protected void onStop() {
@@ -372,6 +439,9 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
 
     }
 
+    /**
+     * inflate toolbar menu for AddTaskActivity
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_toolbar, menu);
@@ -381,6 +451,9 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
     }
 
 
+    /**
+     * handles choosing menu item from toolbar
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -394,6 +467,12 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * used to check if all the data of task is valid
+     * and shows/hides error and helper messages accordingly
+     *
+     * @return : if data is valid true else false
+     */
     @Override
     protected boolean isDataValid() {
 
@@ -433,6 +512,12 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
         return valid;
     }
 
+    /**
+     * shows or hides error and helper messages for each field
+     *
+     * @param key  : field name
+     * @param show : to show or hide the error
+     */
     @Override
     protected void updateErrorVisibility(String key, boolean show) {
         if (show)
@@ -467,6 +552,9 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
             }
     }
 
+    /**
+     * saves (insert / update) the task entry
+     */
     @Override
     protected void save() {
         if (isDataValid()) {
@@ -474,12 +562,16 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
 
             AppExecutor.getInstance().diskIO().execute(() -> {
                 if (mTaskId == DEFAULT_TASK_ID) {
+                    //returns newly inserted task record id
+                    //to be used to assign employees to it in join table(employees tasks join table)
                     mTaskId = (int) mDb.tasksDao().addTask(newTask);
                 } else {
                     mDb.tasksDao().updateTask(newTask);
                 }
             });
 
+            //in case if it is a new task insert the added employees
+            //other cases are handled in horizontal adapter
             if (mTaskId == DEFAULT_TASK_ID) {
                 final List<EmployeeEntry> addedEmployees = mHorizontalEmployeeAdapter.getAddedEmployees();
                 if (!addedEmployees.isEmpty())
@@ -495,6 +587,14 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
     }
 
 
+    /**
+     * notifies the activity when a task employee is clicked
+     * to open AddEmployeeActivity to edit/view this employee
+     *
+     * @param employeeRowID    : employee record id
+     * @param employeePosition : adapter position
+     * @param isFired          : weather employee is fired(deleted) or not
+     */
     @Override
     public void onEmployeeClick(int employeeRowID, int employeePosition, boolean isFired) {
         Intent intent = new Intent(this, AddEmployeeActivity.class);
@@ -503,6 +603,9 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
         startActivity(intent);
     }
 
+    /**
+     * creates a task entry with the data in the views
+     */
     private TaskEntry getTaskEntry() {
         int departmentId = (int) mTaskDepartment.getSelectedView().getTag();
         String taskTitle = mTaskTitle.getText().toString();
@@ -516,6 +619,11 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
             return new TaskEntry(mTaskId, departmentId, taskTitle, taskDescription, taskStartDate, taskDueDate, mOldTaskEntry.getTaskRating(), mOldTaskEntry.isTaskIsCompleted(), mOldTaskEntry.getTaskColorResource());
     }
 
+    /**
+     * checks if any data is changed without saving
+     *
+     * @return
+     */
     @Override
     protected boolean fieldsChanged() {
         if (mTaskId == DEFAULT_TASK_ID) {
@@ -549,6 +657,27 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
         return false;
     }
 
+    @Override
+    protected void showDiscardChangesDialog() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.dialog_title_discard_changes));
+        builder.setMessage(getString(R.string.dialog_message_discard));
+        builder.setNegativeButton(getString(R.string.dialog_negative_btn_discard), (dialogInterface, i) -> {
+            mHorizontalEmployeeAdapter.discardImmediateChanges();
+            dialogInterface.dismiss();
+            finish();
+        });
+
+        builder.setPositiveButton(getString(R.string.dialog_positive_btn_save), (dialogInterface, i) -> {
+            save();
+            dialogInterface.dismiss();
+        });
+        builder.show();
+    }
+
+    //if task is completed then there is no data changed
+    //so finish the activity
     @Override
     public void onBackPressed() {
         if (mTaskIsCompleted)

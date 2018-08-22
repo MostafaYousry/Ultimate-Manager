@@ -46,7 +46,7 @@ public class TasksFragment extends Fragment {
 
     private void setUpViewPager(View rootView) {
         mViewPager = rootView.findViewById(R.id.tasks_view_pager);
-        mPagerAdapter = new TasksPagerAdapter(getActivity().getSupportFragmentManager());
+        mPagerAdapter = new TasksPagerAdapter(getContext(), getActivity().getSupportFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
         mTabLayout = getActivity().findViewById(R.id.tab_layout);
         mTabLayout.setupWithViewPager(mViewPager);

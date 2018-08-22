@@ -9,6 +9,11 @@ import com.example.android.employeesmanagementapp.R;
 import androidx.recyclerview.widget.RecyclerView;
 import de.hdodenhof.circleimageview.CircleImageView;
 
+/**
+ * recycler view adapter class used for displaying colors
+ * in a grid in a dialog that allows user to
+ * choose a task color
+ */
 public class ColorAdapter extends RecyclerView.Adapter<ColorAdapter.ColorViewHolder> {
 
     private int[] mColorResources;
@@ -37,6 +42,10 @@ public class ColorAdapter extends RecyclerView.Adapter<ColorAdapter.ColorViewHol
         return mColorResources.length;
     }
 
+    /**
+     * sends the result of chosen color back to the dialog
+     * fragment
+     */
     public interface OnColorSelectedListener {
         void onColorSelected(int colorRes);
     }

@@ -44,7 +44,7 @@ public class DepartmentEntry {
         this.departmentImageUri = departmentImageUri;
     }
 
-    //used with index of for department spinner
+    //used in comparator of binary search in departments array adapter
     @Ignore
     public DepartmentEntry(@NonNull int departmentId) {
         this.departmentId = departmentId;

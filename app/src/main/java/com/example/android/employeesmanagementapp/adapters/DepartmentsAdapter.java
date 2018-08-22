@@ -1,14 +1,12 @@
 package com.example.android.employeesmanagementapp.adapters;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -37,13 +35,22 @@ import androidx.palette.graphics.Palette;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+/**
+ * Recycler view adapter for
+ * displaying list of departments
+ * extends paged list adapter class
+ * to allow list paging
+ */
 public class DepartmentsAdapter extends PagedListAdapter<DepartmentWithExtras, DepartmentsAdapter.DepartmentsViewHolder> {
-    private static final String TAG = DepartmentsAdapter.class.getSimpleName();
 
     private Context mContext;
 
     private DepartmentItemClickListener mDepartmentItemClickListener;
 
+    //the diff that is called by the paged list adapter
+    //adapter uses this diff to know what changes occurred
+    //between the current list and a new list
+    //it handles notifyItemRemoved() , inserted , changed ,... automatically
     private static DiffUtil.ItemCallback<DepartmentWithExtras> DIFF_CALLBACK =
             new DiffUtil.ItemCallback<DepartmentWithExtras>() {
 
@@ -89,6 +96,7 @@ public class DepartmentsAdapter extends PagedListAdapter<DepartmentWithExtras, D
         }
     }
 
+
     /**
      * interface to handle click events done on a recycler view item
      */
@@ -101,14 +109,9 @@ public class DepartmentsAdapter extends PagedListAdapter<DepartmentWithExtras, D
         TextView mDepartmentName;
         TextView mDepartmentSummary;
         ImageView mDepartmentImage;
-        Palette.Filter paletteFilter = new Palette.Filter() {
-            @Override
-            public boolean isAllowed(int rgb, float[] hsl) {
-                if (rgb == Color.WHITE)
-                    return false;
-                return true;
-            }
-        };
+
+        //filter to palette colors to reject white colors as our text color is white
+        Palette.Filter paletteFilter = (rgb, hsl) -> rgb != Color.WHITE;
 
         DepartmentsViewHolder(View itemView) {
             super(itemView);
@@ -117,93 +120,88 @@ public class DepartmentsAdapter extends PagedListAdapter<DepartmentWithExtras, D
             mDepartmentImage = itemView.findViewById(R.id.department_image);
             mDepartmentSummary = itemView.findViewById(R.id.department_summary);
 
-            itemView.findViewById(R.id.pop_up_menu).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    PopupMenu popup = new PopupMenu(mContext, view);
-                    popup.setGravity(Gravity.TOP);
-                    popup.inflate(R.menu.menu_department_options);
-                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        @Override
-                        public boolean onMenuItemClick(MenuItem item) {
-                            switch (item.getItemId()) {
-                                case R.id.action_delete_department:
+            //sets a click listener on the three dots to show a popup menu with department options
+            itemView.findViewById(R.id.pop_up_menu).setOnClickListener(view -> {
+                PopupMenu popup = new PopupMenu(mContext, view);
+                popup.setGravity(Gravity.TOP);
+                popup.inflate(R.menu.menu_department_options);
+                popup.setOnMenuItemClickListener(item -> {
+                    switch (item.getItemId()) {
+                        case R.id.action_delete_department:
 
-                                    final AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
-                                    alertDialog.setTitle("Note");
-                                    alertDialog.setMessage("All running tasks and employees are about to be deleted, completed tasks will be saved.\nDo you wish to continue ?");
-                                    alertDialog.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+                            final AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
+                            alertDialog.setTitle(mContext.getString(R.string.dialog_title_note));
+                            alertDialog.setMessage(mContext.getString(R.string.dialog_message_delete_department));
+                            alertDialog.setPositiveButton(mContext.getString(R.string.dialog_positive_btn_continue), (dialogInterface, i) ->
+                                    AppExecutor.getInstance().diskIO().execute(() -> {
+                                        AppDatabase db = AppDatabase.getInstance(mContext);
+                                        DepartmentEntry departmentEntry = getItem(getAdapterPosition()).departmentEntry;
 
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                        //first delete all employees in department
+                                        for (EmployeeWithExtras employeeWithExtras : db.employeesDao().loadEmployeesExtrasInDep(departmentEntry.getDepartmentId())) {
 
-                                            AppExecutor.getInstance().diskIO().execute(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    AppDatabase db = AppDatabase.getInstance(mContext);
-                                                    DepartmentEntry departmentEntry = getItem(getAdapterPosition()).departmentEntry;
+                                            int empID = employeeWithExtras.employeeEntry.getEmployeeID();
 
-                                                    for (EmployeeWithExtras employeeWithExtras : db.employeesDao().loadEmployeesExtrasInDep(departmentEntry.getDepartmentId())) {
+                                            //if employee has completed tasks only mark employee as deleted only
+                                            if (employeeWithExtras.employeeNumRunningTasks == 0 && db.employeesTasksDao().getNumCompletedTasksEmployee(empID) > 0) {
+                                                db.employeesDao().markEmployeeAsDeleted(empID);
 
-                                                        int empID = employeeWithExtras.employeeEntry.getEmployeeID();
+                                                //if employee has running tasks only remove employee from them then delete employee record
+                                            } else if (employeeWithExtras.employeeNumRunningTasks > 0 && db.employeesTasksDao().getNumCompletedTasksEmployee(empID) == 0) {
+                                                db.employeesTasksDao().deleteEmployeeJoinRecords(empID);
+                                                db.employeesDao().deleteEmployee(employeeWithExtras.employeeEntry);
 
-                                                        if (employeeWithExtras.employeeNumRunningTasks == 0 && db.employeesTasksDao().getNumCompletedTasksEmployee(empID) > 0) {
-                                                            db.employeesDao().deleteEmployee(empID);
-                                                        } else if (employeeWithExtras.employeeNumRunningTasks > 0 && db.employeesTasksDao().getNumCompletedTasksEmployee(empID) == 0) {
-                                                            db.employeesTasksDao().deleteEmployeeJoinRecords(empID);
-                                                            db.employeesDao().deleteEmployee(employeeWithExtras.employeeEntry);
-                                                        } else if (employeeWithExtras.employeeNumRunningTasks > 0 && db.employeesTasksDao().getNumCompletedTasksEmployee(empID) > 0) {
-                                                            db.employeesTasksDao().deleteEmployeeFromRunningTasks(empID);
-                                                            db.employeesDao().deleteEmployee(empID);
-                                                        } else {
-                                                            db.employeesDao().deleteEmployee(employeeWithExtras.employeeEntry);
-                                                        }
-
-                                                    }
-
-                                                    db.tasksDao().deleteEmptyTasks();
-
-                                                    if (db.departmentsDao().getNumCompletedTasksDepartment(departmentEntry.getDepartmentId()) == 0) {
-                                                        db.departmentsDao().deleteDepartment(departmentEntry);
-                                                    } else {
-                                                        departmentEntry.setDepartmentIsDeleted(true);
-                                                        db.departmentsDao().updateDepartment(departmentEntry);
-                                                    }
-
-                                                }
-                                            });
+                                                //if employee has both so remove him from running tasks only
+                                                //then mark him as deleted
+                                            } else if (employeeWithExtras.employeeNumRunningTasks > 0 && db.employeesTasksDao().getNumCompletedTasksEmployee(empID) > 0) {
+                                                db.employeesTasksDao().deleteEmployeeFromRunningTasks(empID);
+                                                db.employeesDao().markEmployeeAsDeleted(empID);
+                                            } else {
+                                                //if he has nothing delete employee record
+                                                db.employeesDao().deleteEmployee(employeeWithExtras.employeeEntry);
+                                            }
 
                                         }
 
+                                        //then check if tasks with no employees have appeared
+                                        //due to the above employees deletion
+                                        db.tasksDao().deleteTasksWithNoEmployees();
 
-                                    });
-
-                                    alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            dialogInterface.dismiss();
+                                        //then delete department
+                                        //if department has no completed tasks
+                                        //delete department record
+                                        if (db.employeesTasksDao().getNumCompletedTasksDepartment(departmentEntry.getDepartmentId()) == 0) {
+                                            db.departmentsDao().deleteDepartment(departmentEntry);
+                                        } else {
+                                            //if it has then mark department as deleted
+                                            departmentEntry.setDepartmentIsDeleted(true);
+                                            db.departmentsDao().updateDepartment(departmentEntry);
                                         }
-                                    });
-                                    alertDialog.show();
-                                    return true;
-                                default:
-                                    return false;
-                            }
-                        }
-                    });
+
+                                    }));
+
+                            alertDialog.setNegativeButton(mContext.getString(R.string.dialog_negative_btn_cancel), (dialogInterface, i) -> dialogInterface.dismiss());
+                            alertDialog.show();
+                            return true;
+                        default:
+                            return false;
+                    }
+                });
 
 
-                    popup.show();
-                }
-
+                popup.show();
             });
+
             // set the item click listener
             itemView.setOnClickListener(this);
         }
 
-        public void bind(int position) {
+        //binds this item view with it's corresponding data
+        void bind(int position) {
+
             mDepartmentName.setText(getItem(position).departmentEntry.getDepartmentName());
 
+            //gets summary quantity strings
             String runningTasksSummary = mContext.getResources().getQuantityString(R.plurals.numberOfRunningTasks, getItem(position).numRunningTasks, getItem(position).numRunningTasks);
             String completedTasksSummary = mContext.getResources().getQuantityString(R.plurals.numberOfCompletedTasks, getItem(position).numCompletedTasks, getItem(position).numCompletedTasks);
             String numberOfEmployees = mContext.getResources().getQuantityString(R.plurals.numberOfEmployees, getItem(position).numOfEmployees, getItem(position).numOfEmployees);
@@ -211,6 +209,9 @@ public class DepartmentsAdapter extends PagedListAdapter<DepartmentWithExtras, D
             mDepartmentSummary.setText(mContext.getString(R.string.department_summary, numberOfEmployees, runningTasksSummary, completedTasksSummary));
 
 
+            //if department has no image then use default
+            //which is a department icon in center and unique background color depending
+            //on object's hashcode , the background of the summary text is grey
             if (TextUtils.isEmpty(getItem(position).departmentEntry.getDepartmentImageUri())) {
                 Glide.with(mContext).clear(mDepartmentImage);
                 mDepartmentImage.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_departments));
@@ -220,9 +221,13 @@ public class DepartmentsAdapter extends PagedListAdapter<DepartmentWithExtras, D
 
                 mItemView.setCardBackgroundColor(ResourcesCompat.getColor(mContext.getResources(), R.color.department_fallback_color, mContext.getTheme()));
             } else {
+                //if department has an image then load it using Glide
                 Glide.with(mContext)
                         .asBitmap()
                         .load(Uri.parse(getItem(position).departmentEntry.getDepartmentImageUri()))
+                        //listener that notifies us when the image is ready
+                        //to extract a palette for it in order to correctly choose
+                        //a vibrant color as the background of summary text
                         .listener(new RequestListener<Bitmap>() {
                             @Override
                             public boolean onLoadFailed(GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
@@ -238,33 +243,53 @@ public class DepartmentsAdapter extends PagedListAdapter<DepartmentWithExtras, D
                         .into(mDepartmentImage);
             }
 
+            //sets id of the department record as the tag for this view
+            //to be retrieved later when a click occurs
             mItemView.setTag(getItem(position).departmentEntry.getDepartmentId());
         }
 
+        /**
+         * callback that notifies the fragment when a click on rv item occurs
+         *
+         * @param v : view
+         */
         @Override
         public void onClick(View v) {
             mDepartmentItemClickListener.onDepartmentClick((int) mItemView.getTag(), getAdapterPosition());
         }
 
+        /**
+         * creates a palette in a background thread and when finished it registers the
+         * resulting color to the background color of the department's summary text
+         *
+         * @param bitmap
+         */
         void createPaletteAsync(Bitmap bitmap) {
             Palette.Builder builder = new Palette.Builder(bitmap);
             builder.addFilter(paletteFilter);
-            builder.generate(new Palette.PaletteAsyncListener() {
-                public void onGenerated(Palette palette) {
+            builder.generate(palette -> {
 
-                    int fallbackColor = palette.getDominantColor(0);
+                //choose a fallback color as the dominant color in image
+                //to set this color if no vibrant colors exist
+                int fallbackColor = palette.getDominantColor(0);
 
-                    Palette.Swatch vibrantColorSwatch = palette.getVibrantSwatch();
-                    if (vibrantColorSwatch != null) {
-                        int vibrantColor = vibrantColorSwatch.getRgb();
-                        mItemView.setCardBackgroundColor(vibrantColor);
-                    } else {
-                        mItemView.setCardBackgroundColor(fallbackColor);
-                    }
+                //get the most vibrant swatch in image
+                Palette.Swatch vibrantColorSwatch = palette.getVibrantSwatch();
+                if (vibrantColorSwatch != null) {
+                    //if it exists set it
+                    int vibrantColor = vibrantColorSwatch.getRgb();
+                    mItemView.setCardBackgroundColor(vibrantColor);
+                } else {
+                    //if it doesn't then set the fallback color
+                    mItemView.setCardBackgroundColor(fallbackColor);
                 }
             });
         }
 
+        /**
+         * clears view holder to default values
+         * used for place holders in paged list adapter
+         */
         void clear() {
             mDepartmentName.setText("");
             mDepartmentSummary.setText("");

@@ -26,7 +26,7 @@ public interface DepartmentsDao {
     /**
      * load all departments with their extras
      *
-     * @return list of DepartmentWithExtras objects wrapped with LiveData
+     * @return Data source factory to be used in paged list adapter for paging lists
      */
     @Query("Select * ,\n" +
             "(select count(tasks.task_title) from tasks where tasks.task_is_completed = 0 And tasks.department_id = departments.department_id) as num_running_tasks,\n" +
@@ -35,7 +35,6 @@ public interface DepartmentsDao {
             "From departments where department_is_deleted = 0")
     DataSource.Factory<Integer, DepartmentWithExtras> loadDepartmentsWithExtras();
 
-
     /**
      * load all departments
      *
@@ -43,9 +42,6 @@ public interface DepartmentsDao {
      */
     @Query("Select * from departments where department_is_deleted = 0")
     LiveData<List<DepartmentEntry>> loadDepartments();
-
-    @Query("select count(*) from tasks where tasks.task_is_completed = 1 And tasks.department_id = :depID")
-    int getNumCompletedTasksDepartment(int depID);
 
     /**
      * load a department record by it's id
@@ -85,6 +81,5 @@ public interface DepartmentsDao {
      */
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateDepartment(DepartmentEntry departmentEntry);
-
 
 }

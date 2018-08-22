@@ -2,13 +2,11 @@ package com.example.android.employeesmanagementapp.adapters;
 
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -36,14 +34,22 @@ import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-
+/**
+ * Recycler view adapter for
+ * displaying list of tasks
+ * extends paged list adapter class
+ * to allow list paging
+ */
 public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.TasksViewHolder> {
 
     private Context mContext;
     private TasksItemClickListener mTaskClickListener;
     private boolean mTasksAreCompleted;
 
-
+    //the diff that is called by the paged list adapter
+    //adapter uses this diff to know what changes occurred
+    //between the current list and a new list
+    //it handles notifyItemRemoved() , inserted , changed ,... automatically
     private static DiffUtil.ItemCallback<TaskEntry> DIFF_CALLBACK =
             new DiffUtil.ItemCallback<TaskEntry>() {
                 @Override
@@ -69,12 +75,10 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
     @NonNull
     @Override
     public TasksViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // create a new view
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_tasks_rv, parent, false);
 
-        TasksViewHolder tasksViewHolder = new TasksViewHolder(itemView);
-        return tasksViewHolder;
+        return new TasksViewHolder(itemView);
     }
 
     @Override
@@ -98,6 +102,12 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
         void onTaskClick(int taskRowID, int taskPosition, boolean taskIsCompleted);
     }
 
+    /**
+     * shows task color picker dialog
+     * to choose a task color
+     *
+     * @param taskId
+     */
     private void showColorPicker(int taskId) {
         Bundle bundle = new Bundle();
         bundle.putInt(ColorPickerDialogFragment.KEY_TASK_ID, taskId);
@@ -108,34 +118,31 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
         colorPickerDialogFragment.show(((AppCompatActivity) mContext).getSupportFragmentManager(), "colorPicker");
     }
 
+    /**
+     * shows rate task dialog to rate a task
+     * that is completed
+     *
+     * @param taskID
+     */
     private void showRateTaskDialog(final int taskID) {
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        builder.setTitle("Task done");
-        builder.setMessage("Please rate task");
+        builder.setTitle(mContext.getString(R.string.dialog_title_task_done));
+        builder.setMessage(mContext.getString(R.string.dialog_message_rate_task));
 
         View rateDialogView = LayoutInflater.from(mContext).inflate(R.layout.rating_bar, null, false);
+
         final RatingBar ratingBar = rateDialogView.findViewById(R.id.rating_bar);
         ratingBar.setPaddingRelative(AppUtils.dpToPx(mContext, 16), 0, AppUtils.dpToPx(mContext, 16), 0);
         builder.setView(rateDialogView);
 
-        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(mContext.getString(R.string.dialog_positive_btn_confirm), (dialog, which) -> AppExecutor.getInstance().diskIO().execute(new Runnable() {
             @Override
-            public void onClick(final DialogInterface dialog, int which) {
-                AppExecutor.getInstance().diskIO().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        AppDatabase.getInstance(mContext).tasksDao().rateTask(ratingBar.getRating(), taskID);
-                        dialog.dismiss();
-                    }
-                });
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void run() {
+                AppDatabase.getInstance(mContext).tasksDao().rateTask(ratingBar.getRating(), taskID);
                 dialog.dismiss();
             }
-        });
+        }));
+        builder.setNegativeButton(mContext.getString(R.string.dialog_negative_btn_cancel), (dialog, which) -> dialog.dismiss());
 
         builder.show();
     }
@@ -149,54 +156,51 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
 
         TasksViewHolder(final View itemView) {
             super(itemView);
+
             mItemView = (MaterialCardView) itemView;
             mTaskTitle = itemView.findViewById(R.id.task_title);
             mTaskDates = itemView.findViewById(R.id.task_dates);
             mTaskOptions = itemView.findViewById(R.id.task_options_button);
-            mTaskOptions.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    PopupMenu popup = new PopupMenu(view.getContext(), mTaskOptions);
-                    popup.inflate(R.menu.menu_task_options);
 
-                    if (mTasksAreCompleted) {
-                        Menu menu = popup.getMenu();
-                        menu.removeItem(R.id.action_mark_as_done);
-                        menu.removeItem(R.id.action_delete_task);
-                    }
+            //sets a click listener on the three dots to show a popup menu with task options
+            mTaskOptions.setOnClickListener(view -> {
+                PopupMenu popup = new PopupMenu(view.getContext(), mTaskOptions);
+                popup.inflate(R.menu.menu_task_options);
 
-                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        @Override
-                        public boolean onMenuItemClick(final MenuItem item) {
-                            switch (item.getItemId()) {
-                                case R.id.action_mark_as_done:
-                                    showRateTaskDialog((int) itemView.getTag());
-                                    return true;
-                                case R.id.action_delete_task:
-
-                                    AppExecutor.getInstance().diskIO().execute(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            AppDatabase.getInstance(mContext).employeesTasksDao().deleteTaskJoinRecords(getItem(getAdapterPosition()).getTaskId());
-                                            AppDatabase.getInstance(mContext).tasksDao().deleteTask(getItem(getAdapterPosition()));
-                                        }
-                                    });
-
-                                    return true;
-                                case R.id.action_color_task:
-                                    showColorPicker((int) itemView.getTag());
-                                    return true;
-                                default:
-                                    return false;
-                            }
-                        }
-                    });
-                    popup.show();
+                //if task is completed then show color option only
+                if (mTasksAreCompleted) {
+                    Menu menu = popup.getMenu();
+                    menu.removeItem(R.id.action_mark_as_done);
+                    menu.removeItem(R.id.action_delete_task);
                 }
+
+                popup.setOnMenuItemClickListener(item -> {
+
+                    switch (item.getItemId()) {
+                        case R.id.action_mark_as_done:
+                            showRateTaskDialog((int) itemView.getTag());
+                            return true;
+                        case R.id.action_delete_task:
+
+                            AppExecutor.getInstance().diskIO().execute(() -> {
+                                AppDatabase.getInstance(mContext).employeesTasksDao().deleteTaskJoinRecords(getItem(getAdapterPosition()).getTaskId());
+                                AppDatabase.getInstance(mContext).tasksDao().deleteTask(getItem(getAdapterPosition()));
+                            });
+
+                            return true;
+                        case R.id.action_color_task:
+                            showColorPicker((int) itemView.getTag());
+                            return true;
+                        default:
+                            return false;
+                    }
+                });
+                popup.show();
             });
             itemView.setOnClickListener(this);
         }
 
+        //binds this item view with it's corresponding data
         void bind(int position) {
 
             mTaskTitle.setText(getItem(position).getTaskTitle());
@@ -298,11 +302,20 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
             }.start();
         }
 
+        /**
+         * callback that notifies the fragment when a click on rv item occurs
+         *
+         * @param v : view
+         */
         @Override
         public void onClick(View v) {
             mTaskClickListener.onTaskClick((int) mItemView.getTag(), getAdapterPosition(), getItem(getAdapterPosition()).isTaskIsCompleted());
         }
 
+        /**
+         * clears view holder to default values
+         * used for place holders in paged list adapter
+         */
         void clear() {
             mTaskTitle.setText("");
 

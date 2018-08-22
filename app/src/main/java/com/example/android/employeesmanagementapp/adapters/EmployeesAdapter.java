@@ -27,22 +27,23 @@ import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+
+/**
+ * Recycler view adapter for
+ * displaying list of employees
+ * extends paged list adapter class
+ * to allow list paging
+ */
 public class EmployeesAdapter extends PagedListAdapter<EmployeeWithExtras, EmployeesAdapter.EmployeesViewHolder> {
-    public static final int SELECTION_MODE_SINGLE = 1;
 
     private Context mContext;
 
-
-    final private EmployeeItemClickListener mClickListener;
+    public static final int SELECTION_MODE_SINGLE = 1;
     public static final int SELECTION_MODE_MULTIPLE = 2;
-    private static final String TAG = EmployeesAdapter.class.getSimpleName();
-    private static final int HIGHLIGHT_COLOR = 0x999be6ff;
-    private int employeesSelectionMode;
-    private List<EmployeeWithExtras> mSelectedOnes;
-
-    private EmployeeSelectedStateListener mEmployeeSelectedStateListener;
-
-
+    //the diff that is called by the paged list adapter
+    //adapter uses this diff to know what changes occurred
+    //between the current list and a new list
+    //it handles notifyItemRemoved() , inserted , changed ,... automatically
     private static DiffUtil.ItemCallback<EmployeeWithExtras> DIFF_CALLBACK =
             new DiffUtil.ItemCallback<EmployeeWithExtras>() {
                 @Override
@@ -56,6 +57,15 @@ public class EmployeesAdapter extends PagedListAdapter<EmployeeWithExtras, Emplo
                     return oldEmployee.equals(newEmployee);
                 }
             };
+    final private EmployeeItemClickListener mClickListener;
+
+    private static final int HIGHLIGHT_COLOR = 0x999be6ff;
+
+    private List<EmployeeWithExtras> mSelectedOnes;
+
+    private EmployeeSelectedStateListener mEmployeeSelectedStateListener;
+    private int employeesSelectionMode;
+
 
     public EmployeesAdapter(Context context, @NonNull EmployeeItemClickListener listener, @NonNull EmployeeSelectedStateListener employeeSelectedStateListener) {
         super(DIFF_CALLBACK);
@@ -71,9 +81,7 @@ public class EmployeesAdapter extends PagedListAdapter<EmployeeWithExtras, Emplo
         //inflate item layout for the view holder
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_employees_rv, parent, false);
 
-        EmployeesViewHolder employeesViewHolder = new EmployeesViewHolder(v);
-
-        return employeesViewHolder;
+        return new EmployeesViewHolder(v);
     }
 
     @Override
@@ -109,6 +117,9 @@ public class EmployeesAdapter extends PagedListAdapter<EmployeeWithExtras, Emplo
         employeesSelectionMode = selectionMode;
     }
 
+    /**
+     * @return all selected employees
+     */
     public List<EmployeeWithExtras> getSelectedOnes() {
         return mSelectedOnes;
     }
@@ -120,6 +131,9 @@ public class EmployeesAdapter extends PagedListAdapter<EmployeeWithExtras, Emplo
         void onEmployeeClick(int employeeRowID, int employeePosition);
     }
 
+    /**
+     * interface to handle multi selection operation
+     */
     public interface EmployeeSelectedStateListener {
 
         void onMultiSelectStart();
@@ -127,13 +141,9 @@ public class EmployeesAdapter extends PagedListAdapter<EmployeeWithExtras, Emplo
         void onMultiSelectFinish();
 
         void onSelectedNumChanged(int numSelected);
-
     }
 
     public class EmployeesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
-
-        //create object for each view in the item view
-
 
         TextView mEmployeeName;
         ImageView mEmployeeImage;
@@ -142,11 +152,8 @@ public class EmployeesAdapter extends PagedListAdapter<EmployeeWithExtras, Emplo
         TextView mNumRunningTasks;
         MaterialCardView mItemView;
 
-
         EmployeesViewHolder(View itemView) {
             super(itemView);
-
-            //set the objects by the opposite view by id
             mItemView = (MaterialCardView) itemView;
             mEmployeeName = itemView.findViewById(R.id.employee_name);
             mEmployeeImage = itemView.findViewById(R.id.employee_image);
@@ -160,71 +167,91 @@ public class EmployeesAdapter extends PagedListAdapter<EmployeeWithExtras, Emplo
             itemView.setOnLongClickListener(this);
         }
 
+        //binds this item view with it's corresponding data
         void bind(final int position) {
 
-            updateCheckedState(getItem(position).employeeEntry);
-
-
-            //change the item data by the position
             EmployeeWithExtras employeeWithExtras = getItem(position);
 
+            updateCheckedState(employeeWithExtras.employeeEntry);
 
             mEmployeeName.setText(mContext.getString(R.string.employee_list_item_name, employeeWithExtras.employeeEntry.getEmployeeFirstName(), employeeWithExtras.employeeEntry.getEmployeeMiddleName() != null ? employeeWithExtras.employeeEntry.getEmployeeMiddleName() : ""));
 
             mEmployeeRating.setRating(employeeWithExtras.employeeRating);
 
+            //quantity string for number of running tasks
             int numberRunningTasks = employeeWithExtras.employeeNumRunningTasks;
             String runningTasksStr = mContext.getResources().getQuantityString(R.plurals.numberOfRunningTasks, numberRunningTasks, numberRunningTasks);
             mNumRunningTasks.setText(runningTasksStr);
 
+            //if employee has no image then use default
+            //which is a first letter of his first name in a700 color
+            //and it's background is corresponding a100 color colors are unique
+            //as the depend on object's hashcode
             if (TextUtils.isEmpty(employeeWithExtras.employeeEntry.getEmployeeImageUri())) {
-                Context context = mContext;
+                Glide.with(mContext).clear(mEmployeeImage);
 
-                Glide.with(context).clear(mEmployeeImage);
-
-                TextDrawable textDrawable = new TextDrawable(context, employeeWithExtras.employeeEntry, AppUtils.dpToPx(context, 70), AppUtils.dpToPx(context, 70), AppUtils.spToPx(context, 28));
+                TextDrawable textDrawable = new TextDrawable(mContext, employeeWithExtras.employeeEntry, AppUtils.dpToPx(mContext, 70), AppUtils.dpToPx(mContext, 70), AppUtils.spToPx(mContext, 28));
                 mEmployeeImage.setImageDrawable(textDrawable);
             } else {
+                //if employee has an image then load it using Glide
                 Glide.with(mContext)
                         .asBitmap()
                         .load(Uri.parse(employeeWithExtras.employeeEntry.getEmployeeImageUri()))
                         .into(mEmployeeImage);
             }
 
-
+            //sets id of the employee record as the tag for this view
+            //to be retrieved later when a click occurs
             itemView.setTag(employeeWithExtras.employeeEntry.getEmployeeID());
-
 
         }
 
 
+        /**
+         * callback that notifies the fragment when a click on rv item occurs
+         * handles multi/single selection mode
+         *
+         * @param v : view
+         */
         @Override
         public void onClick(View v) {
 
+            //if selection mode is multiple then
+            //clicking will select the item
             if (employeesSelectionMode == SELECTION_MODE_MULTIPLE) {
+                //update item to be checked
                 EmployeeWithExtras extras = getItem(getAdapterPosition());
                 extras.employeeEntry.setChecked(!extras.employeeEntry.isChecked());
                 updateCheckedState(extras.employeeEntry);
 
-
+                //add or remove it from selected list
                 if (extras.employeeEntry.isChecked()) {
                     mSelectedOnes.add(extras);
                 } else {
                     mSelectedOnes.remove(extras);
                 }
 
+                //update selection mode if selected list becomes empty
+                //then selection mode must rollback to single
                 if (mSelectedOnes.isEmpty()) {
                     mEmployeeSelectedStateListener.onMultiSelectFinish();
                     employeesSelectionMode = SELECTION_MODE_SINGLE;
                     mSelectedOnes = null;
                 } else {
+                    //update toolbar counter for selected items
                     mEmployeeSelectedStateListener.onSelectedNumChanged(mSelectedOnes.size());
                 }
 
-            } else
+            } else // normal click on rv item
                 mClickListener.onEmployeeClick((int) mItemView.getTag(), getAdapterPosition());
         }
 
+        /**
+         * starts a multi selection mode operation
+         *
+         * @param view
+         * @return
+         */
         @Override
         public boolean onLongClick(View view) {
             if (employeesSelectionMode != SELECTION_MODE_MULTIPLE) {
@@ -238,10 +265,18 @@ public class EmployeesAdapter extends PagedListAdapter<EmployeeWithExtras, Emplo
                 mEmployeeSelectedStateListener.onSelectedNumChanged(mSelectedOnes.size());
 
                 employeesSelectionMode = SELECTION_MODE_MULTIPLE;
+                return true;
             }
-            return true;
+            return false;
         }
 
+        /**
+         * update changes in item layout to
+         * display to the user that the item is selected
+         * or deselected
+         *
+         * @param employeeEntry
+         */
         private void updateCheckedState(EmployeeEntry employeeEntry) {
 
             if (employeeEntry.isChecked()) {
@@ -257,6 +292,10 @@ public class EmployeesAdapter extends PagedListAdapter<EmployeeWithExtras, Emplo
         }
 
 
+        /**
+         * clears view holder to default values
+         * used for place holders in paged list adapter
+         */
         void clear() {
 
 //            updateCheckedState(mData.get(position).employeeEntry);

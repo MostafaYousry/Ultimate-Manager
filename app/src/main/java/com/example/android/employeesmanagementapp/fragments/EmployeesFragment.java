@@ -222,13 +222,13 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
                 int empID = employeeWithExtras.employeeEntry.getEmployeeID();
 
                 if (employeeWithExtras.employeeNumRunningTasks == 0 && mDb.employeesTasksDao().getNumCompletedTasksEmployee(empID) > 0) {
-                    mDb.employeesDao().deleteEmployee(empID);
+                    mDb.employeesDao().markEmployeeAsDeleted(empID);
                 } else if (employeeWithExtras.employeeNumRunningTasks > 0 && mDb.employeesTasksDao().getNumCompletedTasksEmployee(empID) == 0) {
                     mDb.employeesTasksDao().deleteEmployeeJoinRecords(empID);
                     mDb.employeesDao().deleteEmployee(employeeWithExtras.employeeEntry);
                 } else if (employeeWithExtras.employeeNumRunningTasks > 0 && mDb.employeesTasksDao().getNumCompletedTasksEmployee(empID) > 0) {
                     mDb.employeesTasksDao().deleteEmployeeFromRunningTasks(empID);
-                    mDb.employeesDao().deleteEmployee(empID);
+                    mDb.employeesDao().markEmployeeAsDeleted(empID);
                 } else {
                     mDb.employeesDao().deleteEmployee(employeeWithExtras.employeeEntry);
                 }
@@ -236,7 +236,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
             }
 
             getActivity().runOnUiThread(() -> abortMultiSelection());
-            mDb.tasksDao().deleteEmptyTasks();
+            mDb.tasksDao().deleteTasksWithNoEmployees();
 
         }));
         builder.setNegativeButton(getString(R.string.cancel_delete_employee), (dialog, which) -> dialog.dismiss());
@@ -267,7 +267,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
                     mDb.employeesDao().updateEmployee(employeeWithExtras.employeeEntry);
                 }
 
-                mDb.tasksDao().deleteEmptyTasks();
+                mDb.tasksDao().deleteTasksWithNoEmployees();
 
                 getActivity().runOnUiThread(() -> abortMultiSelection());
             });

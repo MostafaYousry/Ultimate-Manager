@@ -7,8 +7,10 @@ import com.example.android.employeesmanagementapp.R;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-
-public class Splashscreen extends AppCompatActivity {
+/**
+ * activity that shows loading screen for small time
+ */
+public class SplashScreen extends AppCompatActivity {
 
     Thread splashTread;
     @Override
@@ -26,14 +28,14 @@ public class Splashscreen extends AppCompatActivity {
                         sleep(100);
                         waited += 100;
                     }
-                    Intent intent = new Intent(Splashscreen.this,
+                    Intent intent = new Intent(SplashScreen.this,
                             MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     startActivity(intent);
                 } catch (InterruptedException e) {
                     // do nothing
                 } finally {
-                    Splashscreen.this.finish();
+                    SplashScreen.this.finish();
                 }
 
             }

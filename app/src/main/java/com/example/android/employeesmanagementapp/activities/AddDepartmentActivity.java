@@ -3,7 +3,9 @@ package com.example.android.employeesmanagementapp.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,6 +42,7 @@ import androidx.recyclerview.widget.RecyclerView;
  * <p>
  * it shows department details
  * --name
+ * --image
  * --date created
  * --employees
  * --running tasks
@@ -112,6 +115,8 @@ public class AddDepartmentActivity extends BaseAddActivity implements Horizontal
         mViewModel = ViewModelProviders.of(this, new DepIdFact(mDb, mDepartmentId)).get(AddNewDepViewModel.class);
 
 
+        setUpNameOnTextChange();
+
         //decide weather to load old department or create a new one
         if (mDepartmentId == DEFAULT_DEPARTMENT_ID) {
             clearViews();
@@ -129,6 +134,7 @@ public class AddDepartmentActivity extends BaseAddActivity implements Horizontal
             setUpDepCompletedTasksRV();
 
             //disable nested scrolling to avoid sluggish scrolling
+            //because recyclerviews are inside nested scroll view
             ViewCompat.setNestedScrollingEnabled(mDepEmployeesRV, false);
             ViewCompat.setNestedScrollingEnabled(mDepCompletedTasksRV, false);
             ViewCompat.setNestedScrollingEnabled(mDepRunningTasksRV, false);
@@ -141,11 +147,11 @@ public class AddDepartmentActivity extends BaseAddActivity implements Horizontal
     /**
      * gets called after loading a picture or taking a camera picture
      * it displays the loaded image in the image view (in appbar layout)
-     * and saves the ure in mDepartmentPicturePath variable to be later stored in save()
+     * and saves the uri in mDepartmentPicturePath variable to be later stored in save()
      *
      * @param requestCode : unique code assigned when calling start activity for result
      * @param resultCode  : operation is successful or not
-     * @param data        : intent returned from camera or file chooset
+     * @param data        : intent returned from camera or file chooser
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -249,7 +255,30 @@ public class AddDepartmentActivity extends BaseAddActivity implements Horizontal
     }
 
     /**
-     * displays all this dentr's data in relevant views
+     * used to change toolbar text as the user changes department name
+     */
+    private void setUpNameOnTextChange() {
+        mDepartmentName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                mCollapsingToolbar.setTitle(s);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (TextUtils.isEmpty(s.toString())) {
+                    mCollapsingToolbar.setTitle(getString(R.string.toolbar_add_department));
+                }
+            }
+        });
+    }
+
+    /**
+     * displays all this department's data in relevant views
      *
      * @param departmentEntry
      */

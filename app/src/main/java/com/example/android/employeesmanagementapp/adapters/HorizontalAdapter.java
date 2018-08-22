@@ -27,8 +27,18 @@ import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+/**
+ * Recycler view adapter for
+ * displaying list of employees horizontally
+ * extends paged list adapter class
+ * to allow list paging
+ */
 public class HorizontalAdapter extends PagedListAdapter<EmployeeEntry, HorizontalAdapter.MyAdapterVH> {
 
+    //the diff that is called by the paged list adapter
+    //adapter uses this diff to know what changes occurred
+    //between the current list and a new list
+    //it handles notifyItemRemoved() , inserted , changed ,... automatically
     private static DiffUtil.ItemCallback<EmployeeEntry> DIFF_CALLBACK =
             new DiffUtil.ItemCallback<EmployeeEntry>() {
                 @Override
@@ -46,8 +56,10 @@ public class HorizontalAdapter extends PagedListAdapter<EmployeeEntry, Horizonta
     private List<EmployeeEntry> mAddedEmployees;
     private boolean changeOccurred;
     private HorizontalEmployeeItemClickListener mClickListener;
+    private List<EmployeeEntry> mAddedImmediately, mRemovedImmediately;
     private boolean mUseLoadedData;
     private boolean mUseAddedData;
+
     private int mTaskID;
 
 
@@ -70,17 +82,17 @@ public class HorizontalAdapter extends PagedListAdapter<EmployeeEntry, Horizonta
 
     @Override
     public void onBindViewHolder(MyAdapterVH holder, int position) {
-        if (mUseLoadedData && !mUseAddedData) {
+        if (mUseLoadedData && !mUseAddedData) { //in AddDepartment activity case
             if (getItem(position) == null)
                 holder.clear();
             else
                 holder.bindDepEmployee(position);
-        } else if (mUseAddedData && !mUseLoadedData) {
+        } else if (mUseAddedData && !mUseLoadedData) { // new task case
             if (mAddedEmployees.get(position) == null)
                 holder.clear();
             else
                 holder.bindNewTask(position);
-        } else if (mUseLoadedData && mUseAddedData) {
+        } else if (mUseLoadedData && mUseAddedData) { //old task case
             if (getItem(position) == null && mAddedEmployees.get(position) == null)
                 holder.clear();
             else
@@ -105,6 +117,12 @@ public class HorizontalAdapter extends PagedListAdapter<EmployeeEntry, Horizonta
         return mAddedEmployees;
     }
 
+    /**
+     * adds list of chosen employees
+     * to adapter coming from choose task employees dialog
+     *
+     * @param chosenEmployees
+     */
     public void setAddedEmployees(List<EmployeeEntry> chosenEmployees) {
         if (mUseAddedData && !mUseLoadedData) {
             mAddedEmployees.addAll(chosenEmployees);
@@ -116,6 +134,9 @@ public class HorizontalAdapter extends PagedListAdapter<EmployeeEntry, Horizonta
         changeOccurred = true;
     }
 
+    /**
+     * clears all employees in adapter
+     */
     public void clearAdapter() {
         int addedSize = mAddedEmployees.size();
         mAddedEmployees = null;
@@ -134,26 +155,77 @@ public class HorizontalAdapter extends PagedListAdapter<EmployeeEntry, Horizonta
         return employees;
     }
 
+    /**
+     * removes employee from task
+     *
+     * @param employeeEntry
+     */
     private void deleteInBackground(EmployeeEntry employeeEntry) {
+        if (mRemovedImmediately == null)
+            mRemovedImmediately = new ArrayList<>();
+        mRemovedImmediately.add(employeeEntry);
+
         AppExecutor.getInstance().diskIO().execute(() -> AppDatabase.getInstance(mContext).employeesTasksDao().deleteEmployeeTask(new EmployeesTasksEntry(employeeEntry.getEmployeeID(), mTaskID)));
     }
 
+    /**
+     * assign employees to task
+     *
+     * @param chosenEmployees
+     */
     private void insertInBackGround(List<EmployeeEntry> chosenEmployees) {
-        AppExecutor.getInstance().diskIO().execute(() -> {
-            AppDatabase database = AppDatabase.getInstance(mContext);
+        if (!chosenEmployees.isEmpty()) {
+            if (mAddedImmediately == null)
+                mAddedImmediately = new ArrayList<>();
 
-            for (EmployeeEntry e : chosenEmployees) {
-                database.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(e.getEmployeeID(), mTaskID));
-            }
+            mAddedImmediately.addAll(chosenEmployees);
 
-        });
+            AppExecutor.getInstance().diskIO().execute(() -> {
+                AppDatabase database = AppDatabase.getInstance(mContext);
+
+                for (EmployeeEntry e : chosenEmployees) {
+                    database.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(e.getEmployeeID(), mTaskID));
+                }
+
+            });
+        }
 
     }
 
+    /**
+     * discards immediate changes done to task
+     */
+    public void discardImmediateChanges() {
+        if (mAddedImmediately != null)
+            AppExecutor.getInstance().diskIO().execute(() -> {
+                AppDatabase database = AppDatabase.getInstance(mContext);
+                for (EmployeeEntry e : mAddedImmediately) {
+                    database.employeesTasksDao().deleteEmployeeTask(new EmployeesTasksEntry(e.getEmployeeID(), mTaskID));
+                }
+            });
+
+        if (mRemovedImmediately != null)
+            AppExecutor.getInstance().diskIO().execute(() -> {
+                AppDatabase database = AppDatabase.getInstance(mContext);
+                for (EmployeeEntry e : mRemovedImmediately) {
+                    database.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(e.getEmployeeID(), mTaskID));
+                }
+            });
+    }
+
+    /**
+     * for checking if there is unsaved changes
+     * either from adding or removing employees
+     *
+     * @return
+     */
     public boolean didChangeOccur() {
         return changeOccurred;
     }
 
+    /**
+     * interface to handle click events done on a recycler view item
+     */
     public interface HorizontalEmployeeItemClickListener {
         void onEmployeeClick(int employeeRowID, int employeePosition, boolean isFired);
     }
@@ -173,28 +245,41 @@ public class HorizontalAdapter extends PagedListAdapter<EmployeeEntry, Horizonta
 
             itemView.setOnClickListener(this);
 
+            //sets long click listener only if displaying list of tasks
             if (mUseAddedData)
                 itemView.setOnLongClickListener(this);
         }
 
+        //binds this item view with it's corresponding data
+        //from loaded paged list
         void bindDepEmployee(int position) {
+
             employeeName.setText(getItem(position).getEmployeeFirstName());
 
+            //if employee has no image then use default
+            //which is a first letter of his first name in a700 color
+            //and it's background is corresponding a100 color colors are unique
+            //as the depend on object's hashcode
             if (TextUtils.isEmpty(getItem(position).getEmployeeImageUri())) {
                 Glide.with(mContext).clear(employeeImage);
 
                 TextDrawable textDrawable = new TextDrawable(mContext, getItem(position), AppUtils.dpToPx(mContext, 70), AppUtils.dpToPx(mContext, 70), AppUtils.spToPx(mContext, 28));
                 employeeImage.setImageDrawable(textDrawable);
             } else {
+                //if employee has an image then load it using Glide
                 Glide.with(mContext)
                         .load(Uri.parse(getItem(position).getEmployeeImageUri()))
                         .into(employeeImage);
             }
 
+            //sets id of the employee record as the tag for this view
+            //to be retrieved later when a click occurs
             itemView.setTag(getItem(position).getEmployeeID());
 
         }
 
+        //binds this item view with it's corresponding data
+        //from added employees list
         void bindNewTask(int position) {
             employeeName.setText(mAddedEmployees.get(position).getEmployeeFirstName());
 
@@ -212,6 +297,8 @@ public class HorizontalAdapter extends PagedListAdapter<EmployeeEntry, Horizonta
             itemView.setTag(mAddedEmployees.get(position).getEmployeeID());
         }
 
+        //binds this item view with it's corresponding data
+        //from both lists
         void bindOldTask(int position) {
 
             if (getItem(position) != null) {
@@ -222,6 +309,11 @@ public class HorizontalAdapter extends PagedListAdapter<EmployeeEntry, Horizonta
 
         }
 
+        /**
+         * callback that notifies the fragment when a click on rv item occurs
+         *
+         * @param view : view
+         */
         @Override
         public void onClick(View view) {
             if (getItem(getAdapterPosition()) != null) {
@@ -231,13 +323,21 @@ public class HorizontalAdapter extends PagedListAdapter<EmployeeEntry, Horizonta
             }
         }
 
+        /**
+         * callback that notifies the fragment when a long click on rv item occurs
+         *
+         * @param view : view
+         */
         @Override
         public boolean onLongClick(View view) {
+
+            //sets a long click listener to show a popup menu with employee in task options
             PopupMenu popup = new PopupMenu(view.getContext(), view);
             popup.setGravity(Gravity.TOP);
             popup.inflate(R.menu.menu_task_employee_options);
             popup.setOnMenuItemClickListener(item -> {
                 switch (item.getItemId()) {
+
                     case R.id.action_remove_employee:
                         changeOccurred = true;
 
@@ -263,6 +363,10 @@ public class HorizontalAdapter extends PagedListAdapter<EmployeeEntry, Horizonta
             return true;
         }
 
+        /**
+         * clears view holder to default values
+         * used for place holders in paged list adapter
+         */
         void clear() {
             Glide.with(mContext).clear(employeeImage);
             employeeImage.setImageDrawable(null);

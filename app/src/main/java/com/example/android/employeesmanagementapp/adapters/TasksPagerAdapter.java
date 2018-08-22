@@ -1,5 +1,8 @@
 package com.example.android.employeesmanagementapp.adapters;
 
+import android.content.Context;
+
+import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.fragments.CompletedTasksFragment;
 import com.example.android.employeesmanagementapp.fragments.RunningTasksFragment;
 
@@ -7,11 +10,18 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
+/**
+ * adapter for displaying fragments as pages
+ * displays two fragments (running tasks fragment , completed tasks fragment)
+ */
 public class TasksPagerAdapter extends FragmentStatePagerAdapter {
-    private static final int NUM_PAGES = 2;
 
-    public TasksPagerAdapter(FragmentManager fm) {
+    private static final int NUM_PAGES = 2;
+    private Context mContext;
+
+    public TasksPagerAdapter(Context context, FragmentManager fm) {
         super(fm);
+        mContext = context;
     }
 
     @Override
@@ -29,8 +39,8 @@ public class TasksPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         if (position == 0)
-            return "Running";
+            return mContext.getString(R.string.tab_layout_title_running);
         else
-            return "Completed";
+            return mContext.getString(R.string.tab_layout_title_completed);
     }
 }
