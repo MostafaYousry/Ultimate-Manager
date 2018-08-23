@@ -119,7 +119,7 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
 
         View rateDialogView = LayoutInflater.from(mContext).inflate(R.layout.rating_bar, null, false);
         final RatingBar ratingBar = rateDialogView.findViewById(R.id.rating_bar);
-        ratingBar.setPaddingRelative(AppUtils.dpToPx(mContext, 16), 0, AppUtils.dpToPx(mContext, 16), 0);
+//        ratingBar.setPaddingRelative(AppUtils.dpToPx(mContext, 16), 0, AppUtils.dpToPx(mContext, 16), 0);
         builder.setView(rateDialogView);
 
         builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
