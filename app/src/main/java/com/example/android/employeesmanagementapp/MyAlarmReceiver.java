@@ -39,6 +39,7 @@ public class MyAlarmReceiver extends BroadcastReceiver {
         } else {
             Intent serviceIntent = new Intent(context, NotificationService.class);
             serviceIntent.putExtra("intent is sent from receiver", true);
+            serviceIntent.putExtra("task id", intent.getExtras().getInt("task id"));
             context.startService(serviceIntent);
         }
     }
@@ -50,7 +51,7 @@ public class MyAlarmReceiver extends BroadcastReceiver {
             if (allTasksDate.get(i).getTime().getTime() - new Date().getTime() >= -60 * 1000) {
                 Intent intent = new Intent(context, MyAlarmReceiver.class);
                 intent.putExtra("task id", allTasksId.get(i));
-                final PendingIntent pIntent = PendingIntent.getBroadcast(context, allTasksId.get(i), intent, 0);
+                final PendingIntent pIntent = PendingIntent.getBroadcast(context, allTasksId.get(i), intent, PendingIntent.FLAG_UPDATE_CURRENT);
                 AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
                 Calendar calendar = allTasksDate.get(i);
 

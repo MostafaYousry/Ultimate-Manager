@@ -122,6 +122,7 @@ public interface TasksDao {
     @Query("delete from tasks where (SELECT COUNT(*) FROM employees INNER JOIN employees_tasks ON employees.employee_id=employees_tasks.employee_id WHERE employees_tasks.task_id= tasks.task_id )=0")
     void deleteEmptyTasks();
 
-
+    @Query("SELECT task_id from tasks where (SELECT COUNT(*) FROM employees INNER JOIN employees_tasks ON employees.employee_id=employees_tasks.employee_id WHERE employees_tasks.task_id= tasks.task_id )=0")
+    List<Integer> selectEmptyTasksId();
 
 }

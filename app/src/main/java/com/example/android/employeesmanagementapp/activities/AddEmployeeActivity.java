@@ -1,5 +1,8 @@
 package com.example.android.employeesmanagementapp.activities;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -17,6 +20,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.example.android.employeesmanagementapp.MyAlarmReceiver;
+import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.TextDrawable;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
@@ -451,7 +456,9 @@ public class AddEmployeeActivity extends BaseAddActivity implements TasksAdapter
                             @Override
                             public void run() {
                                 mDb.employeesTasksDao().deleteEmployeeFromRunningTasks(mEmployeeId);
+                                List<Integer> emptyTasksId = mDb.tasksDao().selectEmptyTasksId();
                                 mDb.tasksDao().deleteEmptyTasks();
+                                cancelEmptyTasksAlarm(emptyTasksId);
 
                                 employeeEntry.setEmployeeID(mEmployeeId);
                                 mDb.employeesDao().updateEmployee(employeeEntry);
@@ -490,6 +497,23 @@ public class AddEmployeeActivity extends BaseAddActivity implements TasksAdapter
             }
 
 
+        }
+    }
+
+    private void cancelEmptyTasksAlarm(List<Integer> emptyTasksId) {
+        for (int i = 0; i < emptyTasksId.size(); i++) {
+            try {
+                Intent intent = new Intent(getApplicationContext(), MyAlarmReceiver.class);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), emptyTasksId.get(i), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+                alarmManager.cancel(pendingIntent);
+                pendingIntent.cancel();
+                Intent serviceIntent = new Intent(getApplicationContext(), NotificationService.class);
+                serviceIntent.putExtra("task id", emptyTasksId.get(i));
+                getApplicationContext().startService(serviceIntent);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

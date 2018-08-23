@@ -1,7 +1,10 @@
 package com.example.android.employeesmanagementapp.adapters;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
@@ -19,6 +22,8 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.example.android.employeesmanagementapp.MyAlarmReceiver;
+import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
@@ -27,6 +32,8 @@ import com.example.android.employeesmanagementapp.data.EmployeeWithExtras;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.utils.ColorUtils;
 import com.google.android.material.card.MaterialCardView;
+
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -161,7 +168,9 @@ public class DepartmentsAdapter extends PagedListAdapter<DepartmentWithExtras, D
 
                                                     }
 
+                                                    List<Integer> emptyTasksId = db.tasksDao().selectEmptyTasksId();
                                                     db.tasksDao().deleteEmptyTasks();
+                                                    cancelEmptyTasksAlarm(emptyTasksId);
 
                                                     if (db.departmentsDao().getNumCompletedTasksDepartment(departmentEntry.getDepartmentId()) == 0) {
                                                         db.departmentsDao().deleteDepartment(departmentEntry);
@@ -272,6 +281,23 @@ public class DepartmentsAdapter extends PagedListAdapter<DepartmentWithExtras, D
             Glide.with(mContext).clear(mDepartmentImage);
             mItemView.setCardBackgroundColor(Color.WHITE);
 
+        }
+    }
+
+    private void cancelEmptyTasksAlarm(List<Integer> emptyTasksId) {
+        for (int i = 0; i < emptyTasksId.size(); i++) {
+            try {
+                Intent intent = new Intent(mContext, MyAlarmReceiver.class);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, emptyTasksId.get(i), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+                alarmManager.cancel(pendingIntent);
+                pendingIntent.cancel();
+                Intent serviceIntent = new Intent(mContext, NotificationService.class);
+                serviceIntent.putExtra("task id", emptyTasksId.get(i));
+                mContext.startService(serviceIntent);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }

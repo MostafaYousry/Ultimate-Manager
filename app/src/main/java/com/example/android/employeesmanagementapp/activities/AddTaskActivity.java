@@ -18,6 +18,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.android.employeesmanagementapp.MyAlarmReceiver;
+import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
 import com.example.android.employeesmanagementapp.adapters.HorizontalAdapter;
@@ -375,18 +376,22 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
     protected void onStop() {
         super.onStop();
         // if there is a previous alarm manager is created stop it and create a new one with the new taskDueDate
-        stopPreviousAlarm();
+        cancelPreviousAlarm();
         createNewAlarm();
 
     }
 
 
-    private void stopPreviousAlarm() {
+    private void cancelPreviousAlarm() {
         try {
             Intent intent = new Intent(getApplicationContext(), MyAlarmReceiver.class);
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, mTaskId, intent, 0);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, mTaskId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
             alarmManager.cancel(pendingIntent);
+            pendingIntent.cancel();
+            Intent serviceIntent = new Intent(getApplicationContext(), NotificationService.class);
+            serviceIntent.putExtra("task id", mTaskId);
+            startService(serviceIntent);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -396,13 +401,14 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
         Calendar calendar = (Calendar) mTaskDueDate.getTag();
         if (calendar.getTime().compareTo(new Date()) >= 0) {
             Intent intent = new Intent(this, MyAlarmReceiver.class);
-            PendingIntent pIntent = PendingIntent.getBroadcast(this, mTaskId, intent, 0);
+            intent.putExtra("task id", mTaskId);
+            PendingIntent pIntent = PendingIntent.getBroadcast(this, mTaskId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
             //solve the problem of start the service for android8
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 alarm.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() - 1000, pIntent);
             } else
-                alarm.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() - 1500, 0, pIntent);
+                alarm.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() - 1000, 0, pIntent);
         }
     }
 

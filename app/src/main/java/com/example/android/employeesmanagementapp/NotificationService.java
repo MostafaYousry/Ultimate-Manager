@@ -17,7 +17,9 @@ import android.util.Log;
 import com.example.android.employeesmanagementapp.activities.MainActivity;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
+import com.example.android.employeesmanagementapp.fragments.TasksFragment;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -26,11 +28,13 @@ import java.util.TimerTask;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.fragment.app.Fragment;
 
 public class NotificationService extends Service {
     //we are going to use a mHandler to be able to run in our TimerTask
     private String TAG = "Timers";
     private static int mTasksCount = 0;
+    private static ArrayList<Integer> tasksSentNotifications = new ArrayList<>();
 
 
     public NotificationService() {
@@ -46,14 +50,35 @@ public class NotificationService extends Service {
         return null;
     }
 
+
+    /* this method is called to trigger the service work (send notification)
+     * if a task sent a notification, its id will be saved and the tasks that sent a notification count will be increment
+     * when editing the task due date, the task id is removed from the list so when the task send notification , its id will be saved and the count will be increment again
+     * after marking a task as done or deleting it, its id is removed from the list
+     * when the app is running the tasksCount is considered as the  umber of notifications are sent when the app is running and so on when the app is closed
+     *  return START_STICKY to make sure the service is running in the background
+     */
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.e(TAG, "onStartCommand");
         super.onStartCommand(intent, flags, startId);
 
         //check that the service was called after the alarmManager finished or not to send the notification
-        if (intent != null && intent.getExtras().getBoolean("intent is sent from receiver"))
+        if (intent != null && intent.getExtras().getBoolean("intent is sent from receiver")) {
+            if (!tasksSentNotifications.contains(intent.getExtras().getInt("task id"))) {
+                tasksSentNotifications.add(intent.getExtras().getInt("task id"));
+            }
+            mTasksCount = tasksSentNotifications.size();
             sendNotifications();
+        } else if (intent != null) {
+            if (tasksSentNotifications.contains(intent.getExtras().getInt("task id"))) {
+                int index = tasksSentNotifications.indexOf(intent.getExtras().getInt("task id"));
+                tasksSentNotifications.remove(index);
+            }
+            mTasksCount = tasksSentNotifications.size();
+            setBadge(getApplicationContext(), mTasksCount);
+        }
         return START_STICKY;
     }
 
@@ -68,7 +93,7 @@ public class NotificationService extends Service {
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext(), "22327")
                 .setSmallIcon(R.drawable.ic_task_notification)
                 .setContentTitle(getResources().getText(R.string.app_name))
-                .setContentText(++mTasksCount + " tasks due date are met")
+                .setContentText(mTasksCount + " tasks due date are met")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)  // Set the intent that will fire when the user taps the notification
                 .setAutoCancel(true) // cancel the notification from the notifications bar after open the app
@@ -79,7 +104,6 @@ public class NotificationService extends Service {
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
         notificationManager.notify(22327, mBuilder.build());
-
 
         setBadge(getApplicationContext(), mTasksCount);
     }
@@ -111,7 +135,7 @@ public class NotificationService extends Service {
         }
     }
 
-    //set the badfe of the app icon for the number of notifications the user doesn't check them
+    //set the badge of the app icon for the number of notifications the user doesn't check them
     public static void setBadge(Context context, int count) {
         String launcherClassName = getLauncherClassName(context);
         if (launcherClassName == null) {
