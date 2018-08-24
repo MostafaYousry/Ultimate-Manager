@@ -2,6 +2,10 @@
 
 An Android Application that is used by managers to easily evaluate the performance of employees through recording progress and faults and producing periodic reports.
 
+## Screenshots
+
+<img src="screenshots/Screenshot_Ultimate_Manager_20180824-222049.png" width="25%"  hspace="20"/><img src="screenshots/Screenshot_Ultimate_Manager_20180824-232227.png" width="25%" hspace="20"/><img src="screenshots/Screenshot_Ultimate_Manager_20180824-232236.png" width="25%" hspace="20"/>
+
 ## Features
 
 - Hire and Fire employees
