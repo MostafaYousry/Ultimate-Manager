@@ -34,7 +34,7 @@
                 android:id="@+id/check_icon"
                 android:layout_width="@dimen/list_item_avatar_size"
                 android:layout_height="@dimen/list_item_avatar_size"
-                android:src="@mipmap/ic_check_with_background_round"
+                android:src="@drawable/ic_check_white_background"
                 android:visibility="gone" />
 
         </FrameLayout>
