@@ -4,6 +4,7 @@ An Android Application that is used by managers to easily evaluate the performan
 
 ## Screenshots
 
+<img src="screenshots/appDemo.gif" width="300" align="right" hspace="20">
 <img src="screenshots/Screenshot_Ultimate_Manager_20180824-222049.png" width="25%"  hspace="20"/><img src="screenshots/Screenshot_Ultimate_Manager_20180824-232227.png" width="25%" hspace="20"/><img src="screenshots/Screenshot_Ultimate_Manager_20180824-232236.png" width="25%" hspace="20"/>
 
 ## Features
