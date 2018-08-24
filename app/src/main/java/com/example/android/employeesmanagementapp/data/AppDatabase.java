@@ -76,7 +76,7 @@ public abstract class AppDatabase extends RoomDatabase {
                                         db.employeesDao().addEmployee(new EmployeeEntry(16, 5, "abdallah", "amr", "el maradny", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
                                         db.employeesDao().addEmployee(new EmployeeEntry(17, 5, "shawky", "maom", "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
 
-//                                        for (int i = 18 ; i <=1000 ;i++)
+//                                        for (int i = 18 ; i <=1000000 ;i++)
 //                                            db.employeesDao().addEmployee(new EmployeeEntry(i, (int)(Math.random()*1000)+1, "shawky"+i, "maom", "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
 
 

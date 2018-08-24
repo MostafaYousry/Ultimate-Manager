@@ -3,7 +3,6 @@ package com.example.android.employeesmanagementapp.activities;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -556,129 +555,117 @@ public class AddEmployeeActivity extends BaseAddActivity implements TasksAdapter
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage(getString(R.string.dialog_message_employee_department_changed));
-                builder.setPositiveButton(getString(R.string.dialog_positive_btn_continue), (dialogInterface, i) -> AppExecutor.getInstance().diskIO().execute(new Runnable() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        AppExecutor.getInstance().diskIO().execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                mDb.employeesTasksDao().deleteEmployeeFromRunningTasks(mEmployeeId);
-                                List<Integer> emptyTasksId = mDb.tasksDao().selectEmptyTasksId();
-                                mDb.tasksDao().deleteEmptyTasks();
-                                cancelEmptyTasksAlarm(emptyTasksId);
-                                public void run () {
-                                    mDb.employeesTasksDao().deleteEmployeeFromRunningTasks(mEmployeeId);
-                                    mDb.tasksDao().deleteTasksWithNoEmployees();
+                builder.setPositiveButton(getString(R.string.dialog_positive_btn_continue), (dialogInterface, i) -> AppExecutor.getInstance().diskIO().execute(() -> {
+                    mDb.employeesTasksDao().deleteEmployeeFromRunningTasks(mEmployeeId);
 
-                                    employeeEntry.setEmployeeID(mEmployeeId);
-                                    mDb.employeesDao().updateEmployee(employeeEntry);
-                                    dialogInterface.dismiss();
+                    List<Integer> emptyTasksId = mDb.tasksDao().selectEmptyTasksId();
+                    cancelEmptyTasksAlarm(emptyTasksId);
 
-                                    finish();
+                    mDb.tasksDao().deleteTasksWithNoEmployees();
+                    employeeEntry.setEmployeeID(mEmployeeId);
+                    mDb.employeesDao().updateEmployee(employeeEntry);
+                    dialogInterface.dismiss();
 
-                                }
-                            }));
+                    finish();
+                }));
 
                 builder.setNegativeButton(
-
-                            getString(R.string.dialog_negative_btn_cancel), (dialogInterface,i)->
-
-                            {
-                                dialogInterface.dismiss();
-                                return;
-                            });
+                        getString(R.string.dialog_negative_btn_cancel), (dialogInterface, i) -> {
+                            dialogInterface.dismiss();
+                            return;
+                        });
 
                 builder.show();
 
-                        } else{
+            } else {
 
-                            AppExecutor.getInstance().diskIO().execute(() -> {
-                                if (mEmployeeId == DEFAULT_EMPLOYEE_ID)
-                                    mDb.employeesDao().addEmployee(employeeEntry);
-                                else {
-                                    mDb.employeesDao().updateEmployee(employeeEntry);
-                                }
-                            });
-                            finish();
-                        }
-
-
+                AppExecutor.getInstance().diskIO().execute(() -> {
+                    if (mEmployeeId == DEFAULT_EMPLOYEE_ID)
+                        mDb.employeesDao().addEmployee(employeeEntry);
+                    else {
+                        mDb.employeesDao().updateEmployee(employeeEntry);
                     }
-                }
+                });
+                finish();
+            }
 
 
-                private void cancelEmptyTasksAlarm (List < Integer > emptyTasksId) {
-                    for (int i = 0; i < emptyTasksId.size(); i++) {
-                        try {
-                            Intent intent = new Intent(getApplicationContext(), MyAlarmReceiver.class);
-                            PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), emptyTasksId.get(i), intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                            AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-                            alarmManager.cancel(pendingIntent);
-                            pendingIntent.cancel();
-                            Intent serviceIntent = new Intent(getApplicationContext(), NotificationService.class);
-                            serviceIntent.putExtra("task id", emptyTasksId.get(i));
-                            getApplicationContext().startService(serviceIntent);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
+        }
+    }
 
-                /**
-                 * used to check if all the data of employee is valid
-                 * and shows/hides error and helper messages accordingly
-                 *
-                 * @return : if data is valid true else false
-                 */
-                @Override
-                protected boolean isDataValid () {
 
-                    boolean valid = true;
+    private void cancelEmptyTasksAlarm(List<Integer> emptyTasksId) {
+        for (int i = 0; i < emptyTasksId.size(); i++) {
+            try {
+                Intent intent = new Intent(getApplicationContext(), MyAlarmReceiver.class);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), emptyTasksId.get(i), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+                alarmManager.cancel(pendingIntent);
+                pendingIntent.cancel();
+                Intent serviceIntent = new Intent(getApplicationContext(), NotificationService.class);
+                serviceIntent.putExtra("task id", emptyTasksId.get(i));
+                getApplicationContext().startService(serviceIntent);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
-                    if (TextUtils.isEmpty(mEmployeeFirstName.getText())) {
-                        updateErrorVisibility("firstName", true);
-                        valid = false;
-                    } else {
-                        updateErrorVisibility("firstName", false);
-                    }
+    /**
+     * used to check if all the data of employee is valid
+     * and shows/hides error and helper messages accordingly
+     *
+     * @return : if data is valid true else false
+     */
+    @Override
+    protected boolean isDataValid() {
 
-                    if (TextUtils.isEmpty(mEmployeeEmail.getText())) {
-                        updateErrorVisibility("email", true);
-                        valid = false;
-                    } else {
+        boolean valid = true;
+
+        if (TextUtils.isEmpty(mEmployeeFirstName.getText())) {
+            updateErrorVisibility("firstName", true);
+            valid = false;
+        } else {
+            updateErrorVisibility("firstName", false);
+        }
+
+        if (TextUtils.isEmpty(mEmployeeEmail.getText())) {
+            updateErrorVisibility("email", true);
+            valid = false;
+        } else {
             //validate email with regex to see if it is a valid email address
-                        if (!mEmployeeEmail.getText().toString().matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$")) {
-                            updateErrorVisibility("emailValid", true);
-                            valid = false;
-                        } else
-                            updateErrorVisibility("emailValid", false);
-                    }
+            if (!mEmployeeEmail.getText().toString().matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$")) {
+                updateErrorVisibility("emailValid", true);
+                valid = false;
+            } else
+                updateErrorVisibility("emailValid", false);
+        }
 
-                    if (TextUtils.isEmpty(mEmployeePhone.getText())) {
-                        updateErrorVisibility("phone", true);
-                        valid = false;
-                    } else {
-                        updateErrorVisibility("phone", false);
-                    }
+        if (TextUtils.isEmpty(mEmployeePhone.getText())) {
+            updateErrorVisibility("phone", true);
+            valid = false;
+        } else {
+            updateErrorVisibility("phone", false);
+        }
 
-                    if (TextUtils.isEmpty(mEmployeeSalary.getText())) {
-                        updateErrorVisibility("salary", true);
-                        valid = false;
-                    } else {
-                        updateErrorVisibility("salary", false);
-                    }
+        if (TextUtils.isEmpty(mEmployeeSalary.getText())) {
+            updateErrorVisibility("salary", true);
+            valid = false;
+        } else {
+            updateErrorVisibility("salary", false);
+        }
 
-                    if (mEmployeeHireDate.getTag() == null) {
-                        updateErrorVisibility("hireDate", true);
-                        valid = false;
-                    } else {
-                        updateErrorVisibility("hireDate", false);
-                    }
+        if (mEmployeeHireDate.getTag() == null) {
+            updateErrorVisibility("hireDate", true);
+            valid = false;
+        } else {
+            updateErrorVisibility("hireDate", false);
+        }
 
-                    return valid;
+        return valid;
 
 
-                }
+    }
 
     /**
      * shows or hides error and helper messages for each field
@@ -686,48 +673,48 @@ public class AddEmployeeActivity extends BaseAddActivity implements TasksAdapter
      * @param key  : field name
      * @param show : to show or hide the error
      */
-                @Override
-                protected void updateErrorVisibility (String key,boolean show){
-                    if (show)
-                        switch (key) {
-                            case "firstName":
-                                ((TextInputLayout) findViewById(R.id.employee_first_name_TIL)).setError(getString(R.string.required_field));
-                                break;
-                            case "email":
-                                ((TextInputLayout) findViewById(R.id.employee_email_TIL)).setError(getString(R.string.required_field));
-                                break;
-                            case "emailValid":
-                                ((TextInputLayout) findViewById(R.id.employee_email_TIL)).setError(getString(R.string.error_invalid_email));
-                                break;
-                            case "phone":
-                                ((TextInputLayout) findViewById(R.id.employee_phone_TIL)).setError(getString(R.string.required_field));
-                                break;
-                            case "salary":
-                                ((TextInputLayout) findViewById(R.id.employee_salary_TIL)).setError(getString(R.string.required_field));
-                                break;
-                            case "hireDate":
-                                ((TextInputLayout) findViewById(R.id.employee_hire_date_TIL)).setError(getString(R.string.required_field));
-                                break;
-                        }
-                    else
-                        switch (key) {
-                            case "firstName":
-                                ((TextInputLayout) findViewById(R.id.employee_first_name_TIL)).setHelperText(getString(R.string.required_field));
-                                break;
-                            case "emailValid":
-                                ((TextInputLayout) findViewById(R.id.employee_email_TIL)).setHelperText(getString(R.string.required_field));
-                                break;
-                            case "phone":
-                                ((TextInputLayout) findViewById(R.id.employee_phone_TIL)).setHelperText(getString(R.string.required_field));
-                                break;
-                            case "salary":
-                                ((TextInputLayout) findViewById(R.id.employee_salary_TIL)).setHelperText(getString(R.string.required_field));
-                                break;
-                            case "hireDate":
-                                ((TextInputLayout) findViewById(R.id.employee_hire_date_TIL)).setHelperText(getString(R.string.required_field));
-                                break;
-                        }
-                }
+    @Override
+    protected void updateErrorVisibility(String key, boolean show) {
+        if (show)
+            switch (key) {
+                case "firstName":
+                    ((TextInputLayout) findViewById(R.id.employee_first_name_TIL)).setError(getString(R.string.required_field));
+                    break;
+                case "email":
+                    ((TextInputLayout) findViewById(R.id.employee_email_TIL)).setError(getString(R.string.required_field));
+                    break;
+                case "emailValid":
+                    ((TextInputLayout) findViewById(R.id.employee_email_TIL)).setError(getString(R.string.error_invalid_email));
+                    break;
+                case "phone":
+                    ((TextInputLayout) findViewById(R.id.employee_phone_TIL)).setError(getString(R.string.required_field));
+                    break;
+                case "salary":
+                    ((TextInputLayout) findViewById(R.id.employee_salary_TIL)).setError(getString(R.string.required_field));
+                    break;
+                case "hireDate":
+                    ((TextInputLayout) findViewById(R.id.employee_hire_date_TIL)).setError(getString(R.string.required_field));
+                    break;
+            }
+        else
+            switch (key) {
+                case "firstName":
+                    ((TextInputLayout) findViewById(R.id.employee_first_name_TIL)).setHelperText(getString(R.string.required_field));
+                    break;
+                case "emailValid":
+                    ((TextInputLayout) findViewById(R.id.employee_email_TIL)).setHelperText(getString(R.string.required_field));
+                    break;
+                case "phone":
+                    ((TextInputLayout) findViewById(R.id.employee_phone_TIL)).setHelperText(getString(R.string.required_field));
+                    break;
+                case "salary":
+                    ((TextInputLayout) findViewById(R.id.employee_salary_TIL)).setHelperText(getString(R.string.required_field));
+                    break;
+                case "hireDate":
+                    ((TextInputLayout) findViewById(R.id.employee_hire_date_TIL)).setHelperText(getString(R.string.required_field));
+                    break;
+            }
+    }
 
 
     /**
@@ -735,54 +722,56 @@ public class AddEmployeeActivity extends BaseAddActivity implements TasksAdapter
      *
      * @return
      */
-                @Override
-                protected boolean fieldsChanged () {
-                    if (mEmployeeId == DEFAULT_EMPLOYEE_ID) {
-                        if (!TextUtils.isEmpty(mEmployeeFirstName.getText()))
-                            return true;
+    @Override
+    protected boolean fieldsChanged() {
+        if (mEmployeeId == DEFAULT_EMPLOYEE_ID) {
+            if (!TextUtils.isEmpty(mEmployeeFirstName.getText()))
+                return true;
 
-                        if (!TextUtils.isEmpty(mEmployeeMiddleName.getText()))
-                            return true;
+            if (!TextUtils.isEmpty(mEmployeeMiddleName.getText()))
+                return true;
 
-                        if (!TextUtils.isEmpty(mEmployeeLastName.getText()))
-                            return true;
+            if (!TextUtils.isEmpty(mEmployeeLastName.getText()))
+                return true;
 
-                        if (!TextUtils.isEmpty(mEmployeeEmail.getText()))
-                            return true;
+            if (!TextUtils.isEmpty(mEmployeeEmail.getText()))
+                return true;
 
-                        if (!TextUtils.isEmpty(mEmployeePhone.getText()))
-                            return true;
+            if (!TextUtils.isEmpty(mEmployeePhone.getText()))
+                return true;
 
-                        if (!TextUtils.isEmpty(mEmployeeSalary.getText()))
-                            return true;
+            if (!TextUtils.isEmpty(mEmployeeSalary.getText()))
+                return true;
 
-                        if (mEmployeeHireDate.getTag() != null)
-                            return true;
+            if (mEmployeeHireDate.getTag() != null)
+                return true;
 
-                        if (!TextUtils.isEmpty(mEmployeeNote.getText()))
-                            return true;
+            if (!TextUtils.isEmpty(mEmployeeNote.getText()))
+                return true;
 
-                        if (!TextUtils.isEmpty(mEmployeePicturePath))
-                            return true;
+            if (!TextUtils.isEmpty(mEmployeePicturePath))
+                return true;
 
-                        if (mEmployeeDepartment.getSelectedItemPosition() != 0)
-                            return true;
-                    } else
-                        return !mOldEmployeeEntry.equals(getEmployeeEntry());
+            if (mEmployeeDepartment.getSelectedItemPosition() != 0)
+                return true;
+        } else
+            return !mOldEmployeeEntry.equals(getEmployeeEntry());
 
 
-                    return false;
-                }
+        return false;
+    }
 
 
     //if employee is fired then there is no data changed
     //so finish the activity
-                @Override
-                public void onBackPressed () {
-                    if (mEmployeeIsFired)
-                        finish();
-                    else
-                        super.onBackPressed();
-                }
+    @Override
+    public void onBackPressed() {
+        if (mEmployeeIsFired)
+            finish();
+        else
+            super.onBackPressed();
+    }
 
-            }
+}
+
+

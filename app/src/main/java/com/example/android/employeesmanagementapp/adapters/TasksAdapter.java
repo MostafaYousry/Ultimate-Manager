@@ -4,6 +4,7 @@ package com.example.android.employeesmanagementapp.adapters;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -22,7 +23,6 @@ import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.fragments.ColorPickerDialogFragment;
-import com.example.android.employeesmanagementapp.utils.AppUtils;
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.Calendar;
@@ -138,27 +138,13 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
         final RatingBar ratingBar = rateDialogView.findViewById(R.id.rating_bar);
         builder.setView(rateDialogView);
 
-        builder.setPositiveButton(mContext.getString(R.string.dialog_positive_btn_confirm), (dialog, which) -> AppExecutor.getInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
+        builder.setPositiveButton(mContext.getString(R.string.dialog_positive_btn_confirm), (dialogInterface, i) -> {
+            AppExecutor.getInstance().diskIO().execute(() -> {
                 AppDatabase.getInstance(mContext).tasksDao().rateTask(ratingBar.getRating(), taskID);
-            public void onClick(final DialogInterface dialog, int which) {
-                AppExecutor.getInstance().diskIO().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        AppDatabase.getInstance(mContext).tasksDao().rateTask(ratingBar.getRating(), taskID);
-                        dialog.dismiss();
-                    }
-                });
                 cancelAlarmManager(taskID);
-            }
+            });
+            dialogInterface.dismiss();
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        }));
         builder.setNegativeButton(mContext.getString(R.string.dialog_negative_btn_cancel), (dialog, which) -> dialog.dismiss());
 
         builder.show();
@@ -212,18 +198,11 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
                             showRateTaskDialog((int) itemView.getTag());
                             return true;
                         case R.id.action_delete_task:
-                    popup.setOnMenuItemClickListener(item -> {
-                        switch (item.getItemId()) {
-                            case R.id.action_mark_as_done:
-                                showRateTaskDialog((int) itemView.getTag());
-                                return true;
-                            case R.id.action_delete_task:
-
                             AppExecutor.getInstance().diskIO().execute(() -> {
                                 AppDatabase.getInstance(mContext).employeesTasksDao().deleteTaskJoinRecords(getItem(getAdapterPosition()).getTaskId());
                                 AppDatabase.getInstance(mContext).tasksDao().deleteTask(getItem(getAdapterPosition()));
+                                cancelAlarmManager((int) itemView.getTag());
                             });
-
                             return true;
                         case R.id.action_color_task:
                             showColorPicker((int) itemView.getTag());
@@ -233,21 +212,7 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
                     }
                 });
                 popup.show();
-                                AppExecutor.getInstance().diskIO().execute(() -> {
-                                    AppDatabase.getInstance(mContext).employeesTasksDao().deleteTaskJoinRecords(getItem(getAdapterPosition()).getTaskId());
-                                    AppDatabase.getInstance(mContext).tasksDao().deleteTask(getItem(getAdapterPosition()));
-                                });
-                                cancelAlarmManager((int) itemView.getTag());
-                                return true;
-                            case R.id.action_color_task:
-                                showColorPicker((int) itemView.getTag());
-                                return true;
-                            default:
-                                return false;
-                        }
-                    });
-                    popup.show();
-                }
+
             });
             itemView.setOnClickListener(this);
         }
@@ -258,7 +223,6 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
             mTaskTitle.setText(getItem(position).getTaskTitle());
 
             getRemainingTime(getItem(position).getTaskDueDate().getTime());
-            mTaskDates.setText(mContext.getString(R.string.task_list_item_name_dates, AppUtils.getFriendlyDate(getItem(position).getTaskStartDate().getTime()), AppUtils.getFriendlyDate(getItem(position).getTaskDueDate().getTime())));
             if (!getItem(position).isTaskIsCompleted()) {
                 mTaskDates.setVisibility(View.VISIBLE);
                 getRemainingTime(getItem(position).getTaskDueDate().getTime());
@@ -380,8 +344,7 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
             mItemView.setCardBackgroundColor(Color.WHITE);
         }
     }
-
-
 }
+
 
 

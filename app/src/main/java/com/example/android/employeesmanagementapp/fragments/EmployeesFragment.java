@@ -262,10 +262,9 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
 
             }
 
-            getActivity().runOnUiThread(() -> abortMultiSelection());
             List<Integer> emptyTasksId = mDb.tasksDao().selectEmptyTasksId();
             cancelEmptyTasksAlarm(emptyTasksId);
-            mDb.tasksDao().deleteEmptyTasks();
+
             //finish multi selection
             getActivity().runOnUiThread(this::abortMultiSelection);
 
@@ -323,7 +322,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
 
                 List<Integer> emptyTasksId = mDb.tasksDao().selectEmptyTasksId();
                 cancelEmptyTasksAlarm(emptyTasksId);
-                mDb.tasksDao().deleteEmptyTasks();
+
                 mDb.tasksDao().deleteTasksWithNoEmployees();
 
                 getActivity().runOnUiThread(this::abortMultiSelection);

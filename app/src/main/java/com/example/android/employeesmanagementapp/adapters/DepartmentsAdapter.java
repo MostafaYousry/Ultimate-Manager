@@ -3,7 +3,6 @@ package com.example.android.employeesmanagementapp.adapters;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -171,9 +170,9 @@ public class DepartmentsAdapter extends PagedListAdapter<DepartmentWithExtras, D
                                         //then check if tasks with no employees have appeared
                                         //due to the above employees deletion
                                         db.tasksDao().deleteTasksWithNoEmployees();
-                                                    List<Integer> emptyTasksId = db.tasksDao().selectEmptyTasksId();
-                                                    db.tasksDao().deleteEmptyTasks();
-                                                    cancelEmptyTasksAlarm(emptyTasksId);
+
+                                        List<Integer> emptyTasksId = db.tasksDao().selectEmptyTasksId();
+                                        cancelEmptyTasksAlarm(emptyTasksId);
 
                                         //then delete department
                                         //if department has no completed tasks

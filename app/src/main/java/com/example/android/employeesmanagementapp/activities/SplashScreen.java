@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
  */
 public class SplashScreen extends AppCompatActivity {
 
-    Thread splashTread;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
