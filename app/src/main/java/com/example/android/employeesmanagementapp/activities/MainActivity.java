@@ -64,8 +64,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         NotificationService.setBadge(getApplicationContext(), 0);
         NotificationService.setTasksCount(0);
-        if (activeFragment instanceof TasksFragment)
-            cancelNotification(getApplicationContext(), 22327);
+        cancelNotification(getApplicationContext(), 22327);
 
         //set toolbar as actionbar
         Toolbar mToolbar = findViewById(R.id.toolbar);

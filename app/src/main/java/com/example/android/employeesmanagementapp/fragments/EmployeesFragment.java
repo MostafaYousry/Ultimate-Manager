@@ -1,6 +1,9 @@
 package com.example.android.employeesmanagementapp.fragments;
 
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,6 +16,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.android.employeesmanagementapp.MyAlarmReceiver;
+import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.activities.AddEmployeeActivity;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
@@ -257,6 +262,10 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
 
             }
 
+            getActivity().runOnUiThread(() -> abortMultiSelection());
+            List<Integer> emptyTasksId = mDb.tasksDao().selectEmptyTasksId();
+            cancelEmptyTasksAlarm(emptyTasksId);
+            mDb.tasksDao().deleteEmptyTasks();
             //finish multi selection
             getActivity().runOnUiThread(this::abortMultiSelection);
 
@@ -268,6 +277,25 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
         builder.setNegativeButton(getString(R.string.dialog_negative_btn_cancel), (dialog, which) -> dialog.dismiss());
 
         builder.show();
+    }
+
+    private void cancelEmptyTasksAlarm(List<Integer> emptyTasksId) {
+        System.out.println(emptyTasksId.size());
+        for (int i = 0; i < emptyTasksId.size(); i++) {
+            System.out.println(emptyTasksId.get(i));
+            try {
+                Intent intent = new Intent(getContext(), MyAlarmReceiver.class);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), emptyTasksId.get(i), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                AlarmManager alarmManager = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
+                alarmManager.cancel(pendingIntent);
+                pendingIntent.cancel();
+                Intent serviceIntent = new Intent(getContext(), NotificationService.class);
+                serviceIntent.putExtra("task id", emptyTasksId.get(i));
+                getContext().startService(serviceIntent);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void showChooseDepDialog() {
@@ -293,6 +321,9 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
                     mDb.employeesDao().updateEmployee(employeeWithExtras.employeeEntry);
                 }
 
+                List<Integer> emptyTasksId = mDb.tasksDao().selectEmptyTasksId();
+                cancelEmptyTasksAlarm(emptyTasksId);
+                mDb.tasksDao().deleteEmptyTasks();
                 mDb.tasksDao().deleteTasksWithNoEmployees();
 
                 getActivity().runOnUiThread(this::abortMultiSelection);

@@ -1,6 +1,8 @@
 package com.example.android.employeesmanagementapp.adapters;
 
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -13,6 +15,8 @@ import android.widget.ImageButton;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.example.android.employeesmanagementapp.MyAlarmReceiver;
+import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
@@ -132,19 +136,46 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
         View rateDialogView = LayoutInflater.from(mContext).inflate(R.layout.rating_bar, null, false);
 
         final RatingBar ratingBar = rateDialogView.findViewById(R.id.rating_bar);
-        ratingBar.setPaddingRelative(AppUtils.dpToPx(mContext, 16), 0, AppUtils.dpToPx(mContext, 16), 0);
         builder.setView(rateDialogView);
 
         builder.setPositiveButton(mContext.getString(R.string.dialog_positive_btn_confirm), (dialog, which) -> AppExecutor.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
                 AppDatabase.getInstance(mContext).tasksDao().rateTask(ratingBar.getRating(), taskID);
+            public void onClick(final DialogInterface dialog, int which) {
+                AppExecutor.getInstance().diskIO().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        AppDatabase.getInstance(mContext).tasksDao().rateTask(ratingBar.getRating(), taskID);
+                        dialog.dismiss();
+                    }
+                });
+                cancelAlarmManager(taskID);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
             }
         }));
         builder.setNegativeButton(mContext.getString(R.string.dialog_negative_btn_cancel), (dialog, which) -> dialog.dismiss());
 
         builder.show();
+    }
+
+    private void cancelAlarmManager(int taskId) {
+        try {
+            Intent intent = new Intent(mContext, MyAlarmReceiver.class);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, taskId, intent, 0);
+            AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+            alarmManager.cancel(pendingIntent);
+            Intent serviceIntent = new Intent(mContext, NotificationService.class);
+            serviceIntent.putExtra("task id", taskId);
+            mContext.startService(serviceIntent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     class TasksViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -181,6 +212,12 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
                             showRateTaskDialog((int) itemView.getTag());
                             return true;
                         case R.id.action_delete_task:
+                    popup.setOnMenuItemClickListener(item -> {
+                        switch (item.getItemId()) {
+                            case R.id.action_mark_as_done:
+                                showRateTaskDialog((int) itemView.getTag());
+                                return true;
+                            case R.id.action_delete_task:
 
                             AppExecutor.getInstance().diskIO().execute(() -> {
                                 AppDatabase.getInstance(mContext).employeesTasksDao().deleteTaskJoinRecords(getItem(getAdapterPosition()).getTaskId());
@@ -196,6 +233,21 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
                     }
                 });
                 popup.show();
+                                AppExecutor.getInstance().diskIO().execute(() -> {
+                                    AppDatabase.getInstance(mContext).employeesTasksDao().deleteTaskJoinRecords(getItem(getAdapterPosition()).getTaskId());
+                                    AppDatabase.getInstance(mContext).tasksDao().deleteTask(getItem(getAdapterPosition()));
+                                });
+                                cancelAlarmManager((int) itemView.getTag());
+                                return true;
+                            case R.id.action_color_task:
+                                showColorPicker((int) itemView.getTag());
+                                return true;
+                            default:
+                                return false;
+                        }
+                    });
+                    popup.show();
+                }
             });
             itemView.setOnClickListener(this);
         }
@@ -206,6 +258,11 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
             mTaskTitle.setText(getItem(position).getTaskTitle());
 
             getRemainingTime(getItem(position).getTaskDueDate().getTime());
+            mTaskDates.setText(mContext.getString(R.string.task_list_item_name_dates, AppUtils.getFriendlyDate(getItem(position).getTaskStartDate().getTime()), AppUtils.getFriendlyDate(getItem(position).getTaskDueDate().getTime())));
+            if (!getItem(position).isTaskIsCompleted()) {
+                mTaskDates.setVisibility(View.VISIBLE);
+                getRemainingTime(getItem(position).getTaskDueDate().getTime());
+            }
 
             int taskColor = ResourcesCompat.getColor(itemView.getResources(), getItem(position).getTaskColorResource(), mContext.getTheme());
 

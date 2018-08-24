@@ -44,6 +44,7 @@ public class DatePickerDialogFragment extends DialogFragment implements DatePick
             mCalendar = Calendar.getInstance();
             mCalendar.set(Calendar.HOUR_OF_DAY, 0);
             mCalendar.set(Calendar.MINUTE, 0);
+            mCalendar.set(Calendar.SECOND,0);
         }
 
 

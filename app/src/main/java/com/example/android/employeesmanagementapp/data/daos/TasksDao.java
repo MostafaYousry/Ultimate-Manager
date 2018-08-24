@@ -122,4 +122,30 @@ public interface TasksDao {
      */
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateTask(TaskEntry taskEntry);
+
+    /**
+     * update rating of a completed taskEntry
+     *
+     * @param taskRating : int number of stars
+     * @param taskID
+     */
+    @Query("UPDATE tasks SET task_rating = :taskRating , task_is_completed = 1 WHERE task_id=:taskID")
+    void rateTask(float taskRating, int taskID);
+
+
+    /**
+     * update taskEntry color
+     *
+     * @param colorRes : color resource
+     * @param taskID
+     */
+    @Query("UPDATE tasks SET task_color_resource = :colorRes WHERE task_id=:taskID")
+    void updateTaskColor(int colorRes, int taskID);
+
+    @Query("delete from tasks where (SELECT COUNT(*) FROM employees INNER JOIN employees_tasks ON employees.employee_id=employees_tasks.employee_id WHERE employees_tasks.task_id= tasks.task_id )=0")
+    void deleteEmptyTasks();
+
+    @Query("SELECT task_id from tasks where (SELECT COUNT(*) FROM employees INNER JOIN employees_tasks ON employees.employee_id=employees_tasks.employee_id WHERE employees_tasks.task_id= tasks.task_id )=0")
+    List<Integer> selectEmptyTasksId();
+
 }

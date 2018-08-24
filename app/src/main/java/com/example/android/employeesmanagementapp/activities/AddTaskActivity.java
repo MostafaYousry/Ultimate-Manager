@@ -1,8 +1,14 @@
 package com.example.android.employeesmanagementapp.activities;
 
+import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,6 +17,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.example.android.employeesmanagementapp.MyAlarmReceiver;
 import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
@@ -29,6 +36,7 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import androidx.annotation.Nullable;
@@ -431,12 +439,41 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
     @Override
     protected void onStop() {
         super.onStop();
-        Intent intent = new Intent(this, NotificationService.class);
-        intent.putExtra("task id", mTaskId);
-        intent.putExtra("task due date", ((Calendar) mTaskDueDate.getTag()).getTime());
-        intent.putExtra("app is destroyed", false);
-        startService(intent);
+        // if there is a previous alarm manager is created stop it and create a new one with the new taskDueDate
+        cancelPreviousAlarm();
+        createNewAlarm();
 
+    }
+
+
+    private void cancelPreviousAlarm() {
+        try {
+            Intent intent = new Intent(getApplicationContext(), MyAlarmReceiver.class);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, mTaskId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+            alarmManager.cancel(pendingIntent);
+            pendingIntent.cancel();
+            Intent serviceIntent = new Intent(getApplicationContext(), NotificationService.class);
+            serviceIntent.putExtra("task id", mTaskId);
+            startService(serviceIntent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createNewAlarm() {
+        Calendar calendar = (Calendar) mTaskDueDate.getTag();
+        if (calendar.getTime().compareTo(new Date()) >= 0) {
+            Intent intent = new Intent(this, MyAlarmReceiver.class);
+            intent.putExtra("task id", mTaskId);
+            PendingIntent pIntent = PendingIntent.getBroadcast(this, mTaskId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+            //solve the problem of start the service for android8
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                alarm.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() - 1000, pIntent);
+            } else
+                alarm.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() - 1000, 0, pIntent);
+        }
     }
 
     /**
