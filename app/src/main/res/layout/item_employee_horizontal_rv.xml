@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="100dp"
     android:layout_height="150dp"
     android:layout_gravity="center"
-    android:layout_margin="@dimen/item_employee_margin"
-    app:cardBackgroundColor="@android:color/transparent"
-    app:cardElevation="@dimen/cardview_default_elevation">
+    android:layout_margin="@dimen/item_employee_margin">
 
     <ImageView
         android:id="@+id/employee_image"
@@ -20,11 +17,13 @@
         android:id="@+id/employee_name"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        style="@style/detailActivitiesTextStyle"
         android:background="@android:color/white"
         android:layout_gravity="bottom"
         android:padding="8dp"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:textColor="@color/primaryTextColor"
-        android:textSize="15sp"
         tools:text="Moamen" />
 
 </com.google.android.material.card.MaterialCardView>

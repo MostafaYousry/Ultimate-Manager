@@ -373,7 +373,6 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
             //disable changing task's department after being created and assigned to employees
             mTaskDepartment.setEnabled(false);
 
-            // TODO: 8/21/18
 //        mTaskDepartment.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {

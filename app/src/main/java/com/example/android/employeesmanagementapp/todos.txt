@@ -1,3 +1,0 @@
-load lists while showing splash screen
-
-todo -----------------T E S T-----------------------------
