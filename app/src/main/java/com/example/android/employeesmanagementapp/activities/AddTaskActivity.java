@@ -310,6 +310,13 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
      */
     private void clearViews() {
 
+        //set default calendar as tag
+        //in order to prevent null pointer exception
+        //when choosing time before date
+        //or when pressing back from adding empty task
+        mTaskStartDate.setTag(Calendar.getInstance());
+        mTaskDueDate.setTag(Calendar.getInstance());
+
         mTaskDepartment.setSelection(0);
 
         //listener for task department changes to clear selected employees list
