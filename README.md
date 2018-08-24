@@ -17,6 +17,12 @@ An Android Application that is used by managers to easily evaluate the performan
 - Recieve notifications when a task due date is met
 - Images for employees and departments
 
+## Resources
+* [developer.android.com][8]
+* [udacity][9]
+* [stack overflow][10]
+* [material.io][11]
+
 ## Libraries Used
 
 * [Architecture Components][1] 
@@ -28,10 +34,14 @@ An Android Application that is used by managers to easily evaluate the performan
   * [Glide][6]
   * [hdodenhof/CircleImageView][7]
 
-[1]: https://developer.android.com/jetpack/arch/
+[1]: https://developer.android.com/jetpack/arch
 [2]: https://developer.android.com/topic/libraries/architecture/room
 [3]: https://developer.android.com/topic/libraries/architecture/livedata
 [4]: https://developer.android.com/topic/libraries/architecture/viewmodel
 [5]: https://developer.android.com/topic/libraries/architecture/paging
-[6]: https://bumptech.github.io/glide/
+[6]: https://bumptech.github.io/glide
 [7]: https://github.com/hdodenhof/CircleImageView
+[8]: https://developer.android.com
+[9]: https://eg.udacity.com
+[10]: https://stackoverflow.com
+[11]: https://material.io
