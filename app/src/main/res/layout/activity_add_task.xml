@@ -90,8 +90,7 @@
                     android:gravity="top|start"
                     android:hint="@string/hint_task_description"
                     android:inputType="textMultiLine"
-                    android:minLines="10"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                    android:minLines="10" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
