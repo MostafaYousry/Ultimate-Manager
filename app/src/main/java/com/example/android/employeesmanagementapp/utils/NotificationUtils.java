@@ -82,7 +82,7 @@ public final class NotificationUtils {
     public static void resetAllAlarms(Context context, List<Integer> allTasksId, List<Calendar> allTasksDate) {
         for (int i = 0; i < allTasksId.size(); i++) {
             //check if the due date of the task was during the time the boot take to complete or after that time
-            if (allTasksDate.get(i).getTime().getTime() - new Date().getTime() >= -60 * 1000) {
+            if (allTasksDate.get(i).getTime().getTime() - new Date().getTime() >= -120 * 1000) {
                 Intent intent = new Intent(context, MyAlarmReceiver.class);
                 intent.putExtra("task id", allTasksId.get(i));
                 final PendingIntent pIntent = PendingIntent.getBroadcast(context, allTasksId.get(i), intent, PendingIntent.FLAG_UPDATE_CURRENT);
