@@ -9,6 +9,7 @@ import android.os.Build;
 
 import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
+import com.example.android.employeesmanagementapp.utils.NotificationUtils;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -33,7 +34,7 @@ public class MyAlarmReceiver extends BroadcastReceiver {
             AppExecutor.getInstance().diskIO().execute(() -> {
                 allTasksId = AppDatabase.getInstance(context).tasksDao().getAllTasksId();
                 allTasksDate = AppDatabase.getInstance(context).tasksDao().getAllTasksDueDate();
-                createNewAlarm(context);
+                NotificationUtils.resetAllAlarms(context, allTasksId, allTasksDate);
             });
 
         } else {
@@ -41,26 +42,6 @@ public class MyAlarmReceiver extends BroadcastReceiver {
             serviceIntent.putExtra("intent is sent from receiver", true);
             serviceIntent.putExtra("task id", intent.getExtras().getInt("task id"));
             context.startService(serviceIntent);
-        }
-    }
-
-    //reset all the alarms
-    private void createNewAlarm(Context context) {
-        for (int i = 0; i < allTasksId.size(); i++) {
-            //check if the due date of the task was during the time the boot take to complete or after that time
-            if (allTasksDate.get(i).getTime().getTime() - new Date().getTime() >= -60 * 1000) {
-                Intent intent = new Intent(context, MyAlarmReceiver.class);
-                intent.putExtra("task id", allTasksId.get(i));
-                final PendingIntent pIntent = PendingIntent.getBroadcast(context, allTasksId.get(i), intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-                Calendar calendar = allTasksDate.get(i);
-
-                //solve the problem of start the service for android8
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    alarm.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pIntent);
-                } else
-                    alarm.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 0, pIntent);
-            }
         }
     }
 }

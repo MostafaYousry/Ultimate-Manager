@@ -1,8 +1,5 @@
 package com.example.android.employeesmanagementapp.activities;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,8 +17,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.example.android.employeesmanagementapp.MyAlarmReceiver;
-import com.example.android.employeesmanagementapp.NotificationService;
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.TextDrawable;
 import com.example.android.employeesmanagementapp.adapters.DepartmentsArrayAdapter;
@@ -34,6 +29,7 @@ import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
 import com.example.android.employeesmanagementapp.data.factories.EmpIdFact;
 import com.example.android.employeesmanagementapp.data.viewmodels.AddNewEmployeeViewModel;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
+import com.example.android.employeesmanagementapp.utils.NotificationUtils;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
@@ -559,7 +555,7 @@ public class AddEmployeeActivity extends BaseAddActivity implements TasksAdapter
                     mDb.employeesTasksDao().deleteEmployeeFromRunningTasks(mEmployeeId);
 
                     List<Integer> emptyTasksId = mDb.tasksDao().selectEmptyTasksId();
-                    cancelEmptyTasksAlarm(emptyTasksId);
+                    NotificationUtils.cancelEmptyTasksAlarm(getApplicationContext(),emptyTasksId);
 
                     mDb.tasksDao().deleteTasksWithNoEmployees();
                     employeeEntry.setEmployeeID(mEmployeeId);
@@ -590,24 +586,6 @@ public class AddEmployeeActivity extends BaseAddActivity implements TasksAdapter
             }
 
 
-        }
-    }
-
-
-    private void cancelEmptyTasksAlarm(List<Integer> emptyTasksId) {
-        for (int i = 0; i < emptyTasksId.size(); i++) {
-            try {
-                Intent intent = new Intent(getApplicationContext(), MyAlarmReceiver.class);
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), emptyTasksId.get(i), intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-                alarmManager.cancel(pendingIntent);
-                pendingIntent.cancel();
-                Intent serviceIntent = new Intent(getApplicationContext(), NotificationService.class);
-                serviceIntent.putExtra("task id", emptyTasksId.get(i));
-                getApplicationContext().startService(serviceIntent);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
     }
 

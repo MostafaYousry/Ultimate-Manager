@@ -114,25 +114,10 @@
     <!--string for department summary (number of employees/running tasks/completed tasks)-->
     <string name="department_summary">%s\n%s\n%s</string>
 
-
-    <string name="remaining_single_hour">%02d hour</string>
-    <string name="remaining_multi_hours">%02d hours</string>
-    <string name="remaining_single_minute">%02d minute</string>
-    <string name="remaining_multi_minutes">%02d minutes</string>
-    <string name="remaining_single_second">%02d second</string>
-    <string name="remaining_multi_seconds">%02d seconds</string>
+    <!--string for the format of the textView that keep tracking of the remaining time pf a task-->
     <string name="date_three_fields">%s %s %s remaining</string>
     <string name="date_two_fields">%s %s remaining</string>
     <string name="date_one_fields">%s remaining</string>
-
-    <string name="remaining_multi_years"> %d years</string>
-    <string name="remaining_single_year">%d year</string>
-
-    <string name="remaining_multi_moths">%d months</string>
-    <string name="remaining_single_month">%d month</string>
-
-    <string name="remaining_multi_days">%d days</string>
-    <string name="remaining_single_day">%d day</string>
 
     <!--plural strings-->
     <plurals name="numberOfRunningTasks">
@@ -148,6 +133,36 @@
     <plurals name="numberOfEmployees">
         <item quantity="one">%d employee</item>
         <item quantity="other">%d employees</item>
+    </plurals>
+
+    <plurals name="numberOfRemainingYears">
+        <item quantity="one">%l year</item>
+        <item quantity="other">%l years</item>
+    </plurals>
+
+    <plurals name="numberOfRemainingMonths">
+        <item quantity="one">%d month</item>
+        <item quantity="other">%d months</item>
+    </plurals>
+
+    <plurals name="numberOfRemainingDays">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
+
+    <plurals name="numberOfRemainingHours">
+        <item quantity="one">%d hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
+
+    <plurals name="numberOfRemainingMinutes">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+
+    <plurals name="numberOfRemainingSeconds">
+        <item quantity="one">%d second</item>
+        <item quantity="other">%d seconds</item>
     </plurals>
 
 </resources>

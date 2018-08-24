@@ -23,6 +23,7 @@ import com.example.android.employeesmanagementapp.data.AppDatabase;
 import com.example.android.employeesmanagementapp.data.AppExecutor;
 import com.example.android.employeesmanagementapp.data.entries.TaskEntry;
 import com.example.android.employeesmanagementapp.fragments.ColorPickerDialogFragment;
+import com.example.android.employeesmanagementapp.utils.NotificationUtils;
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.Calendar;
@@ -141,7 +142,7 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
         builder.setPositiveButton(mContext.getString(R.string.dialog_positive_btn_confirm), (dialogInterface, i) -> {
             AppExecutor.getInstance().diskIO().execute(() -> {
                 AppDatabase.getInstance(mContext).tasksDao().rateTask(ratingBar.getRating(), taskID);
-                cancelAlarmManager(taskID);
+                NotificationUtils.cancelAlarmManager(mContext, taskID);
             });
             dialogInterface.dismiss();
         });
@@ -150,19 +151,6 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
         builder.show();
     }
 
-    private void cancelAlarmManager(int taskId) {
-        try {
-            Intent intent = new Intent(mContext, MyAlarmReceiver.class);
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, taskId, intent, 0);
-            AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-            alarmManager.cancel(pendingIntent);
-            Intent serviceIntent = new Intent(mContext, NotificationService.class);
-            serviceIntent.putExtra("task id", taskId);
-            mContext.startService(serviceIntent);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     class TasksViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         MaterialCardView mItemView;
@@ -201,7 +189,7 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
                             AppExecutor.getInstance().diskIO().execute(() -> {
                                 AppDatabase.getInstance(mContext).employeesTasksDao().deleteTaskJoinRecords(getItem(getAdapterPosition()).getTaskId());
                                 AppDatabase.getInstance(mContext).tasksDao().deleteTask(getItem(getAdapterPosition()));
-                                cancelAlarmManager((int) itemView.getTag());
+                                NotificationUtils.cancelAlarmManager(mContext, (int) itemView.getTag());
                             });
                             return true;
                         case R.id.action_color_task:
@@ -236,6 +224,8 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
         }
 
         private void getRemainingTime(Date taskDueDate) {
+
+            //if there is a previous countdown, cancel it
             if (mCountDownTimer != null)
                 mCountDownTimer.cancel();
             mCountDownTimer = new CountDownTimer(taskDueDate.getTime() - new Date().getTime(), 1000) {
@@ -255,52 +245,28 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
                     months = cal.get(Calendar.MONTH);
                     days = cal.get(Calendar.DAY_OF_MONTH) - 2;
 
+                    //choose which three or less fields will be displayed
                     if (years > 0 && indexOfFields + 1 != 4) {
-                        if (years == 1)
-                            chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_single_year, years);
-                        else
-                            chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_multi_years, years);
+                        chosenFields[indexOfFields++] = mContext.getResources().getQuantityString(R.plurals.numberOfRemainingYears,(int) years, (int) years);
                     }
                     if (months > 0 && indexOfFields + 1 != 4) {
-
-                        if (months == 1)
-                            chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_single_month, months);
-                        else
-                            chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_multi_moths, months);
-
+                        chosenFields[indexOfFields++] = mContext.getResources().getQuantityString(R.plurals.numberOfRemainingMonths,(int) months, (int) months);
                     }
                     if (days > 0 && indexOfFields + 1 != 4) {
-
-                        if (days == 1)
-                            chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_single_day, days);
-                        else
-                            chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_multi_days, days);
-
+                        chosenFields[indexOfFields++] = mContext.getResources().getQuantityString(R.plurals.numberOfRemainingDays,(int) days, (int) days);
                     }
                     if (hours > 0 && indexOfFields + 1 != 4) {
-
-                        if (hours == 1)
-                            chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_single_hour, hours);
-                        else
-                            chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_multi_hours, hours);
-
+                        chosenFields[indexOfFields++] = mContext.getResources().getQuantityString(R.plurals.numberOfRemainingHours,(int) hours, (int) hours);
                     }
                     if (minutes > 0 && indexOfFields + 1 != 4) {
-
-                        if (minutes == 1)
-                            chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_single_minute, minutes);
-                        else
-                            chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_multi_minutes, minutes);
-
+                        chosenFields[indexOfFields++] = mContext.getResources().getQuantityString(R.plurals.numberOfRemainingMinutes,(int) minutes, (int) minutes);
                     }
                     if (seconds > 0 && indexOfFields + 1 != 4) {
-
-                        if (seconds == 1)
-                            chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_single_second, seconds);
-                        else
-                            chosenFields[indexOfFields++] = mContext.getString(R.string.remaining_multi_seconds, seconds);
+                        chosenFields[indexOfFields++] = mContext.getResources().getQuantityString(R.plurals.numberOfRemainingSeconds,(int) seconds, (int) seconds);
                     }
 
+
+                    //choose which format will display the remaining time
                     if (indexOfFields == 3)
                         mTaskDates.setText(mContext.getString(R.string.date_three_fields, chosenFields[0], chosenFields[1], chosenFields[2]));
 
