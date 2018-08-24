@@ -28,7 +28,6 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 @Database(entities = {EmployeeEntry.class, TaskEntry.class, DepartmentEntry.class, EmployeesTasksEntry.class}, version = 1, exportSchema = false)
 @TypeConverters(CalendarTypeConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
-    private static final String TAG = AppDatabase.class.getSimpleName();
     private static final String DATABASE_NAME = "employee_management";
     private static final Object LOCK = new Object();
     private static AppDatabase sInstance;
@@ -56,6 +55,9 @@ public abstract class AppDatabase extends RoomDatabase {
                                         db.departmentsDao().addDepartment(new DepartmentEntry(8, "dep8", Calendar.getInstance(), "", false));
                                         db.departmentsDao().addDepartment(new DepartmentEntry(9, "dep9", Calendar.getInstance(), "", false));
 
+//                                        for (int i = 10 ; i<= 1000 ;i++)
+//                                            db.departmentsDao().addDepartment(new DepartmentEntry(i, "dep"+i, Calendar.getInstance(), "", false));
+
                                         db.employeesDao().addEmployee(new EmployeeEntry(1, 1, "mostafa", "yousry", null, 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
                                         db.employeesDao().addEmployee(new EmployeeEntry(2, 2, "karim", "hamdy", "abdel azziz", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
                                         db.employeesDao().addEmployee(new EmployeeEntry(3, 3, "ammar", "yasser", "ismaeil", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
@@ -73,57 +75,10 @@ public abstract class AppDatabase extends RoomDatabase {
                                         db.employeesDao().addEmployee(new EmployeeEntry(15, 2, "ismaeil", "el", "yamany", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
                                         db.employeesDao().addEmployee(new EmployeeEntry(16, 5, "abdallah", "amr", "el maradny", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
                                         db.employeesDao().addEmployee(new EmployeeEntry(17, 5, "shawky", "maom", "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(18, 1, "mostafa", "yousry", null, 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(19, 2, "karim", "hamdy", "abdel azziz", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(20, 3, "ammar", "yasser", "ismaeil", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(21, 2, "amir", "swidan", "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(22, 2, "omar", "zawawi", "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(23, 3, "mohamed", null, "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(24, 4, "abdelrahman", "wael", "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(25, 5, "amr", "saleh", "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(26, 6, "hussein", null, "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(27, 6, "loay", "fakhr", "el din", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(28, 7, "yamany", null, null, 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(29, 8, "ziad", "ashraf", "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(30, 9, "ramy", "essam", "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(31, 2, "zorba", "zanaty", "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(32, 2, "ismaeil", "el", "yamany", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(33, 5, "abdallah", "amr", "el maradny", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(35, 5, "shawky", "maom", "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(36, 1, "mostafa", "yousry", null, 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(37, 2, "karim", "hamdy", "abdel azziz", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(38, 3, "ammar", "yasser", "ismaeil", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(39, 2, "amir", "swidan", "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(40, 2, "omar", "zawawi", "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(41, 3, "mohamed", null, "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(42, 4, "abdelrahman", "wael", "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(43, 5, "amr", "saleh", "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(44, 6, "hussein", null, "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(45, 6, "loay", "fakhr", "el din", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(46, 7, "yamany", null, null, 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(47, 8, "ziad", "ashraf", "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(48, 9, "ramy", "essam", "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(49, 2, "zorba", "zanaty", "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(50, 2, "ismaeil", "el", "yamany", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(51, 5, "abdallah", "amr", "el maradny", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(52, 5, "shawky", "maom", "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(53, 1, "mostafa", "yousry", null, 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(54, 2, "karim", "hamdy", "abdel azziz", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(55, 3, "ammar", "yasser", "ismaeil", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(56, 2, "amir", "swidan", "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(57, 2, "omar", "zawawi", "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(58, 3, "mohamed", null, "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(59, 4, "abdelrahman", "wael", "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(60, 5, "amr", "saleh", "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(61, 6, "hussein", null, "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(62, 6, "loay", "fakhr", "el din", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(63, 7, "yamany", null, null, 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(64, 8, "ziad", "ashraf", "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(65, 9, "ramy", "essam", "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(66, 2, "zorba", "zanaty", "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(67, 2, "ismaeil", "el", "yamany", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(68, 5, "abdallah", "amr", "el maradny", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
-//                                        db.employeesDao().addEmployee(new EmployeeEntry(69, 5, "shawky", "maom", "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
+
+//                                        for (int i = 18 ; i <=1000 ;i++)
+//                                            db.employeesDao().addEmployee(new EmployeeEntry(i, (int)(Math.random()*1000)+1, "shawky"+i, "maom", "dfmnweifmw", 23, Calendar.getInstance(), "fef@gmail.com", "013232333", "rvmrivm", "", false));
+
 
                                         db.tasksDao().addTask(new TaskEntry(1, 1, "task1", "askasmas", Calendar.getInstance(), Calendar.getInstance(), 3, true, R.color.task_color_1));
                                         db.employeesTasksDao().addEmployeeTask(new EmployeesTasksEntry(1, 1));

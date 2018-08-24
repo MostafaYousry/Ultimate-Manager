@@ -16,9 +16,13 @@ import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+/**
+ * dialog that shows a list of all available task colors
+ * to allow the user to choose one
+ */
 public class ColorPickerDialogFragment extends DialogFragment implements ColorAdapter.OnColorSelectedListener {
+
     public static final String KEY_TASK_ID = "task_id";
-    private RecyclerView mGrid;
     private int mTaskId;
 
     @Override
@@ -31,7 +35,7 @@ public class ColorPickerDialogFragment extends DialogFragment implements ColorAd
 
         View dialogView = LayoutInflater.from(getActivity()).inflate(R.layout.color_dialog_view, null, false);
 
-        mGrid = dialogView.findViewById(R.id.color_swatches_rv);
+        RecyclerView mGrid = dialogView.findViewById(R.id.color_swatches_rv);
         mGrid.setLayoutManager(new GridLayoutManager(getActivity(), 4));
 
 
@@ -46,14 +50,14 @@ public class ColorPickerDialogFragment extends DialogFragment implements ColorAd
     }
 
 
+    /**
+     * when a color is selected update record of task in database
+     *
+     * @param colorRes
+     */
     @Override
     public void onColorSelected(final int colorRes) {
-        AppExecutor.getInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                AppDatabase.getInstance(getActivity()).tasksDao().updateTaskColor(colorRes, mTaskId);
-            }
-        });
+        AppExecutor.getInstance().diskIO().execute(() -> AppDatabase.getInstance(getActivity()).tasksDao().updateTaskColor(colorRes, mTaskId));
         dismiss();
     }
 }

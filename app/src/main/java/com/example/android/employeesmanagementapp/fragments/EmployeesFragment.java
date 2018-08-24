@@ -37,7 +37,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 /**
- * A simple {@link Fragment} subclass.
+ * fragment that shows a list of all employees in company
  */
 public class EmployeesFragment extends Fragment implements EmployeesAdapter.EmployeeItemClickListener, EmployeesAdapter.EmployeeSelectedStateListener {
 
@@ -63,6 +63,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
         super.onCreate(savedInstanceState);
         mDb = AppDatabase.getInstance(getContext());
 
+        //observes employees list in main view model
         ViewModelProviders.of(getActivity()).get(MainViewModel.class).employeesWithExtrasList
                 .observe(this, employeeWithExtras -> {
                     if (employeeWithExtras != null) {
@@ -84,18 +85,8 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
 
         mActivityToolBar = getActivity().findViewById(R.id.toolbar);
         mActivityToolBarText = getActivity().findViewById(R.id.custom_title);
-        mActivityToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                abortMultiSelection();
-            }
-        });
+        mActivityToolBar.setNavigationOnClickListener(view -> abortMultiSelection());
         mActivityFab = getActivity().findViewById(R.id.fab);
-    }
-
-    public void abortMultiSelection() {
-        onMultiSelectFinish();
-        mEmployeesAdapter.setEmployeeSelectionMode(EmployeesAdapter.SELECTION_MODE_SINGLE);
     }
 
     @Override
@@ -115,6 +106,13 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
         return rootView;
     }
 
+    /**
+     * cancels multi selection operation on list
+     */
+    public void abortMultiSelection() {
+        onMultiSelectFinish();
+        mEmployeesAdapter.setEmployeeSelectionMode(EmployeesAdapter.SELECTION_MODE_SINGLE);
+    }
 
     public boolean isInMultiSelectMode() {
         return mIsInMultiSelectMode;
@@ -145,7 +143,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
 
     private void showEmptyView() {
         mRecyclerView.setVisibility(View.GONE);
-        emptyViewTextView.setText(R.string.employee_empty_view_message);
+        emptyViewTextView.setText(R.string.empty_view_message_employees);
         emptyViewImageView.setImageResource(R.drawable.ic_no_employee);
         emptyView.setVisibility(View.VISIBLE);
     }
@@ -179,6 +177,12 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
     }
 
 
+    /**
+     * creates menu for employees fragment
+     *
+     * @param menu
+     * @param inflater
+     */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_employees_fragment, menu);
@@ -186,11 +190,17 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    /**
+     * handles choosing a menu option
+     *
+     * @param item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
-            case R.id.action_select:
+            case R.id.action_select: //starts a multi select operation on list
                 selectOptionPressed = true;
                 onMultiSelectStart();
                 mEmployeesAdapter.setEmployeeSelectionMode(EmployeesAdapter.SELECTION_MODE_MULTIPLE);
@@ -202,7 +212,12 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
 
             case R.id.action_move_employees:
 
-                showChooseDepDialog();
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setMessage(getString(R.string.dialog_message_move_employees));
+                builder.setPositiveButton(getString(R.string.dialog_positive_btn_continue), (dialogInterface, i) -> showChooseDepDialog());
+
+                builder.setNegativeButton(getString(R.string.dialog_negative_btn_cancel), (dialog, which) -> dialog.dismiss());
+                builder.show();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -212,52 +227,63 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
     private void showDeleteEmployeesDialogue() {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle(getString(R.string.title_dialog_delete_employees));
-        builder.setMessage(getString(R.string.message_dialog_delete_employees));
+        builder.setTitle(getString(R.string.dialog_title_fire_employees));
+        builder.setMessage(getString(R.string.dialog_message_fire_employees));
 
-        builder.setPositiveButton(getString(R.string.delete_employees), (dialog, which) -> AppExecutor.getInstance().diskIO().execute(() -> {
+        builder.setPositiveButton(getString(R.string.dialog_positive_btn_delete), (dialog, which) -> AppExecutor.getInstance().diskIO().execute(() -> {
 
             for (EmployeeWithExtras employeeWithExtras : mEmployeesAdapter.getSelectedOnes()) {
 
                 int empID = employeeWithExtras.employeeEntry.getEmployeeID();
 
+                //if employee has completed tasks only mark employee as deleted only
                 if (employeeWithExtras.employeeNumRunningTasks == 0 && mDb.employeesTasksDao().getNumCompletedTasksEmployee(empID) > 0) {
                     mDb.employeesDao().markEmployeeAsDeleted(empID);
+
+                    //if employee has running tasks only remove employee from them then delete employee record
                 } else if (employeeWithExtras.employeeNumRunningTasks > 0 && mDb.employeesTasksDao().getNumCompletedTasksEmployee(empID) == 0) {
                     mDb.employeesTasksDao().deleteEmployeeJoinRecords(empID);
                     mDb.employeesDao().deleteEmployee(employeeWithExtras.employeeEntry);
+
+                    //if employee has both so remove him from running tasks only
+                    //then mark him as deleted
                 } else if (employeeWithExtras.employeeNumRunningTasks > 0 && mDb.employeesTasksDao().getNumCompletedTasksEmployee(empID) > 0) {
                     mDb.employeesTasksDao().deleteEmployeeFromRunningTasks(empID);
                     mDb.employeesDao().markEmployeeAsDeleted(empID);
                 } else {
+                    //if he has nothing delete employee record
                     mDb.employeesDao().deleteEmployee(employeeWithExtras.employeeEntry);
                 }
 
             }
 
-            getActivity().runOnUiThread(() -> abortMultiSelection());
+            //finish multi selection
+            getActivity().runOnUiThread(this::abortMultiSelection);
+
+            //check if tasks with no employees have appeared
+            //due to the above employees deletion
             mDb.tasksDao().deleteTasksWithNoEmployees();
 
         }));
-        builder.setNegativeButton(getString(R.string.cancel_delete_employee), (dialog, which) -> dialog.dismiss());
+        builder.setNegativeButton(getString(R.string.dialog_negative_btn_cancel), (dialog, which) -> dialog.dismiss());
 
         builder.show();
     }
 
     private void showChooseDepDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle(getString(R.string.choose_department_dialog_title));
-//        builder.setMessage("selected employees will be removed from their assigned running task , completed tasks will not be affected.");
+        builder.setTitle(getString(R.string.dialog_title_choose_department));
 
         final DepartmentsArrayAdapter departmentsArrayAdapter = new DepartmentsArrayAdapter(getActivity(), AppUtils.dpToPx(getActivity(), 24), AppUtils.dpToPx(getActivity(), 8), AppUtils.dpToPx(getActivity(), 0), AppUtils.dpToPx(getActivity(), 8), R.style.mainTextStyle);
 
-
+        //load all departments
         final LiveData<List<DepartmentEntry>> departments = mDb.departmentsDao().loadDepartments();
         departments.observe(this, departmentEntries -> {
             departments.removeObservers(getActivity());
             departmentsArrayAdapter.setData(departmentEntries);
         });
 
+        //make dialog appear as a single choice list
         builder.setSingleChoiceItems(departmentsArrayAdapter, 0, (dialogInterface, i) -> {
             AppExecutor.getInstance().diskIO().execute(() -> {
                 int selectedDepartmentId = departmentsArrayAdapter.getDepId(i);
@@ -269,12 +295,12 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
 
                 mDb.tasksDao().deleteTasksWithNoEmployees();
 
-                getActivity().runOnUiThread(() -> abortMultiSelection());
+                getActivity().runOnUiThread(this::abortMultiSelection);
             });
             dialogInterface.dismiss();
         });
 
-        builder.setNegativeButton(getString(R.string.choose_department_dialog_cancel_button), (dialog, which) -> dialog.dismiss());
+        builder.setNegativeButton(getString(R.string.dialog_negative_btn_cancel), (dialog, which) -> dialog.dismiss());
 
         builder.show();
     }

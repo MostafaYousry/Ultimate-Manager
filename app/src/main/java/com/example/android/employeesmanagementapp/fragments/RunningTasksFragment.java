@@ -22,7 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 /**
- * A simple {@link Fragment} subclass.
+ * fragment that shows a list of all running tasks in company
  */
 public class RunningTasksFragment extends Fragment implements TasksAdapter.TasksItemClickListener {
 
@@ -37,6 +37,8 @@ public class RunningTasksFragment extends Fragment implements TasksAdapter.Tasks
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //observes completed tasks list in main view model
         ViewModelProviders.of(getActivity()).get(MainViewModel.class).runningTasksList
                 .observe(this, taskEntries -> {
                     if (taskEntries != null) {
@@ -88,7 +90,7 @@ public class RunningTasksFragment extends Fragment implements TasksAdapter.Tasks
 
     private void showEmptyView() {
         mRecyclerView.setVisibility(View.GONE);
-        emptyViewTextView.setText(R.string.task_empty_view_message);
+        emptyViewTextView.setText(R.string.empty_view_message_tasks);
         emptyViewImageView.setImageResource(R.drawable.ic_no_task);
         emptyView.setVisibility(View.VISIBLE);
     }

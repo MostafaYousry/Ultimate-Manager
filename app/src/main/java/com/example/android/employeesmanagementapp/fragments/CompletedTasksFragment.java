@@ -19,6 +19,9 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+/**
+ * fragment that shows a list of all completed tasks in company
+ */
 public class CompletedTasksFragment extends Fragment implements TasksAdapter.TasksItemClickListener {
 
     private RecyclerView mRecyclerView;
@@ -32,6 +35,7 @@ public class CompletedTasksFragment extends Fragment implements TasksAdapter.Tas
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //observes completed tasks list in main view model
         ViewModelProviders.of(getActivity()).get(MainViewModel.class).completedTasksList
                 .observe(this, taskEntries -> {
                     if (taskEntries != null) {
@@ -80,7 +84,7 @@ public class CompletedTasksFragment extends Fragment implements TasksAdapter.Tas
 
     private void showEmptyView() {
         mRecyclerView.setVisibility(View.GONE);
-        emptyViewTextView.setText(R.string.task_empty_view_message);
+        emptyViewTextView.setText(R.string.empty_view_message_tasks);
         emptyViewImageView.setImageResource(R.drawable.ic_no_task);
         emptyView.setVisibility(View.VISIBLE);
     }

@@ -157,6 +157,10 @@ public class AddDepartmentActivity extends BaseAddActivity implements Horizontal
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_GET && resultCode == RESULT_OK) {
             Uri fullPhotoUri = data.getData();
+
+            getContentResolver().takePersistableUriPermission(fullPhotoUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+
             mDepartmentPicturePath = fullPhotoUri.toString();
             Glide.with(this)
                     .asBitmap()
@@ -302,7 +306,7 @@ public class AddDepartmentActivity extends BaseAddActivity implements Horizontal
         if (TextUtils.isEmpty(mDepartmentPicturePath)) {
             mDepartmentImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_departments));
             mDepartmentImage.setScaleType(ImageView.ScaleType.CENTER);
-            mDepartmentImage.setBackgroundColor(ResourcesCompat.getColor(getResources(), ColorUtils.getDepartmentBackgroundColor(departmentEntry), getTheme()));
+            mDepartmentImage.setBackgroundColor(ResourcesCompat.getColor(getResources(), ColorUtils.getDepartmentBackgroundColor(departmentEntry.getDepartmentName()), getTheme()));
         } else {
             //loads the department image with it's uri using Glide
             Glide.with(this)

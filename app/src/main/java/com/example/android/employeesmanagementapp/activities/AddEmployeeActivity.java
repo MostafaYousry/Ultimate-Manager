@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -448,11 +449,16 @@ public class AddEmployeeActivity extends BaseAddActivity implements TasksAdapter
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_GET && resultCode == RESULT_OK) {
             Uri fullPhotoUri = data.getData();
+
+            getContentResolver().takePersistableUriPermission(fullPhotoUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
             mEmployeePicturePath = fullPhotoUri.toString();
             Glide.with(this)
                     .asBitmap()
                     .load(fullPhotoUri)
                     .into(mEmployeeImage);
+
+            Log.d("picture path", mEmployeePicturePath);
 
 
         } else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
@@ -543,7 +549,6 @@ public class AddEmployeeActivity extends BaseAddActivity implements TasksAdapter
             if (mEmployeeId != DEFAULT_EMPLOYEE_ID && clickedEmployeeDepId != employeeEntry.getDepartmentId()) {
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle(getString(R.string.dialog_title_note));
                 builder.setMessage(getString(R.string.dialog_message_employee_department_changed));
                 builder.setPositiveButton(getString(R.string.dialog_positive_btn_continue), (dialogInterface, i) -> AppExecutor.getInstance().diskIO().execute(new Runnable() {
                     @Override

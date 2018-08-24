@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.util.TypedValue;
 
-import com.example.android.employeesmanagementapp.data.entries.EmployeeEntry;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -14,6 +12,7 @@ import java.util.Date;
  * class for app utilities
  */
 public final class AppUtils {
+
     /**
      * Converts dp to pixel
      */
@@ -30,16 +29,20 @@ public final class AppUtils {
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, r.getDisplayMetrics()));
     }
 
+    /**
+     * @param date :Date object to be formatted
+     * @return a date string formatted as AUG 21,2018
+     */
     public static String getFriendlyDate(Date date) {
         return SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM).format(date);
     }
 
+    /**
+     * @param date :Date object to be formatted
+     * @return a time string formatted as 11:56 PM
+     */
     public static String getFriendlyTime(Date date) {
         return SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT).format(date);
-    }
-
-    public static String getFullEmployeeName(EmployeeEntry employeeEntry) {
-        return employeeEntry.getEmployeeFirstName() + " " + employeeEntry.getEmployeeMiddleName() + " " + employeeEntry.getEmployeeLastName();
     }
 
 }

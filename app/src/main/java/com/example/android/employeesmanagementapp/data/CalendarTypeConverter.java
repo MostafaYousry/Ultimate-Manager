@@ -15,10 +15,12 @@ public class CalendarTypeConverter {
 
     @TypeConverter
     public static Calendar toCalendar(Long timestamp) {
+        if (timestamp == null)
+            return null;
+
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(timestamp);
-
-        return timestamp == null ? null : calendar;
+        return calendar;
     }
 
     @TypeConverter

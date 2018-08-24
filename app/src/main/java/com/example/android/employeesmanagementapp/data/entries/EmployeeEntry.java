@@ -201,6 +201,10 @@ public class EmployeeEntry {
         isChecked = checked;
     }
 
+    public String getFullName() {
+        return getEmployeeFirstName() + " " + getEmployeeMiddleName() + " " + getEmployeeLastName();
+    }
+
 
     @Override
     public boolean equals(Object obj) {

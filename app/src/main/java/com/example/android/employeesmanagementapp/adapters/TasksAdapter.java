@@ -205,7 +205,6 @@ public class TasksAdapter extends PagedListAdapter<TaskEntry, TasksAdapter.Tasks
 
             mTaskTitle.setText(getItem(position).getTaskTitle());
 
-            mTaskDates.setText(mContext.getString(R.string.task_list_item_name_dates, AppUtils.getFriendlyDate(getItem(position).getTaskStartDate().getTime()), AppUtils.getFriendlyDate(getItem(position).getTaskDueDate().getTime())));
             getRemainingTime(getItem(position).getTaskDueDate().getTime());
 
             int taskColor = ResourcesCompat.getColor(itemView.getResources(), getItem(position).getTaskColorResource(), mContext.getTheme());

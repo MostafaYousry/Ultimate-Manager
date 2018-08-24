@@ -1,111 +1,129 @@
 <resources>
+
     <string name="app_name">Ultimate Manager</string>
-    <string name="default_notification_channel_id">Channel ID</string>
+
     <!-- strings defining navigation menu items -->
     <string name="tasks">Tasks</string>
     <string name="employees">Employees</string>
     <string name="departments">Departments</string>
 
-
-    <string name="required_field">*Required</string>
-
-    <!--string for bottom sheet button-->
-    <string name="show_employees">Show employees</string>
-
-    <!--strings for add taskEntry activity-->
-    <string name="label_task_rating">Rating :</string>
-    <string name="label_task_department">Department :</string>
-    <string name="label_task_employees">Employees :</string>
-    <string name="hint_task_title">Task title</string>
-    <string name="hint_task_description">Task description</string>
+    <!--strings for fields hints-->
+    <string name="hint_task_title">Title</string>
+    <string name="hint_task_description">Description</string>
     <string name="hint_task_start_date">Start date</string>
     <string name="hint_task_due_date">Due date</string>
+    <string name="hint_task_start_time">Start time</string>
+    <string name="hint_task_due_time">Due time</string>
     <string name="hint_task_department">Department</string>
-
-    <!--strings for add employee activity-->
-    <string name="label_employee_name">Name :</string>
-    <string name="label_employee_salary">Salary :</string>
-    <string name="label_employee_hire_date">Hire date :</string>
-    <string name="label_employee_department">Department :</string>
-    <string name="hint_employee_name">Employee Name</string>
-    <string name="hint_employee_salary">Employee Salary</string>
-    <string name="hint_employee_hire_date">Date Hired</string>
-    <string name="hint_employee_department">Choose a Department</string>
-
-
-    <!--strings for add department activity-->
-    <string name="label_department_name">Name :</string>
-    <string name="hint_department_name">Department name</string>
-
-
-    <!--strings for menu actions-->
-    <string name="action_save">Save</string>
-
-
-    <!--strings for toolbar title-->
-    <string name="toolbar_add_task">Add task</string>
-    <string name="toolbar_edit_task">Edit task</string>
-    <string name="toolbar_add_employee">Add employee</string>
-    <string name="edit_employee">Edit employee</string>
-    <string name="add_new_department">Add new department</string>
-    <string name="edit_department">Edit_department</string>
-    <string name="employee_empty_view_message">No employees to show, please add employees</string>
-    <string name="task_empty_view_message">No tasks to show</string>
-    <string name="department_empty_view_message">No departments to show</string>
-    <string name="action_delete_employees">Delete employees</string>
-    <string name="action_move_employees">Move Employees</string>
-    <string name="choose_department_dialog_title">Move to</string>
-    <string name="choose_department_dialog_positive_button">OK</string>
-    <string name="choose_department_dialog_cancel_button">Cancel</string>
-    <string name="action_delete_department">Delete</string>
-    <string name="action_remove_employee">Remove</string>
-    <string name="cancel_delete_employee">Cancel</string>
-    <string name="to">to</string>
-    <string name="action_mark_as_done">mark as done</string>
-    <string name="action_delete_task">delete</string>
-    <string name="action_color_task">color</string>
-    <string name="action_select">Select</string>
-    <string name="error_due_before_start">can\'t be before start date</string>
-    <string name="hint_task_start_date_time">Start time</string>
-    <string name="hint_task_due_date_time">Due time</string>
     <string name="hint_employee_first_name">First name</string>
     <string name="hint_employee_middle_name">Middle name</string>
     <string name="hint_employee_last_name">Last name</string>
+    <string name="hint_employee_salary">Salary</string>
+    <string name="hint_employee_date_hired">Date hired</string>
     <string name="hint_employee_phone">Phone</string>
     <string name="hint_employee_email">Email</string>
     <string name="hint_employee_note">Note</string>
-
-
-    <plurals name="numberOfRunningTasks">
-        <item quantity="one">%d running task</item>
-        <item quantity="other">%d running tasks</item>
-    </plurals>
-
-    <plurals name="numberOfCompletedTasks">
-        <item quantity="one">%d completed task</item>
-        <item quantity="other">%d completed tasks</item>
-    </plurals>
-
-    <string name="department_summary">%s\n%s\n%s</string>
-
-    <plurals name="numberOfEmployees">
-        <item quantity="one">%d employee</item>
-        <item quantity="other">%d employees</item>
-    </plurals>
-
-    <string name="employee_list_item_name">%s %s</string>
-
-    <string name="task_list_item_name_dates">%s to %s</string>
-    <string name="error_invalid_email">invalid email</string>
-    <string name="delete_employees">Delete</string>
-    <string name="title_dialog_delete_employees">Delete Employee(s)</string>
-    <string name="message_dialog_delete_employees">Note:  deleted employee(s) will be removed from running tasks and will be visible only from completed tasks</string>
-    <string name="channel_name">Due Soon</string>
-    <string name="channel_description">Upcoming due dates on your cards</string>
+    <string name="hint_department_name">Name</string>
     <string name="hint_department_date_created">Date created</string>
-    <string name="toolbar_view_task">View task</string>
+
+    <!--strings for menu actions-->
+    <string name="action_save">Save</string>
+    <string name="action_fire_employees">Fire employees</string>
+    <string name="action_move_employees">Move employees</string>
+    <string name="action_delete_department">Delete</string>
+    <string name="action_remove_employee">Remove</string>
+    <string name="action_mark_as_done">Mark as done</string>
+    <string name="action_delete_task">Delete</string>
+    <string name="action_color_task">Color</string>
+    <string name="action_select">Select</string>
     <string name="action_mail">Mail</string>
     <string name="action_phone">Call</string>
+
+    <!--strings for toolbar titles-->
+    <string name="toolbar_add_task">Add task</string>
+    <string name="toolbar_edit_task">Edit task</string>
+    <string name="toolbar_view_task">View task</string>
+    <string name="toolbar_add_employee">Add employee</string>
+    <string name="toolbar_edit_employee">Edit employee</string>
+    <string name="toolbar_add_department">Add department</string>
+    <string name="toolbar_edit_department">Edit department</string>
+
+    <!--strings for messages that are displayed if lists are empty-->
+    <string name="empty_view_message_employees">No employees to show</string>
+    <string name="empty_view_message_tasks">No tasks to show</string>
+    <string name="empty_view_message_departments">No departments to show</string>
+
+    <!--strings for dialog titles-->
+    <string name="dialog_title_choose_department">Move to</string>
+    <string name="dialog_title_no_departments">No departments</string>
+    <string name="dialog_title_task_done">Task done</string>
+    <string name="dialog_title_available_employees">Available employees</string>
+    <string name="dialog_title_discard_changes">Discard changes</string>
+    <string name="dialog_title_fire_employees">Fire Employees</string>
+
+    <!--strings for dialog messages-->
+    <string name="dialog_message_no_departments">Please create a department first</string>
+    <string name="dialog_message_delete_department">All running tasks and employees are about to be deleted, completed tasks will be saved.\nDo you wish to continue ?</string>
+    <string name="dialog_message_move_employees">Selected employees will be removed from their running tasks , completed tasks will not be affected</string>
+    <string name="dialog_message_rate_task">Please rate task</string>
+    <string name="dialog_message_employee_department_changed">Department changed, employee will be removed from all running tasks he had in old department.\nDo you wish to continue ?</string>
+    <string name="dialog_message_no_available_employees">No available employees in selected department</string>
+    <string name="dialog_message_discard">All changes will be discarded</string>
+    <string name="dialog_message_fire_employees">Firing employees will remove them from running tasks and make them visible only from completed tasks</string>
+
+    <!--strings for dialog positive button-->
+    <string name="dialog_positive_btn_create">Create</string>
+    <string name="dialog_positive_btn_continue">Continue</string>
+    <string name="dialog_positive_btn_confirm">Confirm</string>
+    <string name="dialog_positive_btn_delete">Delete</string>
+    <string name="dialog_positive_btn_ok">Ok</string>
+    <string name="dialog_positive_btn_save">Save</string>
+
+    <!--strings for dialog negative button-->
+    <string name="dialog_negative_btn_not_now">Not now</string>
+    <string name="dialog_negative_btn_cancel">Cancel</string>
+    <string name="dialog_negative_btn_discard">Discard</string>
+
+    <!--strings that are displayed as error or helper text for fields-->
+    <string name="required_field">*Required</string>
+    <string name="error_invalid_email">invalid email</string>
+
+    <!--snackBar messages that appear for completed tasks or fired employees-->
+    <string name="snackbar_fired_employee_hint">Fired employees are view only</string>
+    <string name="snackbar_completed_task_hint">Completed tasks are view only</string>
+
+    <!--displayed when task due date is met-->
+    <string name="overdue">Overdue</string>
+
+    <!--strings for notifications-->
+    <string name="default_notification_channel_id">Channel ID</string>
+    <string name="channel_name">Due Soon</string>
+    <string name="channel_description">Upcoming due dates on your cards</string>
+
+    <!--strings for image options -->
+    <string name="image_option_load">Load picture</string>
+    <string name="image_option_camera">Take a photo</string>
+
+    <!--titles for tab layout-->
+    <string name="tab_layout_title_running">Running</string>
+    <string name="tab_layout_title_completed">Completed</string>
+
+    <!--string for employee name in list item (first name + second name)-->
+    <string name="employee_list_item_name">%s %s</string>
+
+    <!--string for department summary (number of employees/running tasks/completed tasks)-->
+    <string name="department_summary">%s\n%s\n%s</string>
+
+
+    <string name="remaining_single_hour">%02d hour</string>
+    <string name="remaining_multi_hours">%02d hours</string>
+    <string name="remaining_single_minute">%02d minute</string>
+    <string name="remaining_multi_minutes">%02d minutes</string>
+    <string name="remaining_single_second">%02d second</string>
+    <string name="remaining_multi_seconds">%02d seconds</string>
+    <string name="date_three_fields">%s %s %s remaining</string>
+    <string name="date_two_fields">%s %s remaining</string>
+    <string name="date_one_fields">%s remaining</string>
 
     <string name="remaining_multi_years"> %d years</string>
     <string name="remaining_single_year">%d year</string>
@@ -116,41 +134,20 @@
     <string name="remaining_multi_days">%d days</string>
     <string name="remaining_single_day">%d day</string>
 
-    <string name="overdue">Overdue</string>
-    <string name="remaining_single_hour">%02d hour</string>
-    <string name="remaining_multi_hours">%02d hours</string>
-    <string name="remaining_single_minute">%02d minute</string>
-    <string name="remaining_multi_minutes">%02d minutes</string>
-    <string name="remaining_single_second">%02d second</string>
-    <string name="remaining_multi_seconds">%02d seconds</string>
-    <string name="date_three_fields">%s %s %s remaining</string>
-    <string name="date_two_fields">%s %s remaining</string>
-    <string name="date_one_fields">%s remaining</string>
-    <string name="snackbar_fired_employee_hint">Fired employees are view only</string>
-    <string name="toolbar_add_department">Add department</string>
-    <string name="dialog_title_note">Note</string>
-    <string name="dialog_message_employee_department_changed">Department changed, employee will be removed from all running tasks in old department. Do you wish to continue ?</string>
-    <string name="dialog_negative_btn_cancel">cancel</string>
-    <string name="snackbar_completed_task_hint">Completed tasks are view only</string>
-    <string name="dialog_message_no_available_employees">No available employees, please choose another one</string>
-    <string name="dialog_positive_btn_ok">ok</string>
-    <string name="dialog_title_available_employees">Available employees</string>
-    <string name="dialog_title_discard_changes">Discard changes</string>
-    <string name="dialog_message_discard">All changes will be discarded</string>
-    <string name="dialog_negative_btn_discard">DISCARD</string>
-    <string name="dialog_positive_btn_save">SAVE</string>
-    <string name="image_option_load">Load picture</string>
-    <string name="image_option_camera">Take a photo</string>
-    <string name="dialog_title_no_departments">No departments</string>
-    <string name="dialog_message_no_departments">Please create a department first</string>
-    <string name="dialog_positive_btn_create">CREATE</string>
-    <string name="dialog_negative_btn_not_now">NOT NOW</string>
-    <string name="dialog_message_delete_department">All running tasks and employees are about to be deleted, completed tasks will be saved. Do you wish to continue ?</string>
-    <string name="dialog_positive_btn_continue">Continue</string>
-    <string name="dialog_title_task_done">Task done</string>
-    <string name="dialog_message_rate_task">Please rate task</string>
-    <string name="dialog_positive_btn_confirm">Confirm</string>
-    <string name="tab_layout_title_running">Running</string>
-    <string name="tab_layout_title_completed">Completed</string>
+    <!--plural strings-->
+    <plurals name="numberOfRunningTasks">
+        <item quantity="one">%d running task</item>
+        <item quantity="other">%d running tasks</item>
+    </plurals>
+
+    <plurals name="numberOfCompletedTasks">
+        <item quantity="one">%d completed task</item>
+        <item quantity="other">%d completed tasks</item>
+    </plurals>
+
+    <plurals name="numberOfEmployees">
+        <item quantity="one">%d employee</item>
+        <item quantity="other">%d employees</item>
+    </plurals>
 
 </resources>

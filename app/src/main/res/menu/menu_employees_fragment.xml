@@ -7,7 +7,7 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/action_delete_employees"
-        android:title="@string/action_delete_employees"
+        android:title="@string/action_fire_employees"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_move_employees"

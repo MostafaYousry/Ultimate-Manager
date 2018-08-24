@@ -18,7 +18,8 @@ import androidx.recyclerview.widget.RecyclerView;
  * a coordinator layout and a bottom navigation view
  * <p>
  * handles anchoring the fab on top of the bottom navigation view
- * handles fab animation up and and down when a snack bar is displayed under it.
+ * handles fab animation up and and down when a snack bar is displayed under it
+ * handles showing and hiding fab on scroll.
  */
 public class BottomNavigationFabBehavior extends CoordinatorLayout.Behavior<FloatingActionButton> {
 

@@ -270,7 +270,7 @@ public class AddTaskActivity extends BaseAddActivity implements HorizontalAdapte
 
         String[] arr = new String[employeeEntries.size()];
         for (int i = 0; i < employeeEntries.size(); i++) {
-            arr[i] = AppUtils.getFullEmployeeName(employeeEntries.get(i));
+            arr[i] = employeeEntries.get(i).getFullName();
         }
 
         return arr;

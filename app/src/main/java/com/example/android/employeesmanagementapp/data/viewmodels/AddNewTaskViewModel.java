@@ -13,6 +13,14 @@ import androidx.lifecycle.ViewModel;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 
+/**
+ * View Model class
+ * <p>
+ * caches data for AddTaskActivity
+ * ---> task entry record
+ * ---> all company departments for spinner that selects task's department
+ * ---> all task employees
+ */
 public class AddNewTaskViewModel extends ViewModel {
     public LiveData<TaskEntry> taskEntry;
     public LiveData<List<DepartmentEntry>> allDepartments;
@@ -32,8 +40,8 @@ public class AddNewTaskViewModel extends ViewModel {
         if (taskId != -1) {
             taskEntry = appDatabase.tasksDao().loadTaskById(taskId);
 
+            //configurations for pagedListAdapter
             PagedList.Config config = new PagedList.Config.Builder()
-                    .setPrefetchDistance(50)
                     .setPageSize(10)
                     .build();
 
@@ -42,7 +50,11 @@ public class AddNewTaskViewModel extends ViewModel {
 
     }
 
-
+    /**
+     * @param selectedDepartmentId
+     * @param exceptThese
+     * @return All available employees in same department of a task that can be assigned to that task
+     */
     public LiveData<List<EmployeeEntry>> getRestOfEmployeesInDep(int selectedDepartmentId, List<EmployeeEntry> exceptThese) {
 
         LiveData<List<EmployeeEntry>> restOfEmployeesInDep;
@@ -55,6 +67,12 @@ public class AddNewTaskViewModel extends ViewModel {
         return restOfEmployeesInDep;
     }
 
+    /**
+     * maps employee entries list to employee ids list
+     *
+     * @param exceptThese
+     * @return
+     */
     private List<Integer> getIds(List<EmployeeEntry> exceptThese) {
         List<Integer> ids = new ArrayList<>();
         for (EmployeeEntry entry : exceptThese) {

@@ -13,10 +13,14 @@ import com.example.android.employeesmanagementapp.utils.ColorUtils;
 
 import androidx.core.content.res.ResourcesCompat;
 
+/**
+ * class for making a drawable with text in it.
+ * (a Letter)
+ * used for employee default image if no image is set
+ */
 public class TextDrawable extends ShapeDrawable {
 
     private final Paint textPaint;
-    private EmployeeEntry mEmployee;
     private char mLetter;
     private int width;
     private int height;
@@ -24,16 +28,15 @@ public class TextDrawable extends ShapeDrawable {
 
     public TextDrawable(Context context, EmployeeEntry employeeEntry, int width, int height, int fontSize) {
 
-        mEmployee = employeeEntry;
-
         this.width = width;
         this.height = height;
         this.fontSize = fontSize;
 
-        mLetter = Character.toUpperCase(mEmployee.getEmployeeFirstName().charAt(0));
+        mLetter = Character.toUpperCase(employeeEntry.getEmployeeFirstName().charAt(0));
 
 
-        int a700Color = ResourcesCompat.getColor(context.getResources(), ColorUtils.getLetterColor(mEmployee), context.getTheme());
+        //color of letter
+        int a700Color = ResourcesCompat.getColor(context.getResources(), ColorUtils.getLetterColor(employeeEntry.getFullName()), context.getTheme());
 
         textPaint = new Paint();
         textPaint.setColor(a700Color);
@@ -44,7 +47,8 @@ public class TextDrawable extends ShapeDrawable {
         textPaint.setTextAlign(Paint.Align.CENTER);
 
 
-        int a100Color = ResourcesCompat.getColor(context.getResources(), ColorUtils.getLetterBackgroundColor(mEmployee), context.getTheme());
+        //color of letter background
+        int a100Color = ResourcesCompat.getColor(context.getResources(), ColorUtils.getLetterBackgroundColor(employeeEntry.getFullName()), context.getTheme());
 
         Paint drawablePaint = getPaint();
         drawablePaint.setColor(a100Color);
@@ -66,7 +70,6 @@ public class TextDrawable extends ShapeDrawable {
         int height = this.height < 0 ? r.height() : this.height;
         int fontSize = this.fontSize < 0 ? (Math.min(width, height) / 2) : this.fontSize;
         textPaint.setTextSize(fontSize);
-
 
         canvas.drawText(String.valueOf(mLetter), width / 2, height / 2 - ((textPaint.descent() + textPaint.ascent()) / 2), textPaint);
 

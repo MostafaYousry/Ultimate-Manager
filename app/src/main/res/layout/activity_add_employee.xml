@@ -309,7 +309,7 @@
                     android:layout_height="wrap_content"
                     android:cursorVisible="false"
                     android:focusable="false"
-                    android:hint="@string/hint_employee_hire_date"
+                    android:hint="@string/hint_employee_date_hired"
                     android:inputType="text"
                     android:maxLines="1" />
 

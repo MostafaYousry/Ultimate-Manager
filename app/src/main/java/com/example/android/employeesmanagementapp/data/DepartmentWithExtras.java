@@ -7,6 +7,13 @@ import java.util.Objects;
 import androidx.room.ColumnInfo;
 import androidx.room.Embedded;
 
+/**
+ * class that maps to a query result
+ * the room query result is a
+ * department entry object (all department entry columns),
+ * column for number of running tasks in department,
+ * column for number of completed tasks in department
+ */
 public class DepartmentWithExtras {
 
     @Embedded

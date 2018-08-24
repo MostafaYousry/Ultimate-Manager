@@ -15,7 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 
 /**
- * a dialog fragment that pops to allow user to choose a date
+ * a dialog fragment that allows user to pick a date
  * and displays that date in a given view id (TextView).
  */
 public class DatePickerDialogFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
@@ -36,6 +36,8 @@ public class DatePickerDialogFragment extends DialogFragment implements DatePick
                 mViewToShowDateIn = getActivity().findViewById(bundle.getInt(KEY_DISPLAY_VIEW_ID));
         }
 
+        //if there exist a previous date
+        //then show the dialog with the previous date selected
         if (mViewToShowDateIn.getTag() != null)
             mCalendar = (Calendar) mViewToShowDateIn.getTag();
         else {

@@ -298,16 +298,17 @@ public class EmployeesAdapter extends PagedListAdapter<EmployeeWithExtras, Emplo
          */
         void clear() {
 
-//            updateCheckedState(mData.get(position).employeeEntry);
+            mCheckIcon.setVisibility(View.GONE);
+
+            mEmployeeImage.setVisibility(View.VISIBLE);
 
             mEmployeeName.setText("");
 
-            mEmployeeRating.setRating(0);
+            mEmployeeRating.setVisibility(View.GONE);
 
             mNumRunningTasks.setText("");
 
             Glide.with(mContext).clear(mEmployeeImage);
-
 
         }
     }

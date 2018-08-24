@@ -2,6 +2,11 @@ package com.example.android.employeesmanagementapp.utils;
 
 import com.example.android.employeesmanagementapp.R;
 
+/**
+ * class for color utilities
+ * used in task background colors ,
+ * employee avatar , department colors ,..
+ */
 public final class ColorUtils {
     private static int[] taskColorResources = new int[12];
     private static int[] accent100Values = new int[16];
@@ -80,18 +85,42 @@ public final class ColorUtils {
 
     }
 
+    /**
+     * @return all available task colors
+     */
     public static int[] getTaskColorResources() {
         return taskColorResources;
     }
 
+    /**
+     * returns employee first name letter color
+     * the color depends on object's hashcode
+     *
+     * @param object
+     * @return color resource
+     */
     public static int getLetterColor(Object object) {
         return accent700Values[Math.abs(object.hashCode()) % accent700Values.length];
     }
 
+    /**
+     * returns employee first name letter background color
+     * the color depends on object's hashcode
+     *
+     * @param object
+     * @return color resource
+     */
     public static int getLetterBackgroundColor(Object object) {
         return accent100Values[Math.abs(object.hashCode()) % accent100Values.length];
     }
 
+    /**
+     * returns department default icon background color
+     * the color depends on object's hashcode
+     *
+     * @param object
+     * @return color resource
+     */
     public static int getDepartmentBackgroundColor(Object object) {
         return accent200Values[Math.abs(object.hashCode()) % accent200Values.length];
     }

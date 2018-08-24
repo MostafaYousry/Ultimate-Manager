@@ -129,8 +129,21 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             departmentsFragment = (DepartmentsFragment) getSupportFragmentManager().getFragment(savedInstanceState, "departments_fragment");
 
             //restore selected active fragment from bundle
-            mBottomNavigationView.setSelectedItemId(savedInstanceState.getInt("selected_fragment_id"));
+            int selectedFragmentId = savedInstanceState.getInt("selected_fragment_id");
+            switch (selectedFragmentId) {
+                case R.id.nav_tasks:
+                    activeFragment = tasksFragment;
+                    break;
+                case R.id.nav_employees:
+                    activeFragment = employeesFragment;
+                    break;
+                case R.id.nav_departments:
+                    activeFragment = departmentsFragment;
+                    break;
 
+            }
+
+            mBottomNavigationView.setSelectedItemId(selectedFragmentId);
         }
     }
 
@@ -205,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
      * @param fragment : fragment to be shown
      */
     private void loadFragment(Fragment fragment) {
-        if (activeFragment == null || activeFragment == fragment)
+        if (activeFragment == fragment)
             return;
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -355,7 +368,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
      * checks first if there is a multi selection happening
      * in employees fragment and ends it first then returns to home fragment(tasks) if
      * active fragment is not tasks
-     *
      */
     @Override
     public void onBackPressed() {

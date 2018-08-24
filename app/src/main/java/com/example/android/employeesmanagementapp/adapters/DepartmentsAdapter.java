@@ -79,9 +79,7 @@ public class DepartmentsAdapter extends PagedListAdapter<DepartmentWithExtras, D
     @Override
     public DepartmentsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_departments_rv, parent, false);
-        DepartmentsViewHolder departmentsViewHolder = new DepartmentsViewHolder(rootView);
-
-        return departmentsViewHolder;
+        return new DepartmentsViewHolder(rootView);
     }
 
     @Override
@@ -130,7 +128,6 @@ public class DepartmentsAdapter extends PagedListAdapter<DepartmentWithExtras, D
                         case R.id.action_delete_department:
 
                             final AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
-                            alertDialog.setTitle(mContext.getString(R.string.dialog_title_note));
                             alertDialog.setMessage(mContext.getString(R.string.dialog_message_delete_department));
                             alertDialog.setPositiveButton(mContext.getString(R.string.dialog_positive_btn_continue), (dialogInterface, i) ->
                                     AppExecutor.getInstance().diskIO().execute(() -> {
@@ -217,7 +214,7 @@ public class DepartmentsAdapter extends PagedListAdapter<DepartmentWithExtras, D
                 mDepartmentImage.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_departments));
                 mDepartmentImage.setScaleType(ImageView.ScaleType.CENTER);
 
-                mDepartmentImage.setBackgroundColor(ResourcesCompat.getColor(mContext.getResources(), ColorUtils.getDepartmentBackgroundColor(getItem(position).departmentEntry), mContext.getTheme()));
+                mDepartmentImage.setBackgroundColor(ResourcesCompat.getColor(mContext.getResources(), ColorUtils.getDepartmentBackgroundColor(getItem(position).departmentEntry.getDepartmentName()), mContext.getTheme()));
 
                 mItemView.setCardBackgroundColor(ResourcesCompat.getColor(mContext.getResources(), R.color.department_fallback_color, mContext.getTheme()));
             } else {

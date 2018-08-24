@@ -7,6 +7,13 @@ import java.util.Objects;
 import androidx.room.ColumnInfo;
 import androidx.room.Embedded;
 
+/**
+ * class that maps to a query result
+ * the room query result is a
+ * employee entry object (all employee entry columns),
+ * column for employee rating,
+ * column for employee's number of running tasks
+ */
 public class EmployeeWithExtras {
 
     @Embedded

@@ -17,10 +17,12 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
+/**
+ * fragment that hosts both running tasks / completed tasks fragment
+ */
 public class TasksFragment extends Fragment {
+
     private ViewPager mViewPager;
-    private TasksPagerAdapter mPagerAdapter;
-    private TabLayout mTabLayout;
     private FloatingActionButton mFab;
     private static final String PAGE_INDEX_KEY = "page index";
 
@@ -46,12 +48,15 @@ public class TasksFragment extends Fragment {
 
     private void setUpViewPager(View rootView) {
         mViewPager = rootView.findViewById(R.id.tasks_view_pager);
-        mPagerAdapter = new TasksPagerAdapter(getContext(), getActivity().getSupportFragmentManager());
+        TasksPagerAdapter mPagerAdapter = new TasksPagerAdapter(getContext(), getActivity().getSupportFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
-        mTabLayout = getActivity().findViewById(R.id.tab_layout);
+        TabLayout mTabLayout = getActivity().findViewById(R.id.tab_layout);
         mTabLayout.setupWithViewPager(mViewPager);
     }
 
+    /**
+     * used to show fab in running tasks and hide it from completed tasks
+     */
     private void setUpViewPagerOnPageChangeListener() {
         mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 

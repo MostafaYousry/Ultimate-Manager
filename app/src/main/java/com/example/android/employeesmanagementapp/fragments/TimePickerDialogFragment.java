@@ -15,7 +15,11 @@ import java.util.Calendar;
 
 import androidx.fragment.app.DialogFragment;
 
-public class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
+/**
+ * a dialog fragment that allows user to pick a time
+ * and displays that date in a given view id (TextView).
+ */
+public class TimePickerDialogFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
     public static final String KEY_DISPLAY_VIEW_ID = "time_view_id";
 
     private View viewToShowTimeIn;
@@ -24,7 +28,6 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        // Use the current time as the default values for the picker
         Bundle bundle = getArguments();
 
         if (bundle != null) {
@@ -35,6 +38,7 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
 
         }
 
+        //retrieve calendar object from date views
         if (viewId == R.id.task_start_date_time)
             mCalendar = (Calendar) getActivity().findViewById(R.id.task_start_date).getTag();
         else
@@ -45,7 +49,7 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
     }
 
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        // Do something with the time chosen by the user
+
         TextView textView = (TextView) viewToShowTimeIn;
         mCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
         mCalendar.set(Calendar.MINUTE, minute);

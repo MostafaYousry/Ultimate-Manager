@@ -9,7 +9,7 @@ import android.view.View;
 
 import com.example.android.employeesmanagementapp.R;
 import com.example.android.employeesmanagementapp.fragments.DatePickerDialogFragment;
-import com.example.android.employeesmanagementapp.fragments.TimePickerFragment;
+import com.example.android.employeesmanagementapp.fragments.TimePickerDialogFragment;
 
 import java.io.File;
 import java.io.IOException;
@@ -97,9 +97,9 @@ public abstract class BaseAddActivity extends AppCompatActivity {
         Bundle bundle = new Bundle();
 
         //send the clicked view id to display time in after selecting one
-        bundle.putInt(TimePickerFragment.KEY_DISPLAY_VIEW_ID, view.getId());
+        bundle.putInt(TimePickerDialogFragment.KEY_DISPLAY_VIEW_ID, view.getId());
 
-        DialogFragment timePickerFragment = new TimePickerFragment();
+        DialogFragment timePickerFragment = new TimePickerDialogFragment();
         timePickerFragment.setArguments(bundle);
 
         timePickerFragment.show(getSupportFragmentManager(), "timePicker");

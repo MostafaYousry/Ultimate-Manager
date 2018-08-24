@@ -10,6 +10,15 @@ import androidx.lifecycle.ViewModel;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 
+/**
+ * View Model class
+ * <p>
+ * caches data for AddDepartmentActivity
+ * ---> department entry record
+ * ---> all department's employees
+ * ---> all department's running tasks
+ * ---> all department's completed tasks
+ */
 public class AddNewDepViewModel extends ViewModel {
     public LiveData<DepartmentEntry> departmentEntry;
 
@@ -21,8 +30,8 @@ public class AddNewDepViewModel extends ViewModel {
         if (depId > 0) {
             departmentEntry = database.departmentsDao().loadDepartmentById(depId);
 
+            //configurations for pagedListAdapter
             PagedList.Config config = new PagedList.Config.Builder()
-                    .setPrefetchDistance(50)
                     .setPageSize(10)
                     .build();
 

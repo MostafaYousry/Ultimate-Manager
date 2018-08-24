@@ -25,7 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 /**
- * A simple {@link Fragment} subclass.
+ * fragment that shows a list of all departments in company
  */
 public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.DepartmentItemClickListener {
 
@@ -40,7 +40,7 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
+        //observes departments list in main view model
         ViewModelProviders.of(getActivity()).get(MainViewModel.class)
                 .allDepartmentsWithExtrasList
                 .observe(this, departmentWithExtras -> {
@@ -102,7 +102,7 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
 
     private void showEmptyView() {
         mRecyclerView.setVisibility(View.GONE);
-        mEmptyViewTextView.setText(R.string.department_empty_view_message);
+        mEmptyViewTextView.setText(R.string.empty_view_message_departments);
         mEmptyViewImageView.setImageResource(R.drawable.ic_no_dep);
         mEmptyView.setVisibility(View.VISIBLE);
     }
@@ -119,6 +119,9 @@ public class DepartmentsFragment extends Fragment implements DepartmentsAdapter.
         startActivity(intent);
     }
 
+    /**
+     * Recycler view item decorator to evenly distribute spaces between grid items
+     */
     public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
 
         private int spacingLeftRight = AppUtils.dpToPx(getContext(), 3);

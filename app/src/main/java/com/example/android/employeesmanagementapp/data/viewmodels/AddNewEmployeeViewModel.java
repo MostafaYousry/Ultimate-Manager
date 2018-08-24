@@ -12,6 +12,15 @@ import androidx.lifecycle.ViewModel;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 
+/**
+ * View Model class
+ * <p>
+ * caches data for AddEmployeeActivity
+ * ---> employee entry record
+ * ---> all company departments for spinner that selects employee's department
+ * ---> all employee's running tasks
+ * ---> all employee's completed tasks
+ */
 public class AddNewEmployeeViewModel extends ViewModel {
     public LiveData<EmployeeWithExtras> employeeEntry;
 
@@ -28,8 +37,8 @@ public class AddNewEmployeeViewModel extends ViewModel {
 
             employeeEntry = database.employeesDao().loadEmployeeById(empID);
 
+            //configurations for pagedListAdapter
             PagedList.Config config = new PagedList.Config.Builder()
-                    .setPrefetchDistance(50)
                     .setPageSize(10)
                     .build();
 

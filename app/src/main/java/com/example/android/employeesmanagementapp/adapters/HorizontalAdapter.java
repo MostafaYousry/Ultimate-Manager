@@ -88,10 +88,7 @@ public class HorizontalAdapter extends PagedListAdapter<EmployeeEntry, Horizonta
             else
                 holder.bindDepEmployee(position);
         } else if (mUseAddedData && !mUseLoadedData) { // new task case
-            if (mAddedEmployees.get(position) == null)
-                holder.clear();
-            else
-                holder.bindNewTask(position);
+            holder.bindNewTask(position);
         } else if (mUseLoadedData && mUseAddedData) { //old task case
             if (getItem(position) == null && mAddedEmployees.get(position) == null)
                 holder.clear();

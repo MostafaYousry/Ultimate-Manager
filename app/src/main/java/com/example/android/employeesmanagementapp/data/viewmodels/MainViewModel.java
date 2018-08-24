@@ -17,8 +17,10 @@ import androidx.paging.PagedList;
  * <p>
  * caches data for MainActivity
  * ---> runningTasksList for RunningTasksFragment
+ * ---> completedTasksList for CompletedTasksFragment
  * ---> departmentsList for DepartmentsFragment
  * ---> employeesList for EmployeesFragment
+ * ---> number of company departments
  */
 public class MainViewModel extends AndroidViewModel {
 
@@ -35,8 +37,9 @@ public class MainViewModel extends AndroidViewModel {
 
         AppDatabase db = AppDatabase.getInstance(application.getApplicationContext());
 
+        //configurations for pagedListAdapter
         PagedList.Config config = new PagedList.Config.Builder()
-                .setPrefetchDistance(50)
+                .setEnablePlaceholders(true)
                 .setPageSize(10)
                 .build();
 
