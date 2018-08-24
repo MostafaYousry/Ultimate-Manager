@@ -29,6 +29,7 @@ import com.example.android.employeesmanagementapp.data.DepartmentWithExtras;
 import com.example.android.employeesmanagementapp.data.EmployeeWithExtras;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.utils.ColorUtils;
+import com.example.android.employeesmanagementapp.utils.NotificationUtils;
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.List;
@@ -172,7 +173,7 @@ public class DepartmentsAdapter extends PagedListAdapter<DepartmentWithExtras, D
                                         db.tasksDao().deleteTasksWithNoEmployees();
 
                                         List<Integer> emptyTasksId = db.tasksDao().selectEmptyTasksId();
-                                        cancelEmptyTasksAlarm(emptyTasksId);
+                                        NotificationUtils.cancelEmptyTasksAlarm(mContext, emptyTasksId);
 
                                         //then delete department
                                         //if department has no completed tasks
@@ -304,23 +305,6 @@ public class DepartmentsAdapter extends PagedListAdapter<DepartmentWithExtras, D
             Glide.with(mContext).clear(mDepartmentImage);
             mItemView.setCardBackgroundColor(Color.WHITE);
 
-        }
-    }
-
-    private void cancelEmptyTasksAlarm(List<Integer> emptyTasksId) {
-        for (int i = 0; i < emptyTasksId.size(); i++) {
-            try {
-                Intent intent = new Intent(mContext, MyAlarmReceiver.class);
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, emptyTasksId.get(i), intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-                alarmManager.cancel(pendingIntent);
-                pendingIntent.cancel();
-                Intent serviceIntent = new Intent(mContext, NotificationService.class);
-                serviceIntent.putExtra("task id", emptyTasksId.get(i));
-                mContext.startService(serviceIntent);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
     }
 }

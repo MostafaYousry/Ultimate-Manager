@@ -28,6 +28,7 @@ import com.example.android.employeesmanagementapp.data.EmployeeWithExtras;
 import com.example.android.employeesmanagementapp.data.entries.DepartmentEntry;
 import com.example.android.employeesmanagementapp.data.viewmodels.MainViewModel;
 import com.example.android.employeesmanagementapp.utils.AppUtils;
+import com.example.android.employeesmanagementapp.utils.NotificationUtils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
@@ -263,7 +264,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
             }
 
             List<Integer> emptyTasksId = mDb.tasksDao().selectEmptyTasksId();
-            cancelEmptyTasksAlarm(emptyTasksId);
+            NotificationUtils.cancelEmptyTasksAlarm(getContext(),emptyTasksId);
 
             //finish multi selection
             getActivity().runOnUiThread(this::abortMultiSelection);
@@ -276,25 +277,6 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
         builder.setNegativeButton(getString(R.string.dialog_negative_btn_cancel), (dialog, which) -> dialog.dismiss());
 
         builder.show();
-    }
-
-    private void cancelEmptyTasksAlarm(List<Integer> emptyTasksId) {
-        System.out.println(emptyTasksId.size());
-        for (int i = 0; i < emptyTasksId.size(); i++) {
-            System.out.println(emptyTasksId.get(i));
-            try {
-                Intent intent = new Intent(getContext(), MyAlarmReceiver.class);
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), emptyTasksId.get(i), intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                AlarmManager alarmManager = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
-                alarmManager.cancel(pendingIntent);
-                pendingIntent.cancel();
-                Intent serviceIntent = new Intent(getContext(), NotificationService.class);
-                serviceIntent.putExtra("task id", emptyTasksId.get(i));
-                getContext().startService(serviceIntent);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     private void showChooseDepDialog() {
@@ -321,7 +303,7 @@ public class EmployeesFragment extends Fragment implements EmployeesAdapter.Empl
                 }
 
                 List<Integer> emptyTasksId = mDb.tasksDao().selectEmptyTasksId();
-                cancelEmptyTasksAlarm(emptyTasksId);
+                NotificationUtils.cancelEmptyTasksAlarm(getContext(),emptyTasksId);
 
                 mDb.tasksDao().deleteTasksWithNoEmployees();
 
